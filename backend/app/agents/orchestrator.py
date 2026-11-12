@@ -147,6 +147,10 @@ class Orchestrator:
             "irrigation_plan": irrigation_env.outputs if isinstance(irrigation_env.outputs, dict) else None,
             "crop_name": crop_cycle.crop_name if crop_cycle else None,
             "crop_area": farm.area,
+            "area_acres": farm.area,
+            "state": farm.state,
+            "district": farm.district,
+            "season": "Kharif",
         }
         yield_env = await self.yield_agent.run(
             context=yield_context,
@@ -155,6 +159,20 @@ class Orchestrator:
             farm_id=farm.id,
         )
         envelopes["YieldAgent"] = yield_env
+
+        # Record handoff from Yield to Advisory with predicted range if available
+        if isinstance(yield_env.outputs, dict) and yield_env.outputs.get("expected_yield_quintals_per_acre") is not None:
+            exp_y = yield_env.outputs.get("expected_yield_quintals_per_acre")
+            low_y = yield_env.outputs.get("yield_range_lower")
+            up_y = yield_env.outputs.get("yield_range_upper")
+            handoffs.append(
+                HandoffRecord(
+                    from_agent="YieldAgent",
+                    to_agent="AdvisoryAgent",
+                    message=f"Yield agent passed expected_yield={exp_y} q/acre (Range: {low_y} - {up_y} q/acre) to Advisory agent",
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                )
+            )
 
         # Conflict Detection
         conflicts = detect_and_resolve_conflicts(

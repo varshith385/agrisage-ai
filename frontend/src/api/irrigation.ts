@@ -22,3 +22,4 @@ export async function diagnoseIrrigationIssue(
     body: formData,
   });
 }
+

@@ -71,3 +71,4 @@ class IrrigationDiagnosisResponse(BaseModel):
     visual_cues: Optional[Dict[str, Any]] = None
     finger_test_guide: Dict[str, Any]
     status: Literal["WORKING", "PARTIAL", "DEMO"] = "PARTIAL"
+
