@@ -141,7 +141,7 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 
 ## Group 6: FAO-56 Irrigation Engine & Problem Diagnosis
 
-### `T1-20`: FAO-56 Dual Evapotranspiration ($ET_c$) Calculation
+### `T1-20`: FAO-56 Single Crop Coefficient Evapotranspiration ($ET_c$) Calculation
 - **Tier**: Tier 1
 - **Observable Behaviour**: Implements $ET_c = K_c \times ET_0$ across 4 growth stages for at least 10 major Indian crops (rice, wheat, cotton, maize, groundnut, chilli, tomato, sugarcane, soybean, pulses).
 - **Verification Method**: `pytest backend/tests/test_irrigation_fao56.py` against hand-calculated benchmark values.
