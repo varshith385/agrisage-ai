@@ -14,6 +14,7 @@ from backend.app.api.v1.auth import router as auth_router
 from backend.app.api.v1.location import router as location_router
 from backend.app.api.v1.weather import router as weather_router
 from backend.app.api.v1.farms import router as farms_router
+from backend.app.api.v1.agents import router as agents_router
 
 
 @asynccontextmanager
@@ -115,3 +116,4 @@ app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(location_router, prefix=settings.API_V1_PREFIX)
 app.include_router(weather_router, prefix=settings.API_V1_PREFIX)
 app.include_router(farms_router, prefix=settings.API_V1_PREFIX)
+app.include_router(agents_router, prefix=settings.API_V1_PREFIX)

@@ -18,9 +18,9 @@
 | **Location Hierarchy & Geocoding** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/location/districts`, `/geocode` | 4-state hierarchy, partial village disclosure, Open-Meteo geocoding with centroid fallback. |
 | **Resilient Weather Service & Caching** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/weather/current`, `/forecast` | Open-Meteo integration, 30-min TTL SQLite cache, stale=true resilience, 7-day daily ET0 & rain. |
 | **Weather Crop Suitability Signal** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/weather/suitability` | Rule-based agronomic window evaluation returning complete ExplainabilitySchema. |
-| **Multi-Agent Orchestrator Pipeline** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/agents/run` | Awaiting Phase 3 implementation. |
-| **Agent Conflict Detection & Resolution** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/agents/orchestrator.py` | Awaiting Phase 3 implementation. |
-| **Dashboard Shell & Agent Activity Log** | Tier 1 | WORKING | `WORKING` | `/dashboard` (UI) | Live weather, crop phenology from API, primary holding summary, and transparent NOT STARTED agent activity timeline. |
+| **Multi-Agent Orchestrator Pipeline** | Tier 1 | WORKING | `WORKING` | `POST /api/v1/agents/run` | Sequential orchestration (Weather → Irrigation → Disease → Yield → Advisory) with typed messages, timeout isolation, and persistence. |
+| **Agent Conflict Detection & Resolution** | Tier 1 | WORKING | `WORKING` | `backend/app/agents/conflict_rules.py` | 15mm 24h rain-skip Rule 1 and 80% humidity overhead irrigation Rule 2 conflict detection & resolution. |
+| **Dashboard Shell & Agent Activity Log** | Tier 1 | WORKING | `WORKING` | `/dashboard` (UI) | Live weather, crop phenology from API, primary holding summary, animated AgentFlowDiagram, and interactive AgentActivityLog with one-click trigger. |
 | **PlantVillage CV Model & Quality Gate** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/disease/predict` | Awaiting Phase 3 implementation. |
 | **Calibrated Disease Confidence & Disclaimer** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/ml/disease_model.py` | Awaiting Phase 3 implementation. |
 | **Disease Knowledge Base (Safe Prescriptions)** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/ml/disease_kb.json` | Awaiting Phase 3 implementation. |

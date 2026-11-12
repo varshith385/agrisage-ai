@@ -33,6 +33,7 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: All agent exchanges follow the `AgentEnvelope` structure: `agent_name`, `status`, `timestamp`, `inputs_used`, `outputs`, `confidence`, and `warnings`. Every execution writes an audit record to `agent_runs`.
 - **Verification Method**: Execute `pytest backend/tests/test_agents.py` and inspect database rows in `agent_runs`.
 - **Pass Criteria**: Each run persists start time, duration, status, inputs, and outputs with zero JSON serialization failures.
+- **Status**: **PASS** (Verified 2026-11-13). `AgentEnvelope` Pydantic schema mirrors the contracts in SPEC.md. `BaseAgent` provides automatic execution timing, configurable timeout catching (`asyncio.wait_for`), exception isolation, and persistent logging to `agent_runs` table in SQLite. Tested across all 5 agents with shared `run_id` UUID correlation in `backend/tests/test_agents.py`.
 
 ---
 
@@ -100,18 +101,21 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Orchestrator executes sequential agent flow: Weather → Irrigation → Disease → Yield → Advisory, passing typed envelopes. Handles absence of disease photo via partial run mode without crashing.
 - **Verification Method**: `Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/v1/agents/run -Body '{"farm_id": 1}'`.
 - **Pass Criteria**: All active agents execute and record handoffs; failure of one agent marks it `degraded` without crashing the overall advisory response.
+- **Status**: **PASS** (Verified 2026-11-13). Executed via `POST /api/v1/agents/run` for farm 1 returning run `3895cb1d-c226-45c1-96b9-b704b29a676b` in 1048 ms. Handoffs explicitly logged between Weather, Irrigation, Disease, Yield, and Advisory. Non-weather stubs strictly return `null` for numeric estimates. Degraded execution and partial run mode verified with 10 unit tests in `backend/tests/test_agents.py`.
 
 ### `T1-13`: Agent Conflict Detection & Resolution Rule Engine
 - **Tier**: Tier 1
 - **Observable Behaviour**: Detects conflicting recommendations (e.g., Irrigation agent requests overhead watering while Disease agent detects high fungal risk; or Irrigation requests 25 mm while Weather forecasts heavy rain). Resolves using explicit, documented rules.
-- **Verification Method**: Unit test with conflicting mock inputs: `pytest backend/tests/test_agent_conflicts.py`.
+- **Verification Method**: Unit test with conflicting mock inputs: `pytest backend/tests/test_agents.py`.
 - **Pass Criteria**: Output includes `conflicts[]` listing `agent_a`, `agent_b`, `issue`, `resolution`, and `rationale`.
+- **Status**: **PASS** (Verified 2026-11-13). `detect_and_resolve_conflicts()` implements Rule 1 (rain-skip for forecasted rain $\ge 15.0\text{ mm}$ within 24h) and Rule 2 (fungal humidity $\ge 80.0\%$ heuristic vs overhead/sprinkler watering recommendation). Returns typed `Conflict` models with full rationale and indicative labels. Verified in `test_conflict_detection_rain_and_fungal`.
 
 ### `T1-14`: Dashboard Agent Activity Log & Cooperating Flow Diagram
 - **Tier**: Tier 1
 - **Observable Behaviour**: UI displays a timeline of inter-agent messages showing which agent passed data to which, timestamp, confidence, expandable raw JSON payload, and an animated "agents cooperating" flow diagram.
 - **Verification Method**: Open Dashboard in browser agent at `http://127.0.0.1:5173/dashboard` and verify Activity Log panel renders real run data.
 - **Pass Criteria**: Live agent run entries displayed with `<StatusBadge/>`; JSON expander opens without errors; flow diagram animates transitions.
+- **Status**: **PASS** (Verified 2026-11-13). Verified in live browser at `http://127.0.0.1:5173/dashboard` in both Telugu and English. Clicking "బహుళ-ఏజెంట్ విశ్లేషణను ప్రారంభించండి" triggered execution yielding run `3963126d-97a9-4d01-a671-7f1ea482552b`. Displays `<AgentFlowDiagram/>` with motion-safe animations, handoff timeline, explainability card, and collapsible raw JSON inspector. Evidence: `agent_flow_telugu.png`, `agent_flow_desktop_en.png`, and `agent_flow_mobile.png`.
 
 ---
 

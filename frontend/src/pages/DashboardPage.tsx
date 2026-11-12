@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sprout,
   Calendar,
   Layers,
-  HelpCircle,
-  Clock,
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
 import { weatherApi } from '../api/weather';
 import { farmsApi } from '../api/farms';
-import { CurrentWeather, Farm } from '../types/api';
+import { agentsApi } from '../api/agents';
+import { CurrentWeather, Farm, AgentRunItem, OrchestratorRunResult } from '../types/api';
 import { CurrentWeatherCard } from '../components/weather/CurrentWeatherCard';
 import { StatusBadge } from '../components/common/StatusBadge';
-import { AgentChip } from '../components/common/AgentChip';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorState } from '../components/common/ErrorState';
+import { AgentFlowDiagram } from '../components/agents/AgentFlowDiagram';
+import { AgentActivityLog } from '../components/agents/AgentActivityLog';
 
 export const DashboardPage: React.FC = () => {
   const { user, activeFarm, activeCrop } = useAuth();
@@ -28,6 +28,12 @@ export const DashboardPage: React.FC = () => {
   const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState<boolean>(true);
   const [weatherError, setWeatherError] = useState<string | null>(null);
+
+  // Agent Orchestration State
+  const [latestRunResult, setLatestRunResult] = useState<OrchestratorRunResult | null>(null);
+  const [historicalRuns, setHistoricalRuns] = useState<AgentRunItem[]>([]);
+  const [isLoadingRuns, setIsLoadingRuns] = useState<boolean>(false);
+  const [isTriggering, setIsTriggering] = useState<boolean>(false);
 
   // Fetch full farm details if activeFarm exists
   useEffect(() => {
@@ -40,6 +46,41 @@ export const DashboardPage: React.FC = () => {
       })
       .catch((err) => console.error('Error fetching farm list', err));
   }, []);
+
+  const activeFarmId = farmData?.id || activeFarm?.id;
+
+  const loadAgentRuns = useCallback(async () => {
+    if (!activeFarmId) return;
+    setIsLoadingRuns(true);
+    try {
+      const runs = await agentsApi.listRuns({ farm_id: activeFarmId, limit: 30 });
+      setHistoricalRuns(runs);
+    } catch (err) {
+      console.error('Failed to load historical agent runs', err);
+    } finally {
+      setIsLoadingRuns(false);
+    }
+  }, [activeFarmId]);
+
+  useEffect(() => {
+    if (activeFarmId) {
+      loadAgentRuns();
+    }
+  }, [activeFarmId, loadAgentRuns]);
+
+  const handleTriggerAgentRun = async () => {
+    if (!activeFarmId) return;
+    setIsTriggering(true);
+    try {
+      const result = await agentsApi.triggerRun({ farm_id: activeFarmId });
+      setLatestRunResult(result);
+      await loadAgentRuns();
+    } catch (err) {
+      console.error('Failed to execute agent run', err);
+    } finally {
+      setIsTriggering(false);
+    }
+  };
 
   // Weather lat/lon
   const lat = farmData?.latitude || activeFarm?.latitude || 17.9689;
@@ -243,61 +284,22 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Multi-Agent Orchestrator Activity Timeline (Transparently NOT STARTED per Honesty Rules) */}
-      <div className="bg-white border border-agri-soil-200/80 rounded-3xl p-6 sm:p-8 shadow-warm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-stone-100 pb-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-display text-lg font-bold text-stone-900">
-                {t('dashboard.agent_panel_title')}
-              </h3>
-              <StatusBadge status="NOT STARTED" />
-            </div>
-            <p className="text-xs text-stone-500">
-              {t('dashboard.agent_panel_desc')}
-            </p>
-          </div>
+      {/* Live Autonomous Multi-Agent Flow Diagram */}
+      <AgentFlowDiagram
+        envelopes={latestRunResult?.envelopes}
+        isRunning={isTriggering}
+      />
 
-          <div className="flex items-center gap-1.5 text-xs text-stone-500 bg-agri-cream-100 px-3 py-1.5 rounded-xl border border-stone-200">
-            <Clock className="w-3.5 h-3.5 text-stone-400" />
-            <span>Scheduled for Phase 3 Multi-Agent Orchestrator</span>
-          </div>
-        </div>
-
-        <div className="p-4 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-600 flex items-start gap-2.5">
-          <HelpCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
-          <span>{t('dashboard.agent_status_notice')}</span>
-        </div>
-
-        {/* Real architectural roster representing the 5 specialized agents */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          <AgentChip
-            name="Weather"
-            status="WORKING"
-            roleDescription="Open-Meteo 7-day forecast & ET0"
-          />
-          <AgentChip
-            name="Irrigation"
-            status="NOT STARTED"
-            roleDescription="FAO-56 Single Kc water budgeting"
-          />
-          <AgentChip
-            name="Disease"
-            status="NOT STARTED"
-            roleDescription="PlantVillage CV diagnosis & quality gate"
-          />
-          <AgentChip
-            name="Yield"
-            status="NOT STARTED"
-            roleDescription="Yield prediction intervals"
-          />
-          <AgentChip
-            name="Advisory"
-            status="NOT STARTED"
-            roleDescription="7-day actionable guidance coordinator"
-          />
-        </div>
-      </div>
+      {/* Live Agent Activity & Execution Log with Transparency */}
+      <AgentActivityLog
+        farmId={activeFarmId || 1}
+        latestRunResult={latestRunResult}
+        historicalRuns={historicalRuns}
+        isLoading={isLoadingRuns}
+        isTriggering={isTriggering}
+        onTriggerRun={handleTriggerAgentRun}
+        onRefresh={loadAgentRuns}
+      />
     </div>
   );
 };

@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     DISEASE_CONFIDENCE_THRESHOLD: float = 0.65
     WEATHER_CACHE_TTL_MINUTES: int = 30
 
+    # Agent Engine & Conflict Resolution Indicative Baselines
+    AGENT_TIMEOUT_SECONDS: float = 10.0
+    RAIN_CONFLICT_THRESHOLD_MM: float = 15.0  # Indicative baseline from SPEC.md (15mm in 24h)
+    RAIN_CONFLICT_WINDOW_HOURS: int = 24
+    FUNGAL_HUMIDITY_THRESHOLD_PCT: float = 80.0  # Indicative heuristic for elevated fungal spore germination
+
     @property
     def cors_origins_list(self) -> List[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]

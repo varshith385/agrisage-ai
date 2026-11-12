@@ -185,3 +185,119 @@ export interface ApiErrorResponse {
   timestamp?: string;
 }
 
+export interface AgentEnvelope<T = Record<string, any>> {
+  agent_name: string;
+  status: 'success' | 'degraded' | 'failed';
+  timestamp: string;
+  inputs_used: Record<string, any>;
+  outputs: T;
+  confidence: number;
+  warnings: string[];
+}
+
+export interface WeatherReport {
+  temperature_c: number;
+  relative_humidity_pct: number;
+  expected_rainfall_today_mm: number;
+  rain_forecast_24h_mm: number;
+  rain_forecast_48h_mm: number;
+  reference_et0_mm: number;
+  wind_speed_kmh: number;
+  stale: boolean;
+  source: string;
+  fetched_at: string;
+  status: 'WORKING' | 'PARTIAL' | 'DEMO';
+}
+
+export interface IrrigationPlan {
+  status: 'WORKING' | 'PARTIAL' | 'DEMO' | 'stub';
+  message: string;
+  irrigate?: boolean | null;
+  water_depth_mm?: number | null;
+  litres_needed?: number | null;
+  litres_saved?: number | null;
+  recommendation_text?: string | null;
+  rain_skip_triggered: boolean;
+  foliar_wetness_caution: boolean;
+  confidence: number;
+}
+
+export interface DiseaseFinding {
+  status: 'WORKING' | 'PARTIAL' | 'DEMO' | 'stub';
+  message: string;
+  image_provided: boolean;
+  detected_disease?: string | null;
+  risk_level?: string | null;
+  confidence: number;
+  fungal_risk_elevated: boolean;
+  safe_ipm_steps: string[];
+}
+
+export interface YieldEstimate {
+  status: 'WORKING' | 'PARTIAL' | 'DEMO' | 'stub';
+  message: string;
+  expected_yield_quintals_per_acre?: number | null;
+  yield_range_lower?: number | null;
+  yield_range_upper?: number | null;
+  adjustment_factors: string[];
+  confidence: number;
+}
+
+export interface AdvisoryPlan {
+  status: 'WORKING' | 'PARTIAL' | 'DEMO' | 'stub';
+  message: string;
+  farm_health_score?: number | null;
+  seven_day_plan?: string[] | null;
+  summary?: string | null;
+  explainable_cards: ExplainabilitySchema[];
+  confidence: number;
+}
+
+export interface Conflict {
+  agent_a: string;
+  agent_b: string;
+  issue: string;
+  resolution: string;
+  rationale: string;
+  rule_type: string;
+  indicative: boolean;
+}
+
+export interface HandoffRecord {
+  from_agent: string;
+  to_agent: string;
+  message: string;
+  timestamp: string;
+}
+
+export interface OrchestratorRunResult {
+  run_id: string;
+  farm_id: number;
+  status: string;
+  duration_ms: number;
+  handoffs: HandoffRecord[];
+  conflicts: Conflict[];
+  envelopes: Record<string, AgentEnvelope>;
+  advisory_plan: AdvisoryPlan;
+  created_at: string;
+}
+
+export interface AgentRunItem {
+  id: number;
+  run_id: string;
+  farm_id?: number | null;
+  agent_name?: string | null;
+  trigger_type: string;
+  status: string;
+  duration_ms: number;
+  inputs: Record<string, any>;
+  outputs: Record<string, any>;
+  warnings: string[];
+  created_at: string;
+}
+
+export interface AgentRunRequest {
+  farm_id: number;
+  image_path?: string | null;
+}
+
