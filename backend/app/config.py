@@ -1,0 +1,75 @@
+from pathlib import Path
+from typing import List
+from pydantic import model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DEFAULT_DB_FILE = PROJECT_ROOT / "agrisage.db"
+PLACEHOLDER_SECRETS = {
+    "agrisage_insecure_development_secret_change_me_in_production",
+    "your-secret-key-here",
+    "change-me",
+    "secret",
+    "",
+}
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=str(PROJECT_ROOT / ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
+    DEMO_MODE: bool = True
+    API_V1_PREFIX: str = "/api/v1"
+    HOST: str = "127.0.0.1"
+    PORT: int = 8000
+
+    JWT_SECRET: str = "agrisage_insecure_development_secret_change_me_in_production"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+
+    DATABASE_URL: str = ""
+
+    DEMO_EXPERT_PASSWORD: str = "ExpertDemo@2026"
+    DEMO_BUYER_PASSWORD: str = "BuyerDemo@2026"
+    DEMO_ADMIN_PASSWORD: str = "AdminDemo@2026"
+    DEMO_FARMER_PASSWORD: str = "FarmerRamesh@2026"
+
+    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
+
+    GEMINI_API_KEY: str = ""
+    DATA_GOV_IN_API_KEY: str = ""
+    HF_TOKEN: str = ""
+
+    ENABLE_DEMO_FALLBACKS: bool = True
+    DISEASE_CONFIDENCE_THRESHOLD: float = 0.65
+    WEATHER_CACHE_TTL_MINUTES: int = 30
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+
+    @property
+    def resolved_database_url(self) -> str:
+        if self.DATABASE_URL and self.DATABASE_URL.strip():
+            return self.DATABASE_URL.strip()
+        # Ensure absolute SQLite path
+        db_path = str(DEFAULT_DB_FILE.as_posix())
+        return f"sqlite:///{db_path}"
+
+    @model_validator(mode="after")
+    def validate_production_jwt_secret(self) -> "Settings":
+        if not self.DEBUG and self.JWT_SECRET in PLACEHOLDER_SECRETS:
+            raise ValueError(
+                "CRITICAL SECURITY: Cannot start application in production (DEBUG=false) "
+                "with an insecure placeholder JWT_SECRET! Please configure a secure secret in .env."
+            )
+        return self
+
+
+settings = Settings()
+

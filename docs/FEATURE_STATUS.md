@@ -12,12 +12,12 @@
 
 | Module / Feature | Tier | Current Status | UI Badge | Evidence / Route | Known Limitations / Notes |
 |---|---|---|---|---|---|
-| **User Authentication & JWT Security** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/auth/login` | Awaiting Phase 2 implementation. |
-| **Instant One-Click Demo Mode ("Ramesh")** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/auth/demo-login` | Awaiting Phase 2 implementation. |
-| **Multi-Farm CRUD & Ownership Math** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/farms` | Awaiting Phase 2 implementation. |
-| **Location Hierarchy & Geocoding** | Tier 1 | NOT STARTED | `NOT STARTED` | `GET /api/v1/location/districts` | Awaiting Phase 2 implementation. |
-| **Resilient Weather Service & Caching** | Tier 1 | NOT STARTED | `NOT STARTED` | `GET /api/v1/weather/current` | Awaiting Phase 2 implementation. |
-| **Weather Crop Suitability Signal** | Tier 1 | NOT STARTED | `NOT STARTED` | `GET /api/v1/weather/suitability` | Awaiting Phase 2 implementation. |
+| **User Authentication & JWT Security** | Tier 1 | WORKING | `WORKING` | `POST /api/v1/auth/login`, `POST /api/v1/auth/register` | Direct bcrypt hashing, role dependency guards (Farmer/Expert/Buyer/Admin), JWT tokens. |
+| **Instant One-Click Demo Mode ("Ramesh")** | Tier 1 | WORKING | `WORKING` | `POST /api/v1/auth/demo-login` | Passwordless demo login restricted exclusively to Farmer Ramesh when DEMO_MODE=true. |
+| **Multi-Farm CRUD & Ownership Math** | Tier 1 | WORKING | `WORKING` | `POST /api/v1/farms`, `GET /api/v1/farms` | Multiple farms per user, strict owned+leased area validation on mixed tenure, positive area guards. |
+| **Location Hierarchy & Geocoding** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/location/districts`, `/geocode` | 4-state hierarchy, partial village disclosure, Open-Meteo geocoding with centroid fallback. |
+| **Resilient Weather Service & Caching** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/weather/current`, `/forecast` | Open-Meteo integration, 30-min TTL SQLite cache, stale=true resilience, 7-day daily ET0 & rain. |
+| **Weather Crop Suitability Signal** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/weather/suitability` | Rule-based agronomic window evaluation returning complete ExplainabilitySchema. |
 | **Multi-Agent Orchestrator Pipeline** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/agents/run` | Awaiting Phase 3 implementation. |
 | **Agent Conflict Detection & Resolution** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/agents/orchestrator.py` | Awaiting Phase 3 implementation. |
 | **Dashboard Shell & Agent Activity Log** | Tier 1 | NOT STARTED | `NOT STARTED` | `/dashboard` (UI) | Awaiting Phase 2 & 3 implementation. |
