@@ -16,6 +16,7 @@ from backend.app.api.v1.weather import router as weather_router
 from backend.app.api.v1.farms import router as farms_router
 from backend.app.api.v1.agents import router as agents_router
 from backend.app.api.v1.disease import router as disease_router
+from backend.app.api.v1.irrigation import router as irrigation_router
 
 
 @asynccontextmanager
@@ -119,3 +120,4 @@ app.include_router(weather_router, prefix=settings.API_V1_PREFIX)
 app.include_router(farms_router, prefix=settings.API_V1_PREFIX)
 app.include_router(agents_router, prefix=settings.API_V1_PREFIX)
 app.include_router(disease_router, prefix=settings.API_V1_PREFIX)
+app.include_router(irrigation_router, prefix=settings.API_V1_PREFIX)

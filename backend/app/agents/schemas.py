@@ -31,6 +31,20 @@ class IrrigationPlan(BaseModel):
     rain_skip_triggered: bool = False
     foliar_wetness_caution: bool = False
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    # Extra fields when full FAO-56 plan is computed
+    growth_stage: Optional[str] = None
+    days_after_sowing: Optional[int] = None
+    kc: Optional[float] = None
+    reference_et0_mm: Optional[float] = None
+    etc_today_mm: Optional[float] = None
+    effective_rain_today_mm: Optional[float] = None
+    net_depth_mm: Optional[float] = None
+    gross_depth_mm: Optional[float] = None
+    next_irrigation_date: Optional[str] = None
+    taw_mm: Optional[float] = None
+    raw_mm: Optional[float] = None
+    depletion_today_mm: Optional[float] = None
+    daily_forecast_balance: Optional[List[Dict[str, Any]]] = None
 
 
 class DiseaseFinding(BaseModel):

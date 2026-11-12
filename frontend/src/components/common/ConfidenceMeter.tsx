@@ -3,7 +3,7 @@ import { useTranslation } from '../../context/LanguageContext';
 
 interface ConfidenceMeterProps {
   value: number; // 0.0 to 1.0 or 0 to 100
-  type?: 'model_metric' | 'heuristic' | 'rule' | 'prediction_confidence';
+  type?: 'model_metric' | 'heuristic' | 'rule' | 'rule_based' | 'prediction_confidence';
   showLabel?: boolean;
   className?: string;
 }
@@ -23,6 +23,7 @@ export const ConfidenceMeter: React.FC<ConfidenceMeterProps> = ({
       case 'model_metric':
         return t('explain.confidence_model_metric');
       case 'rule':
+      case 'rule_based':
         return t('explain.confidence_rule');
       case 'heuristic':
         return t('explain.heuristic_estimate');

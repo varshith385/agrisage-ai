@@ -71,14 +71,28 @@ export const ExplainCard: React.FC<ExplainCardProps> = ({
             {t('explain.sources_heading')}
           </h5>
           <div className="flex flex-wrap gap-1.5">
-            {data.sources.map((src, idx) => (
-              <span
-                key={idx}
-                className="inline-block px-2 py-0.5 bg-stone-100 text-stone-700 rounded text-[11px] font-medium border border-stone-200"
-              >
-                {src}
-              </span>
-            ))}
+            {data.sources.map((src, idx) => {
+              const label = typeof src === 'string' ? src : src.title || src.name || src.url || 'Source';
+              const link = typeof src === 'object' && src.url && src.url !== 'to verify' ? src.url : null;
+              return link ? (
+                <a
+                  key={idx}
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-2 py-0.5 bg-stone-100 hover:bg-stone-200 text-agri-green-800 rounded text-[11px] font-medium border border-stone-200 underline"
+                >
+                  {label}
+                </a>
+              ) : (
+                <span
+                  key={idx}
+                  className="inline-block px-2 py-0.5 bg-stone-100 text-stone-700 rounded text-[11px] font-medium border border-stone-200"
+                >
+                  {label}
+                </span>
+              );
+            })}
           </div>
         </div>
       )}

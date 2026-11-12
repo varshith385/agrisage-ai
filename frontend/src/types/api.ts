@@ -145,9 +145,9 @@ export interface WeatherForecast {
 export interface ExplainabilitySchema {
   value: string;
   confidence: number;
-  confidence_type: 'model_metric' | 'heuristic' | 'rule';
+  confidence_type: 'model_metric' | 'heuristic' | 'rule' | 'rule_based' | 'prediction_confidence';
   reasons: string[];
-  sources: string[];
+  sources: Array<string | { title?: string; name?: string; url?: string }>;
   status: FeatureStatus;
   limitations: string[];
 }
@@ -383,5 +383,100 @@ export interface DiseaseHistoryItem {
   reported_to_outbreak: boolean;
   created_at: string;
 }
+
+export interface IrrigationPlanPayload {
+  farm_id?: number;
+  crop_name?: string;
+  planting_date?: string;
+  soil_type?: string;
+  irrigation_method?: string;
+  area_acres?: number;
+  latitude?: number;
+  longitude?: number;
+  reference_et0_mm?: number;
+  rain_forecast_24h_mm?: number;
+  rain_forecast_48h_mm?: number;
+  current_depletion_mm?: number;
+}
+
+export interface DailyBalanceItem {
+  date: string;
+  day_index: number;
+  kc: number;
+  et0_mm: number;
+  etc_mm: number;
+  rain_mm: number;
+  effective_rain_mm: number;
+  root_zone_depletion_mm: number;
+  taw_mm: number;
+  raw_mm: number;
+  moisture_stress_risk: boolean;
+  rain_skip_potential: boolean;
+}
+
+export interface IrrigationPlanResponse {
+  crop_name: string;
+  growth_stage: string;
+  days_after_sowing: number;
+  kc: number;
+  reference_et0_mm: number;
+  etc_today_mm: number;
+  effective_rain_today_mm: number;
+  should_irrigate: boolean;
+  net_depth_mm: number;
+  gross_depth_mm: number;
+  litres_needed: number;
+  litres_saved: number;
+  rain_skip_triggered: boolean;
+  next_irrigation_date: string;
+  irrigation_method: string;
+  method_efficiency: number;
+  soil_type: string;
+  awc_mm_per_m: number;
+  taw_mm: number;
+  raw_mm: number;
+  depletion_today_mm: number;
+  daily_forecast_balance: DailyBalanceItem[];
+  recommendation_text: string;
+  explanation: ExplainabilitySchema;
+  status: FeatureStatus;
+}
+
+export interface FingerTestStep {
+  step: number;
+  title: string;
+  instruction?: string;
+  condition?: string;
+  status?: string;
+  action?: string;
+}
+
+export interface FingerTestGuide {
+  title: string;
+  notice: string;
+  steps: FingerTestStep[];
+}
+
+export interface VisualCues {
+  visual_indicator_disclaimer: string;
+  aspect_ratio: number;
+  green_foliar_ratio: number;
+  wilting_or_yellowing_cue: string;
+  surface_waterlogging_cue: string;
+  color_tone: string;
+}
+
+export interface IrrigationDiagnosisResponse {
+  category: string;
+  title: string;
+  severity: string;
+  confidence: number;
+  description: string;
+  suggestions: string[];
+  visual_cues?: VisualCues | null;
+  finger_test_guide: FingerTestGuide;
+  status: FeatureStatus;
+}
+
 
 
