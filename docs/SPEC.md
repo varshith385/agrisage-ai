@@ -74,7 +74,7 @@ Every feature is tagged with its operational tier (**Tier 1** or **Tier 2**). Ev
   - Camera capture and drag-and-drop leaf photo upload.
   - **Input Quality Gate**: Evaluates image sharpness, illumination, and plant presence; rejects blurry or non-leaf photos with diagnostic feedback.
   - **Pretrained CV Inference**: CPU-based classification on PlantVillage classes, yielding top-3 disease candidates with softmax probabilities.
-  - **Calibrated Honesty**: Discloses PlantVillage lab-image context; returns "uncertain" fallback when confidence is below configured threshold.
+  - **Honest confidence (uncalibrated)**: Discloses PlantVillage lab-image context; returns "uncertain" fallback when confidence is below configured threshold.
   - Safe IPM recommendations from `disease_kb.json` (cultural, biological, and organic steps; zero specific chemical dosages).
   - Telemetry opt-in to log village centroid cluster report to Outbreak Map.
 - **Status**: Tier 1 (`WORKING`).

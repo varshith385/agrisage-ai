@@ -30,7 +30,12 @@
     "role_farmer": "Farmer / Producer",
     "role_expert": "Agronomist / Expert",
     "role_buyer": "Produce Buyer / Trader",
-    "role_admin": "Platform Administrator"
+    "role_admin": "Platform Administrator",
+    "hackathon_badge": "Yuktik 2026 Hackathon Ready",
+    "honesty_badge": "Honesty Rule Certified",
+    "honesty_desc": "Zero synthetic or fabricated telemetry",
+    "fao_badge": "FAO-56 Calibrated",
+    "fao_desc": "Agro-meteorological crop water budgeting"
   },
   "location": {
     "title": "Location & Agro-Weather Setup",
@@ -52,7 +57,9 @@
     "et0": "Reference ET0 (FAO-56)",
     "stale_badge": "Stale Data (Offline Cache)",
     "stale_explanation": "Live Open-Meteo weather service was unreachable. Displaying cached forecast recorded at:",
-    "proceed_to_farm": "Configure Farm Profile →"
+    "proceed_to_farm": "Configure Farm Profile →",
+    "expected_rain_mm": "Expected Rain (mm)",
+    "et0_demand_mm": "ET0 Water Demand (mm)"
   },
   "farms": {
     "title": "Farm Profile & Land Tenure Management",
@@ -76,7 +83,26 @@
     "submit_btn": "Save & Register Holding",
     "math_error": "Ownership mismatch: Owned area ({owned} ac) + Leased area ({leased} ac) must equal Total area ({total} ac).",
     "positive_area_error": "Farm area must be greater than zero.",
-    "success_created": "Farm holding registered successfully!"
+    "success_created": "Farm holding registered successfully!",
+    "tenure_breakdown_heading": "Tenure Breakdown & Lease Cost",
+    "soil_black_cotton": "Black Cotton Soil",
+    "soil_red_loam": "Red Loam Soil",
+    "soil_alluvial": "Alluvial Soil",
+    "soil_sandy_loam": "Sandy Loam",
+    "irrigation_drip": "Drip Irrigation",
+    "irrigation_sprinkler": "Sprinkler",
+    "irrigation_flood": "Flood Irrigation",
+    "irrigation_furrow": "Furrow",
+    "state_label": "State",
+    "village_label": "Village",
+    "district_label": "District",
+    "latitude_label": "Latitude",
+    "longitude_label": "Longitude",
+    "soil_label_short": "Soil",
+    "water_label_short": "Water",
+    "method_label_short": "Method",
+    "coordinates_label": "Coordinates",
+    "active_cycle_label": "Active"
   },
   "dashboard": {
     "title": "Executive Farmer Dashboard",
@@ -94,7 +120,9 @@
     "agent_panel_desc": "Sequential orchestration between Weather, Irrigation (FAO-56), Disease CV, Yield, and Advisory agents.",
     "agent_status_notice": "Tier 1 Multi-Agent Orchestrator is scheduled for Phase 3. Live agent executions are not simulated here to respect Honesty Rules.",
     "health_score_title": "Farm Health Composite Score",
-    "health_score_placeholder": "Health score will be evaluated once the multi-agent pipeline is executed in Phase 3."
+    "health_score_placeholder": "Health score will be evaluated once the multi-agent pipeline is executed in Phase 3.",
+    "portal_badge": "Live Farm Portal",
+    "weather_feed_error": "Meteorological Feed Error"
   },
   "explain": {
     "title": "Why this recommendation?",
@@ -102,6 +130,7 @@
     "confidence_model_metric": "Historical Model Accuracy",
     "confidence_prediction": "Prediction Confidence",
     "confidence_rule": "Rule Match Reliability",
+    "heuristic_estimate": "Heuristic Estimate",
     "reasons_heading": "Evidence & Agronomic Logic",
     "sources_heading": "Scientific & Meteorological Sources",
     "limitations_heading": "Honest Operational Limitations",
@@ -117,8 +146,11 @@
     "loading": "Loading agronomic data...",
     "retry": "Retry Request",
     "error_heading": "Unable to Load Data",
+    "default_error_desc": "An error occurred while communicating with the agricultural service.",
     "back": "Back",
     "save": "Save Changes",
+    "change": "Change",
+    "remove": "Remove",
     "acres": "Acres",
     "inr": "₹",
     "select_language": "Language"
@@ -154,6 +186,9 @@
     "conflict_heuristic_badge": "Indicative Heuristic",
     "conflict_resolution_label": "Transparent Resolution",
     "conflict_rationale_label": "Agronomic Rationale",
+    "issue_label": "Issue:",
+    "hide_json": "Hide Telemetry JSON",
+    "inspect_json": "Inspect Raw Envelopes JSON",
     "stub_disclaimer": "Numeric predictions (water volume, harvest yield, health score) are intentionally null in current preview stubs per Yuktik Honesty Rules. Conflict detection and weather telemetry are fully live."
   },
   "disease": {
@@ -187,8 +222,34 @@
     "schemes_heading": "Applicable Support Schemes",
     "uncertain_warning": "Diagnosis is inconclusive due to low prediction confidence. Please consult your local Krishi Vigyan Kendra (KVK) or Agriculture Officer before applying any treatment.",
     "read_aloud": "Read Diagnosis Aloud",
+    "stop_audio": "Stop Audio",
     "history_title": "Recent Community Outbreak Contributions",
-    "no_history": "No previous disease reports submitted yet."
+    "no_history": "No previous disease reports submitted yet.",
+    "badge_tier1": "Tier 1 Working • Pretrained MobileNetV2",
+    "badge_classes": "38 Classes • CPU",
+    "format_hint": "JPG, PNG, WebP up to 15MB",
+    "ready_title": "Ready for Leaf Diagnostics",
+    "ready_desc": "Upload or capture an affected plant leaf. Our on-device vision agent will evaluate photo sharpness, classify foliar symptoms, and recommend organic IPM controls.",
+    "diagnostic_checks": "Diagnostic Telemetry Checks",
+    "sharpness_metric": "Sharpness (Edge Var)",
+    "min_label": "min",
+    "luminance_metric": "Luminance",
+    "foliar_chromaticity_metric": "Foliar Chromaticity",
+    "photo_tips_title": "Tips for capturing a diagnostic leaf photo:",
+    "photo_tip_1": "Hold the camera steady 15–20 cm away from the affected foliar lesion.",
+    "photo_tip_2": "Ensure soft, even daylight without severe harsh shadows or direct flash glare.",
+    "photo_tip_3": "Frame a single symptomatic leaf against a natural or neutral background.",
+    "outbreak_logged": "Outbreak Logged",
+    "benchmark_class": "Benchmark Class:",
+    "inconclusive_warning_title": "Inconclusive Diagnosis Warning",
+    "zero_chemical_dosages": "Zero Chemical Dosages",
+    "elevated_spore_risk": "Elevated Spore Risk",
+    "low_atmospheric_risk": "Low Atmospheric Risk",
+    "indicative_microclimate": "(Indicative Microclimate Telemetry)",
+    "anonymized_centroids": "Anonymized Village Centroids Only",
+    "consult_officer": "Consult local extension officer.",
+    "speech_not_supported": "Speech synthesis is not supported in this browser.",
+    "no_voice_for_language": "No speech synthesis voice found on your device for {lang}. Audio cannot be played."
   }
 }
 

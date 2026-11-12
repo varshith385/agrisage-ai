@@ -83,7 +83,7 @@ export const AuthPage: React.FC = () => {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-agri-gold-100 text-agri-soil-800 text-xs font-bold border border-agri-gold-400/50">
               <Sprout className="w-4 h-4 text-agri-green-700" />
-              <span>Yuktik 2026 Hackathon Ready</span>
+              <span>{t('auth.hackathon_badge')}</span>
             </div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-agri-green-900 leading-tight">
               {t('auth.welcome_title')}
@@ -128,15 +128,15 @@ export const AuthPage: React.FC = () => {
             <div className="p-3 bg-white/80 rounded-2xl border border-stone-200/80 flex items-start gap-2.5">
               <ShieldCheck className="w-5 h-5 text-agri-green-700 flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xs font-bold text-stone-900">Honesty Rule Certified</h4>
-                <p className="text-[11px] text-stone-500">Zero synthetic or fabricated telemetry</p>
+                <h4 className="text-xs font-bold text-stone-900">{t('auth.honesty_badge')}</h4>
+                <p className="text-[11px] text-stone-500">{t('auth.honesty_desc')}</p>
               </div>
             </div>
             <div className="p-3 bg-white/80 rounded-2xl border border-stone-200/80 flex items-start gap-2.5">
               <Sprout className="w-5 h-5 text-agri-gold-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xs font-bold text-stone-900">FAO-56 Calibrated</h4>
-                <p className="text-[11px] text-stone-500">Agro-meteorological crop water budgeting</p>
+                <h4 className="text-xs font-bold text-stone-900">{t('auth.fao_badge')}</h4>
+                <p className="text-[11px] text-stone-500">{t('auth.fao_desc')}</p>
               </div>
             </div>
           </div>

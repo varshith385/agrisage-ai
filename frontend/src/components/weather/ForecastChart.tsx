@@ -60,10 +60,10 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ data, className = 
               }}
             />
             <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-            <Bar yAxisId="water" dataKey="rainfall" name="Expected Rain (mm)" fill="#38bdf8" radius={[4, 4, 0, 0]} />
+            <Bar yAxisId="water" dataKey="rainfall" name={t('location.expected_rain_mm')} fill="#38bdf8" radius={[4, 4, 0, 0]} />
             <Line yAxisId="temp" type="monotone" dataKey="maxTemp" name="Max Temp (°C)" stroke="#e11d48" strokeWidth={2.5} dot={{ r: 3 }} />
             <Line yAxisId="temp" type="monotone" dataKey="minTemp" name="Min Temp (°C)" stroke="#0ea5e9" strokeWidth={2} dot={{ r: 3 }} />
-            <Line yAxisId="water" type="monotone" dataKey="et0" name="ET0 Water Demand (mm)" stroke="#16a34a" strokeWidth={2} strokeDasharray="4 4" />
+            <Line yAxisId="water" type="monotone" dataKey="et0" name={t('location.et0_demand_mm')} stroke="#16a34a" strokeWidth={2} strokeDasharray="4 4" />
           </ComposedChart>
         </ResponsiveContainer>
       </div>

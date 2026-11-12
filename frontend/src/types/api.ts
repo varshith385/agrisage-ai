@@ -323,10 +323,12 @@ export interface PredictionCandidate {
 }
 
 export interface SourceCitation {
-  title: string;
-  url: string;
+  title?: string;
+  name?: string;
+  url?: string;
+  source?: string;
   last_verified?: string;
-  status: string;
+  status?: string;
 }
 
 export interface WeatherFungalRisk {

@@ -175,7 +175,7 @@ export const AgentActivityLog: React.FC<AgentActivityLogProps> = ({
                         </span>
                       </div>
                       <p className="text-xs text-stone-700 font-medium mb-1">
-                        <span className="text-stone-500 font-normal">Issue:</span> {conflict.issue}
+                        <span className="text-stone-500 font-normal">{t('agents.issue_label')}</span> {conflict.issue}
                       </p>
                       <div className="text-xs text-emerald-900 bg-emerald-50/60 p-2 rounded-lg border border-emerald-200/60 mt-1">
                         <span className="font-bold text-emerald-800">
@@ -239,7 +239,7 @@ export const AgentActivityLog: React.FC<AgentActivityLogProps> = ({
               >
                 <Code2 className="w-3.5 h-3.5" />
                 <span>
-                  {showJsonInspector ? 'Hide Telemetry JSON' : 'Inspect Raw Envelopes JSON'}
+                  {showJsonInspector ? t('agents.hide_json') : t('agents.inspect_json')}
                 </span>
                 {showJsonInspector ? (
                   <ChevronUp className="w-3.5 h-3.5" />

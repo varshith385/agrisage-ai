@@ -42,6 +42,20 @@ export const DiseasePage: React.FC = () => {
   const [reportToOutbreak, setReportToOutbreak] = useState<boolean>(false);
   const [speechSpeaking, setSpeechSpeaking] = useState<boolean>(false);
   const [showSupportedModal, setShowSupportedModal] = useState<boolean>(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const updateVoices = () => {
+      setVoices(window.speechSynthesis.getVoices());
+    };
+    updateVoices();
+    window.speechSynthesis.onvoiceschanged = updateVoices;
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
 
   // Queries
   const { data: supportedData } = useQuery<SupportedCropsResponse>({
@@ -137,8 +151,9 @@ export const DiseasePage: React.FC = () => {
 
   // TTS Read-aloud trigger
   const handleReadAloud = (res: DiseasePredictionResponse) => {
+    setVoiceNotice(null);
     if (!('speechSynthesis' in window)) {
-      alert('Speech synthesis is not supported in this browser.');
+      setVoiceNotice(t('disease.speech_not_supported'));
       return;
     }
 
@@ -148,16 +163,32 @@ export const DiseasePage: React.FC = () => {
       return;
     }
 
+    const langPrefix = language === 'te' ? 'te' : language === 'hi' ? 'hi' : 'en';
     const langCode = language === 'te' ? 'te-IN' : language === 'hi' ? 'hi-IN' : 'en-IN';
+
+    const currentVoices = voices.length > 0 ? voices : window.speechSynthesis.getVoices();
+    const matchedVoice = currentVoices.find((v) =>
+      v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix)
+    );
+
+    if (currentVoices.length > 0 && !matchedVoice) {
+      const langLabel = language === 'te' ? 'Telugu (తెలుగు)' : language === 'hi' ? 'Hindi (हिंदी)' : 'English';
+      setVoiceNotice(t('disease.no_voice_for_language', { lang: langLabel }));
+      return;
+    }
+
     const textToRead =
       language === 'te'
         ? `గుర్తించిన తెగులు: ${res.predicted_disease}. పంట: ${res.predicted_crop}. అంచనా ఖచ్చితత్వం: ${Math.round((res.prediction_confidence || 0) * 100)} శాతం. సిఫార్సు చేయబడిన సేంద్రీయ పద్ధతులు: ${res.safe_ipm_steps.slice(0, 2).join('. ')}`
         : language === 'hi'
         ? `पहचाना गया रोग: ${res.predicted_disease}. फसल: ${res.predicted_crop}. अनुमानित विश्वास: ${Math.round((res.prediction_confidence || 0) * 100)} प्रतिशत. सुरक्षित उपाय: ${res.safe_ipm_steps.slice(0, 2).join('. ')}`
-        : `Identified condition: ${res.predicted_disease} on ${res.predicted_crop}. Prediction confidence: ${Math.round((res.prediction_confidence || 0) * 100)} percent. Key management step: ${res.safe_ipm_steps[0] || 'Consult local extension officer.'}`;
+        : `Identified condition: ${res.predicted_disease} on ${res.predicted_crop}. Prediction confidence: ${Math.round((res.prediction_confidence || 0) * 100)} percent. Key management step: ${res.safe_ipm_steps[0] || t('disease.consult_officer')}`;
 
     const utterance = new SpeechSynthesisUtterance(textToRead);
     utterance.lang = langCode;
+    if (matchedVoice) {
+      utterance.voice = matchedVoice;
+    }
     utterance.rate = 0.95;
     utterance.onend = () => setSpeechSpeaking(false);
     utterance.onerror = () => setSpeechSpeaking(false);
@@ -177,10 +208,10 @@ export const DiseasePage: React.FC = () => {
             <div className="flex items-center gap-2 mb-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-agri-green-100 text-agri-green-800 border border-agri-green-200">
                 <Leaf className="w-3.5 h-3.5 text-agri-green-700" />
-                Tier 1 Working • Pretrained MobileNetV2
+                {t('disease.badge_tier1')}
               </span>
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-agri-gold-100 text-agri-gold-900 border border-agri-gold-200">
-                38 Classes • CPU
+                {t('disease.badge_classes')}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-agri-green-900">
@@ -289,7 +320,7 @@ export const DiseasePage: React.FC = () => {
                     {t('disease.drag_drop_text')}
                   </p>
                   <p className="text-[11px] text-agri-green-600 mt-1">
-                    JPG, PNG, WebP up to 15MB
+                    {t('disease.format_hint')}
                   </p>
                 </div>
 
@@ -321,14 +352,14 @@ export const DiseasePage: React.FC = () => {
                       onClick={() => fileInputRef.current?.click()}
                       className="px-2.5 py-1 rounded-xl bg-black/60 text-white text-[11px] font-bold backdrop-blur-md hover:bg-black/80"
                     >
-                      Change
+                      {t('disease.change_photo')}
                     </button>
                     <button
                       type="button"
                       onClick={handleClearImage}
                       className="px-2.5 py-1 rounded-xl bg-red-600/80 text-white text-[11px] font-bold backdrop-blur-md hover:bg-red-700"
                     >
-                      Remove
+                      {t('disease.remove_photo')}
                     </button>
                   </div>
                 </div>
@@ -419,10 +450,10 @@ export const DiseasePage: React.FC = () => {
                 <Leaf className="w-8 h-8" />
               </div>
               <h3 className="text-lg font-display font-bold text-agri-green-900">
-                Ready for Leaf Diagnostics
+                {t('disease.ready_title')}
               </h3>
               <p className="text-xs text-agri-green-700/80 max-w-sm mt-1 leading-relaxed">
-                Upload or capture an affected plant leaf. Our on-device vision agent will evaluate photo sharpness, classify foliar symptoms, and recommend organic IPM controls.
+                {t('disease.ready_desc')}
               </p>
             </div>
           )}
@@ -462,25 +493,25 @@ export const DiseasePage: React.FC = () => {
               {result.quality_gate?.metrics && (
                 <div className="bg-red-50/60 rounded-2xl p-4 border border-red-200 space-y-2 text-xs">
                   <p className="font-bold text-red-900 text-[11px] uppercase tracking-wider">
-                    Diagnostic Telemetry Checks
+                    {t('disease.diagnostic_checks')}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
                     <div className="bg-white rounded-xl p-2.5 border border-red-100">
-                      <span className="text-neutral-500 block">Sharpness (Edge Var)</span>
+                      <span className="text-neutral-500 block">{t('disease.sharpness_metric')}</span>
                       <span className="font-bold text-neutral-800">
-                        {result.quality_gate.metrics.sharpness_laplacian_var ?? 'N/A'} (min 60)
+                        {result.quality_gate.metrics.sharpness_laplacian_var ?? 'N/A'} ({t('disease.min_label')} 60)
                       </span>
                     </div>
                     <div className="bg-white rounded-xl p-2.5 border border-red-100">
-                      <span className="text-neutral-500 block">Luminance</span>
+                      <span className="text-neutral-500 block">{t('disease.luminance_metric')}</span>
                       <span className="font-bold text-neutral-800">
                         {result.quality_gate.metrics.mean_luminance ?? 'N/A'} (20–240)
                       </span>
                     </div>
                     <div className="bg-white rounded-xl p-2.5 border border-red-100">
-                      <span className="text-neutral-500 block">Foliar Chromaticity</span>
+                      <span className="text-neutral-500 block">{t('disease.foliar_chromaticity_metric')}</span>
                       <span className="font-bold text-neutral-800">
-                        {result.quality_gate.metrics.foliar_ratio ?? 'N/A'} (min 0.20)
+                        {result.quality_gate.metrics.foliar_ratio ?? 'N/A'} ({t('disease.min_label')} 0.20)
                       </span>
                     </div>
                   </div>
@@ -488,11 +519,11 @@ export const DiseasePage: React.FC = () => {
               )}
 
               <div className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200 text-xs text-neutral-700 space-y-1">
-                <p className="font-bold text-neutral-900">Tips for capturing a diagnostic leaf photo:</p>
+                <p className="font-bold text-neutral-900">{t('disease.photo_tips_title')}</p>
                 <ul className="list-disc list-inside text-[11px] space-y-0.5 text-neutral-600">
-                  <li>Hold the camera steady 15–20 cm away from the affected foliar lesion.</li>
-                  <li>Ensure soft, even daylight without severe harsh shadows or direct flash glare.</li>
-                  <li>Frame a single symptomatic leaf against a natural or neutral background.</li>
+                  <li>{t('disease.photo_tip_1')}</li>
+                  <li>{t('disease.photo_tip_2')}</li>
+                  <li>{t('disease.photo_tip_3')}</li>
                 </ul>
               </div>
             </div>
@@ -512,7 +543,7 @@ export const DiseasePage: React.FC = () => {
                     {result.reported_to_outbreak && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-800 border border-blue-200">
                         <MapPin className="w-3 h-3 text-blue-600" />
-                        Outbreak Logged
+                        {t('disease.outbreak_logged')}
                       </span>
                     )}
                   </div>
@@ -520,7 +551,7 @@ export const DiseasePage: React.FC = () => {
                     {result.predicted_disease}
                   </h3>
                   <p className="text-xs text-agri-green-700 font-medium mt-0.5">
-                    Benchmark Class: <span className="font-mono text-[11px]">{result.predicted_class}</span>
+                    {t('disease.benchmark_class')} <span className="font-mono text-[11px]">{result.predicted_class}</span>
                   </p>
                 </div>
 
@@ -535,10 +566,18 @@ export const DiseasePage: React.FC = () => {
                     }`}
                   >
                     <Volume2 className="w-4 h-4 text-agri-green-700" />
-                    <span>{speechSpeaking ? 'Stop Audio' : t('disease.read_aloud')}</span>
+                    <span>{speechSpeaking ? t('disease.stop_audio') : t('disease.read_aloud')}</span>
                   </button>
                 </div>
               </div>
+
+              {/* Voice Notice (e.g. if speech synthesis voice is missing) */}
+              {voiceNotice && (
+                <div className="bg-amber-50 rounded-2xl p-3 border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                  <p className="leading-relaxed">{voiceNotice}</p>
+                </div>
+              )}
 
               {/* Confidence Meter (Explicitly Uncalibrated) */}
               <div className="bg-agri-cream-50/70 rounded-2xl p-4 border border-agri-cream-300 space-y-2">
@@ -555,7 +594,7 @@ export const DiseasePage: React.FC = () => {
                 <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-700 mt-0.5 shrink-0" />
                   <div className="text-xs text-amber-900 leading-relaxed space-y-1">
-                    <p className="font-bold">Inconclusive Diagnosis Warning</p>
+                    <p className="font-bold">{t('disease.inconclusive_warning_title')}</p>
                     <p>{t('disease.uncertain_warning')}</p>
                   </div>
                 </div>
@@ -631,7 +670,7 @@ export const DiseasePage: React.FC = () => {
                       {t('disease.ipm_heading')}
                     </h4>
                     <span className="text-[10px] font-semibold text-agri-green-700 bg-agri-green-50 px-2 py-0.5 rounded-full border border-agri-green-200">
-                      Zero Chemical Dosages
+                      {t('disease.zero_chemical_dosages')}
                     </span>
                   </div>
 
@@ -673,10 +712,10 @@ export const DiseasePage: React.FC = () => {
                             : 'bg-agri-green-100 text-agri-green-800'
                         }`}
                       >
-                        {result.weather_fungal_risk.elevated ? 'Elevated Spore Risk' : 'Low Atmospheric Risk'}
+                        {result.weather_fungal_risk.elevated ? t('disease.elevated_spore_risk') : t('disease.low_atmospheric_risk')}
                       </span>
                       <span className="text-[11px] text-neutral-500">
-                        (Indicative Microclimate Telemetry)
+                        {t('disease.indicative_microclimate')}
                       </span>
                     </div>
                     <p>{result.weather_fungal_risk.explanation}</p>
@@ -692,18 +731,28 @@ export const DiseasePage: React.FC = () => {
                       {t('disease.sources_heading')}
                     </h5>
                     <div className="space-y-1">
-                      {result.sources.map((s, idx) => (
-                        <a
-                          key={idx}
-                          href={s.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-between text-xs text-agri-green-800 hover:text-agri-green-950 bg-neutral-50 hover:bg-neutral-100 p-2 rounded-xl border border-neutral-200 transition-colors"
-                        >
-                          <span className="truncate pr-1">{s.title}</span>
-                          <ExternalLink className="w-3.5 h-3.5 shrink-0 text-neutral-400" />
-                        </a>
-                      ))}
+                      {result.sources.map((s, idx) =>
+                        s.url && s.url.startsWith('http') ? (
+                          <a
+                            key={idx}
+                            href={s.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between text-xs text-agri-green-800 hover:text-agri-green-950 bg-neutral-50 hover:bg-neutral-100 p-2 rounded-xl border border-neutral-200 transition-colors"
+                          >
+                            <span className="truncate pr-1">{s.title || s.name}</span>
+                            <ExternalLink className="w-3.5 h-3.5 shrink-0 text-neutral-400" />
+                          </a>
+                        ) : (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between text-xs text-stone-700 bg-neutral-50 p-2 rounded-xl border border-neutral-200"
+                          >
+                            <span className="truncate pr-1">{s.title || s.name}</span>
+                            <span className="text-[10px] text-amber-700 font-semibold px-1.5 py-0.5 rounded bg-amber-100">to verify</span>
+                          </div>
+                        )
+                      )}
                     </div>
                   </div>
                 )}
@@ -740,7 +789,7 @@ export const DiseasePage: React.FC = () => {
               {t('disease.history_title')}
             </h3>
             <span className="text-xs text-neutral-500 font-medium">
-              Anonymized Village Centroids Only
+              {t('disease.anonymized_centroids')}
             </span>
           </div>
 

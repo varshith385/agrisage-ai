@@ -28,7 +28,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         {title || t('common.error_heading')}
       </h4>
       <p className="text-xs text-stone-600 max-w-md mb-4 leading-relaxed">
-        {message || 'An error occurred while communicating with the agricultural service.'}
+        {message || t('common.default_error_desc')}
       </p>
       {onRetry && (
         <button

@@ -128,7 +128,7 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Pass Criteria**: Blurry/non-leaf image rejected with HTTP 400/200 diagnostic explanation; valid leaf returns top-3 classes.
 - **Status**: **PASS** (Verified 2026-11-13). Evaluated `neghani/plantvillage-mobilenetv2` (38 classes, CPU inference <150ms). Valid leaf (`tomato_early_blight.jpg`) passed Quality Gate with 87.7% uncalibrated confidence for `Tomato___Early_blight`. Dark image (<20 luminance), flat/blurry image (<60 Laplacian variance), and non-leaf pattern (<0.20 foliar ratio) cleanly rejected by Quality Gate with diagnostic telemetry feedback. Verified across 13 automated tests in `backend/tests/test_disease.py`.
 
-### `T1-16`: Calibrated Disease Confidence & Lab Context Disclosure
+### `T1-16`: Honest confidence (uncalibrated) & Lab Context Disclosure
 - **Tier**: Tier 1
 - **Observable Behaviour**: Disease prediction displays model probability as "prediction confidence (uncalibrated)" alongside an explicit note that the model was trained on lab-style PlantVillage images. Returns "uncertain" fallback below confidence threshold.
 - **Verification Method**: POST low-contrast or ambiguous leaf image; inspect response confidence flags and disclaimers.

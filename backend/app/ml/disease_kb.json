@@ -10,10 +10,21 @@
       "Avoid overhead sprinkler irrigation that prolongs leaf wetness."
     ],
     "sources": [
-      { "name": "FAO IPM Guidelines for Temperate Fruit Crops", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" },
-      { "name": "Dr. YS Parmar UHF Solan Horticultural Advisory", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "FAO IPM Guidelines for Temperate Fruit Crops",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "Dr. YS Parmar UHF Solan Horticultural Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "Mission for Integrated Development of Horticulture - MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)",
+      "Mission for Integrated Development of Horticulture - MIDH (check eligibility, details to verify)"
+    ]
   },
   "Apple___Black_rot": {
     "crop": "Apple",
@@ -25,9 +36,15 @@
       "Maintain tree vigour with balanced organic compost to resist wound invasion."
     ],
     "sources": [
-      { "name": "FAO IPM Guidelines for Temperate Fruit Crops", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO IPM Guidelines for Temperate Fruit Crops",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Apple___Cedar_apple_rust": {
     "crop": "Apple",
@@ -39,9 +56,15 @@
       "Apply sulfur-based organic dusts during pink bud and petal fall stages."
     ],
     "sources": [
-      { "name": "ICAR-CITH Srinagar Apple Advisory", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "ICAR-CITH Srinagar Apple Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Apple___healthy": {
     "crop": "Apple",
@@ -52,9 +75,15 @@
       "Monitor canopy foliage weekly for early season aphids or mite presence."
     ],
     "sources": [
-      { "name": "FAO Plant Production Standards", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO Plant Production Standards",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PKVY Organic Farming (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PKVY Organic Farming (check eligibility, details to verify)"
+    ]
   },
   "Blueberry___healthy": {
     "crop": "Blueberry",
@@ -65,9 +94,15 @@
       "Ensure uniform soil moisture through root-zone drip irrigation."
     ],
     "sources": [
-      { "name": "FAO Horticultural Guide", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "FAO Horticultural Guide",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Cherry_(including_sour)___Powdery_mildew": {
     "crop": "Cherry",
@@ -79,9 +114,15 @@
       "Avoid excess nitrogen fertilizer that induces succulent, mildew-susceptible young flushes."
     ],
     "sources": [
-      { "name": "ICAR-CITH Temperate Fruit Bulletins", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "ICAR-CITH Temperate Fruit Bulletins",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Cherry_(including_sour)___healthy": {
     "crop": "Cherry",
@@ -91,9 +132,15 @@
       "Maintain standard orchard sanitation and mulch tree basins."
     ],
     "sources": [
-      { "name": "FAO Plant Health Guidance", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO Plant Health Guidance",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PKVY (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PKVY (check eligibility, details to verify)"
+    ]
   },
   "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
     "crop": "Corn (Maize)",
@@ -105,10 +152,21 @@
       "Select resistant maize hybrids certified by regional agricultural stations."
     ],
     "sources": [
-      { "name": "ICAR-IIMR Ludhiana Maize Disease Compendium", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" },
-      { "name": "PJTSAU Maize Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIMR Ludhiana Maize Disease Compendium",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "PJTSAU Maize Package of Practices",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "NFSM Coarse Cereals (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)",
+      "NFSM Coarse Cereals (check eligibility, details to verify)"
+    ]
   },
   "Corn_(maize)___Common_rust_": {
     "crop": "Corn (Maize)",
@@ -120,10 +178,21 @@
       "Maintain balanced potash fertilization to strengthen cell walls against fungal penetration."
     ],
     "sources": [
-      { "name": "ICAR-IIMR Ludhiana Maize Disease Compendium", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" },
-      { "name": "PJTSAU Maize Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIMR Ludhiana Maize Disease Compendium",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "PJTSAU Maize Package of Practices",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "NFSM (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)",
+      "NFSM (check eligibility, details to verify)"
+    ]
   },
   "Corn_(maize)___Northern_Leaf_Blight": {
     "crop": "Corn (Maize)",
@@ -135,9 +204,15 @@
       "Avoid high plant densities that trap moisture and reduce airflow within the canopy."
     ],
     "sources": [
-      { "name": "ICAR-IIMR Ludhiana Maize Disease Compendium", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIMR Ludhiana Maize Disease Compendium",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)"
+    ]
   },
   "Corn_(maize)___healthy": {
     "crop": "Corn (Maize)",
@@ -148,9 +223,15 @@
       "Ensure drainage channels are clear to prevent waterlogging during monsoon showers."
     ],
     "sources": [
-      { "name": "ICAR-IIMR Ludhiana Maize Production Guide", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIMR Ludhiana Maize Production Guide",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["NFSM (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "NFSM (check eligibility, details to verify)"
+    ]
   },
   "Grape___Black_rot": {
     "crop": "Grape",
@@ -162,9 +243,15 @@
       "Apply Bordeaux mixture or copper oxychloride organic sprays before bloom."
     ],
     "sources": [
-      { "name": "ICAR-NRC Grapes Pune Disease Advisory", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "ICAR-NRC Grapes Pune Disease Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Grape___Esca_(Black_Measles)": {
     "crop": "Grape",
@@ -176,9 +263,15 @@
       "Uproot and destroy chronically infected, stunted vines to protect neighboring plants."
     ],
     "sources": [
-      { "name": "FAO Mediterranean Viticulture Manual", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO Mediterranean Viticulture Manual",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
     "crop": "Grape",
@@ -189,9 +282,15 @@
       "Apply botanical neem seed kernel extract (NSKE 5%) as an organic preventative spray."
     ],
     "sources": [
-      { "name": "ICAR-NRC Grapes Pune Advisory", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "ICAR-NRC Grapes Pune Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Grape___healthy": {
     "crop": "Grape",
@@ -201,9 +300,15 @@
       "Maintain drip fertigation and shoot pinching as per phenological stage."
     ],
     "sources": [
-      { "name": "ICAR-NRC Grapes Technical Guide", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "ICAR-NRC Grapes Technical Guide",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PKVY (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PKVY (check eligibility, details to verify)"
+    ]
   },
   "Orange___Haunglongbing_(Citrus_greening)": {
     "crop": "Orange (Citrus)",
@@ -215,10 +320,21 @@
       "Rogue out severely infected trees to prevent psyllid vector transmission across the grove."
     ],
     "sources": [
-      { "name": "ICAR-CCRI Nagpur Citrus Advisory", "url": "to verify", "last_verified": "to verify" },
-      { "name": "FAO Citrus Greening Management Guidelines", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-CCRI Nagpur Citrus Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "FAO Citrus Greening Management Guidelines",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)", "Mission on Sub-Mission on Plant Protection (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)",
+      "Mission on Sub-Mission on Plant Protection (check eligibility, details to verify)"
+    ]
   },
   "Peach___Bacterial_spot": {
     "crop": "Peach",
@@ -230,9 +346,15 @@
       "Prune out diseased twigs during winter dormancy."
     ],
     "sources": [
-      { "name": "FAO IPM Bulletins", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO IPM Bulletins",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Peach___healthy": {
     "crop": "Peach",
@@ -242,9 +364,15 @@
       "Maintain basin mulching and balanced micronutrient fertilization (zinc and iron)."
     ],
     "sources": [
-      { "name": "FAO Horticultural Bulletins", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO Horticultural Bulletins",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PKVY (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PKVY (check eligibility, details to verify)"
+    ]
   },
   "Pepper,_bell___Bacterial_spot": {
     "crop": "Bell Pepper",
@@ -256,10 +384,21 @@
       "Rotate with non-solanaceous crops (cereals, legumes) for 2 to 3 years."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous Crop IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
-      { "name": "PJTSAU Vegetable Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous Crop IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "PJTSAU Vegetable Package of Practices",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)", "PKVY (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)",
+      "PKVY (check eligibility, details to verify)"
+    ]
   },
   "Pepper,_bell___healthy": {
     "crop": "Bell Pepper",
@@ -269,9 +408,15 @@
       "Maintain regular fertigation and weed sanitation around field boundaries."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Vegetable Production Guidelines", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Vegetable Production Guidelines",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Potato___Early_blight": {
     "crop": "Potato",
@@ -283,10 +428,21 @@
       "Apply protective copper-based or biofungicide sprays (Trichoderma) at first sign of target spots."
     ],
     "sources": [
-      { "name": "ICAR-CPRI Shimla Potato Advisory", "url": "https://cpri.icar.gov.in", "last_verified": "2026-11-13" },
-      { "name": "FAO Potato IPM Compendium", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-CPRI Shimla Potato Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "FAO Potato IPM Compendium",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)",
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Potato___Late_blight": {
     "crop": "Potato",
@@ -298,10 +454,21 @@
       "Avoid surface water stagnation; earth up ridges well to provide tuber cover."
     ],
     "sources": [
-      { "name": "ICAR-CPRI Shimla Potato Advisory", "url": "https://cpri.icar.gov.in", "last_verified": "2026-11-13" },
-      { "name": "FAO Potato IPM Compendium", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-CPRI Shimla Potato Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "FAO Potato IPM Compendium",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)",
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Potato___healthy": {
     "crop": "Potato",
@@ -312,9 +479,15 @@
       "Monitor for aphids using yellow water pan traps."
     ],
     "sources": [
-      { "name": "ICAR-CPRI Shimla Potato Advisory", "url": "https://cpri.icar.gov.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-CPRI Shimla Potato Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Raspberry___healthy": {
     "crop": "Raspberry",
@@ -324,9 +497,15 @@
       "Trellis canes to maintain canopy openness and avoid soil contact."
     ],
     "sources": [
-      { "name": "FAO Berry Production Manual", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "FAO Berry Production Manual",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Soybean___healthy": {
     "crop": "Soybean",
@@ -337,9 +516,15 @@
       "Maintain field drainage during continuous monsoon showers."
     ],
     "sources": [
-      { "name": "ICAR-IISR Indore Soybean Guidelines", "url": "https://iisrindore.icar.gov.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IISR Indore Soybean Guidelines",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["NFSM Oilseeds (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "NFSM Oilseeds (check eligibility, details to verify)"
+    ]
   },
   "Squash___Powdery_mildew": {
     "crop": "Squash",
@@ -351,9 +536,15 @@
       "Ensure wide vine spacing to maximize sunlight and airflow."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Vegetable Advisory", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Vegetable Advisory",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Strawberry___Leaf_scorch": {
     "crop": "Strawberry",
@@ -365,9 +556,15 @@
       "Irrigate via drip systems rather than overhead sprinklers."
     ],
     "sources": [
-      { "name": "FAO Horticultural Guides", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO Horticultural Guides",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Strawberry___healthy": {
     "crop": "Strawberry",
@@ -377,9 +574,15 @@
       "Maintain clean straw mulch and runner pruning."
     ],
     "sources": [
-      { "name": "FAO Horticultural Guides", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "FAO Horticultural Guides",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Bacterial_spot": {
     "crop": "Tomato",
@@ -391,10 +594,21 @@
       "Avoid intercultivation when foliage is wet with dew or rain."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
-      { "name": "PJTSAU Vegetable Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "PJTSAU Vegetable Package of Practices",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)", "PKVY (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)",
+      "PKVY (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Early_blight": {
     "crop": "Tomato",
@@ -406,10 +620,21 @@
       "Rotate with non-solanaceous crops (marigold, maize, pulses) for 2 to 3 years."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
-      { "name": "PJTSAU Vegetable Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "PJTSAU Vegetable Package of Practices",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)",
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Late_blight": {
     "crop": "Tomato",
@@ -421,10 +646,21 @@
       "Apply protective copper-based or Bordeaux mixture organic sprays ahead of prolonged cool, wet forecasts."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
-      { "name": "FAO Potato and Tomato IPM", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "FAO Potato and Tomato IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "PMFBY (check eligibility, details to verify)",
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Leaf_Mold": {
     "crop": "Tomato",
@@ -436,9 +672,15 @@
       "Apply biofungicide spray (Bacillus subtilis) at first symptom appearance."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Septoria_leaf_spot": {
     "crop": "Tomato",
@@ -450,9 +692,15 @@
       "Avoid handling tomato plants when foliage is wet from morning dew or overhead rain."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Spider_mites Two-spotted_spider_mite": {
     "crop": "Tomato",
@@ -464,9 +712,15 @@
       "Encourage predatory mites (Phytoseiidae) and ladybird beetles."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Target_Spot": {
     "crop": "Tomato",
@@ -478,9 +732,15 @@
       "Avoid overhead irrigation."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Solanaceous Disease Bulletins", "url": "to verify", "last_verified": "to verify" }
+      {
+        "name": "ICAR-IIHR Solanaceous Disease Bulletins",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
     "crop": "Tomato",
@@ -493,10 +753,21 @@
       "Rogue out and bury virus-infected seedlings within 30 days of transplanting."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
-      { "name": "PJTSAU Tomato Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "PJTSAU Tomato Package of Practices",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)", "Sub-Mission on Plant Protection (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)",
+      "Sub-Mission on Plant Protection (check eligibility, details to verify)"
+    ]
   },
   "Tomato___Tomato_mosaic_virus": {
     "crop": "Tomato",
@@ -508,10 +779,20 @@
       "Use certified virus-free seed stock and resistant tomato rootstocks/hybrids."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
-      { "name": "PJTSAU Tomato Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      },
+      {
+        "name": "PJTSAU Tomato Package of Practices",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)"
+    ]
   },
   "Tomato___healthy": {
     "crop": "Tomato",
@@ -522,8 +803,15 @@
       "Ensure proper root-zone aeration and avoid excessive waterlogging."
     ],
     "sources": [
-      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+      {
+        "name": "ICAR-IIHR Bengaluru Solanaceous IPM",
+        "source": "to verify",
+        "last_verified": "to verify"
+      }
     ],
-    "scheme_tags": ["MIDH (check eligibility, details to verify)", "PKVY (check eligibility, details to verify)"]
+    "scheme_tags": [
+      "MIDH (check eligibility, details to verify)",
+      "PKVY (check eligibility, details to verify)"
+    ]
   }
 }

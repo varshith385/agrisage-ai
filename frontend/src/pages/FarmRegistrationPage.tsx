@@ -249,7 +249,7 @@ export const FarmRegistrationPage: React.FC = () => {
               <div className="p-4 bg-agri-cream-100/70 border border-agri-soil-200/80 rounded-2xl space-y-3">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-agri-soil-800">
                   <Layers className="w-4 h-4 text-agri-soil-600" />
-                  <span>Tenure Breakdown & Lease Cost</span>
+                  <span>{t('farms.tenure_breakdown_heading')}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -326,10 +326,10 @@ export const FarmRegistrationPage: React.FC = () => {
                   onChange={(e) => setSoilType(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs bg-white"
                 >
-                  <option value="Black Cotton">Black Cotton Soil</option>
-                  <option value="Red Loam">Red Loam Soil</option>
-                  <option value="Alluvial">Alluvial Soil</option>
-                  <option value="Sandy Loam">Sandy Loam</option>
+                  <option value="Black Cotton">{t('farms.soil_black_cotton')}</option>
+                  <option value="Red Loam">{t('farms.soil_red_loam')}</option>
+                  <option value="Alluvial">{t('farms.soil_alluvial')}</option>
+                  <option value="Sandy Loam">{t('farms.soil_sandy_loam')}</option>
                 </select>
               </div>
 
@@ -355,10 +355,10 @@ export const FarmRegistrationPage: React.FC = () => {
                   onChange={(e) => setIrrigationMethod(e.target.value as IrrigationMethod)}
                   className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs bg-white"
                 >
-                  <option value="drip">Drip Irrigation</option>
-                  <option value="sprinkler">Sprinkler</option>
-                  <option value="flood">Flood Irrigation</option>
-                  <option value="furrow">Furrow</option>
+                  <option value="drip">{t('farms.irrigation_drip')}</option>
+                  <option value="sprinkler">{t('farms.irrigation_sprinkler')}</option>
+                  <option value="flood">{t('farms.irrigation_flood')}</option>
+                  <option value="furrow">{t('farms.irrigation_furrow')}</option>
                 </select>
               </div>
 
@@ -380,7 +380,7 @@ export const FarmRegistrationPage: React.FC = () => {
             {/* Location coordinates */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
               <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">State</label>
+                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.state_label')}</label>
                 <input
                   type="text"
                   value={state}
@@ -389,7 +389,7 @@ export const FarmRegistrationPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">Village</label>
+                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.village_label')}</label>
                 <input
                   type="text"
                   value={village}
@@ -398,7 +398,7 @@ export const FarmRegistrationPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">District</label>
+                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.district_label')}</label>
                 <input
                   type="text"
                   value={district}
@@ -407,7 +407,7 @@ export const FarmRegistrationPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">Latitude</label>
+                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.latitude_label')}</label>
                 <input
                   type="number"
                   step="0.0001"
@@ -417,7 +417,7 @@ export const FarmRegistrationPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">Longitude</label>
+                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.longitude_label')}</label>
                 <input
                   type="number"
                   step="0.0001"
@@ -514,16 +514,16 @@ export const FarmRegistrationPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[11px] text-stone-600 bg-agri-cream-50 p-2.5 rounded-xl border border-stone-100">
-                  <div>Soil: <strong>{farm.soil_type || 'Unspecified'}</strong></div>
-                  <div>Water: <strong>{farm.water_source || 'Unspecified'}</strong></div>
-                  <div>Method: <strong className="capitalize">{farm.irrigation_method}</strong></div>
-                  <div>Coordinates: <strong>{farm.latitude.toFixed(2)}, {farm.longitude.toFixed(2)}</strong></div>
+                  <div>{t('farms.soil_label_short')}: <strong>{farm.soil_type || 'Unspecified'}</strong></div>
+                  <div>{t('farms.water_label_short')}: <strong>{farm.water_source || 'Unspecified'}</strong></div>
+                  <div>{t('farms.method_label_short')}: <strong className="capitalize">{farm.irrigation_method}</strong></div>
+                  <div>{t('farms.coordinates_label')}: <strong>{farm.latitude.toFixed(2)}, {farm.longitude.toFixed(2)}</strong></div>
                 </div>
 
                 {/* Crop cycle indicator */}
                 {farm.current_crop_cycles && farm.current_crop_cycles.length > 0 && (
                   <div className="text-xs text-agri-green-800 bg-agri-green-50 p-2 rounded-xl flex items-center justify-between">
-                    <span>Active: <strong>{farm.current_crop_cycles[0].crop_name}</strong></span>
+                    <span>{t('farms.active_cycle_label')}: <strong>{farm.current_crop_cycles[0].crop_name}</strong></span>
                     <span className="capitalize text-[11px] px-2 py-0.5 bg-agri-green-200/60 rounded-full font-bold">
                       {farm.current_crop_cycles[0].current_stage}
                     </span>

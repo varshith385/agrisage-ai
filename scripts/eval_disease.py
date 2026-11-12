@@ -3,16 +3,12 @@ Evaluation script for AgriSage AI Plant Disease Classification Model.
 Evaluates local sample benchmark fixtures from PlantVillage against MobileNetV2.
 
 CRITICAL CAVEATS & DISCLOSURES:
-- Sample size: n=3 sample images included in repository fixtures.
-- Potential training data overlap: These images are from the PlantVillage dataset; because
-  the pretrained model neghani/plantvillage-mobilenetv2 was trained on PlantVillage,
-  these evaluation samples may overlap with the training distribution, making test accuracy
-  highly optimistic compared to in-field operational performance.
-- Dataset Source: spMohanty/PlantVillage-Dataset (GitHub / Hugging Face).
-- Dataset Licence: 'to verify' (licence details must be verified directly against the upstream repository).
-- Statistical validity: Per-class accuracy with ~1 image per class is illustrative only and NOT
-  statistically meaningful or indicative of real-world field robustness.
-- App UI Policy: Never surface these benchmark numbers in the user-facing UI as 'model accuracy'.
+- The evaluation sample is small (exact sample size n = 3).
+- PlantVillage images may overlap with the model's training data (so results are optimistic).
+- The results are not a measure of real-world field accuracy.
+- The dataset licence is 'to verify' unless you open the licence page.
+- Per-class accuracy with ~1 image per class is not statistically meaningful: say so.
+- No accuracy number is shown in the app UI as the model's accuracy.
 """
 
 import sys
@@ -56,13 +52,11 @@ def run_evaluation():
     print("AGRISAGE AI: PLANT DISEASE MODEL BENCHMARK EVALUATION")
     print("=" * 80)
     print("DISCLAIMERS & METHODOLOGY:")
-    print("1. Sample Size: n = 3 curated benchmark leaf fixtures.")
-    print("2. Overlap Notice: Samples originate from PlantVillage. Because the pretrained")
-    print("   MobileNetV2 model was trained on PlantVillage, results are optimistic and")
-    print("   do NOT represent field performance under variable natural illumination or backgrounds.")
-    print("3. Dataset Licence: 'to verify' (upstream PlantVillage terms to verify).")
-    print("4. Statistical note: Per-class evaluation with 1 image/class is NOT statistically")
-    print("   meaningful for generalisation. Do NOT display these results in the user UI as model accuracy.")
+    print("1. The evaluation sample is small (exact sample size n = 3).")
+    print("2. PlantVillage images may overlap with the model's training data (so results are optimistic).")
+    print("3. The results are not a measure of real-world field accuracy.")
+    print("4. The dataset licence is 'to verify' unless you open the licence page.")
+    print("5. No accuracy number is shown in the app UI as the model's accuracy.")
     print("=" * 80)
 
     top1_correct = 0

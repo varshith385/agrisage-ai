@@ -1,12 +1,10 @@
 import uuid
-from pathlib import Path
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from backend.app.config import settings
@@ -121,8 +119,3 @@ app.include_router(weather_router, prefix=settings.API_V1_PREFIX)
 app.include_router(farms_router, prefix=settings.API_V1_PREFIX)
 app.include_router(agents_router, prefix=settings.API_V1_PREFIX)
 app.include_router(disease_router, prefix=settings.API_V1_PREFIX)
-
-# Mount sample fixtures for test access
-fixtures_dir = Path(__file__).resolve().parent.parent / "tests" / "fixtures"
-if fixtures_dir.exists():
-    app.mount("/fixtures", StaticFiles(directory=str(fixtures_dir)), name="fixtures")

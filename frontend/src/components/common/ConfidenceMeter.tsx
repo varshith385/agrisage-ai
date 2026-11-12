@@ -25,7 +25,7 @@ export const ConfidenceMeter: React.FC<ConfidenceMeterProps> = ({
       case 'rule':
         return t('explain.confidence_rule');
       case 'heuristic':
-        return 'Heuristic Estimate';
+        return t('explain.heuristic_estimate');
       case 'prediction_confidence':
       default:
         return t('explain.confidence_prediction');

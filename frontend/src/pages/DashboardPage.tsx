@@ -123,7 +123,7 @@ export const DashboardPage: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-agri-gold-400 text-agri-green-950 font-bold text-xs uppercase tracking-wider">
-                {user?.is_demo_account ? t('dashboard.demo_badge') : 'Live Farm Portal'}
+                {user?.is_demo_account ? t('dashboard.demo_badge') : t('dashboard.portal_badge')}
               </span>
               <StatusBadge status="WORKING" />
             </div>
@@ -256,7 +256,7 @@ export const DashboardPage: React.FC = () => {
 
           {weatherError && !isLoadingWeather && (
             <ErrorState
-              title="Meteorological Feed Error"
+              title={t('dashboard.weather_feed_error')}
               message={weatherError}
               onRetry={() => fetchWeather(lat, lon)}
             />
