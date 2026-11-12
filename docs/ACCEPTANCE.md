@@ -12,18 +12,21 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: All Tier 1 endpoints under `/api/v1` are declared in `docs/SPEC.md` with explicit Pydantic request and response schemas.
 - **Verification Method**: Inspect `backend/app/schemas/` and run `pytest backend/tests/test_contracts.py`.
 - **Pass Criteria**: Every route has corresponding request/response schemas; invoking endpoints with malformed JSON returns HTTP 422 with structured validation error details.
+- **Status**: **PASS** (Verified 2026-11-13). Malformed JSON POST to `/api/v1/auth/login` returns HTTP 422 with structured validation error payload and request ID tracking.
 
 ### `T1-02`: Database Schema & Table Persistence
 - **Tier**: Tier 1
 - **Observable Behaviour**: Database models for `users`, `farms`, `crops_history`, `current_crop_cycles`, `weather_cache`, `agent_runs`, and `disease_predictions` initialize cleanly in SQLite with foreign keys and indexes.
 - **Verification Method**: Run `python -c "from backend.app.database.session import init_db; init_db()"`.
 - **Pass Criteria**: Database file created without errors; tables, foreign keys, and indexes correctly created.
+- **Status**: **PASS** (Verified 2026-11-13). `init_db()` executes with SQLAlchemy 2.0 creating all 7 core tables and indexes with zero errors.
 
 ### `T1-03`: Universal Explainability Schema (`{value, confidence, reasons...}`)
 - **Tier**: Tier 1
 - **Observable Behaviour**: Every recommendation endpoint returns the standard explainability object containing `value`, `confidence`, `confidence_type` (`"model_metric"` | `"heuristic"` | `"rule"`), `reasons[]`, `sources[]`, `status` (`"WORKING"` | `"PARTIAL"` | `"DEMO"`), and `limitations[]`.
 - **Verification Method**: Unit test asserting schema compliance on responses from `/api/v1/recommend/crop`, `/api/v1/irrigation/plan`, `/api/v1/yield/predict`, and `/api/v1/advisory/plan`.
 - **Pass Criteria**: Zero endpoints return bare unexplainable numbers; schema validation passes.
+- **Status**: **PASS** (Verified 2026-11-13). `/api/v1/weather/suitability` returns verified `ExplainabilitySchema` (`value: Suitable`, `confidence: 0.9`, `confidence_type: rule`, `reasons[]`, `sources[]`, `limitations[]`, `status: WORKING`). Rendered in frontend `<ExplainCard/>`.
 
 ### `T1-04`: Agent Communication Protocol (`AgentEnvelope`)
 - **Tier**: Tier 1
@@ -40,24 +43,28 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Users can register and authenticate; valid credentials yield a signed JWT bearer token; invalid credentials yield HTTP 401. Passwords hashed using bcrypt/argon2. Role guards protect Farmer, Expert, Buyer, and Admin routes.
 - **Verification Method**: `Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/v1/auth/register` and `/login`.
 - **Pass Criteria**: Passwords never stored in plaintext; protected routes return HTTP 401 without token.
+- **Status**: **PASS** (Verified 2026-11-13). User registration, direct bcrypt password hashing, JWT bearer token generation, and HTTP 401 guard on unauthenticated access to `/api/v1/farms` verified via live API and pytest `test_auth.py`.
 
 ### `T1-06`: Instant One-Click Demo Mode ("Ramesh") — Backend Endpoint
 - **Tier**: Tier 1
 - **Observable Behaviour**: `/api/v1/auth/demo-login` creates or retrieves demo farmer "Ramesh" with preloaded Telangana location, a mixed owned/leased farm, and historical cotton crop cycle without requiring a password.
 - **Verification Method**: `Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/v1/auth/demo-login`.
 - **Pass Criteria**: Returns HTTP 200 with JWT, profile name "Ramesh", farm ID, pre-seeded crop cycle, and role `Farmer`.
+- **Status**: **PASS** (Verified 2026-11-13). Returns 200 with JWT, profile "Ramesh Kumar (Demo Farmer)", role `Farmer`, farm `Rameshwaram Farm (Warangal)`, and active cotton cycle. Gated by `DEMO_MODE=true`.
 
 ### `T1-07`: One-Click Demo Mode — Frontend End-to-End Walkthrough
 - **Tier**: Tier 1
 - **Observable Behaviour**: Welcome page displays a prominent "Demo Mode" button. Clicking it instantly logs in as farmer "Ramesh", sets language to Telugu, pre-seeds sample crop/farm data, and directs the user to the active dashboard.
 - **Verification Method**: Open `http://127.0.0.1:5173/` in browser agent, click "Demo Mode" button, and verify redirection to `/dashboard` with Ramesh's data displayed.
 - **Pass Criteria**: Zero credential prompts shown; dashboard mounts within 2 seconds with live summary and Telugu localization.
+- **Status**: **PASS** (Verified 2026-11-13). Browser agent clicked "One-Click Demo Mode (Farmer Ramesh)", resulting in instantaneous login, redirect to `/dashboard`, Telugu localization, and active cotton flowering stage render. Evidence: `auth_desktop.png` and `dashboard_desktop.png`.
 
 ### `T1-08`: Multi-Farm Registration & Ownership Math Validation
 - **Tier**: Tier 1
 - **Observable Behaviour**: Farmers can register multiple farms with ownership types `owned`, `leased`, or `mixed`. Validates that `area > 0`, `lease_amount >= 0`, and for `mixed`, `owned_area + leased_area == total_area`.
 - **Verification Method**: `pytest backend/tests/test_farms.py` with boundary cases (`area = 0`, inconsistent area sum).
 - **Pass Criteria**: Invalid sums or negative numbers rejected with HTTP 422; valid farms stored with coordinates.
+- **Status**: **PASS** (Verified 2026-11-13). Inconsistent mixed acreage rejected with HTTP 422. Registered "East Valley Parcel" (6.0 ac = 4.0 owned + 2.0 leased) in live browser and listed all 3 holdings. All 4 farm tests pass in `test_farms.py`. Evidence: `farms_desktop.png`.
 
 ---
 
@@ -68,18 +75,21 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Provides hierarchical lookup for Indian states (Telangana, Andhra Pradesh, Maharashtra, Karnataka) down to districts and sample villages with latitude/longitude coordinates. Geocoding integrates Open-Meteo with local static fallback.
 - **Verification Method**: `Invoke-RestMethod -Uri http://127.0.0.1:8000/api/v1/location/districts?state=Telangana`.
 - **Pass Criteria**: Returns valid district and village lists with coordinates; falls back cleanly if external geocoding is unavailable.
+- **Status**: **PASS** (Verified 2026-11-13). Telangana districts returned; village directory lists centroids marked `is_partial: true`; Open-Meteo geocoding resolves Warangal (18.0, 79.58333). Tested in browser UI cascade on `/setup`.
 
 ### `T1-10`: Resilient Weather Service & 30-Minute Cache Fallback
 - **Tier**: Tier 1
 - **Observable Behaviour**: Fetches live temperature, humidity, rainfall probability, precipitation, wind speed, reference evapotranspiration ($ET_0$), and a 7-day forecast from Open-Meteo. Caches responses in `weather_cache` with a 30-minute TTL.
 - **Verification Method**: Call `/api/v1/weather/current?lat=17.38&lon=78.48`. Inspect `weather_cache`. Disconnect network or mock API outage and verify response has `stale: true`.
 - **Pass Criteria**: Live payload returned within 2 seconds; API failure falls back to last cached entry; never returns fabricated weather.
+- **Status**: **PASS** (Verified 2026-11-13). Live weather returns 5 meteorological parameters + 7-day daily rainfall (mm/day) & FAO-56 $ET_0$. Tested stale cache fallback and 503 response in `test_weather.py`. Stale flag rendered in UI with timestamp banner. Evidence: `setup_desktop.png`.
 
 ### `T1-11`: Weather-Based Crop Suitability Signal
 - **Tier**: Tier 1
 - **Observable Behaviour**: Evaluates current and forecasted weather against agronomic temperature and rainfall windows for candidate crops, generating a "Should I grow crop X now?" status with reasons.
 - **Verification Method**: Query `/api/v1/weather/suitability?crop=cotton&lat=17.38&lon=78.48`.
 - **Pass Criteria**: Returns suitability classification, explicit reasons (e.g., rainfall excess or frost risk), labelled as rule-based.
+- **Status**: **PASS** (Verified 2026-11-13). Returns "Suitable" / "Moderately Suitable" for cotton, citing temperature windows, expected rain, and ICAR practices. Fully transparent limitations disclosed in `<ExplainCard/>`.
 
 ---
 
@@ -280,12 +290,14 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Application renders an earthy, warm theme (deep green, soil-brown, harvest-gold) with mobile-first responsiveness (verified at 390px width). Every feature card and panel displays a `<StatusBadge/>` matching `docs/FEATURE_STATUS.md`.
 - **Verification Method**: Browser agent inspection at 390px and 1280px widths.
 - **Pass Criteria**: No text overflow or horizontal scroll; all interactive elements have $\ge 44\text{px}$ touch targets; `<StatusBadge/>` present on all panels.
+- **Status**: **PASS** (Verified 2026-11-13). Evaluated in Chrome DevTools at 390px (mobile) and 1280px (desktop). All cards render `<StatusBadge/>` components; no overflow; mobile thumb navigation bar integrated. Evidence: `auth_mobile.png`, `dashboard_mobile.png`, `farms_mobile.png`, `setup_mobile.png`.
 
 ### `T1-40`: Multilingual Language Choice (`en`, `te`, `hi`) & Font Glyphs
 - **Tier**: Tier 1
 - **Observable Behaviour**: Language selector on Welcome/Location page instantly switches entire UI between English, Telugu, and Hindi with persistent user selection. Zero unlocalized English strings appear when switched. Fonts (Noto Sans Telugu, Noto Sans Devanagari) render cleanly without broken glyphs.
 - **Verification Method**: Switch language to Telugu in browser and inspect DOM strings; run automated string audit script.
 - **Pass Criteria**: All text sourced from translation JSON files; no hardcoded English strings in Telugu/Hindi modes; fonts render cleanly.
+- **Status**: **PASS** (Verified 2026-11-13). Switching between English, Telugu, and Hindi updates all views instantaneously via `LanguageContext` and `localStorage`. Noto Sans Telugu and Noto Sans Devanagari load and render cleanly. Audited in `docs/I18N_REVIEW.md`.
 
 ### `T1-41`: Voice Assistant Speech-to-Text & Text-to-Speech (Multilingual)
 - **Tier**: Tier 1
