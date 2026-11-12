@@ -46,7 +46,13 @@ class Settings(BaseSettings):
     HF_TOKEN: str = ""
 
     ENABLE_DEMO_FALLBACKS: bool = True
-    DISEASE_CONFIDENCE_THRESHOLD: float = 0.65
+    DISEASE_CONFIDENCE_THRESHOLD: float = 0.45  # Adjustable default indicative heuristic
+    QUALITY_GATE_MIN_LUMINANCE: float = 20.0     # Indicative heuristic
+    QUALITY_GATE_MAX_LUMINANCE: float = 240.0    # Indicative heuristic
+    QUALITY_GATE_MIN_LAPLACIAN_VAR: float = 60.0 # Indicative heuristic on 224x224 resize
+    QUALITY_GATE_MIN_FOLIAR_RATIO: float = 0.20  # Indicative heuristic for vegetative/diseased chromaticity
+    MAX_IMAGE_FILE_SIZE_BYTES: int = 15 * 1024 * 1024 # 15 MB
+    MAX_IMAGE_PIXELS: int = 25_000_000           # Decompression bomb protection limit
     WEATHER_CACHE_TTL_MINUTES: int = 30
 
     # Agent Engine & Conflict Resolution Indicative Baselines

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, CloudSun, Tractor } from 'lucide-react';
+import { LayoutDashboard, CloudSun, Tractor, Leaf } from 'lucide-react';
 import { useTranslation } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -14,6 +14,7 @@ export const BottomNav: React.FC = () => {
     { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
     { to: '/setup', label: t('nav.weather'), icon: CloudSun },
     { to: '/farms', label: t('nav.farms'), icon: Tractor },
+    { to: '/disease', label: t('nav.disease'), icon: Leaf },
   ];
 
   return (

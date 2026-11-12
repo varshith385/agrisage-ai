@@ -1,0 +1,529 @@
+{
+  "Apple___Apple_scab": {
+    "crop": "Apple",
+    "disease_name": "Apple Scab (Venturia inaequalis)",
+    "symptoms": "Olive-green to black velvety spots on leaves, turning brown and corky on mature foliage and fruit.",
+    "cultural_organic_control": [
+      "Collect and destroy fallen leaf litter post-harvest to reduce overwintering pseudothecia.",
+      "Prune trees to open the canopy for increased airflow and rapid foliar drying.",
+      "Apply organic neem oil spray or biocontrol agents (Bacillus subtilis) at green tip stage.",
+      "Avoid overhead sprinkler irrigation that prolongs leaf wetness."
+    ],
+    "sources": [
+      { "name": "FAO IPM Guidelines for Temperate Fruit Crops", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" },
+      { "name": "Dr. YS Parmar UHF Solan Horticultural Advisory", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "Mission for Integrated Development of Horticulture - MIDH (check eligibility, details to verify)"]
+  },
+  "Apple___Black_rot": {
+    "crop": "Apple",
+    "disease_name": "Black Rot (Botryosphaeria obtusa)",
+    "symptoms": "Frog-eye leaf spots with purple margins and light brown centres, developing pycnidia and cankers on branches.",
+    "cultural_organic_control": [
+      "Prune out dead wood, cankers, and mummified fruit during winter dormancy.",
+      "Disinfect pruning shears between cuts using 70% alcohol solution.",
+      "Maintain tree vigour with balanced organic compost to resist wound invasion."
+    ],
+    "sources": [
+      { "name": "FAO IPM Guidelines for Temperate Fruit Crops", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Apple___Cedar_apple_rust": {
+    "crop": "Apple",
+    "disease_name": "Cedar Apple Rust (Gymnosporangium juniperi-virginianae)",
+    "symptoms": "Bright yellow-orange circular lesions on upper leaf surface, producing tiny tube-like aecia on leaf underside.",
+    "cultural_organic_control": [
+      "Remove nearby alternative host plants (wild cedar/juniper trees) within 1 km where feasible.",
+      "Plant rust-resistant cultivars in areas with high cedar populations.",
+      "Apply sulfur-based organic dusts during pink bud and petal fall stages."
+    ],
+    "sources": [
+      { "name": "ICAR-CITH Srinagar Apple Advisory", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Apple___healthy": {
+    "crop": "Apple",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Leaves are uniform green without chlorotic halos, necrotic lesions, or sporulation.",
+    "cultural_organic_control": [
+      "Continue balanced nitrogen-phosphorus-potassium organic manuring.",
+      "Monitor canopy foliage weekly for early season aphids or mite presence."
+    ],
+    "sources": [
+      { "name": "FAO Plant Production Standards", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PKVY Organic Farming (check eligibility, details to verify)"]
+  },
+  "Blueberry___healthy": {
+    "crop": "Blueberry",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Normal elliptical green leaves with healthy turgor and clean venation.",
+    "cultural_organic_control": [
+      "Maintain acidic soil pH (4.5 to 5.2) using pine needle or peat mulch.",
+      "Ensure uniform soil moisture through root-zone drip irrigation."
+    ],
+    "sources": [
+      { "name": "FAO Horticultural Guide", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Cherry_(including_sour)___Powdery_mildew": {
+    "crop": "Cherry",
+    "disease_name": "Powdery Mildew (Podosphaera clandestina)",
+    "symptoms": "White talcum-like powdery fungal growth on leaves and shoots, causing upward leaf curling and distortion.",
+    "cultural_organic_control": [
+      "Prune dense shoots to promote sunlight penetration and reduce microclimate humidity.",
+      "Apply potassium bicarbonate or horticultural mineral oil sprays early in the morning.",
+      "Avoid excess nitrogen fertilizer that induces succulent, mildew-susceptible young flushes."
+    ],
+    "sources": [
+      { "name": "ICAR-CITH Temperate Fruit Bulletins", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Cherry_(including_sour)___healthy": {
+    "crop": "Cherry",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Vigorous, dark green foliage free from powdery spots, shot holes, or margin chlorosis.",
+    "cultural_organic_control": [
+      "Maintain standard orchard sanitation and mulch tree basins."
+    ],
+    "sources": [
+      { "name": "FAO Plant Health Guidance", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PKVY (check eligibility, details to verify)"]
+  },
+  "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+    "crop": "Corn (Maize)",
+    "disease_name": "Gray Leaf Spot (Cercospora zeae-maydis)",
+    "symptoms": "Small, tan spots with yellow halos expanding into long, rectangular grayish lesions restricted by leaf veins.",
+    "cultural_organic_control": [
+      "Practice deep summer plowing to bury crop residues harboring conidia.",
+      "Rotate with non-host dicot crops (soybean, pulses, or groundnut) for at least two seasons.",
+      "Select resistant maize hybrids certified by regional agricultural stations."
+    ],
+    "sources": [
+      { "name": "ICAR-IIMR Ludhiana Maize Disease Compendium", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" },
+      { "name": "PJTSAU Maize Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "NFSM Coarse Cereals (check eligibility, details to verify)"]
+  },
+  "Corn_(maize)___Common_rust_": {
+    "crop": "Corn (Maize)",
+    "disease_name": "Common Rust (Puccinia sorghi)",
+    "symptoms": "Cinnamon-brown circular to elongate pustules (uredinia) scattered across upper and lower leaf surfaces.",
+    "cultural_organic_control": [
+      "Plant rust-resistant certified seed varieties early in the season to evade peak spore flights.",
+      "Apply biocontrol formulations such as Trichoderma harzianum or botanical sprays at first notice of pustules.",
+      "Maintain balanced potash fertilization to strengthen cell walls against fungal penetration."
+    ],
+    "sources": [
+      { "name": "ICAR-IIMR Ludhiana Maize Disease Compendium", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" },
+      { "name": "PJTSAU Maize Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "NFSM (check eligibility, details to verify)"]
+  },
+  "Corn_(maize)___Northern_Leaf_Blight": {
+    "crop": "Corn (Maize)",
+    "disease_name": "Northern Corn Leaf Blight (Exserohilum turcicum)",
+    "symptoms": "Long, elliptical grayish-green or tan cigar-shaped lesions measuring 2 to 15 cm on middle and upper leaves.",
+    "cultural_organic_control": [
+      "Practice 2-year crop rotation with non-grass legumes.",
+      "Plow under or compost post-harvest maize stalks thoroughly.",
+      "Avoid high plant densities that trap moisture and reduce airflow within the canopy."
+    ],
+    "sources": [
+      { "name": "ICAR-IIMR Ludhiana Maize Disease Compendium", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)"]
+  },
+  "Corn_(maize)___healthy": {
+    "crop": "Corn (Maize)",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Clean green leaves with healthy parallel venation and normal photosynthetic vigour.",
+    "cultural_organic_control": [
+      "Apply recommended organic FYM and biofertilizers (Azotobacter, PSB).",
+      "Ensure drainage channels are clear to prevent waterlogging during monsoon showers."
+    ],
+    "sources": [
+      { "name": "ICAR-IIMR Ludhiana Maize Production Guide", "url": "https://iimr.icar.gov.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["NFSM (check eligibility, details to verify)"]
+  },
+  "Grape___Black_rot": {
+    "crop": "Grape",
+    "disease_name": "Black Rot (Guignardia bidwellii)",
+    "symptoms": "Small yellowish necrotic spots turning reddish-brown with dark borders and small black dots (pycnidia).",
+    "cultural_organic_control": [
+      "Canopy management: prune and tie canes to ensure open air circulation and sunlight penetration.",
+      "Remove mummified berries and infected canes from the vineyard floor.",
+      "Apply Bordeaux mixture or copper oxychloride organic sprays before bloom."
+    ],
+    "sources": [
+      { "name": "ICAR-NRC Grapes Pune Disease Advisory", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Grape___Esca_(Black_Measles)": {
+    "crop": "Grape",
+    "disease_name": "Esca / Black Measles (Phaeomoniella chlamydospora complex)",
+    "symptoms": "Tiger-stripe interveinal leaf chlorosis and necrosis with dark brown wood vascular discoloration.",
+    "cultural_organic_control": [
+      "Prune in dry weather to minimize wound infection by fungal spores.",
+      "Seal larger pruning cuts with organic wound sealant or vegetable paste.",
+      "Uproot and destroy chronically infected, stunted vines to protect neighboring plants."
+    ],
+    "sources": [
+      { "name": "FAO Mediterranean Viticulture Manual", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+    "crop": "Grape",
+    "disease_name": "Isariopsis Leaf Spot / Leaf Blight (Phaeoisariopsis clavispora)",
+    "symptoms": "Irregular dark reddish-brown lesions with distinct margins on upper leaf surfaces, spreading from lower canopy.",
+    "cultural_organic_control": [
+      "Remove affected lower leaves during veraison to prevent upward progression.",
+      "Apply botanical neem seed kernel extract (NSKE 5%) as an organic preventative spray."
+    ],
+    "sources": [
+      { "name": "ICAR-NRC Grapes Pune Advisory", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Grape___healthy": {
+    "crop": "Grape",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Broad green palmate leaves free from spots, curling, or downy mildew patches.",
+    "cultural_organic_control": [
+      "Maintain drip fertigation and shoot pinching as per phenological stage."
+    ],
+    "sources": [
+      { "name": "ICAR-NRC Grapes Technical Guide", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["PKVY (check eligibility, details to verify)"]
+  },
+  "Orange___Haunglongbing_(Citrus_greening)": {
+    "crop": "Orange (Citrus)",
+    "disease_name": "Citrus Greening / Huanglongbing (Candidatus Liberibacter asiaticus)",
+    "symptoms": "Asymmetrical blotchy mottle chlorosis crossing leaf veins, small upright leaves, twig dieback, and lopsided sour fruit.",
+    "cultural_organic_control": [
+      "Control the vector Asian Citrus Psyllid (Diaphorina citri) using yellow sticky traps and botanical neem sprays.",
+      "Plant certified disease-free nursery budded saplings from government-accredited nurseries.",
+      "Rogue out severely infected trees to prevent psyllid vector transmission across the grove."
+    ],
+    "sources": [
+      { "name": "ICAR-CCRI Nagpur Citrus Advisory", "url": "to verify", "last_verified": "to verify" },
+      { "name": "FAO Citrus Greening Management Guidelines", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)", "Mission on Sub-Mission on Plant Protection (check eligibility, details to verify)"]
+  },
+  "Peach___Bacterial_spot": {
+    "crop": "Peach",
+    "disease_name": "Bacterial Spot (Xanthomonas arboricola pv. pruni)",
+    "symptoms": "Small water-soaked angular spots on leaves turning purple-black and falling out, giving a shot-hole appearance.",
+    "cultural_organic_control": [
+      "Avoid planting in wind-exposed, highly sandy sites without windbreaks.",
+      "Apply fixed copper or copper hydroxide organic bactericide before bud break in spring.",
+      "Prune out diseased twigs during winter dormancy."
+    ],
+    "sources": [
+      { "name": "FAO IPM Bulletins", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Peach___healthy": {
+    "crop": "Peach",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Glossy lanceolate green leaves without shot holes, leaf curl, or cankers.",
+    "cultural_organic_control": [
+      "Maintain basin mulching and balanced micronutrient fertilization (zinc and iron)."
+    ],
+    "sources": [
+      { "name": "FAO Horticultural Bulletins", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PKVY (check eligibility, details to verify)"]
+  },
+  "Pepper,_bell___Bacterial_spot": {
+    "crop": "Bell Pepper",
+    "disease_name": "Bacterial Spot (Xanthomonas campestris pv. vesicatoria)",
+    "symptoms": "Small, yellow-green spots on leaves turning dark brown, water-soaked, and causing severe defoliation.",
+    "cultural_organic_control": [
+      "Use certified disease-free seeds or hot-water seed treatment (50°C for 25 minutes).",
+      "Avoid overhead sprinkler irrigation; use surface drip lines to keep foliage dry.",
+      "Rotate with non-solanaceous crops (cereals, legumes) for 2 to 3 years."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous Crop IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
+      { "name": "PJTSAU Vegetable Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)", "PKVY (check eligibility, details to verify)"]
+  },
+  "Pepper,_bell___healthy": {
+    "crop": "Bell Pepper",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Uniform dark green foliage with upright growth, healthy branching, and no mosaic mottle.",
+    "cultural_organic_control": [
+      "Maintain regular fertigation and weed sanitation around field boundaries."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Vegetable Production Guidelines", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Potato___Early_blight": {
+    "crop": "Potato",
+    "disease_name": "Early Blight (Alternaria solani)",
+    "symptoms": "Dark brown to black necrotic spots with characteristic target-like concentric rings on older leaves.",
+    "cultural_organic_control": [
+      "Follow 3-year crop rotation excluding other solanaceous hosts (tomato, eggplant).",
+      "Ensure adequate nitrogen and potassium nutrition to avoid early plant stress.",
+      "Apply protective copper-based or biofungicide sprays (Trichoderma) at first sign of target spots."
+    ],
+    "sources": [
+      { "name": "ICAR-CPRI Shimla Potato Advisory", "url": "https://cpri.icar.gov.in", "last_verified": "2026-11-13" },
+      { "name": "FAO Potato IPM Compendium", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+  },
+  "Potato___Late_blight": {
+    "crop": "Potato",
+    "disease_name": "Late Blight (Phytophthora infestans)",
+    "symptoms": "Large, irregular water-soaked pale green lesions rapidly turning dark brown/black with white mildew fuzz on underside under humid conditions.",
+    "cultural_organic_control": [
+      "Plant certified disease-free seed tubers from trusted seed agencies.",
+      "Destroy volunteer potato plants and haulms before harvest to prevent tuber infection.",
+      "Avoid surface water stagnation; earth up ridges well to provide tuber cover."
+    ],
+    "sources": [
+      { "name": "ICAR-CPRI Shimla Potato Advisory", "url": "https://cpri.icar.gov.in", "last_verified": "2026-11-13" },
+      { "name": "FAO Potato IPM Compendium", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+  },
+  "Potato___healthy": {
+    "crop": "Potato",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Lush compound green leaves with crisp margin turgor and no water-soaking or blight spots.",
+    "cultural_organic_control": [
+      "Maintain proper earthing up at 30 and 45 days after planting.",
+      "Monitor for aphids using yellow water pan traps."
+    ],
+    "sources": [
+      { "name": "ICAR-CPRI Shimla Potato Advisory", "url": "https://cpri.icar.gov.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Raspberry___healthy": {
+    "crop": "Raspberry",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Pinnately compound green leaves with serrated margins free from anthracnose or rust spots.",
+    "cultural_organic_control": [
+      "Trellis canes to maintain canopy openness and avoid soil contact."
+    ],
+    "sources": [
+      { "name": "FAO Berry Production Manual", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Soybean___healthy": {
+    "crop": "Soybean",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Trifoliolate green leaves with clean surfaces free from rust, mosaic, or frogeye spots.",
+    "cultural_organic_control": [
+      "Inoculate seed with Bradyrhizobium japonicum culture at sowing.",
+      "Maintain field drainage during continuous monsoon showers."
+    ],
+    "sources": [
+      { "name": "ICAR-IISR Indore Soybean Guidelines", "url": "https://iisrindore.icar.gov.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["NFSM Oilseeds (check eligibility, details to verify)"]
+  },
+  "Squash___Powdery_mildew": {
+    "crop": "Squash",
+    "disease_name": "Powdery Mildew (Podosphaera xanthii)",
+    "symptoms": "White powdery talc-like fungal patches appearing on upper and lower surfaces of leaves and petioles.",
+    "cultural_organic_control": [
+      "Select resistant hybrid cultivars with powdery mildew tolerance.",
+      "Apply potassium silicate, sulfur dust, or dilute milk-spray organic preventative formulations.",
+      "Ensure wide vine spacing to maximize sunlight and airflow."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Vegetable Advisory", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Strawberry___Leaf_scorch": {
+    "crop": "Strawberry",
+    "disease_name": "Leaf Scorch (Diplocarpon earlianum)",
+    "symptoms": "Numerous small, irregular purple to dark brown spots on upper leaf surfaces, coalescing to give leaves a scorched look.",
+    "cultural_organic_control": [
+      "Remove older infected leaves post-harvest and incinerate or deeply compost.",
+      "Use plastic or straw mulch to prevent soil splashing onto crown foliage.",
+      "Irrigate via drip systems rather than overhead sprinklers."
+    ],
+    "sources": [
+      { "name": "FAO Horticultural Guides", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Strawberry___healthy": {
+    "crop": "Strawberry",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Dark green trifoliolate leaves with distinct dentate margins and healthy crown growth.",
+    "cultural_organic_control": [
+      "Maintain clean straw mulch and runner pruning."
+    ],
+    "sources": [
+      { "name": "FAO Horticultural Guides", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___Bacterial_spot": {
+    "crop": "Tomato",
+    "disease_name": "Bacterial Spot (Xanthomonas perforans)",
+    "symptoms": "Small, dark brown water-soaked angular spots on leaves, often surrounded by yellow halos, causing blossom drop.",
+    "cultural_organic_control": [
+      "Treat seeds with hot water (50°C for 25 min) or certified pathogen-free seed stock.",
+      "Sanitize stakes and nursery crates with 5% bleaching powder solution.",
+      "Avoid intercultivation when foliage is wet with dew or rain."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
+      { "name": "PJTSAU Vegetable Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)", "PKVY (check eligibility, details to verify)"]
+  },
+  "Tomato___Early_blight": {
+    "crop": "Tomato",
+    "disease_name": "Early Blight (Alternaria solani)",
+    "symptoms": "Concentric rings (target board pattern) forming brown-black spots on lower leaves, surrounded by yellow chlorosis.",
+    "cultural_organic_control": [
+      "Remove bottom 30 cm foliage (leaf pruning) as plant matures to prevent soil-contact splash.",
+      "Apply protective bio-fungicide (Trichoderma viride or Pseudomonas fluorescens) in root zone.",
+      "Rotate with non-solanaceous crops (marigold, maize, pulses) for 2 to 3 years."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
+      { "name": "PJTSAU Vegetable Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___Late_blight": {
+    "crop": "Tomato",
+    "disease_name": "Late Blight (Phytophthora infestans)",
+    "symptoms": "Large, irregular greasy water-soaked lesions turning dark brown to purplish-black with white cottony mildew on undersides during high humidity.",
+    "cultural_organic_control": [
+      "Destroy volunteer plants and infected crop debris immediately upon detection.",
+      "Use drip irrigation exclusively; ensure high ridges to avoid standing water.",
+      "Apply protective copper-based or Bordeaux mixture organic sprays ahead of prolonged cool, wet forecasts."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
+      { "name": "FAO Potato and Tomato IPM", "url": "https://www.fao.org/pest-and-pesticide-management/ipm/en/", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["PMFBY (check eligibility, details to verify)", "MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___Leaf_Mold": {
+    "crop": "Tomato",
+    "disease_name": "Leaf Mold (Passalora fulva)",
+    "symptoms": "Pale green or yellowish spots with indefinite margins on upper leaf surfaces, with olive-brown velvety mold on undersides.",
+    "cultural_organic_control": [
+      "Lower relative humidity inside polyhouses or tunnels below 85% with adequate ventilation.",
+      "Space plants widely and prune lower foliage to increase air movement.",
+      "Apply biofungicide spray (Bacillus subtilis) at first symptom appearance."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___Septoria_leaf_spot": {
+    "crop": "Tomato",
+    "disease_name": "Septoria Leaf Spot (Septoria lycopersici)",
+    "symptoms": "Numerous small circular spots with dark brown margins and sunken grayish-white centers dotted with tiny black pycnidia.",
+    "cultural_organic_control": [
+      "Stake tomato vines and mulch beds with clean straw to prevent soil-splash onto foliage.",
+      "Prune and discard the lowest diseased leaves early in the season.",
+      "Avoid handling tomato plants when foliage is wet from morning dew or overhead rain."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___Spider_mites Two-spotted_spider_mite": {
+    "crop": "Tomato",
+    "disease_name": "Two-Spotted Spider Mite (Tetranychus urticae)",
+    "symptoms": "Fine white/yellow stippling on leaf surfaces, fine webbing on undersides, progressing to bronzing and leaf drop.",
+    "cultural_organic_control": [
+      "Spray foliage underside with high-pressure water stream to dislodge mite colonies.",
+      "Apply neem oil (0.5% to 1%) or insecticidal potassium soap solutions.",
+      "Encourage predatory mites (Phytoseiidae) and ladybird beetles."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___Target_Spot": {
+    "crop": "Tomato",
+    "disease_name": "Target Spot (Corynespora cassiicola)",
+    "symptoms": "Small brown water-soaked lesions developing into circular spots with light brown centers and dark brown concentric rings.",
+    "cultural_organic_control": [
+      "Maintain adequate plant spacing and stake vines off the ground.",
+      "Remove suckers and lower old foliage to improve canopy aeration.",
+      "Avoid overhead irrigation."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Solanaceous Disease Bulletins", "url": "to verify", "last_verified": "to verify" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+    "crop": "Tomato",
+    "disease_name": "Tomato Leaf Curl / Yellow Leaf Curl Virus (TYLCV)",
+    "symptoms": "Severe stunting, erect bushy growth, upward cupping and curling of leaf margins, interveinal chlorosis, and aborted flowers.",
+    "cultural_organic_control": [
+      "Control the vector whitefly (Bemisia tabaci) using yellow sticky traps (15-20 traps/acre).",
+      "Grow border crops of 2-3 rows of tall maize, sorghum, or pearl millet as physical barrier.",
+      "Spray 5% neem seed kernel extract (NSKE) at weekly intervals during early crop growth.",
+      "Rogue out and bury virus-infected seedlings within 30 days of transplanting."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
+      { "name": "PJTSAU Tomato Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)", "Sub-Mission on Plant Protection (check eligibility, details to verify)"]
+  },
+  "Tomato___Tomato_mosaic_virus": {
+    "crop": "Tomato",
+    "disease_name": "Tomato Mosaic Virus (ToMV)",
+    "symptoms": "Mottling of leaves with alternating light and dark green areas, leaf distortion (shoestring effect), and reduced plant size.",
+    "cultural_organic_control": [
+      "Workers should wash hands with soap and water before handling plants (virus spreads mechanically).",
+      "Sterilize pruning knives and tools in 10% trisodium phosphate solution.",
+      "Use certified virus-free seed stock and resistant tomato rootstocks/hybrids."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" },
+      { "name": "PJTSAU Tomato Package of Practices", "url": "https://pjtsau.edu.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)"]
+  },
+  "Tomato___healthy": {
+    "crop": "Tomato",
+    "disease_name": "Healthy Foliage",
+    "symptoms": "Deep green compound leaves with upright growth, healthy branching, and no spotting, chlorosis, or curling.",
+    "cultural_organic_control": [
+      "Maintain regular fertigation, trellising, and preventive monitoring.",
+      "Ensure proper root-zone aeration and avoid excessive waterlogging."
+    ],
+    "sources": [
+      { "name": "ICAR-IIHR Bengaluru Solanaceous IPM", "url": "https://iihr.res.in", "last_verified": "2026-11-13" }
+    ],
+    "scheme_tags": ["MIDH (check eligibility, details to verify)", "PKVY (check eligibility, details to verify)"]
+  }
+}

@@ -44,6 +44,20 @@ class DiseaseFinding(BaseModel):
     # Rule-based / heuristic check flag (e.g. humidity > 80%)
     fungal_risk_elevated: bool = False
     safe_ipm_steps: List[str] = Field(default_factory=list)
+    # Extra fields for full diagnosis
+    crop_hint: Optional[str] = None
+    predicted_crop: Optional[str] = None
+    predicted_class: Optional[str] = None
+    confidence_type: str = "prediction confidence (uncalibrated)"
+    is_uncertain: Optional[bool] = None
+    crop_supported: Optional[bool] = None
+    quality_gate_passed: Optional[bool] = None
+    weather_fungal_risk_factor: Optional[str] = None
+    top3_predictions: Optional[List[Dict[str, Any]]] = None
+    symptoms: Optional[str] = None
+    sources: Optional[List[Dict[str, str]]] = None
+    scheme_tags: Optional[List[str]] = None
+    warnings: List[str] = Field(default_factory=list)
 
 
 class YieldEstimate(BaseModel):

@@ -301,3 +301,85 @@ export interface AgentRunRequest {
   image_path?: string | null;
 }
 
+export interface QualityGateMetrics {
+  width?: number;
+  height?: number;
+  mean_luminance?: number;
+  sharpness_laplacian_var?: number;
+  foliar_ratio?: number;
+}
+
+export interface QualityGateResult {
+  passed: boolean;
+  reason: string;
+  metrics: QualityGateMetrics;
+}
+
+export interface PredictionCandidate {
+  class_key: string;
+  crop: string;
+  disease_name: string;
+  probability: number;
+}
+
+export interface SourceCitation {
+  title: string;
+  url: string;
+  last_verified?: string;
+  status: string;
+}
+
+export interface WeatherFungalRisk {
+  elevated: boolean;
+  relative_humidity_pct?: number;
+  rain_24h_mm?: number;
+  explanation: string;
+  indicative: boolean;
+}
+
+export interface DiseasePredictionResponse {
+  success: boolean;
+  quality_gate: QualityGateResult;
+  predicted_class?: string | null;
+  predicted_crop?: string | null;
+  predicted_disease?: string | null;
+  prediction_confidence?: number | null;
+  confidence_type: string;
+  is_uncertain: boolean;
+  crop_supported: boolean;
+  supported_crops: string[];
+  top3_predictions: PredictionCandidate[];
+  symptoms?: string | null;
+  safe_ipm_steps: string[];
+  sources: SourceCitation[];
+  scheme_tags: string[];
+  weather_fungal_risk?: WeatherFungalRisk | null;
+  warnings: string[];
+  reported_to_outbreak: boolean;
+  outbreak_record_id?: number | null;
+  error?: string | null;
+}
+
+export interface SupportedCropsResponse {
+  model_name: string;
+  num_classes: number;
+  supported_crops: string[];
+  unsupported_examples: string[];
+  note: string;
+}
+
+export interface DiseaseHistoryItem {
+  id: number;
+  farm_id?: number | null;
+  crop_hint?: string | null;
+  predicted_disease: string;
+  confidence: number;
+  confidence_type: string;
+  village: string;
+  district: string;
+  state: string;
+  reported_to_outbreak: boolean;
+  created_at: string;
+}
+
+

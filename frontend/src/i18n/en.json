@@ -8,6 +8,7 @@
     "dashboard": "Dashboard",
     "weather": "Weather & Location",
     "farms": "My Farms",
+    "disease": "Disease Diagnosis",
     "logout": "Logout"
   },
   "auth": {
@@ -154,6 +155,40 @@
     "conflict_resolution_label": "Transparent Resolution",
     "conflict_rationale_label": "Agronomic Rationale",
     "stub_disclaimer": "Numeric predictions (water volume, harvest yield, health score) are intentionally null in current preview stubs per Yuktik Honesty Rules. Conflict detection and weather telemetry are fully live."
+  },
+  "disease": {
+    "title": "Plant Disease Diagnosis & Crop Protection",
+    "subtitle": "Upload or capture a leaf photo for AI diagnosis, quality checking, and organic IPM recommendations.",
+    "supported_crops_title": "Supported Crops (PlantVillage Benchmark)",
+    "supported_crops_desc": "The pretrained computer vision model classifies foliar lesions across 14 crops. For crops outside this benchmark, visual similarity matches are returned with a clear mismatch notice.",
+    "unsupported_warning_title": "Common Crops Outside Benchmark",
+    "upload_heading": "Leaf Photo Ingestion",
+    "drag_drop_text": "Drag and drop leaf photo here, or browse from device",
+    "camera_btn": "Take Photo / Camera",
+    "select_farm_label": "Select Farm (Optional, for microclimate fungal risk)",
+    "no_farm_selected": "-- No farm selected (Standalone scan) --",
+    "crop_hint_label": "Crop Hint (Optional)",
+    "crop_hint_placeholder": "e.g. Tomato, Corn, Apple, Cotton...",
+    "opt_in_outbreak_label": "Contribute anonymized village report to Community Outbreak Map",
+    "opt_in_outbreak_hint": "Privacy guaranteed: Uploaded leaf photo is never stored. Only village centroid and detected disease are shared.",
+    "diagnose_btn": "Diagnose Leaf Disease",
+    "diagnosing_btn": "Analyzing Foliar Health...",
+    "quality_gate_failed": "Image Quality Gate Rejected",
+    "quality_gate_passed": "Quality Gate Passed",
+    "diagnosis_results": "Diagnosis & Treatment Advisory",
+    "detected_disease_label": "Identified Condition",
+    "confidence_label": "Prediction Confidence (Uncalibrated)",
+    "top3_ranking": "Top 3 Visual Matches",
+    "symptoms_heading": "Characteristic Symptoms",
+    "ipm_heading": "Safe Cultural & Organic IPM Practices",
+    "ipm_disclaimer": "Strict safety guideline: Cultural and organic steps only. Zero specific chemical dosages are provided without certified ground agronomist prescription.",
+    "weather_fungal_title": "Microclimate Fungal Risk Factor",
+    "sources_heading": "Agronomic Knowledge Sources",
+    "schemes_heading": "Applicable Support Schemes",
+    "uncertain_warning": "Diagnosis is inconclusive due to low prediction confidence. Please consult your local Krishi Vigyan Kendra (KVK) or Agriculture Officer before applying any treatment.",
+    "read_aloud": "Read Diagnosis Aloud",
+    "history_title": "Recent Community Outbreak Contributions",
+    "no_history": "No previous disease reports submitted yet."
   }
 }
 
