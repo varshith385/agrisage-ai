@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background-color: #faf8f5;
+  color: #1c1917;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* Custom scrollbars for mobile feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f4f0ea;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4a373;
+  border-radius: 9999px;
+}
+
+/* Large tap targets guarantee */
+button, input, select, textarea {
+  touch-action: manipulation;
+}
+

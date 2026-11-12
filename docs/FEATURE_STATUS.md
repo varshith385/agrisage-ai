@@ -20,7 +20,7 @@
 | **Weather Crop Suitability Signal** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/weather/suitability` | Rule-based agronomic window evaluation returning complete ExplainabilitySchema. |
 | **Multi-Agent Orchestrator Pipeline** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/agents/run` | Awaiting Phase 3 implementation. |
 | **Agent Conflict Detection & Resolution** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/agents/orchestrator.py` | Awaiting Phase 3 implementation. |
-| **Dashboard Shell & Agent Activity Log** | Tier 1 | NOT STARTED | `NOT STARTED` | `/dashboard` (UI) | Awaiting Phase 2 & 3 implementation. |
+| **Dashboard Shell & Agent Activity Log** | Tier 1 | WORKING | `WORKING` | `/dashboard` (UI) | Live weather, crop phenology from API, primary holding summary, and transparent NOT STARTED agent activity timeline. |
 | **PlantVillage CV Model & Quality Gate** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/disease/predict` | Awaiting Phase 3 implementation. |
 | **Calibrated Disease Confidence & Disclaimer** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/ml/disease_model.py` | Awaiting Phase 3 implementation. |
 | **Disease Knowledge Base (Safe Prescriptions)** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/ml/disease_kb.json` | Awaiting Phase 3 implementation. |
@@ -37,7 +37,7 @@
 | **Growth-Stage-Aware Guidance & Tasks** | Tier 1 | NOT STARTED | `NOT STARTED` | `GET /api/v1/advisory/tasks` | Awaiting Phase 3 implementation. |
 | **Advisory Coordinator (7-Day Plan)** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/advisory/plan` | Awaiting Phase 3 implementation. |
 | **Farm Health Score (0–100) & Breakdown** | Tier 1 | NOT STARTED | `NOT STARTED` | `/dashboard` gauge widget | Awaiting Phase 3 implementation. |
-| **Universal Explainable "Because..." Cards** | Tier 1 | NOT STARTED | `NOT STARTED` | `<ExplainCard/>` component | Awaiting Phase 2 implementation. |
+| **Universal Explainable "Because..." Cards** | Tier 1 | WORKING | `WORKING` | `<ExplainCard/>` component | Standardized component rendering reasons, sources, limitations, confidence, and status. |
 | **Cost of Cultivation Engine (`Decimal`)** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/economics/calculate` | Awaiting Phase 4 implementation. |
 | **Owned vs Leased vs Mixed Tenure Math** | Tier 1 | NOT STARTED | `NOT STARTED` | `backend/app/services/economics.py` | Awaiting Phase 4 implementation. |
 | **Interactive What-If Scenario Simulator** | Tier 1 | NOT STARTED | `NOT STARTED` | `/economics` slider view | Awaiting Phase 4 implementation. |
@@ -45,8 +45,8 @@
 | **Agronomic Crop Rotation Planner** | Tier 1 | NOT STARTED | `NOT STARTED` | `GET /api/v1/rotation/recommend` | Awaiting Phase 4 implementation. |
 | **Crop Lifecycle Calendar & `.ics` Export** | Tier 1 | NOT STARTED | `NOT STARTED` | `GET /api/v1/calendar/export.ics` | Awaiting Phase 4 implementation. |
 | **Seasonal Awareness Engine (Kharif/Rabi)** | Tier 1 | NOT STARTED | `NOT STARTED` | `GET /api/v1/calendar/season` | Awaiting Phase 4 implementation. |
-| **Mobile-First Design System** | Tier 1 | NOT STARTED | `NOT STARTED` | `frontend/src/` | Awaiting Phase 2 implementation. |
-| **Multilingual i18n (`en`, `te`, `hi`)** | Tier 1 | NOT STARTED | `NOT STARTED` | `frontend/src/i18n/` | Awaiting Phase 2 implementation. |
+| **Mobile-First Design System** | Tier 1 | WORKING | `WORKING` | `frontend/src/` | Warm earthy AgriTech theme, 44px tap targets, bottom navigation, evaluated at 390px. |
+| **Multilingual i18n (`en`, `te`, `hi`)** | Tier 1 | WORKING | `WORKING` | `frontend/src/i18n/` | Full i18n dictionary for English, Telugu, and Hindi; Noto Sans Telugu & Devanagari fonts. |
 | **Voice Assistant (STT & TTS)** | Tier 1 | NOT STARTED | `NOT STARTED` | `<VoiceAssistant/>` global FAB | Awaiting Phase 2/6 implementation. |
 | **Voice Capability Detection & Fallback** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/voice/query` | Awaiting Phase 2/6 implementation. |
 | **Community Groups & Peer Boards** | Tier 2 | NOT STARTED | `NOT STARTED` | `POST /api/v1/community/groups` | Awaiting Phase 5 implementation. |
