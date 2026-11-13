@@ -5,6 +5,7 @@ import {
   CloudRain,
   ShieldCheck,
   AlertTriangle,
+  AlertCircle,
   CheckCircle2,
   Sparkles,
   Info,
@@ -32,6 +33,7 @@ import {
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { getIrrigationPlan, diagnoseIrrigationIssue } from '../api/irrigation';
+import { validateImageFile, compressImage } from '../utils/imageCompressor';
 import { farmsApi } from '../api/farms';
 import {
   Farm,
@@ -193,31 +195,66 @@ export const IrrigationPage: React.FC = () => {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [diagnosisResult, setDiagnosisResult] = useState<IrrigationDiagnosisResponse | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [borderlineWarning, setBorderlineWarning] = useState<{
+    message: string;
+    confidence: number;
+    top_class?: string;
+  } | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      const val = validateImageFile(file);
+      if (!val.valid) {
+        setValidationError(val.errorMessage || 'Invalid image file.');
+        setPhotoFile(null);
+        setPhotoPreview(null);
+        return;
+      }
+      setValidationError(null);
+      setBorderlineWarning(null);
+      setIsConfirmed(false);
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
+      setDiagnosisResult(null);
+      diagnoseMutation.reset();
     }
   };
 
   const diagnoseMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (confirmOverride?: boolean) => {
       const formData = new FormData();
       if (problemText.trim()) {
         formData.append('text_query', problemText.trim());
       }
       if (photoFile) {
-        formData.append('file', photoFile);
+        const compressed = await compressImage(photoFile);
+        formData.append('file', compressed);
       }
       if (selectedFarmId) {
         formData.append('farm_id', String(selectedFarmId));
       }
+      formData.append('confirmed', String(confirmOverride ?? isConfirmed));
+      formData.append('language', language);
       return diagnoseIrrigationIssue(formData);
     },
     onSuccess: (data) => {
+      setBorderlineWarning(null);
       setDiagnosisResult(data);
+    },
+    onError: (err: any) => {
+      setDiagnosisResult(null);
+      if (err.status === 422 && err.detailPayload?.borderline) {
+        setBorderlineWarning({
+          message: err.message,
+          confidence: err.detailPayload.confidence,
+          top_class: err.detailPayload.top_class,
+        });
+      } else {
+        setBorderlineWarning(null);
+      }
     },
   });
 
@@ -895,6 +932,60 @@ export const IrrigationPage: React.FC = () => {
               )}
             </button>
           </form>
+
+          {/* Client-side File Validation Error */}
+          {validationError && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>{validationError}</span>
+            </div>
+          )}
+
+          {/* Borderline Domain Gate Warning with Confirm-to-Continue */}
+          {borderlineWarning && (
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-300 rounded-2xl text-amber-900 space-y-2.5 shadow-sm">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-amber-900">
+                    Borderline Field Confidence ({Math.round(borderlineWarning.confidence * 100)}%)
+                  </p>
+                  <p className="text-[11px] text-amber-800 mt-0.5">{borderlineWarning.message}</p>
+                  <p className="text-[10px] text-amber-700 italic mt-0.5">
+                    Visual indication only, not a soil moisture measurement.
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsConfirmed(true);
+                    diagnoseMutation.mutate(true);
+                  }}
+                  className="px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
+                >
+                  Confirm and Proceed
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Authoritative Domain Gate Rejection (HTTP 422) */}
+          {diagnoseMutation.isError && !borderlineWarning && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-900 flex items-start gap-2.5 shadow-sm">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-red-900">Image Gate Rejected</p>
+                <p className="text-[11px] text-red-800 mt-0.5 leading-relaxed">
+                  {diagnoseMutation.error instanceof Error ? diagnoseMutation.error.message : 'Photo rejected.'}
+                </p>
+                <p className="text-[10px] text-red-700 mt-0.5">
+                  Non-field photo detected. No diagnosis generated.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Diagnostic Result Output */}
           {diagnosisResult && (

@@ -1,5 +1,3 @@
-import { ApiErrorResponse } from '../types/api';
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export class ApiError extends Error {
@@ -7,14 +5,16 @@ export class ApiError extends Error {
   errorCode?: string;
   requestId?: string;
   timestamp?: string;
+  detailPayload?: any;
 
-  constructor(status: number, message: string, errorCode?: string, requestId?: string, timestamp?: string) {
+  constructor(status: number, message: string, errorCode?: string, requestId?: string, timestamp?: string, detailPayload?: any) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.errorCode = errorCode;
     this.requestId = requestId;
     this.timestamp = timestamp;
+    this.detailPayload = detailPayload;
   }
 }
 
@@ -65,9 +65,19 @@ export async function apiRequest<T>(
     let reqId: string | undefined;
     let timestamp: string | undefined;
 
+    let detailPayload: any = null;
     try {
-      const errorJson: ApiErrorResponse = await response.json();
-      if (errorJson.detail) errorDetail = errorJson.detail;
+      const errorJson: any = await response.json();
+      if (errorJson.detail) {
+        detailPayload = errorJson.detail;
+        if (typeof errorJson.detail === 'string') {
+          errorDetail = errorJson.detail;
+        } else if (typeof errorJson.detail === 'object' && errorJson.detail.message) {
+          errorDetail = errorJson.detail.message;
+        } else {
+          errorDetail = JSON.stringify(errorJson.detail);
+        }
+      }
       errorCode = errorJson.error_code;
       reqId = errorJson.request_id;
       timestamp = errorJson.timestamp;
@@ -75,7 +85,7 @@ export async function apiRequest<T>(
       // Non-JSON error response
     }
 
-    throw new ApiError(response.status, errorDetail, errorCode, reqId, timestamp);
+    throw new ApiError(response.status, errorDetail, errorCode, reqId, timestamp, detailPayload);
   }
 
   if (response.status === 204) {

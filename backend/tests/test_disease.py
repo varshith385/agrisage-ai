@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from backend.app.config import settings
+from backend.app.ml.disease_model import disease_model
 from backend.app.models.disease_prediction import DiseasePrediction
 from backend.app.models.farm import Farm, IrrigationMethod, OwnershipType
 from backend.app.models.user import User, UserRole, Language
@@ -111,12 +112,26 @@ def test_quality_gate_rejects_dark_image(client: TestClient, auth_headers: dict)
         headers=auth_headers,
         files={"file": ("dark.jpg", dark_bytes, "image/jpeg")},
     )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["success"] is False
-    assert data["quality_gate"]["passed"] is False
-    assert "too dark" in data["error"].lower()
-    assert data["quality_gate"]["metrics"]["mean_luminance"] < settings.QUALITY_GATE_MIN_LUMINANCE
+    # Pitch black image is rejected either by domain gate (422) or quality gate (200)
+    assert response.status_code in (200, 422)
+    if response.status_code == 422:
+        assert (
+            "doesn't look like a farm or crop photo" in response.json()["detail"]
+            or "Low colour variety" in response.json()["detail"]
+        )
+    else:
+        data = response.json()
+        assert data["success"] is False
+        assert data["quality_gate"]["passed"] is False
+        assert "too dark" in data["error"].lower()
+        assert data["quality_gate"]["metrics"]["mean_luminance"] < settings.QUALITY_GATE_MIN_LUMINANCE
+
+    # Direct unit test of quality gate for dark images
+    dark_img = Image.new("RGB", (224, 224), color=(5, 5, 5))
+    gate_res = disease_model.evaluate_quality_gate(dark_img)
+    assert gate_res.passed is False
+    assert "too dark" in gate_res.reason.lower()
+    assert gate_res.metrics["mean_luminance"] < settings.QUALITY_GATE_MIN_LUMINANCE
 
 
 # ---------------------------------------------------------------------------
@@ -160,11 +175,14 @@ def test_quality_gate_rejects_non_leaf_image(client: TestClient, auth_headers: d
         headers=auth_headers,
         files={"file": ("blue_screen.jpg", blue_bytes, "image/jpeg")},
     )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["success"] is False
-    assert data["quality_gate"]["passed"] is False
-    assert "not appear to contain plant leaves" in data["error"]
+    assert response.status_code in (200, 422)
+    if response.status_code == 422:
+        assert "doesn't look like a farm or crop photo" in response.json()["detail"]
+    else:
+        data = response.json()
+        assert data["success"] is False
+        assert data["quality_gate"]["passed"] is False
+        assert "not appear to contain plant leaves" in data["error"]
 
 
 # ---------------------------------------------------------------------------
@@ -265,10 +283,13 @@ def test_decompression_bomb_guard(client: TestClient, auth_headers: dict):
             headers=auth_headers,
             files={"file": ("bomb.jpg", img_bytes, "image/jpeg")},
         )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is False
-        assert "decompression" in data["error"].lower()
+        assert response.status_code in (200, 422)
+        if response.status_code == 422:
+            assert "decompression" in response.json()["detail"].lower()
+        else:
+            data = response.json()
+            assert data["success"] is False
+            assert "decompression" in data["error"].lower()
 
 
 # ---------------------------------------------------------------------------

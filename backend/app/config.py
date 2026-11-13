@@ -47,6 +47,9 @@ class Settings(BaseSettings):
 
     ENABLE_DEMO_FALLBACKS: bool = True
     DISEASE_CONFIDENCE_THRESHOLD: float = 0.45  # Adjustable default indicative heuristic
+    IMAGE_GATE_THRESHOLD: float = 0.55           # Minimum positive class probability for authoritative acceptance
+    IMAGE_GATE_BORDERLINE_THRESHOLD: float = 0.35 # Borderline range [0.35, 0.55) requires explicit user confirmation
+    IMAGE_GATE_USE_CLIP: bool = True             # Zero-shot CLIP gate with CPU inference; falls back to heuristics if false/unloaded
     QUALITY_GATE_MIN_LUMINANCE: float = 20.0     # Indicative heuristic
     QUALITY_GATE_MAX_LUMINANCE: float = 240.0    # Indicative heuristic
     QUALITY_GATE_MIN_LAPLACIAN_VAR: float = 60.0 # Indicative heuristic on 224x224 resize

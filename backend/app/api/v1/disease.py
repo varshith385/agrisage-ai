@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from backend.app.config import settings
 from backend.app.database.session import get_db
 from backend.app.ml.disease_model import SUPPORTED_CROPS, disease_model
+from backend.app.ml.image_gate import image_domain_gate
 from backend.app.models.disease_prediction import DiseasePrediction
 from backend.app.models.farm import Farm
 from backend.app.models.user import User, UserRole
@@ -44,6 +45,8 @@ async def predict_plant_disease(
     crop_hint: Optional[str] = Form(None),
     farm_id: Optional[int] = Form(None),
     report_to_outbreak: bool = Form(False),
+    confirmed: bool = Form(False),
+    language: Optional[str] = Form(None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -76,7 +79,20 @@ async def predict_plant_disease(
             detail=f"Image file size ({actual_mb:.1f} MB) exceeds maximum allowed limit of {max_mb:.0f} MB.",
         )
 
-    # 2. Verify farm ownership & fetch weather for fungal factor if farm_id is provided
+    # 2. Authoritative Image Domain Gate (Heuristic + Zero-Shot CLIP)
+    user_lang = language or (
+        current_user.language.value
+        if hasattr(current_user, "language") and current_user.language
+        else "en"
+    )
+    domain_gate_res = image_domain_gate.verify_image(
+        contents,
+        domain="leaf",
+        language=user_lang,
+        confirmed=confirmed,
+    )
+
+    # 3. Verify farm ownership & fetch weather for fungal factor if farm_id is provided
     farm = None
     weather_fungal_risk: Optional[Dict[str, Any]] = None
     if farm_id is not None:
@@ -157,6 +173,7 @@ async def predict_plant_disease(
 
     return {
         "success": pred.get("success", False),
+        "domain_gate": domain_gate_res,
         "quality_gate": pred.get("quality_gate", {}),
         "predicted_class": pred.get("predicted_class"),
         "predicted_crop": pred.get("predicted_crop"),

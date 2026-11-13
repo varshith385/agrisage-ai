@@ -18,6 +18,7 @@ import {
 
 import { useTranslation } from '../context/LanguageContext';
 import { predictPlantDisease, getSupportedCrops, getDiseaseHistory } from '../api/disease';
+import { validateImageFile, compressImage } from '../utils/imageCompressor';
 import { farmsApi } from '../api/farms';
 import {
   DiseasePredictionResponse,
@@ -44,6 +45,15 @@ export const DiseasePage: React.FC = () => {
   const [showSupportedModal, setShowSupportedModal] = useState<boolean>(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+
+  // Image gate validation and borderline states
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [borderlineWarning, setBorderlineWarning] = useState<{
+    message: string;
+    confidence: number;
+    top_class?: string;
+  } | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -85,10 +95,11 @@ export const DiseasePage: React.FC = () => {
 
   // Mutation for diagnosis
   const diagnoseMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (confirmOverride?: boolean) => {
       if (!selectedFile) throw new Error('No file selected');
+      const compressed = await compressImage(selectedFile);
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append('file', compressed);
       if (cropHint.trim()) {
         formData.append('crop_hint', cropHint.trim());
       }
@@ -96,11 +107,25 @@ export const DiseasePage: React.FC = () => {
         formData.append('farm_id', String(selectedFarmId));
       }
       formData.append('report_to_outbreak', String(reportToOutbreak));
+      formData.append('confirmed', String(confirmOverride ?? isConfirmed));
+      formData.append('language', language);
       return predictPlantDisease(formData);
     },
     onSuccess: (data) => {
+      setBorderlineWarning(null);
       if (data.reported_to_outbreak) {
         queryClient.invalidateQueries({ queryKey: ['diseaseHistory'] });
+      }
+    },
+    onError: (err: any) => {
+      if (err.status === 422 && err.detailPayload?.borderline) {
+        setBorderlineWarning({
+          message: err.message,
+          confidence: err.detailPayload.confidence,
+          top_class: err.detailPayload.top_class,
+        });
+      } else {
+        setBorderlineWarning(null);
       }
     },
   });
@@ -108,6 +133,16 @@ export const DiseasePage: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      const val = validateImageFile(file);
+      if (!val.valid) {
+        setValidationError(val.errorMessage || 'Invalid image file.');
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        return;
+      }
+      setValidationError(null);
+      setBorderlineWarning(null);
+      setIsConfirmed(false);
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
       diagnoseMutation.reset();
@@ -118,6 +153,16 @@ export const DiseasePage: React.FC = () => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
+      const val = validateImageFile(file);
+      if (!val.valid) {
+        setValidationError(val.errorMessage || 'Invalid image file.');
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        return;
+      }
+      setValidationError(null);
+      setBorderlineWarning(null);
+      setIsConfirmed(false);
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
       diagnoseMutation.reset();
@@ -131,6 +176,9 @@ export const DiseasePage: React.FC = () => {
   const handleClearImage = () => {
     setSelectedFile(null);
     setPreviewUrl(null);
+    setValidationError(null);
+    setBorderlineWarning(null);
+    setIsConfirmed(false);
     diagnoseMutation.reset();
   };
 
@@ -443,8 +491,65 @@ export const DiseasePage: React.FC = () => {
 
         {/* Right Column: Diagnosis Advisory & Results (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
+          {/* Client-side File Validation Error */}
+          {validationError && (
+            <div className="bg-red-50 border border-red-300 text-red-900 rounded-2xl p-5 flex items-start gap-3 shadow-sm">
+              <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-bold text-red-900">Invalid File</h4>
+                <p className="text-xs text-red-800 mt-1 leading-relaxed">{validationError}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Borderline Domain Gate Warning with Confirm-to-Continue */}
+          {borderlineWarning && (
+            <div className="bg-amber-50 border border-amber-300 text-amber-900 rounded-2xl p-5 space-y-3 shadow-sm">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-bold text-amber-900">
+                    Borderline Agricultural Confidence ({Math.round(borderlineWarning.confidence * 100)}%)
+                  </h4>
+                  <p className="text-xs text-amber-800 mt-1 leading-relaxed">{borderlineWarning.message}</p>
+                  <p className="text-[11px] text-amber-700 italic mt-1">
+                    Visual indication only, not a soil moisture measurement. Please confirm to proceed.
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsConfirmed(true);
+                    diagnoseMutation.mutate(true);
+                  }}
+                  className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all active:scale-95"
+                >
+                  Confirm and Continue
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Authoritative Domain Gate Rejection (HTTP 422) */}
+          {diagnoseMutation.isError && !borderlineWarning && (
+            <div className="bg-red-50 border border-red-300 text-red-900 rounded-2xl p-6 flex items-start gap-3 shadow-sm">
+              <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-bold text-red-900">Image Gate Verification Rejected</h4>
+                <p className="text-xs text-red-800 mt-1 font-medium leading-relaxed">
+                  {diagnoseMutation.error instanceof Error ? diagnoseMutation.error.message : 'Upload rejected.'}
+                </p>
+                <p className="text-[11px] text-red-700 mt-1">
+                  Non-agricultural photo detected. No diagnosis generated.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Initial Empty / Idle State */}
-          {!result && !diagnoseMutation.isPending && (
+          {!result && !diagnoseMutation.isPending && !diagnoseMutation.isError && !validationError && !borderlineWarning && (
             <div className="bg-white rounded-3xl p-8 sm:p-12 text-center shadow-card border border-agri-cream-200 flex flex-col items-center justify-center min-h-[380px]">
               <div className="w-16 h-16 rounded-3xl bg-agri-cream-100 flex items-center justify-center text-agri-green-700 mb-4 shadow-subtle">
                 <Leaf className="w-8 h-8" />

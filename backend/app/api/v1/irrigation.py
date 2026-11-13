@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from backend.app.config import settings
 from backend.app.database.session import get_db
+from backend.app.ml.image_gate import image_domain_gate
 from backend.app.ml.irrigation import IrrigationDiagnostician, irrigation_engine
 from backend.app.models.farm import Farm, IrrigationMethod
 from backend.app.models.user import User, UserRole
@@ -161,6 +162,8 @@ async def generate_irrigation_plan(
 async def diagnose_irrigation_issue(
     text_query: Optional[str] = Form(None),
     file: Optional[UploadFile] = File(None),
+    confirmed: bool = Form(False),
+    language: Optional[str] = Form(None),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -188,6 +191,19 @@ async def diagnose_irrigation_issue(
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail="Image file size exceeds maximum limit.",
+            )
+
+        if len(image_bytes) > 0:
+            user_lang = language or (
+                current_user.language.value
+                if hasattr(current_user, "language") and current_user.language
+                else "en"
+            )
+            image_domain_gate.verify_image(
+                image_bytes,
+                domain="irrigation",
+                language=user_lang,
+                confirmed=confirmed,
             )
 
     result = IrrigationDiagnostician.diagnose(text_query=text_query, image_bytes=image_bytes)
