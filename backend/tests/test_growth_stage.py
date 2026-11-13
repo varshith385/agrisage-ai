@@ -111,3 +111,4 @@ def test_api_advisory_tasks_endpoint(client: TestClient, farmer_headers: dict):
     assert data["crop_name"].lower() == "cotton"
     assert len(data["tasks"]) >= 2
     assert all("guidance_disclaimer" in t for t in data["tasks"])
+

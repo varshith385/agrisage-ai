@@ -142,3 +142,4 @@ class AdvisoryPlanResponse(BaseModel):
     explainable_cards: List[ExplainabilitySchema] = Field(default_factory=list)
     summary: str
     confidence: float = Field(default=0.85, ge=0.0, le=1.0)
+

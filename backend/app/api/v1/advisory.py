@@ -200,3 +200,4 @@ async def generate_advisory_plan(
         summary=adv_plan.summary or "Multi-agent advisory plan completed.",
         confidence=adv_plan.confidence,
     )
+
