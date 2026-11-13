@@ -123,3 +123,27 @@ The following multilingual phrases were added in Phase 6.1 for the global voice 
 
 
 
+---
+
+## 6. Phase 5 & Redesign Translation Additions (Unverified — Awaiting Native Review)
+
+The following translations were added across the Phase 1-5 UI overhaul for "What is this?" explanatory dialogs, pictorial mode summaries, guided tour steps, how-to guides, and plain language "What this means for you" templates:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Common UI** | What is this? | ఇది ఏమిటి? | यह क्या है? | **Unverified**: Needs native review. |
+| **Common UI** | What this means for you | దీని అర్థం ఏమిటి? | आपके लिए इसका क्या अर्थ है? | **Unverified**: Needs native review. |
+| **Common UI** | Listen in audio | ఆడియో వినండి | आवाज सुनें | **Unverified**: Needs native review. |
+| **Common UI** | Pictorial Mode | చిత్రాల రూపం | चित्र रूप (सरल दृश्य) | **Unverified**: Needs native review. |
+| **Dashboard** | Visual Farm Overview | మీ వ్యవసాయ సారాంశం | खेत का संपूर्ण दृश्य | **Unverified**: Needs native review. |
+| **Irrigation** | Crop Water Budget & Watering Advice | పంట నీటి అవసరం మరియు తడుల ప్రణాళిక | फसल जल आवश्यकता एवं सिंचाई सलाह | **Unverified**: Needs native review. |
+| **Disease** | Leaf Disease Diagnosis | ఆకు తెగుళ్ల నిర్ధారణ | पत्ती रोग पहचान एवं उपचार | **Unverified**: Needs native review. |
+| **Economics** | Farm Profit & Costs | ఆదాయం మరియు ఖర్చుల అంచనా | खेत का मुनाफा और खर्च | **Unverified**: Needs native review. |
+| **Weather** | Village Weather & 7-Day Rain | గ్రామ వాతావరణం మరియు వర్ష సూచన | गांव का मौसम और 7 दिन की बारिश | **Unverified**: Needs native review. |
+| **Market** | Market Prices & Mandi Payouts | మార్కెట్ ధరలు మరియు లాభం | मंडी के भाव और शुद्ध कमाई | **Unverified**: Needs native review. |
+| **Farms** | Farm Holdings & Land Registration | భూమి వివరాలు మరియు హక్కుల రకం | खेत का विवरण और पट्टा स्थिति | **Unverified**: Needs native review. |
+| **Soil Card** | Soil Health Card & Nutrients | నేల పరీక్ష ఫలితాలు మరియు ఎరువుల మోతాదు | मिट्टी की जांच और उर्वरक की मात्रा | **Unverified**: Needs native review. |
+| **Community** | Farmer Community & Equipment Sharing | రైతు సంఘం మరియు యంత్రాల అద్దె | किसान समूह और कृषि यंत्र किराया | **Unverified**: Needs native review. |
+| **Calendar** | Field Operations & Crop Stage Timeline | వ్యవసాయ పనుల క్యాలెండర్ మరియు పంట దశలు | कृषि कार्य कैलेंडर और फसल अवस्थाएं | **Unverified**: Needs native review. |
+| **How-To** | How to Use AgriSage AI | అగ్రిసేజ్ యాప్ ఎలా ఉపయోగించాలి? | एग्रीसेज का उपयोग कैसे करें? | **Unverified**: Needs native review. |
+| **Video Guide** | Watch How to Use AgriSage AI | అగ్రిసేజ్ వీడియో గైడ్ | एग्रीसेज वीडियो गाइड | **Unverified**: Needs native review. |
