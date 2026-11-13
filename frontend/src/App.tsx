@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { PictorialProvider } from './context/PictorialContext';
 import { Layout } from './components/layout/Layout';
 import { AuthPage } from './pages/AuthPage';
 import { LocationWeatherPage } from './pages/LocationWeatherPage';
@@ -16,6 +17,8 @@ import { CalendarPage } from './pages/CalendarPage';
 import { CropRecommendationPage } from './pages/CropRecommendationPage';
 import { SchemesPage } from './pages/SchemesPage';
 import { CommunityPage } from './pages/CommunityPage';
+import { HowToPage } from './pages/HowToPage';
+import { WatchHowToPage } from './pages/WatchHowToPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,33 +33,36 @@ export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<AuthPage />} />
-                <Route path="login" element={<AuthPage />} />
-                <Route path="register" element={<AuthPage />} />
-                <Route path="setup" element={<LocationWeatherPage />} />
-                <Route path="farms" element={<FarmRegistrationPage />} />
-                <Route path="disease" element={<DiseasePage />} />
-                <Route path="irrigation" element={<IrrigationPage />} />
-                <Route path="economics" element={<EconomicsPage />} />
-                <Route path="market" element={<MarketPage />} />
-                <Route path="calendar" element={<CalendarPage />} />
-                <Route path="recommend" element={<CropRecommendationPage />} />
-                <Route path="schemes" element={<SchemesPage />} />
-                <Route path="community" element={<CommunityPage />} />
-                <Route path="dashboard" element={<DashboardPage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
+        <PictorialProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<AuthPage />} />
+                  <Route path="login" element={<AuthPage />} />
+                  <Route path="register" element={<AuthPage />} />
+                  <Route path="setup" element={<LocationWeatherPage />} />
+                  <Route path="farms" element={<FarmRegistrationPage />} />
+                  <Route path="disease" element={<DiseasePage />} />
+                  <Route path="irrigation" element={<IrrigationPage />} />
+                  <Route path="economics" element={<EconomicsPage />} />
+                  <Route path="market" element={<MarketPage />} />
+                  <Route path="calendar" element={<CalendarPage />} />
+                  <Route path="recommend" element={<CropRecommendationPage />} />
+                  <Route path="schemes" element={<SchemesPage />} />
+                  <Route path="community" element={<CommunityPage />} />
+                  <Route path="dashboard" element={<DashboardPage />} />
+                  <Route path="how-to" element={<HowToPage />} />
+                  <Route path="watch" element={<WatchHowToPage />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
+        </PictorialProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
 };
 
 export default App;
-

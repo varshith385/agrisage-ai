@@ -1,45 +1,41 @@
 import React from 'react';
-import { AlertCircle, RotateCcw } from 'lucide-react';
-import { useTranslation } from '../../context/LanguageContext';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
-interface ErrorStateProps {
+export interface ErrorStateProps {
   title?: string;
-  message?: string;
+  message: string;
   onRetry?: () => void;
   className?: string;
 }
 
 export const ErrorState: React.FC<ErrorStateProps> = ({
-  title,
+  title = 'Something could not load',
   message,
   onRetry,
   className = '',
-}) => {
-  const { t } = useTranslation();
-
-  return (
-    <div
-      className={`flex flex-col items-center justify-center p-6 text-center bg-rose-50/70 border border-rose-200/80 rounded-2xl ${className}`}
-    >
-      <div className="w-12 h-12 mb-3 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center">
-        <AlertCircle className="w-6 h-6" />
-      </div>
-      <h4 className="font-display text-base font-bold text-stone-900 mb-1">
-        {title || t('common.error_heading')}
-      </h4>
-      <p className="text-xs text-stone-600 max-w-md mb-4 leading-relaxed">
-        {message || t('common.default_error_desc')}
-      </p>
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-agri-green-700 hover:bg-agri-green-800 text-white rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          {t('common.retry')}
-        </button>
-      )}
+}) => (
+  <div
+    role="alert"
+    className={`bg-[#FEF6E9] rounded-3xl border border-[#DA9A4C]/40 p-6 text-center flex flex-col items-center justify-center max-w-xl mx-auto shadow-sm ${className}`}
+  >
+    <div className="w-12 h-12 rounded-2xl bg-amber-100 text-[#DA9A4C] flex items-center justify-center mb-3">
+      <AlertTriangle className="w-6 h-6" />
     </div>
-  );
-};
-
+    <h3 className="font-display text-lg font-bold text-[#7A553A] mb-1">
+      {title}
+    </h3>
+    <p className="text-base text-[#543924] leading-relaxed mb-5 max-w-md">
+      {message}
+    </p>
+    {onRetry && (
+      <button
+        type="button"
+        onClick={onRetry}
+        className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] transition-all flex items-center gap-2 shadow-sm"
+      >
+        <RefreshCw className="w-4 h-4" />
+        <span>Try Again</span>
+      </button>
+    )}
+  </div>
+);
