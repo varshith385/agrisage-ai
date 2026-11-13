@@ -1,21 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, ArrowRight, Info } from 'lucide-react';
+import {
+  MapPin,
+  ArrowRight,
+  Info,
+  CloudSun,
+  Droplets,
+  Calendar,
+  Sparkles,
+} from 'lucide-react';
 import { locationApi } from '../api/location';
 import { weatherApi } from '../api/weather';
 import { CurrentWeather, DailyForecastItem, CropSuitabilityResponse, VillageItem } from '../types/api';
 import { CurrentWeatherCard } from '../components/weather/CurrentWeatherCard';
 import { ForecastChart } from '../components/weather/ForecastChart';
 import { ExplainCard } from '../components/common/ExplainCard';
-import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
+import { SkeletonCard } from '../components/common/SkeletonLoader';
 import { ErrorState } from '../components/common/ErrorState';
-import { StatusBadge } from '../components/common/StatusBadge';
+import { PageHeader } from '../components/common/PageHeader';
+import { WhatThisMeans } from '../components/common/WhatThisMeans';
+import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { WeatherIllustration } from '../components/common/FarmerIllustrations';
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { usePictorial } from '../context/PictorialContext';
 
 export const LocationWeatherPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const navigate = useNavigate();
+  const { isPictorial } = usePictorial();
   const { activeFarm, location, setLocation } = useAuth();
 
   // Location Selector State (defaulting to activeFarm/global location)
@@ -43,6 +56,7 @@ export const LocationWeatherPage: React.FC = () => {
   const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
   const [dailyForecast, setDailyForecast] = useState<DailyForecastItem[]>([]);
   const [suitability, setSuitability] = useState<CropSuitabilityResponse | null>(null);
+  const [activeTab, setActiveTab] = useState<'forecast' | 'location' | 'suitability'>('forecast');
 
   // Loading & Error States
   const [isLoadingWeather, setIsLoadingWeather] = useState<boolean>(false);
@@ -150,112 +164,90 @@ export const LocationWeatherPage: React.FC = () => {
     }
   };
 
+  // Derived plain language advice
+  const plainMeaning = weatherData
+    ? weatherData.expected_rainfall_today_mm > 5
+      ? `Rainfall of ${weatherData.expected_rainfall_today_mm.toFixed(1)} mm is expected today. You can pause irrigation and avoid spraying liquid pesticides.`
+      : weatherData.temperature_c > 38
+      ? `High heat of ${weatherData.temperature_c.toFixed(0)}°C detected. Ensure field moisture is maintained to prevent crop heat stress.`
+      : `Weather conditions are moderate (${weatherData.temperature_c.toFixed(0)}°C, ${weatherData.relative_humidity_pct}% humidity). Favourable for routine field maintenance.`
+    : 'Live weather telemetry will calculate field action recommendations once loaded.';
+
+  // PICTORIAL MODE
+  if (isPictorial) {
+    return (
+      <div className="space-y-6 animate-fadeIn pb-12">
+        <PageHeader
+          icon={CloudSun}
+          title={language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम की जानकारी' : 'Weather'}
+          purpose={language === 'te' ? 'ఈ రోజు ఎండ, వర్షం మరియు గాలి సమాచారం' : language === 'hi' ? 'आज की धूप, बारिश और हवा की स्थिति' : 'Visual weather forecast for your village.'}
+        />
+
+        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
+          <div className="flex justify-center">
+            <WeatherIllustration className="w-48 h-36 drop-shadow-sm" />
+          </div>
+
+          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
+            {selectedVillage}, {selectedDistrict}
+          </h2>
+
+          {weatherData ? (
+            <div className="space-y-3">
+              <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-2">
+                <span className="text-4xl font-display font-black text-[#183D2E]">
+                  {weatherData.temperature_c.toFixed(0)}°C
+                </span>
+                <p className="text-sm font-bold text-[#7A553A]">
+                  {weatherData.expected_rainfall_today_mm > 0 ? `Rain: ${weatherData.expected_rainfall_today_mm} mm` : 'No heavy rain expected today'}
+                </p>
+                <div className="flex justify-center gap-4 text-xs text-[#4E5F57] pt-1">
+                  <span>Humidity: {weatherData.relative_humidity_pct}%</span>
+                  <span>&bull;</span>
+                  <span>Wind: {weatherData.wind_speed_kmh} km/h</span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <ReadAloudButton text={`Weather for ${selectedVillage}: ${weatherData.temperature_c.toFixed(0)} degrees Celsius. ${plainMeaning}`} />
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-[#4E5F57]">Loading weather...</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-agri-gold-600">
-              Tier 1 Agro-Meteorology
-            </span>
-            <StatusBadge status="WORKING" />
-          </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-stone-900">
-            {t('location.title')}
-          </h1>
-          <p className="text-xs sm:text-sm text-stone-500">
-            {t('location.subtitle')}
-          </p>
-        </div>
-
-        <button
-          onClick={() => navigate('/farms')}
-          className="inline-flex items-center gap-2 px-5 py-3 bg-agri-green-700 hover:bg-agri-green-800 text-white rounded-2xl text-xs font-bold shadow-md transition-all active:scale-95 self-start sm:self-auto"
-        >
-          <span>{t('location.proceed_to_farm')}</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Location Cascading Selectors */}
-      <div className="bg-white border border-agri-soil-200/80 rounded-2xl p-5 shadow-warm space-y-4">
-        <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
-          <MapPin className="w-5 h-5 text-agri-green-700" />
-          <h3 className="font-display text-sm font-bold text-stone-900">
-            Select Agro-Climatic Zone & Village Coordinates
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* State */}
-          <div>
-            <label className="block text-xs font-bold text-stone-700 mb-1">
-              {t('location.select_state')}
-            </label>
-            <select
-              value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-xs font-medium focus:ring-2 focus:ring-agri-green-600 bg-white"
-            >
-              {states.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* District */}
-          <div>
-            <label className="block text-xs font-bold text-stone-700 mb-1">
-              {t('location.select_district')}
-            </label>
-            <select
-              value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-xs font-medium focus:ring-2 focus:ring-agri-green-600 bg-white"
-            >
-              {districts.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Village */}
-          <div>
-            <label className="block text-xs font-bold text-stone-700 mb-1">
-              {t('location.select_village')}
-            </label>
-            <select
-              value={selectedVillage}
-              onChange={(e) => handleVillageChange(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-xs font-medium focus:ring-2 focus:ring-agri-green-600 bg-white"
-            >
-              {villages.map((v) => (
-                <option key={v.village} value={v.village}>
-                  {v.village} ({v.lat.toFixed(2)}, {v.lon.toFixed(2)})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Partial Village Dataset Disclaimer */}
-        {isPartialNotice && (
-          <div className="flex items-start gap-2 p-3 bg-agri-cream-100 rounded-xl border border-stone-200/80 text-[11px] text-stone-600">
-            <Info className="w-4 h-4 text-agri-soil-600 flex-shrink-0 mt-0.5" />
-            <span>{t('location.partial_dataset_notice')}</span>
-          </div>
-        )}
-      </div>
+    <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
+      {/* PAGE HEADER */}
+      <PageHeader
+        icon={CloudSun}
+        title={t('location.title')}
+        purpose={t('location.subtitle')}
+        whatIsThis={{
+          summary: 'Retrieves live open-meteo agro-meteorology, UN FAO-56 atmospheric water demand (ET0), and village-level rainfall forecasts for crop protection.',
+          whatToEnter: 'Your State, District, and Village centroid from the cascading pickers below.',
+          whatYouGet: 'Current temperature, humidity, wind, 7-day weather outlook, and crop thermal suitability analysis.',
+        }}
+        actions={
+          <button
+            type="button"
+            onClick={() => navigate('/farms')}
+            className="min-h-[48px] px-5 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2"
+          >
+            <span>{t('location.proceed_to_farm')}</span>
+            <ArrowRight className="w-4 h-4 text-[#DA9A4C]" />
+          </button>
+        }
+      />
 
       {/* Loading Skeleton */}
       {isLoadingWeather && (
-        <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-warm">
-          <LoadingSkeleton lines={4} />
+        <div className="bg-white border border-[#7A553A]/20 rounded-2xl p-6 shadow-sm">
+          <SkeletonCard rows={3} />
         </div>
       )}
 
@@ -268,28 +260,289 @@ export const LocationWeatherPage: React.FC = () => {
         />
       )}
 
-      {/* Live Weather Card */}
+      {/* LEAD SUMMARY SECTION (1 to 3 Large Cards + Primary Action) */}
       {weatherData && !isLoadingWeather && (
-        <CurrentWeatherCard weather={weatherData} />
-      )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Card 1: Today's Weather & Rain Risk */}
+          <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
+                  Today's Agro-Weather
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
+                  {selectedVillage}
+                </span>
+              </div>
 
-      {/* 7-Day Forecast & Suitability Layout */}
-      {dailyForecast.length > 0 && !isLoadingWeather && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-8">
-            <ForecastChart data={dailyForecast} />
+              <div className="flex items-baseline gap-3 pt-1">
+                <span className="text-4xl sm:text-5xl font-display font-black text-[#183D2E]">
+                  {weatherData.temperature_c.toFixed(0)}°C
+                </span>
+                <span className="text-sm font-semibold text-[#7A553A]">
+                  Rain: <strong>{weatherData.expected_rainfall_today_mm.toFixed(1)} mm</strong>
+                </span>
+              </div>
+
+              <p className="text-xs text-[#4E5F57] leading-relaxed">
+                Open-Meteo live feed &bull; Coordinates: {currentLat.toFixed(2)}°N, {currentLon.toFixed(2)}°E
+              </p>
+            </div>
+
+            <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">
+              <ReadAloudButton text={`Weather for ${selectedVillage}: ${weatherData.temperature_c.toFixed(0)} degrees Celsius. ${plainMeaning}`} />
+              <button
+                type="button"
+                onClick={() => setActiveTab('forecast')}
+                className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
+              >
+                <span>7-Day Outlook</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
-          <div className="lg:col-span-4">
-            {suitability && (
-              <ExplainCard
-                title={t('location.suitability_heading')}
-                data={suitability}
+          {/* Card 2: Evaporative Demand & Humidity */}
+          <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                  <Droplets className="w-4 h-4 text-blue-600" />
+                  Atmospheric Demand
+                </span>
+                <span className="text-xs text-[#7A553A] font-semibold">
+                  FAO-56 ET0 ({weatherData.reference_et0_mm} mm)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
+                  <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Humidity</span>
+                  <span className="text-xl font-black text-[#183D2E]">
+                    {weatherData.relative_humidity_pct}%
+                  </span>
+                </div>
+                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
+                  <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Wind Speed</span>
+                  <span className="text-xl font-black text-[#183D2E]">
+                    {weatherData.wind_speed_kmh} <span className="text-xs font-normal">km/h</span>
+                  </span>
+                </div>
+              </div>
+
+              <WhatThisMeans
+                message={plainMeaning}
+                confidenceNote="Observation feeds from Open-Meteo agro-meteorological models."
               />
-            )}
+            </div>
+          </div>
+
+          {/* Card 3: Village Centroid & Farm Matching */}
+          <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-[#DA9A4C]" />
+                  Active Agro-Centroid
+                </span>
+                <span className="text-xs font-bold text-[#183D2E]">
+                  {selectedDistrict}
+                </span>
+              </div>
+
+              <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1 text-xs">
+                <p className="text-[#183D2E] font-bold">
+                  {selectedVillage}, {selectedDistrict}, {selectedState}
+                </p>
+                <p className="text-[#7A553A]">
+                  Centroid Lat/Lon: {currentLat.toFixed(4)}, {currentLon.toFixed(4)}
+                </p>
+                {activeFarm && (
+                  <p className="text-emerald-800 font-semibold pt-1 border-t border-[#7A553A]/10">
+                    Linked to farm: {activeFarm.name} ({activeFarm.area} ac)
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between text-xs text-[#7A553A]">
+              <span>Indicative village-level centroid.</span>
+              <button
+                type="button"
+                onClick={() => setActiveTab('location')}
+                className="text-xs font-bold text-[#183D2E] hover:underline"
+              >
+                Change Village →
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      {/* DETAIL TABS (Preserving all weather features and controls) */}
+      <div className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+        {/* Tabs Bar */}
+        <div className="flex border-b border-[#7A553A]/15 overflow-x-auto bg-[#FAF8F5]/80">
+          <button
+            type="button"
+            onClick={() => setActiveTab('forecast')}
+            className={`min-h-[48px] px-5 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-all ${
+              activeTab === 'forecast'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <Calendar className="w-4 h-4 text-[#DA9A4C]" />
+            <span>7-Day Agro-Forecast ({dailyForecast.length} days)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('location')}
+            className={`min-h-[48px] px-5 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-all ${
+              activeTab === 'location'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <MapPin className="w-4 h-4 text-[#183D2E]" />
+            <span>Village & Location Selector</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('suitability')}
+            className={`min-h-[48px] px-5 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-all ${
+              activeTab === 'suitability'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-emerald-600" />
+            <span>Crop Climate Suitability</span>
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-5 sm:p-6">
+          {/* TAB 1: 7-DAY FORECAST */}
+          {activeTab === 'forecast' && (
+            <div className="space-y-6">
+              {weatherData && (
+                <div className="pb-4">
+                  <CurrentWeatherCard weather={weatherData} />
+                </div>
+              )}
+
+              {dailyForecast.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-[#183D2E]">
+                      7-Day Daily Rain & Evapotranspiration
+                    </h3>
+                    <span className="text-xs text-[#7A553A]">
+                      Rainfall in mm &bull; ET0 demand
+                    </span>
+                  </div>
+                  <ForecastChart data={dailyForecast} />
+                </div>
+              ) : (
+                <p className="text-xs text-neutral-500 text-center py-6">Forecast data loading...</p>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: VILLAGE & LOCATION SELECTOR */}
+          {activeTab === 'location' && (
+            <div className="space-y-5">
+              <div className="flex items-center gap-2 border-b border-[#7A553A]/15 pb-3">
+                <MapPin className="w-5 h-5 text-[#183D2E]" />
+                <h3 className="text-sm font-bold text-[#183D2E]">
+                  Select Agro-Climatic Zone & Village Coordinates
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* State */}
+                <div>
+                  <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                    {t('location.select_state')}
+                  </label>
+                  <select
+                    value={selectedState}
+                    onChange={(e) => setSelectedState(e.target.value)}
+                    className="w-full min-h-[48px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-xs font-medium focus:ring-2 focus:ring-[#183D2E] bg-white text-[#183D2E]"
+                  >
+                    {states.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* District */}
+                <div>
+                  <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                    {t('location.select_district')}
+                  </label>
+                  <select
+                    value={selectedDistrict}
+                    onChange={(e) => setSelectedDistrict(e.target.value)}
+                    className="w-full min-h-[48px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-xs font-medium focus:ring-2 focus:ring-[#183D2E] bg-white text-[#183D2E]"
+                  >
+                    {districts.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Village */}
+                <div>
+                  <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                    {t('location.select_village')}
+                  </label>
+                  <select
+                    value={selectedVillage}
+                    onChange={(e) => handleVillageChange(e.target.value)}
+                    className="w-full min-h-[48px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-xs font-medium focus:ring-2 focus:ring-[#183D2E] bg-white text-[#183D2E]"
+                  >
+                    {villages.map((v) => (
+                      <option key={v.village} value={v.village}>
+                        {v.village} ({v.lat.toFixed(2)}, {v.lon.toFixed(2)})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Partial Village Dataset Disclaimer */}
+              {isPartialNotice && (
+                <div className="flex items-start gap-2 p-3.5 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/20 text-xs text-[#7A553A]">
+                  <Info className="w-4 h-4 text-[#DA9A4C] shrink-0 mt-0.5" />
+                  <span>{t('location.partial_dataset_notice')}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: CROP CLIMATE SUITABILITY */}
+          {activeTab === 'suitability' && (
+            <div className="space-y-4">
+              {suitability ? (
+                <ExplainCard
+                  title={t('location.suitability_heading')}
+                  data={suitability}
+                />
+              ) : (
+                <p className="text-xs text-neutral-500 text-center py-6">Suitability analysis loading...</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
+
+export default LocationWeatherPage;

@@ -8,19 +8,26 @@ import {
   Clock,
   CheckCircle,
   Sprout,
+  ArrowRight,
+  BookOpen,
 } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { usePictorial } from '../context/PictorialContext';
 import { getCropCalendar, getSeasonalAwareness } from '../api/economics';
 import {
   CropCalendarResponse,
   SeasonalAwarenessResponse,
 } from '../types/api';
-import { StatusBadge } from '../components/common/StatusBadge';
 import { ExplainCard } from '../components/common/ExplainCard';
+import { PageHeader } from '../components/common/PageHeader';
+import { WhatThisMeans } from '../components/common/WhatThisMeans';
+import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { EmptyPlotIllustration } from '../components/common/FarmerIllustrations';
 
 export const CalendarPage: React.FC = () => {
   const { t, language } = useTranslation();
+  const { isPictorial } = usePictorial();
   const { activeFarm, activeFarmId, setActiveFarmId, farms } = useAuth();
 
   const [cropName, setCropName] = useState<string>('Cotton');
@@ -30,6 +37,7 @@ export const CalendarPage: React.FC = () => {
   const [seasonData, setSeasonData] = useState<SeasonalAwarenessResponse | null>(null);
   const [eventTypeFilter, setEventTypeFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'tasks' | 'stages' | 'season' | 'methodology'>('tasks');
 
   // Browser Notification state
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
@@ -102,42 +110,125 @@ export const CalendarPage: React.FC = () => {
     return evt.event_type === eventTypeFilter;
   });
 
-  return (
-    <div className="space-y-8 animate-fadeIn max-w-6xl mx-auto pb-16">
-      {/* Top Banner */}
-      <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-agri-gold-400 text-stone-900 rounded-md">
-              {t('common.demo_mode')}
-            </span>
-            <StatusBadge status="WORKING" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-display font-black text-stone-900 tracking-tight flex items-center gap-2.5">
-            <CalendarIcon className="w-8 h-8 text-agri-green-700" />
-            {t('calendar.title')}
-          </h1>
-          <p className="text-xs text-stone-600 mt-1">
-            {t('calendar.subtitle')}
-          </p>
+  const activeStage = calendarData?.lifecycle_stages.find((st) => st.is_active);
+  const nextEvent = filteredEvents?.[0];
 
-          {/* Farm & Crop Selector */}
-          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-stone-100">
-            {farms.length > 0 && (
+  const plainMeaning = calendarData
+    ? `Your ${cropName} crop is currently at DAS ${calendarData.days_after_sowing} in the ${activeStage?.stage_name_en || 'active growth'} stage. Next priority task is: ${nextEvent?.title || 'routine field maintenance'}.`
+    : 'Generating crop lifecycle calendar...';
+
+  // PICTORIAL MODE
+  if (isPictorial) {
+    return (
+      <div className="space-y-6 animate-fadeIn pb-12">
+        <PageHeader
+          icon={CalendarIcon}
+          title={language === 'te' ? 'పంట కాలెండర్' : language === 'hi' ? 'फसल कैलेंडर' : 'Crop Calendar'}
+          purpose={language === 'te' ? 'పంట దశ మరియు రాబోయే పనుల వివరాలు' : language === 'hi' ? 'फसल की अवस्था और आगामी कार्यों की जानकारी' : 'Visual schedule of field activities.'}
+        />
+
+        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
+          <div className="flex justify-center">
+            <EmptyPlotIllustration className="w-48 h-36 drop-shadow-sm" />
+          </div>
+
+          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
+            {cropName} &bull; DAS {calendarData?.days_after_sowing ?? 90}
+          </h2>
+
+          <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-2 text-left">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#183D2E] text-white">
+              Current Stage
+            </span>
+            <h3 className="text-xl font-bold text-[#183D2E]">
+              {activeStage?.stage_name_en || 'Mid-Season Development'}
+            </h3>
+            <p className="text-sm text-[#4E5F57]">
+              {nextEvent?.title ? `Next Task: ${nextEvent.title}` : 'Routine scouting and water checks.'}
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <ReadAloudButton text={`Crop Calendar: ${cropName} is at DAS ${calendarData?.days_after_sowing}. ${plainMeaning}`} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 animate-fadeIn max-w-6xl mx-auto pb-16">
+      {/* PAGE HEADER */}
+      <PageHeader
+        icon={CalendarIcon}
+        title={t('calendar.title')}
+        purpose={t('calendar.subtitle')}
+        whatIsThis={{
+          summary: 'Generates day-by-day agronomic task timelines and 7-stage phenological milestones based on your actual sowing date using UN FAO-56 crop growth stage models.',
+          whatToEnter: 'Selected crop, sowing/planting date, and your registered farm holding.',
+          whatYouGet: 'Scheduled field actions (fertilizer, scouting, weeding, harvest), growth stage tracking, and downloadable RFC 5545 .ics smartphone calendar file.',
+        }}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={downloadIcsFile}
+              className="min-h-[44px] flex items-center gap-1.5 px-4 py-2 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all"
+              title="Export RFC 5545 .ics Calendar"
+            >
+              <Download className="w-4 h-4 text-[#DA9A4C]" />
+              <span>{t('calendar.export_ics_btn')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={requestNotificationOptIn}
+              className={`min-h-[44px] flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl border transition-all ${
+                notificationPermission === 'granted'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                  : 'bg-white text-[#183D2E] border-[#7A553A]/30 hover:bg-[#FAF8F5]'
+              }`}
+            >
+              {notificationPermission === 'granted' ? (
+                <>
+                  <Bell className="w-4 h-4 text-emerald-600" />
+                  <span>{t('calendar.notifications_active')}</span>
+                </>
+              ) : (
+                <>
+                  <BellOff className="w-4 h-4 text-[#7A553A]" />
+                  <span>{t('calendar.enable_notifications')}</span>
+                </>
+              )}
+            </button>
+          </div>
+        }
+      />
+
+      {/* Sowing Date & Farm Switcher Bar */}
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-[#7A553A]/20 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {farms.length > 0 && (
+            <div>
+              <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">Farm Holding</label>
               <select
                 value={activeFarmId || ''}
                 onChange={(e) => setActiveFarmId(Number(e.target.value))}
-                className="text-xs font-bold bg-stone-100 text-stone-800 rounded-lg px-2.5 py-1.5 border border-stone-300"
+                className="min-h-[40px] text-xs font-bold bg-[#FAF8F5] text-[#183D2E] rounded-xl px-3 py-1.5 border border-[#7A553A]/30 focus:ring-2 focus:ring-[#183D2E]"
               >
                 {farms.map((f) => (
                   <option key={f.id} value={f.id}>{f.name} ({f.area} ac)</option>
                 ))}
               </select>
-            )}
+            </div>
+          )}
+
+          <div>
+            <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">Crop</label>
             <select
               value={cropName}
               onChange={(e) => setCropName(e.target.value)}
-              className="text-xs font-bold bg-stone-100 text-stone-800 rounded-lg px-2.5 py-1.5 border border-stone-300"
+              className="min-h-[40px] text-xs font-bold bg-[#FAF8F5] text-[#183D2E] rounded-xl px-3 py-1.5 border border-[#7A553A]/30 focus:ring-2 focus:ring-[#183D2E]"
             >
               <option value="Cotton">Cotton (పత్తి)</option>
               <option value="Rice">Rice (వరి)</option>
@@ -148,234 +239,383 @@ export const CalendarPage: React.FC = () => {
               <option value="Groundnut">Groundnut (వేరుశనగ)</option>
               <option value="Sugarcane">Sugarcane (చెరకు)</option>
             </select>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">Planting / Sowing Date</label>
             <input
               type="date"
               value={plantingDate}
               onChange={(e) => setPlantingDate(e.target.value)}
-              className="text-xs font-bold bg-stone-100 text-stone-800 rounded-lg px-2.5 py-1.5 border border-stone-300"
+              className="min-h-[40px] text-xs font-bold bg-[#FAF8F5] text-[#183D2E] rounded-xl px-3 py-1.5 border border-[#7A553A]/30 focus:ring-2 focus:ring-[#183D2E]"
             />
-            {loading && <span className="text-[10px] text-stone-500 font-bold animate-pulse">Syncing...</span>}
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={downloadIcsFile}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-agri-green-700 hover:bg-agri-green-800 text-white font-bold text-xs rounded-xl shadow transition-all"
-            title="Export RFC 5545 .ics Calendar"
-          >
-            <Download className="w-4 h-4" />
-            {t('calendar.export_ics_btn')}
-          </button>
-
-          <button
-            onClick={requestNotificationOptIn}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-all ${notificationPermission === 'granted'
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                : 'bg-stone-50 text-stone-700 border-stone-300 hover:bg-stone-100'
-              }`}
-          >
-            {notificationPermission === 'granted' ? (
-              <>
-                <Bell className="w-4 h-4 text-emerald-600" />
-                {t('calendar.notifications_active')}
-              </>
-            ) : (
-              <>
-                <BellOff className="w-4 h-4 text-stone-500" />
-                {t('calendar.enable_notifications')}
-              </>
-            )}
-          </button>
-        </div>
+        {loading && <span className="text-xs text-[#DA9A4C] font-bold animate-pulse">Syncing Calendar...</span>}
       </div>
 
       {notificationMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs p-3 rounded-xl flex items-center gap-2 animate-fadeIn">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs p-3.5 rounded-xl flex items-center gap-2 animate-fadeIn">
           <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{notificationMsg}</span>
         </div>
       )}
 
-      {/* Seasonal Awareness Card */}
-      {seasonData && (
-        <div className="bg-gradient-to-r from-agri-cream-100/90 to-agri-cream-50 border border-agri-gold-300 rounded-2xl p-6 shadow-subtle space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-agri-gold-200/80 pb-3">
-            <div className="flex items-center gap-2.5">
-              <Sun className="w-6 h-6 text-amber-600" />
-              <div>
-                <h3 className="text-base font-bold text-stone-900">
-                  {t('calendar.season_awareness_title')}: {seasonData.current_season} ({seasonData.season_period})
-                </h3>
-                <span className="text-[11px] text-stone-600">
-                  {language === 'te' ? seasonData.season_name_te : (language === 'hi' ? seasonData.season_name_hi : `${seasonData.current_season} Season`)} &bull; Current Month: {seasonData.current_month}
-                </span>
-              </div>
-            </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-white px-2.5 py-1 rounded-lg border border-agri-gold-300 text-stone-700">
-              IMD Agromet Guidelines
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/80 p-3.5 rounded-xl border border-stone-200">
-              <span className="text-xs font-bold text-stone-800 block mb-1">Climatic Expectations:</span>
-              <ul className="text-xs text-stone-600 space-y-1">
-                <li>• Temp: <strong>{seasonData.climate_expectations.temperature}</strong></li>
-                <li>• Rain: <strong>{seasonData.climate_expectations.rainfall}</strong></li>
-                <li>• Humidity: <strong>{seasonData.climate_expectations.humidity}</strong></li>
-              </ul>
+      {/* LEAD SUMMARY SECTION (1 to 3 Large Cards + Primary Action) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Card 1: Current Phenological Stage */}
+        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
+                Current Growth Stage
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
+                DAS {calendarData?.days_after_sowing ?? 90}
+              </span>
             </div>
 
-            <div className="bg-white/80 p-3.5 rounded-xl border border-stone-200">
-              <span className="text-xs font-bold text-stone-800 block mb-1">Typical Regional Crops:</span>
-              <div className="flex flex-wrap gap-1.5 mt-1">
-                {seasonData.typical_crops.map((c) => (
-                  <span key={c} className="text-[11px] bg-agri-green-50 text-agri-green-800 font-semibold px-2 py-0.5 rounded-md border border-agri-green-200">
-                    {c}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-[#183D2E]">
+              {activeStage?.stage_name_en || 'Mid-Season Development'}
+            </h2>
 
-            <div className="bg-white/80 p-3.5 rounded-xl border border-amber-200">
-              <span className="text-xs font-bold text-amber-900 block mb-1">Primary Seasonal Risks:</span>
-              <ul className="text-[11px] text-amber-800 space-y-1">
-                {seasonData.primary_risks.map((r, i) => (
-                  <li key={i}>• {r}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
+            <p className="text-xs text-[#7A553A] font-semibold">
+              Duration: {calendarData?.total_duration_days ?? 160} days total &bull; Sown: {plantingDate}
+            </p>
 
-      {/* Lifecycle Timeline (7 Stages) */}
-      {calendarData && (
-        <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-agri-green-700" />
-              <h3 className="text-base font-bold text-stone-900">
-                {t('calendar.lifecycle_timeline_title')} ({cropName} &bull; Sown: {plantingDate} &bull; DAS {calendarData.days_after_sowing})
-              </h3>
-            </div>
-            <span className="text-xs text-stone-500 font-semibold">
-              Total Duration: {calendarData.total_duration_days} days
-            </span>
+            <p className="text-xs text-[#4E5F57] leading-relaxed pt-1">
+              Active activities: {activeStage?.key_activities?.join(', ') || 'Weed control, vegetative scouting, and soil moisture checks.'}
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2.5 pt-2">
-            {calendarData.lifecycle_stages.map((st) => (
-              <div
-                key={st.stage_id}
-                className={`p-3 rounded-xl border transition-all ${st.is_active
-                    ? 'bg-agri-gold-50 border-agri-gold-400 shadow-sm ring-2 ring-agri-gold-400/40'
-                    : 'bg-stone-50/70 border-stone-200'
-                  }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className={`text-[10px] font-black uppercase px-1.5 py-0.5 rounded ${st.is_active ? 'bg-agri-gold-400 text-stone-900' : 'bg-stone-200 text-stone-700'
-                    }`}>
-                    {st.is_active ? 'Current' : `DAS ${st.start_das}`}
-                  </span>
-                </div>
-                <h4 className="font-bold text-stone-900 text-xs line-clamp-1">{st.stage_name_en}</h4>
-                <span className="text-[10px] text-stone-500 block mb-2">{st.start_date.slice(5)} to {st.end_date.slice(5)}</span>
-                <ul className="text-[10px] text-stone-600 space-y-1">
-                  {st.key_activities.slice(0, 2).map((act, i) => (
-                    <li key={i} className="line-clamp-2">• {act}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Dated Calendar Events List */}
-      <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Sprout className="w-5 h-5 text-agri-green-700" />
-            <h3 className="text-base font-bold text-stone-900">
-              {t('calendar.events_list_title')} ({filteredEvents?.length || 0} Scheduled Actions)
-            </h3>
-          </div>
-
-          {/* Event Filters */}
-          <div className="flex flex-wrap gap-1 bg-stone-100 p-1 rounded-xl text-xs">
-            {['all', 'sowing', 'irrigation', 'fertilizer', 'scouting', 'harvest'].map((filterKey) => (
-              <button
-                key={filterKey}
-                onClick={() => setEventTypeFilter(filterKey)}
-                className={`px-2.5 py-1 rounded-lg font-bold capitalize transition-all ${eventTypeFilter === filterKey ? 'bg-white shadow text-agri-green-900' : 'text-stone-600'
-                  }`}
-              >
-                {filterKey}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Event Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2">
-          {filteredEvents?.map((evt) => (
-            <div
-              key={evt.event_id}
-              className="p-4 rounded-xl border border-stone-200 bg-stone-50/50 hover:bg-stone-50 transition-colors flex flex-col justify-between"
+          <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">
+            <ReadAloudButton text={`Current Stage is ${activeStage?.stage_name_en || 'Active growth'}. ${plainMeaning}`} />
+            <button
+              type="button"
+              onClick={() => setActiveTab('stages')}
+              className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="px-2 py-0.5 bg-agri-cream-200 text-agri-green-900 text-[10px] font-black uppercase rounded-md tracking-wider">
-                    {evt.event_type}
-                  </span>
-                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${evt.priority === 'high' ? 'bg-red-100 text-red-800' : 'bg-stone-200 text-stone-700'
-                    }`}>
-                    {evt.priority} Priority
-                  </span>
-                </div>
+              <span>View 7 Stages</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
 
-                <h4 className="font-bold text-stone-900 text-sm mb-1">{evt.title}</h4>
-                <p className="text-xs text-stone-600 mb-2 leading-relaxed">{evt.description}</p>
+        {/* Card 2: Next Field Action & Priority */}
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-[#DA9A4C]" />
+                Next Priority Task
+              </span>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                nextEvent?.priority === 'high' ? 'bg-red-100 text-red-900' : 'bg-stone-200 text-stone-800'
+              }`}>
+                {nextEvent?.priority || 'Normal'} Priority
+              </span>
+            </div>
+
+            <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1">
+              <h3 className="text-sm font-bold text-[#183D2E]">
+                {nextEvent?.title || 'Foliar Nutrient Spraying'}
+              </h3>
+              <p className="text-xs text-[#4E5F57] leading-relaxed">
+                {nextEvent?.description || 'Inspect underside of leaves for early sucking pests and verify root zone soil moisture.'}
+              </p>
+              <span className="text-[11px] text-[#7A553A] font-semibold block pt-1">
+                Target Window: {nextEvent?.start_date || 'Upcoming'}
+              </span>
+            </div>
+
+            <WhatThisMeans
+              message={plainMeaning}
+              confidenceNote="Computed from FAO-56 stage days and local agro-meteorological guidelines."
+            />
+          </div>
+        </div>
+
+        {/* Card 3: Seasonal Agro-Climate Status */}
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                <Sun className="w-4 h-4 text-amber-600" />
+                Regional Season
+              </span>
+              <span className="text-xs font-bold text-[#183D2E]">
+                {seasonData?.current_season || 'Kharif'}
+              </span>
+            </div>
+
+            <div className="space-y-1 text-xs">
+              <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
+                <span className="text-[#7A553A] block text-[10px]">Season Period:</span>
+                <strong className="text-[#183D2E]">{seasonData?.season_period || 'June to October'}</strong>
               </div>
-
-              <div className="border-t border-stone-200 pt-2 flex items-center justify-between text-xs text-stone-500">
-                <span className="flex items-center gap-1 font-semibold text-agri-green-800">
-                  <Clock className="w-3.5 h-3.5" />
-                  {evt.start_date} {evt.end_date ? `to ${evt.end_date}` : ''}
-                </span>
-                <span className="capitalize text-[11px] text-stone-500">{evt.growth_stage} stage</span>
+              <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
+                <span className="text-[#7A553A] block text-[10px]">Primary Seasonal Risk:</span>
+                <strong className="text-amber-900">{seasonData?.primary_risks?.[0] || 'Unseasonal rain during flowering'}</strong>
               </div>
             </div>
-          ))}
+          </div>
+
+          <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between text-xs text-[#7A553A]">
+            <span>IMD Agromet Guidelines</span>
+            <button
+              type="button"
+              onClick={() => setActiveTab('season')}
+              className="font-bold text-[#183D2E] hover:underline"
+            >
+              Season Details →
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Universal ExplainCard */}
-      <ExplainCard
-        title={t('calendar.explain_title')}
-        data={{
-          value: `${cropName} Calendar & Lifecycle Schedule`,
-          status: 'WORKING',
-          confidence: 0.90,
-          confidence_type: 'rule',
-          reasons: [
-            "Lifecycle stages align directly with FAO-56 stage lengths computed from your crop sowing date.",
-            "Calendar export complies strictly with the RFC 5545 iCalendar standard for cross-platform calendar synchronization.",
-            "In-app reminders flag high-priority moisture stress checks and pest scouting windows ahead of time.",
-          ],
-          sources: [
-            "FAO Irrigation and Drainage Paper 56 — Crop Stages and Lengths",
-            "ICAR Krishi Vigyan Kendra (KVK) Agronomic Calendar Schedules",
-          ],
-          limitations: [
-            "Weather anomalies (monsoon delay, heavy unseasonal rain) may accelerate or retard phenological DAS by 5-7 days.",
-            "Notification alerts require active browser permission grant on your mobile device.",
-          ],
-        }}
-      />
+      {/* DETAIL TABS (Decluttering all calendar controls without deleting) */}
+      <div className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+        {/* Tabs Bar */}
+        <div className="flex border-b border-[#7A553A]/15 overflow-x-auto bg-[#FAF8F5]/80">
+          <button
+            type="button"
+            onClick={() => setActiveTab('tasks')}
+            className={`min-h-[48px] px-5 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-all ${
+              activeTab === 'tasks'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <Sprout className="w-4 h-4 text-emerald-600" />
+            <span>Scheduled Field Tasks ({filteredEvents?.length || 0})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('stages')}
+            className={`min-h-[48px] px-5 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-all ${
+              activeTab === 'stages'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <Clock className="w-4 h-4 text-[#DA9A4C]" />
+            <span>7-Stage Lifecycle Timeline</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('season')}
+            className={`min-h-[48px] px-5 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-all ${
+              activeTab === 'season'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <Sun className="w-4 h-4 text-amber-600" />
+            <span>Seasonal Awareness & IMD Agromet</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('methodology')}
+            className={`min-h-[48px] px-5 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-all ${
+              activeTab === 'methodology'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <BookOpen className="w-4 h-4 text-[#7A553A]" />
+            <span>Methodology & Disclaimers</span>
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-5 sm:p-6">
+          {/* TAB 1: SCHEDULED TASKS */}
+          {activeTab === 'tasks' && (
+            <div className="space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#7A553A]/15">
+                <h3 className="text-sm font-bold text-[#183D2E]">
+                  Filter Scheduled Actions:
+                </h3>
+                <div className="flex flex-wrap gap-1 bg-[#FAF8F5] p-1 rounded-xl text-xs border border-[#7A553A]/20">
+                  {['all', 'sowing', 'irrigation', 'fertilizer', 'scouting', 'harvest'].map((filterKey) => (
+                    <button
+                      key={filterKey}
+                      onClick={() => setEventTypeFilter(filterKey)}
+                      className={`min-h-[36px] px-3 py-1 rounded-lg font-bold capitalize transition-all ${
+                        eventTypeFilter === filterKey ? 'bg-[#183D2E] text-white shadow' : 'text-[#7A553A] hover:text-[#183D2E]'
+                      }`}
+                    >
+                      {filterKey}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredEvents?.map((evt) => (
+                  <div
+                    key={evt.event_id}
+                    className="p-4 rounded-xl border border-[#7A553A]/20 bg-[#FAF8F5] hover:bg-[#EFE7DE]/30 transition-colors flex flex-col justify-between space-y-3"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="px-2.5 py-0.5 bg-[#DA9A4C]/20 text-[#7A553A] text-[10px] font-black uppercase rounded-md tracking-wider">
+                          {evt.event_type}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
+                          evt.priority === 'high' ? 'bg-red-100 text-red-800' : 'bg-stone-200 text-stone-700'
+                        }`}>
+                          {evt.priority} Priority
+                        </span>
+                      </div>
+
+                      <h4 className="font-bold text-[#183D2E] text-sm mb-1">{evt.title}</h4>
+                      <p className="text-xs text-[#4E5F57] leading-relaxed">{evt.description}</p>
+                    </div>
+
+                    <div className="border-t border-[#7A553A]/15 pt-2 flex items-center justify-between text-xs text-[#7A553A]">
+                      <span className="flex items-center gap-1 font-semibold text-[#183D2E]">
+                        <Clock className="w-3.5 h-3.5" />
+                        {evt.start_date} {evt.end_date ? `to ${evt.end_date}` : ''}
+                      </span>
+                      <span className="capitalize text-[11px] text-[#7A553A]">{evt.growth_stage} stage</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: LIFECYCLE STAGES */}
+          {activeTab === 'stages' && (
+            <div className="space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-[#7A553A]/15">
+                <h3 className="text-sm font-bold text-[#183D2E]">
+                  {t('calendar.lifecycle_timeline_title')} ({cropName} &bull; Sown: {plantingDate} &bull; DAS {calendarData?.days_after_sowing})
+                </h3>
+                <span className="text-xs text-[#7A553A] font-semibold">
+                  Total Duration: {calendarData?.total_duration_days} days
+                </span>
+              </div>
+
+              {calendarData && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+                  {calendarData.lifecycle_stages.map((st) => (
+                    <div
+                      key={st.stage_id}
+                      className={`p-3.5 rounded-xl border transition-all ${
+                        st.is_active
+                          ? 'bg-[#FEF6E9] border-[#DA9A4C] shadow-sm ring-2 ring-[#DA9A4C]/50'
+                          : 'bg-[#FAF8F5] border-[#7A553A]/20'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                          st.is_active ? 'bg-[#183D2E] text-white' : 'bg-[#7A553A]/15 text-[#7A553A]'
+                        }`}>
+                          {st.is_active ? 'Current' : `DAS ${st.start_das}`}
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-[#183D2E] text-xs line-clamp-1">{st.stage_name_en}</h4>
+                      <span className="text-[10px] text-[#7A553A] block mb-2">{st.start_date.slice(5)} to {st.end_date.slice(5)}</span>
+                      <ul className="text-[10px] text-[#4E5F57] space-y-1">
+                        {st.key_activities.slice(0, 2).map((act, i) => (
+                          <li key={i} className="line-clamp-2">• {act}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: SEASONAL AWARENESS */}
+          {activeTab === 'season' && (
+            <div className="space-y-5">
+              {seasonData && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#7A553A]/15 pb-3">
+                    <div>
+                      <h3 className="text-base font-bold text-[#183D2E]">
+                        {seasonData.current_season} Season ({seasonData.season_period})
+                      </h3>
+                      <span className="text-xs text-[#7A553A]">
+                        {language === 'te' ? seasonData.season_name_te : (language === 'hi' ? seasonData.season_name_hi : `${seasonData.current_season} Season`)} &bull; Current Month: {seasonData.current_month}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FAF8F5] px-2.5 py-1 rounded-lg border border-[#7A553A]/20 text-[#7A553A]">
+                      IMD Agromet Guidelines
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#7A553A]/20">
+                      <span className="text-xs font-bold text-[#183D2E] block mb-1">Climatic Expectations:</span>
+                      <ul className="text-xs text-[#4E5F57] space-y-1">
+                        <li>• Temp: <strong>{seasonData.climate_expectations.temperature}</strong></li>
+                        <li>• Rain: <strong>{seasonData.climate_expectations.rainfall}</strong></li>
+                        <li>• Humidity: <strong>{seasonData.climate_expectations.humidity}</strong></li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#7A553A]/20">
+                      <span className="text-xs font-bold text-[#183D2E] block mb-1">Typical Regional Crops:</span>
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {seasonData.typical_crops.map((c) => (
+                          <span key={c} className="text-[11px] bg-white text-[#183D2E] font-semibold px-2 py-0.5 rounded-md border border-[#7A553A]/20">
+                            {c}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                      <span className="text-xs font-bold text-amber-900 block mb-1">Primary Seasonal Risks:</span>
+                      <ul className="text-[11px] text-amber-800 space-y-1">
+                        {seasonData.primary_risks.map((r, i) => (
+                          <li key={i}>• {r}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 4: METHODOLOGY */}
+          {activeTab === 'methodology' && (
+            <div className="space-y-4">
+              <ExplainCard
+                title={t('calendar.explain_title')}
+                data={{
+                  value: `${cropName} Calendar & Lifecycle Schedule`,
+                  status: 'WORKING',
+                  confidence: 0.90,
+                  confidence_type: 'rule',
+                  reasons: [
+                    "Lifecycle stages align directly with FAO-56 stage lengths computed from your crop sowing date.",
+                    "Calendar export complies strictly with the RFC 5545 iCalendar standard for cross-platform calendar synchronization.",
+                    "In-app reminders flag high-priority moisture stress checks and pest scouting windows ahead of time.",
+                  ],
+                  sources: [
+                    "FAO Irrigation and Drainage Paper 56 — Crop Stages and Lengths",
+                    "ICAR Krishi Vigyan Kendra (KVK) Agronomic Calendar Schedules",
+                  ],
+                  limitations: [
+                    "Weather anomalies (monsoon delay, heavy unseasonal rain) may accelerate or retard phenological DAS by 5-7 days.",
+                    "Notification alerts require active browser permission grant on your mobile device.",
+                  ],
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
+
+export default CalendarPage;

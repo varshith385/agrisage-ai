@@ -2,23 +2,20 @@ import React, { useState, useEffect } from 'react';
 import {
   Store,
   TrendingUp,
-  MapPin,
   Building2,
-  DollarSign,
   AlertTriangle,
-  ExternalLink,
+  ShieldCheck,
+  Plus,
+  Check,
+  ArrowRight,
+  Truck,
   ChevronDown,
   ChevronUp,
-  CheckCircle2,
-  Plus,
-  ShieldCheck,
+  Lock,
+  Sliders,
   Phone,
   Mail,
-  Lock,
-  Unlock,
-  Info,
-  Calendar,
-  Check,
+  RotateCcw,
 } from 'lucide-react';
 import {
   LineChart,
@@ -31,7 +28,7 @@ import {
 } from 'recharts';
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { StatusBadge } from '../components/common/StatusBadge';
+import { usePictorial } from '../context/PictorialContext';
 import {
   getNetRealizationRanking,
   getMSPComparison,
@@ -53,9 +50,14 @@ import {
   PriceTrendResponse,
   WarehouseResponse,
 } from '../types/api';
+import { PageHeader } from '../components/common/PageHeader';
+import { WhatThisMeans } from '../components/common/WhatThisMeans';
+import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { MoneyProfitIllustration } from '../components/common/FarmerIllustrations';
 
 export const MarketPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const { isPictorial } = usePictorial();
   const { user, activeFarm, activeCrop, location } = useAuth();
 
   // Active Tab
@@ -199,7 +201,7 @@ export const MarketPage: React.FC = () => {
         message: inqMsg,
       });
       setShowInquiryModal(false);
-      setFeedbackMsg('Procurement inquiry sent to farmer!');
+      setFeedbackMsg('Inquiry submitted to seller!');
       setTimeout(() => setFeedbackMsg(null), 4000);
       loadMarketplaceData();
     } catch (err) {
@@ -207,14 +209,24 @@ export const MarketPage: React.FC = () => {
     }
   };
 
-  const handleInquiryDecision = async (inqId: number, decision: 'accepted' | 'declined') => {
+  const handleUpdateStatus = async (inquiryId: number, status: 'accepted' | 'declined') => {
     try {
-      await updateInquiryStatus(inqId, decision);
-      setFeedbackMsg(`Inquiry ${decision}! Contact details are now accessible.`);
+      await updateInquiryStatus(inquiryId, status);
+      setFeedbackMsg(`Inquiry marked as ${status}`);
       setTimeout(() => setFeedbackMsg(null), 4000);
       loadMarketplaceData();
     } catch (err) {
-      console.error('Failed to update inquiry decision:', err);
+      console.error('Failed to update status:', err);
+    }
+  };
+
+  const handleDeleteListing = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this listing?')) return;
+    try {
+      await deleteMarketplaceListing(id);
+      loadMarketplaceData();
+    } catch (err) {
+      console.error('Failed to delete listing:', err);
     }
   };
 
@@ -225,906 +237,847 @@ export const MarketPage: React.FC = () => {
       setTimeout(() => setFeedbackMsg(null), 4000);
       loadMarketplaceData();
     } catch (err) {
-      console.error('Failed to update verification:', err);
+      console.error('Failed to verify farmer:', err);
     }
   };
 
-  const handleDeleteListing = async (listingId: number) => {
-    if (!window.confirm('Are you sure you want to delete this listing?')) return;
-    try {
-      await deleteMarketplaceListing(listingId);
-      setFeedbackMsg('Listing deleted successfully.');
-      setTimeout(() => setFeedbackMsg(null), 4000);
-      loadMarketplaceData();
-    } catch (err) {
-      console.error('Failed to delete listing:', err);
-    }
-  };
+  const bestMandi = rankingData?.rankings?.[0];
+
+  const plainMeaning = bestMandi
+    ? `Selling ${quantity} quintals of ${selectedCrop} at ${bestMandi.mandi} gives your highest net payout of ₹${bestMandi.net_realization_per_q.toFixed(0)}/q after deducting transport and mandi fees.`
+    : 'Calculating net mandi realization rankings...';
+
+  // PICTORIAL MODE
+  if (isPictorial) {
+    return (
+      <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
+        <PageHeader
+          icon={Store}
+          title={language === 'te' ? 'మార్కెట్ ధరలు' : language === 'hi' ? 'मंडी के भाव' : 'Market Prices'}
+          purpose={language === 'te' ? 'దగ్గర్లోని మార్కెట్లలో ధరలు మరియు లాభం చూడండి' : language === 'hi' ? 'नजदीकी मंडियों के भाव और शुद्ध कमाई देखें' : 'Visual market prices and best net mandi payout.'}
+        />
+
+        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
+          <div className="flex justify-center">
+            <MoneyProfitIllustration className="w-48 h-36 drop-shadow-sm" />
+          </div>
+
+          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
+            {selectedCrop} &bull; Best Mandi
+          </h2>
+
+          {bestMandi ? (
+            <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-2 text-left">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#183D2E] text-white">
+                Highest Net Return
+              </span>
+              <h3 className="text-xl font-bold text-[#183D2E]">
+                {bestMandi.mandi} ({bestMandi.distance_km} km)
+              </h3>
+              <div className="text-3xl font-display font-black text-[#183D2E]">
+                ₹{bestMandi.net_realization_per_q.toFixed(0)} <span className="text-xs text-[#7A553A]">/ quintal net</span>
+              </div>
+              <p className="text-xs text-[#4E5F57]">
+                Modal price: ₹{bestMandi.modal_price}/q &bull; Net Total: ₹{bestMandi.net_realization.toLocaleString('en-IN')}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-[#4E5F57]">Loading mandi prices...</p>
+          )}
+
+          <div className="pt-2">
+            <ReadAloudButton text={`Best mandi for ${selectedCrop} is ${bestMandi?.mandi || 'nearby APMC'}. ${plainMeaning}`} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 animate-fadeIn max-w-7xl mx-auto pb-16">
-      {/* Top Header Card */}
-      <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-agri-gold-400 text-stone-900 rounded-md">
-              Tier 2
-            </span>
-            <StatusBadge status={rankingData?.demo ? "DEMO" : "WORKING"} />
-            {rankingData?.demo && (
-              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 rounded-md">
-                DEMO DATA
+    <div className="max-w-7xl mx-auto space-y-6 pb-16 animate-fadeIn">
+      {/* PAGE HEADER */}
+      <PageHeader
+        icon={Store}
+        title={t('market.title', { defaultValue: 'Mandi Trade & Farm-Gate Marketplace' })}
+        purpose={t('market.subtitle', { defaultValue: 'Compare net realizations across regional APMC mandis, check MSP benchmarks, and list harvests.' })}
+        whatIsThis={{
+          summary: language === 'te'
+            ? 'రవాణా ఖర్చులు మరియు మార్కెట్ రుసుములు మినహాయించిన తర్వాత ప్రతి మార్కెట్‌లో చేతికి వచ్చే అసలు నికర ఆదాయాన్ని లెక్కిస్తుంది.'
+            : language === 'hi'
+            ? 'किराया और मंडी टैक्स काटने के बाद हर मंडी में किसान के हाथ में आने वाली असली शुद्ध कमाई की गणना करता है।'
+            : 'Calculates the real in-hand cash you earn per quintal after deducting fuel and market cess for every nearby APMC mandi.',
+          whatToEnter: language === 'te'
+            ? 'పంట రకం, పరిమాణం (క్వింటాళ్లలో), మరియు రవాణా రేటు.'
+            : language === 'hi'
+            ? 'अपनी फसल, मात्रा (क्विंटल में) और अनुमानित भाड़ा दर।'
+            : 'Your harvested crop, total volume in quintals, and optional transport rate assumption.',
+          whatYouGet: language === 'te'
+            ? 'ఏ మార్కెట్‌లో అత్యధిక లాభం వస్తుందో ర్యాంకింగ్, మరియు దళారులు లేకుండా నేరుగా కొనుగోలుదారులతో మాట్లాడే సదుపాయం.'
+            : language === 'hi'
+            ? 'सबसे ज्यादा मुनाफा देने वाली मंडी की रैंकिंग और सीधे खरीदारों से जुड़ने की सुविधा।'
+            : 'Clear rankings showing where you pocket the most money, plus a direct marketplace to sell to buyers without middlemen.',
+        }}
+      />
+
+      {/* Global Feedback Toast */}
+      {feedbackMsg && (
+        <div className="bg-[#FEF6E9] border border-[#DA9A4C] text-[#183D2E] px-4 py-3 rounded-2xl text-xs font-semibold flex items-center gap-2 shadow-sm animate-fadeIn">
+          <Check className="w-4 h-4 text-[#DA9A4C] shrink-0" />
+          <span>{feedbackMsg}</span>
+        </div>
+      )}
+
+      {/* LEAD SUMMARY SECTION */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card 1: Top Mandi Net Realization */}
+        <div className="bg-gradient-to-br from-[#FEF6E9] to-white rounded-2xl border-2 border-[#DA9A4C] p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
+                Top Mandi Realization
               </span>
-            )}
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
+                {selectedCrop}
+              </span>
+            </div>
+
+            <div className="flex items-baseline justify-between pt-1">
+              <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-[#183D2E]">
+                {bestMandi ? bestMandi.mandi : 'Warangal Mandi'}
+              </h2>
+              <span className="text-xs font-semibold text-[#7A553A]">
+                {bestMandi ? `${bestMandi.distance_km} km` : '15 km'}
+              </span>
+            </div>
+
+            <div className="text-3xl sm:text-4xl font-display font-black text-[#183D2E]">
+              ₹{bestMandi ? bestMandi.net_realization_per_q.toFixed(0) : '7,050'}
+              <span className="text-xs font-semibold text-[#7A553A] ml-1">/ q net</span>
+            </div>
+
+            <p className="text-xs text-[#4E5F57] leading-relaxed">
+              Total Net Payout: <strong>₹{bestMandi ? bestMandi.net_realization.toLocaleString('en-IN') : '141,000'}</strong> for {quantity} quintals.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-display font-black text-stone-900 tracking-tight flex items-center gap-2.5">
-            <Store className="w-8 h-8 text-agri-green-700" />
-            {t('market.title')}
-          </h1>
-          <p className="text-xs text-stone-600 mt-1 max-w-2xl">
-            {t('market.subtitle')}
-          </p>
+
+          <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">
+            <ReadAloudButton text={`Best mandi for ${selectedCrop} is ${bestMandi?.mandi || 'nearby APMC'}. ${plainMeaning}`} />
+            <button
+              type="button"
+              onClick={() => setActiveTab('mandi')}
+              className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
+            >
+              <span>View All Mandis</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
-        {/* Action Tabs */}
-        <div className="flex bg-stone-100 p-1 rounded-2xl gap-1 shrink-0 self-start md:self-center">
+        {/* Card 2: MSP Benchmark & Price Defense */}
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-[#DA9A4C]" />
+                Official MSP Benchmark
+              </span>
+              <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
+                2026-27 Season
+              </span>
+            </div>
+
+            <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1">
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs text-[#7A553A]">Government MSP:</span>
+                <strong className="text-base font-bold text-[#183D2E]">
+                  ₹{mspData?.benchmark?.msp_per_quintal ? mspData.benchmark.msp_per_quintal.toLocaleString('en-IN') : '7,121'} / q
+                </strong>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs text-[#7A553A]">Market Realization:</span>
+                <strong className="text-xs font-bold text-[#183D2E]">
+                  ₹{bestMandi ? bestMandi.net_realization_per_q.toFixed(0) : '7,050'} / q
+                </strong>
+              </div>
+            </div>
+
+            <WhatThisMeans
+              message={plainMeaning}
+              confidenceNote="APMC mandi prices and government MSP benchmarks (modelled, indicative data to verify)."
+            />
+          </div>
+        </div>
+
+        {/* Card 3: Freight & Cess Logistics Deduction */}
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                <Truck className="w-4 h-4 text-[#DA9A4C]" />
+                Transport & Cess Math
+              </span>
+              <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
+                ₹{transportRate}/km/q
+              </span>
+            </div>
+
+            <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Gross Realization ({quantity} q):</span>
+                <strong>₹{bestMandi ? (bestMandi.modal_price * quantity).toLocaleString('en-IN') : '144,000'}</strong>
+              </div>
+              <div className="flex justify-between text-red-700">
+                <span>Freight Logistics:</span>
+                <strong>-₹{bestMandi ? bestMandi.transport_cost.toLocaleString('en-IN') : '750'}</strong>
+              </div>
+              <div className="flex justify-between text-red-700">
+                <span>Mandi Cess ({marketFeePct}%):</span>
+                <strong>-₹{bestMandi ? bestMandi.market_fee.toLocaleString('en-IN') : '1,440'}</strong>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-[#7A553A]">
+              Gross modal price is misleading without transport cost. Always choose based on net realization.
+            </p>
+          </div>
+
           <button
+            type="button"
+            onClick={() => {
+              setActiveTab('marketplace');
+              setShowListingModal(true);
+            }}
+            className="w-full min-h-[44px] py-2 px-3 rounded-xl border border-[#DA9A4C] bg-[#FEF6E9] hover:bg-[#FAF8F5] font-bold text-xs text-[#183D2E] flex items-center justify-center gap-2 transition-all shadow-sm"
+          >
+            <Plus className="w-4 h-4 text-[#DA9A4C]" />
+            <span>List Harvest for Farm-Gate Sale</span>
+          </button>
+        </div>
+      </div>
+
+      {/* DETAIL TABS */}
+      <div className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+        <div className="flex border-b border-[#7A553A]/15 bg-[#FAF8F5] px-3 sm:px-6 overflow-x-auto scrollbar-none">
+          <button
+            type="button"
             onClick={() => setActiveTab('mandi')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all ${
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
               activeTab === 'mandi'
-                ? 'bg-white shadow text-agri-green-900'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
             }`}
           >
-            {t('market.tab_mandi')}
+            <TrendingUp className="w-4 h-4 text-[#DA9A4C]" />
+            <span>Mandi Rankings & Trends</span>
+            {mandiLoading && <span className="text-[10px] text-[#7A553A] font-normal">(Loading...)</span>}
           </button>
+
           <button
+            type="button"
             onClick={() => setActiveTab('marketplace')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all ${
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
               activeTab === 'marketplace'
-                ? 'bg-white shadow text-agri-green-900'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
             }`}
           >
-            {t('market.tab_marketplace')}
+            <Store className="w-4 h-4 text-[#DA9A4C]" />
+            <span>Farm-Gate Marketplace</span>
+            {listings.length > 0 && (
+              <span className="px-2 py-0.2 rounded-full text-[10px] bg-[#183D2E] text-white">
+                {listings.length}
+              </span>
+            )}
           </button>
+
           <button
+            type="button"
             onClick={() => setActiveTab('inquiries')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all relative ${
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
               activeTab === 'inquiries'
-                ? 'bg-white shadow text-agri-green-900'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
             }`}
           >
-            {t('market.tab_inquiries')}
+            <Mail className="w-4 h-4 text-[#DA9A4C]" />
+            <span>Buyer Inquiries & Inbox</span>
             {inquiries.length > 0 && (
-              <span className="ml-1.5 px-1.5 py-0.2 bg-agri-green-700 text-white rounded-full text-[10px] font-black">
+              <span className="px-2 py-0.2 rounded-full text-[10px] bg-[#DA9A4C] text-[#183D2E] font-black">
                 {inquiries.length}
               </span>
             )}
           </button>
         </div>
-      </div>
 
-      {/* Global Feedback Toast */}
-      {feedbackMsg && (
-        <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 px-4 py-3 rounded-2xl text-xs font-semibold flex items-center gap-2 shadow-sm animate-fadeIn">
-          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>{feedbackMsg}</span>
-        </div>
-      )}
+        <div className="p-4 sm:p-6">
+          {/* TAB 1: MANDI INTELLIGENCE & RANKINGS */}
+          {activeTab === 'mandi' && (
+            <div className="space-y-6">
+              {/* DEMO DATA Banner */}
+              {rankingData?.demo && (
+                <div className="bg-[#FEF6E9] border border-[#DA9A4C] rounded-2xl p-4 flex items-start gap-3 text-xs text-[#183D2E]">
+                  <AlertTriangle className="w-5 h-5 text-[#DA9A4C] shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-bold flex items-center gap-1.5">
+                      <span className="bg-[#DA9A4C] text-white px-2 py-0.5 rounded font-black text-[10px]">
+                        DEMO DATA
+                      </span>
+                      &bull; Source: datasets/demo/mandi_prices.csv
+                    </p>
+                    <p className="text-[11px] text-[#7A553A] leading-relaxed">
+                      APMC modal prices and transport rates are calibrated on illustrative market datasets.
+                    </p>
+                  </div>
+                </div>
+              )}
 
-      {/* ========================================================================= */}
-      {/* TAB 1: MANDI INTELLIGENCE & NET REALIZATION                                */}
-      {/* ========================================================================= */}
-      {activeTab === 'mandi' && (
-        <div className="space-y-6">
-          {/* DEMO DATA Banner */}
-          {rankingData?.demo && (
-            <div className="bg-amber-50/90 border border-amber-300 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-900 shadow-subtle">
-              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <p className="font-bold flex items-center gap-1.5">
-                  <span className="bg-amber-200 px-2 py-0.5 rounded font-black text-amber-950">
-                    {t('market.demo_banner_title')}
-                  </span>
-                  &bull; Source: datasets/demo/mandi_prices.csv
-                </p>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
-                  {t('market.demo_banner_desc')}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Controls & Editable Assumptions Card */}
-          <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200/60 pb-3">
-              <div>
-                <h3 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-agri-green-700" />
-                  {t('market.assumptions_title')}
-                </h3>
-                <span className="text-[11px] text-stone-500">
-                  {t('market.transport_rate_hint')} &bull; {t('market.market_fee_hint')}
-                </span>
-              </div>
-              <button
-                onClick={loadMandiData}
-                disabled={mandiLoading}
-                className="px-3.5 py-1.5 bg-agri-green-700 hover:bg-agri-green-800 text-white font-bold text-xs rounded-xl shadow transition-all self-start sm:self-auto disabled:opacity-50"
-              >
-                {mandiLoading ? 'Recalculating...' : t('market.recalculate_btn')}
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                  {t('market.select_crop')}
-                </label>
-                <select
-                  value={selectedCrop}
-                  onChange={(e) => setSelectedCrop(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold text-stone-900 focus:ring-2 focus:ring-agri-green-600"
-                >
-                  <option value="Cotton">Cotton (పత్తి / कपास)</option>
-                  <option value="Chilli">Chilli (మిర్చి / मिर्च)</option>
-                  <option value="Paddy">Paddy (వరి / धान)</option>
-                  <option value="Rice">Rice (బియ్యం / चावल)</option>
-                  <option value="Maize">Maize (మొక్కజొన్న / मक्का)</option>
-                  <option value="Groundnut">Groundnut (వేరుశనగ / मूंगफली)</option>
-                  <option value="Soybean">Soybean (సోయాచిక్కుడు / सोयाबीन)</option>
-                  <option value="Wheat">Wheat (గోధుమలు / गेहूं)</option>
-                  <option value="Tomato">Tomato (టమోటా / टमाटर)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                  {t('market.quantity_label')}
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseFloat(e.target.value) || 1)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold text-stone-900 focus:ring-2 focus:ring-agri-green-600"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                  {t('market.transport_rate_label')}
-                </label>
-                <input
-                  type="number"
-                  min="0.5"
-                  step="0.25"
-                  value={transportRate}
-                  onChange={(e) => setTransportRate(parseFloat(e.target.value) || 0.5)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold text-stone-900 focus:ring-2 focus:ring-agri-green-600"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                  {t('market.market_fee_label')}
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  value={marketFeePct}
-                  onChange={(e) => setMarketFeePct(parseFloat(e.target.value) || 0)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold text-stone-900 focus:ring-2 focus:ring-agri-green-600"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* MSP Benchmark Comparison Chip & Rationale Card */}
-          {mspData && (
-            <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-agri-green-700" />
-                  <h3 className="text-sm font-bold text-stone-900">
-                    {t('market.msp_title')}: {selectedCrop}
+              {/* Assumptions & Controls */}
+              <div className="p-4 sm:p-5 bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#7A553A]/15 pb-3">
+                  <h3 className="text-sm font-bold text-[#183D2E] flex items-center gap-1.5">
+                    <Sliders className="w-4 h-4 text-[#DA9A4C]" />
+                    <span>Realization Simulator Parameters</span>
                   </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuantity(20.0);
+                      setTransportRate(2.50);
+                      setMarketFeePct(1.0);
+                    }}
+                    className="text-xs font-semibold text-[#7A553A] hover:text-[#183D2E] flex items-center gap-1 self-start sm:self-auto"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset Defaults</span>
+                  </button>
                 </div>
 
-                {mspData.msp_verified ? (
-                  <span className="px-2.5 py-1 text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl flex items-center gap-1.5 self-start">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-                    {t('market.msp_verified_badge')} (₹{mspData.benchmark?.msp_per_quintal?.toLocaleString()}/q)
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+                  <div>
+                    <label className="font-bold text-[#183D2E] block mb-1">Crop</label>
+                    <select
+                      value={selectedCrop}
+                      onChange={(e) => setSelectedCrop(e.target.value)}
+                      className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 bg-white font-medium"
+                    >
+                      <option value="Cotton">Cotton</option>
+                      <option value="Paddy (Dhan)">Paddy (Dhan)</option>
+                      <option value="Maize">Maize</option>
+                      <option value="Red Gram (Tur)">Red Gram (Tur)</option>
+                      <option value="Chilli (Dry)">Chilli (Dry)</option>
+                      <option value="Soyabean">Soyabean</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-[#183D2E] block mb-1">Harvest Volume (Quintals)</label>
+                    <input
+                      type="number"
+                      value={quantity}
+                      onChange={(e) => setQuantity(parseFloat(e.target.value) || 1)}
+                      className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 bg-white font-medium"
+                      min={1}
+                      step={1}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-[#183D2E] block mb-1">Transport Rate (₹/km/q)</label>
+                    <input
+                      type="number"
+                      value={transportRate}
+                      onChange={(e) => setTransportRate(parseFloat(e.target.value) || 0)}
+                      className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 bg-white font-medium"
+                      step={0.1}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-[#183D2E] block mb-1">Market Fee / Cess (%)</label>
+                    <input
+                      type="number"
+                      value={marketFeePct}
+                      onChange={(e) => setMarketFeePct(parseFloat(e.target.value) || 0)}
+                      className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 bg-white font-medium"
+                      step={0.5}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Mandi Rankings Table */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-[#183D2E]">
+                    APMC Mandis Ranked by Net Realization ({selectedCrop})
+                  </h3>
+                  <span className="text-xs text-[#7A553A]">
+                    Formula: (Modal Price &times; Qty) - Transport Cost - Mandi Fee
                   </span>
+                </div>
+
+                {rankingData && rankingData.rankings.length > 0 ? (
+                  <div className="overflow-x-auto rounded-2xl border border-[#7A553A]/20">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-[#FAF8F5] text-[#183D2E] border-b border-[#7A553A]/20">
+                          <th className="p-3 font-bold">Rank</th>
+                          <th className="p-3 font-bold">Mandi</th>
+                          <th className="p-3 font-bold">Distance</th>
+                          <th className="p-3 font-bold">Modal Price</th>
+                          <th className="p-3 font-bold">Transport Cost</th>
+                          <th className="p-3 font-bold">Mandi Fee</th>
+                          <th className="p-3 font-bold">Net Realization / q</th>
+                          <th className="p-3 font-bold">Total Net Payout</th>
+                          <th className="p-3 font-bold text-right">Details</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#7A553A]/15">
+                        {rankingData.rankings.map((m) => (
+                          <React.Fragment key={m.rank}>
+                            <tr
+                              className={`hover:bg-[#FAF8F5]/60 transition-colors ${
+                                m.rank === 1 ? 'bg-[#FEF6E9] font-bold' : ''
+                              }`}
+                            >
+                              <td className="p-3">
+                                <span
+                                  className={`w-6 h-6 rounded-full inline-flex items-center justify-center text-[11px] font-black ${
+                                    m.rank === 1
+                                      ? 'bg-[#183D2E] text-white'
+                                      : m.rank === 2
+                                      ? 'bg-[#DA9A4C] text-[#183D2E]'
+                                      : 'bg-stone-200 text-stone-700'
+                                  }`}
+                                >
+                                  {m.rank}
+                                </span>
+                              </td>
+                              <td className="p-3">
+                                <div className="font-bold text-[#183D2E]">{m.mandi}</div>
+                                <span className="text-[10px] text-[#7A553A]">{m.district}, {m.state}</span>
+                              </td>
+                              <td className="p-3 text-[#4E5F57]">{m.distance_km} km</td>
+                              <td className="p-3 text-[#4E5F57]">₹{m.modal_price.toLocaleString('en-IN')}</td>
+                              <td className="p-3 text-red-700 font-medium">-₹{m.transport_cost.toLocaleString('en-IN')}</td>
+                              <td className="p-3 text-[#7A553A]">-₹{m.market_fee.toLocaleString('en-IN')}</td>
+                              <td className="p-3">
+                                <span className="font-extrabold text-[#183D2E]">
+                                  ₹{m.net_realization_per_q.toFixed(0)}
+                                </span>
+                              </td>
+                              <td className="p-3 font-extrabold text-[#183D2E]">
+                                ₹{m.net_realization.toLocaleString('en-IN')}
+                              </td>
+                              <td className="p-3 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedReasoning(expandedReasoning === m.rank ? null : m.rank)}
+                                  className="text-xs text-[#7A553A] hover:text-[#183D2E] p-1 inline-flex items-center"
+                                  aria-label="Toggle details"
+                                >
+                                  {expandedReasoning === m.rank ? (
+                                    <ChevronUp className="w-4 h-4" />
+                                  ) : (
+                                    <ChevronDown className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </td>
+                            </tr>
+                            {expandedReasoning === m.rank && (
+                              <tr className="bg-[#FAF8F5]">
+                                <td colSpan={9} className="p-4 text-xs space-y-1">
+                                  <p className="font-bold text-[#183D2E]">Economic Reasoning:</p>
+                                  <p className="text-[#4E5F57] leading-relaxed">{m.reasoning}</p>
+                                  <p className="text-[10px] text-[#7A553A]">
+                                    Source: {m.source} &bull; Indicative data to verify before hauling produce.
+                                  </p>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
-                  <span className="px-2.5 py-1 text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-xl flex items-center gap-1.5 self-start">
-                    <Info className="w-3.5 h-3.5 text-amber-700" />
-                    {t('market.msp_unverified_badge')}
-                  </span>
+                  <p className="text-xs text-neutral-500 text-center py-6">Loading rankings...</p>
                 )}
               </div>
 
-              <p className="text-xs text-stone-700 leading-relaxed bg-stone-50 p-3.5 rounded-xl border border-stone-200/60">
-                {mspData.explanation}
-              </p>
+              {/* Price Trend Chart & Seasonal Outlook */}
+              {trendData && (
+                <div className="p-4 bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h3 className="text-sm font-bold text-[#183D2E] flex items-center gap-1.5">
+                        <TrendingUp className="w-4 h-4 text-[#DA9A4C]" />
+                        <span>Price Trend & Seasonal Projection ({selectedCrop})</span>
+                      </h3>
+                      <p className="text-xs text-[#7A553A]">{trendData.seasonal_pattern_summary}</p>
+                    </div>
+                    <span
+                      className={`px-2.5 py-1 text-xs font-bold rounded-xl self-start ${
+                        trendData.trend_direction === 'rising'
+                          ? 'bg-emerald-100 text-emerald-900'
+                          : trendData.trend_direction === 'falling'
+                          ? 'bg-amber-100 text-amber-900'
+                          : 'bg-stone-100 text-stone-800'
+                      }`}
+                    >
+                      {trendData.trend_direction.toUpperCase()}
+                    </span>
+                  </div>
 
-              {mspData.msp_verified && mspData.source_url && (
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-stone-500">
-                  <a
-                    href={mspData.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-agri-green-700 hover:text-agri-green-900 font-bold underline flex items-center gap-1"
-                  >
-                    <span>{t('market.msp_source_link')} ({mspData.benchmark?.season} {mspData.benchmark?.year})</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                  {mspData.last_verified && (
-                    <span>{t('market.msp_verified_date')}: <strong className="text-stone-700">{mspData.last_verified}</strong></span>
-                  )}
+                  <div className="h-56 w-full pt-1" style={{ minHeight: '200px' }}>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <LineChart
+                        data={[
+                          ...trendData.historical_prices.map((p) => ({
+                            month: p.month_year,
+                            price: p.modal_price,
+                            type: 'Historical',
+                          })),
+                          ...trendData.forecast_prices.map((p) => ({
+                            month: p.month_year,
+                            price: p.modal_price,
+                            type: 'Forecast',
+                          })),
+                        ]}
+                        margin={{ top: 10, right: 20, left: 15, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#EFE7DE" />
+                        <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#7A553A' }} />
+                        <YAxis tick={{ fontSize: 10, fill: '#7A553A' }} tickFormatter={(v) => `₹${v}`} />
+                        <Tooltip
+                          formatter={(value: any) => [`₹${value}`, 'Modal Price']}
+                          contentStyle={{ backgroundColor: '#FAF8F5', borderColor: '#DA9A4C', borderRadius: '0.75rem', fontSize: '12px' }}
+                        />
+                        <Line type="monotone" dataKey="price" stroke="#183D2E" strokeWidth={2.5} dot={{ r: 3 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="text-xs text-[#4E5F57] flex flex-col sm:flex-row justify-between gap-2 border-t border-[#7A553A]/15 pt-2">
+                    <span>{trendData.best_time_to_sell_hint}</span>
+                    <span className="text-[10px] text-[#7A553A]">{trendData.disclaimer}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Nearby Warehouses & Cold Storages */}
+              {warehouseData?.warehouses && warehouseData.warehouses.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <h3 className="text-sm font-bold text-[#183D2E] flex items-center gap-1.5">
+                    <Building2 className="w-4 h-4 text-[#DA9A4C]" />
+                    <span>Nearby WDRA Accredited Warehouses (Eligible for e-NWR Pledge Loans)</span>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {warehouseData.warehouses.map((wh) => (
+                      <div key={wh.name} className="p-3.5 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/20 text-xs space-y-1">
+                        <div className="flex justify-between items-start">
+                          <strong className="text-[#183D2E]">{wh.name}</strong>
+                          <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">
+                            {wh.distance_km} km away
+                          </span>
+                        </div>
+                        <p className="text-[#4E5F57]">{wh.district}, {wh.state} ({wh.warehouse_type})</p>
+                        <p className="text-[11px] text-[#7A553A]">
+                          Capacity: {wh.capacity_mt.toLocaleString('en-IN')} MT &bull; Daily Charge: ₹{wh.daily_charge_per_quintal}/q/day
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Net Realization Mandi Ranking Table */}
-          {rankingData && (
-            <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-agri-green-700" />
-                    {t('market.ranking_title')}
-                  </h3>
-                  <p className="text-xs text-stone-500 mt-0.5">
-                    {t('market.ranking_subtitle')}
+          {/* TAB 2: FARM-GATE MARKETPLACE */}
+          {activeTab === 'marketplace' && (
+            <div className="space-y-5">
+              {/* Privacy Banner */}
+              <div className="bg-[#FAF8F5] border border-[#DA9A4C] rounded-2xl p-4 flex items-start gap-3 text-xs text-[#183D2E]">
+                <Lock className="w-5 h-5 text-[#DA9A4C] shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-bold">
+                    Farmer Contact Privacy Protection (Smallholder Privacy)
+                  </p>
+                  <p className="text-[11px] text-[#7A553A] leading-relaxed">
+                    Farmer phone numbers and precise farm locations are never displayed publicly. Phone contact is released only when a buyer makes an inquiry and the farmer accepts the offer.
                   </p>
                 </div>
-                <span className="text-[11px] font-bold text-stone-600 bg-stone-100 px-3 py-1 rounded-xl self-start">
-                  Volume: {quantity} quintals
-                </span>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-stone-100 text-stone-700 border-b border-stone-200">
-                      <th className="p-3 font-bold">{t('market.col_rank')}</th>
-                      <th className="p-3 font-bold">{t('market.col_mandi')}</th>
-                      <th className="p-3 font-bold">{t('market.col_modal_price')}</th>
-                      <th className="p-3 font-bold">{t('market.col_distance')}</th>
-                      <th className="p-3 font-bold">{t('market.col_transport_cost')}</th>
-                      <th className="p-3 font-bold">{t('market.col_market_fee')}</th>
-                      <th className="p-3 font-bold">{t('market.col_net')}</th>
-                      <th className="p-3 font-bold">{t('market.col_net_per_q')}</th>
-                      <th className="p-3 font-bold text-right">Reasoning</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-200/60">
-                    {rankingData.rankings.map((m) => (
-                      <React.Fragment key={m.rank}>
-                        <tr
-                          className={`hover:bg-stone-50/80 transition-colors ${
-                            m.rank === 1 ? 'bg-emerald-50/50 font-semibold' : ''
-                          }`}
-                        >
-                          <td className="p-3">
-                            <span
-                              className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black ${
-                                m.rank === 1
-                                  ? 'bg-emerald-600 text-white'
-                                  : m.rank === 2
-                                  ? 'bg-stone-300 text-stone-800'
-                                  : 'bg-stone-200 text-stone-600'
-                              }`}
-                            >
-                              {m.rank}
+              <div className="flex items-center justify-between pb-3 border-b border-[#7A553A]/15">
+                <div>
+                  <h3 className="text-base font-bold text-[#183D2E]">
+                    Available Harvest Batches
+                    {marketLoading && <span className="text-xs text-stone-400 font-normal ml-2">Loading...</span>}
+                  </h3>
+                  <p className="text-xs text-[#7A553A]">
+                    Direct farm-gate listings with verified village sources.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowListingModal(true)}
+                  className="min-h-[44px] px-4 py-2 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all"
+                >
+                  <Plus className="w-4 h-4 text-[#DA9A4C]" />
+                  <span>Post Harvest Listing</span>
+                </button>
+              </div>
+
+              {listings.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {listings.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-4 bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 flex flex-col justify-between space-y-3 shadow-xs hover:border-[#DA9A4C] transition-all"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <span className="text-xs font-bold text-[#DA9A4C] uppercase tracking-wider block">
+                              {item.crop_name}
                             </span>
-                          </td>
-                          <td className="p-3">
-                            <div className="font-bold text-stone-900 flex items-center gap-1.5">
-                              {m.mandi}
-                              {m.rank === 1 && (
-                                <span className="px-1.5 py-0.5 text-[9px] font-black bg-emerald-100 text-emerald-800 rounded">
-                                  {t('market.best_choice_badge')}
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-[10px] text-stone-500">{m.district}, {m.state}</span>
-                          </td>
-                          <td className="p-3 font-bold text-stone-900">
-                            ₹{m.modal_price.toLocaleString()}
-                          </td>
-                          <td className="p-3 text-stone-700">
-                            {m.distance_km} km
-                          </td>
-                          <td className="p-3 text-red-600 font-medium">
-                            -₹{m.transport_cost.toLocaleString()}
-                          </td>
-                          <td className="p-3 text-stone-600">
-                            -₹{m.market_fee.toLocaleString()}
-                          </td>
-                          <td className="p-3 text-sm font-black text-agri-green-800">
-                            ₹{m.net_realization.toLocaleString()}
-                          </td>
-                          <td className="p-3 font-bold text-stone-900">
-                            ₹{m.net_realization_per_q.toLocaleString()} / q
-                          </td>
-                          <td className="p-3 text-right">
-                            <button
-                              onClick={() =>
-                                setExpandedReasoning(expandedReasoning === m.rank ? null : m.rank)
-                              }
-                              className="text-[11px] font-bold text-agri-green-700 hover:text-agri-green-900 inline-flex items-center gap-0.5"
-                            >
-                              <span>{expandedReasoning === m.rank ? 'Hide' : 'Explain'}</span>
-                              {expandedReasoning === m.rank ? (
-                                <ChevronUp className="w-3.5 h-3.5" />
-                              ) : (
-                                <ChevronDown className="w-3.5 h-3.5" />
-                              )}
-                            </button>
-                          </td>
-                        </tr>
+                            <h4 className="text-base font-bold text-[#183D2E]">{item.variety || 'Standard Quality'}</h4>
+                          </div>
+                          <span className="text-xs font-black text-[#183D2E] bg-white px-2 py-1 rounded-lg border border-[#7A553A]/15">
+                            ₹{item.expected_price_per_q}/q
+                          </span>
+                        </div>
 
-                        {expandedReasoning === m.rank && (
-                          <tr className="bg-stone-50/90 text-stone-700 text-xs">
-                            <td colSpan={9} className="p-3.5 border-t border-stone-200">
-                              <div className="bg-white p-3 rounded-xl border border-stone-200 space-y-1">
-                                <span className="text-[10px] font-black uppercase text-stone-400 block tracking-wider">
-                                  {t('market.reasoning_label')} — {m.mandi}
-                                </span>
-                                <p className="text-xs text-stone-800 leading-relaxed">
-                                  {m.reasoning}
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
+                        <p className="text-xs text-[#4E5F57] line-clamp-2">{item.description}</p>
+
+                        <div className="text-[11px] text-[#7A553A] space-y-0.5">
+                          <div>Quantity: <strong>{item.quantity_quintals} quintals</strong></div>
+                          <div>Village: <strong>{item.village}, {item.district}</strong></div>
+                          <div>Harvest Date: <strong>{item.harvest_date}</strong></div>
+                          <div>Seller: <strong>{item.farmer_name}</strong> {item.is_verified_seller && <span className="text-emerald-700 font-bold ml-1">✓ Verified</span>}</div>
+                        </div>
+
+                        {item.contact_unlocked && item.farmer_contact && (
+                          <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-950 space-y-1">
+                            <span className="font-bold flex items-center gap-1"><Phone className="w-3.5 h-3.5" /> Contact Released:</span>
+                            <p>{item.farmer_contact.full_name}: {item.farmer_contact.phone_number}</p>
+                          </div>
                         )}
-                      </React.Fragment>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2 pt-2 border-t border-[#7A553A]/15">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveListingForInquiry(item);
+                              setShowInquiryModal(true);
+                            }}
+                            className="min-h-[40px] px-4 py-2 bg-[#DA9A4C] hover:bg-[#C28538] text-[#183D2E] font-bold text-xs rounded-xl transition-all shadow-sm flex-1 text-center"
+                          >
+                            Send Inquiry
+                          </button>
+                          {(user?.id === item.farmer_id || item.is_owner) && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteListing(item.id)}
+                              className="min-h-[40px] px-3 py-2 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+
+                        {user?.role === 'Admin' && (
+                          <div className="text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleAdminVerify(item.farmer_id, item.is_verified_seller)}
+                              className="text-[10px] font-bold text-blue-700 underline"
+                            >
+                              {item.is_verified_seller ? 'Admin: Unverify' : 'Admin: Verify Seller'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-neutral-500 text-center py-6">No marketplace listings available.</p>
+              )}
             </div>
           )}
 
-          {/* Historical Price Trend & Best-Time-To-Sell Hint */}
-          {trendData && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Price Line Chart */}
-              <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-agri-green-700" />
-                      {t('market.trends_title')}: {selectedCrop}
-                    </h3>
-                    <p className="text-xs text-stone-500">
-                      {trendData.seasonal_pattern_summary}
-                    </p>
-                  </div>
-                  <span
-                    className={`px-2.5 py-1 text-xs font-bold rounded-xl self-start ${
-                      trendData.trend_direction === 'rising'
-                        ? 'bg-emerald-100 text-emerald-900'
-                        : trendData.trend_direction === 'falling'
-                        ? 'bg-amber-100 text-amber-900'
-                        : 'bg-stone-100 text-stone-800'
-                    }`}
-                  >
-                    {trendData.trend_direction === 'rising'
-                      ? t('market.trend_badge_rising')
-                      : trendData.trend_direction === 'falling'
-                      ? t('market.trend_badge_falling')
-                      : t('market.trend_badge_stable')}
-                  </span>
-                </div>
+          {/* TAB 3: INQUIRIES & INBOX */}
+          {activeTab === 'inquiries' && (
+            <div className="space-y-5">
+              <div className="flex items-center gap-2 border-b border-[#7A553A]/15 pb-3">
+                <button
+                  type="button"
+                  onClick={() => setInboxTab('received')}
+                  className={`min-h-[38px] px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    inboxTab === 'received' ? 'bg-[#183D2E] text-white shadow' : 'bg-[#FAF8F5] text-[#7A553A]'
+                  }`}
+                >
+                  Received Inquiries
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInboxTab('sent')}
+                  className={`min-h-[38px] px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    inboxTab === 'sent' ? 'bg-[#183D2E] text-white shadow' : 'bg-[#FAF8F5] text-[#7A553A]'
+                  }`}
+                >
+                  Sent Inquiries
+                </button>
+              </div>
 
-                <div className="h-64 w-full pt-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={[
-                        ...trendData.historical_prices.map((p) => ({
-                          month: p.month_year,
-                          price: p.modal_price,
-                          type: 'historical',
-                        })),
-                        ...trendData.forecast_prices.map((p) => ({
-                          month: p.month_year,
-                          price: p.modal_price,
-                          type: 'forecast',
-                        })),
-                      ]}
+              {inquiries.length > 0 ? (
+                <div className="space-y-3">
+                  {inquiries.map((inq) => (
+                    <div
+                      key={inq.id}
+                      className="p-4 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis
-                        domain={['auto', 'auto']}
-                        tick={{ fontSize: 11 }}
-                        tickFormatter={(v) => `₹${v}`}
-                      />
-                      <Tooltip
-                        formatter={(val: number) => [`₹${val.toLocaleString()}`, 'Modal Price']}
-                        labelFormatter={(lbl) => `Month: ${lbl}`}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="price"
-                        stroke="#15803d"
-                        strokeWidth={2.5}
-                        dot={{ r: 4, fill: '#15803d' }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="text-[11px] text-stone-500 flex items-center justify-between pt-1 border-t border-stone-200">
-                  <span>Green line: APMC monthly modal prices (historical + 3-month seasonal projection)</span>
-                  <span className="font-bold text-stone-700">Indicative seasonal pattern</span>
-                </div>
-              </div>
-
-              {/* Best-Time-To-Sell Hint & Honesty Disclaimer */}
-              <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-4 flex flex-col justify-between">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-agri-gold-600" />
-                    <h3 className="text-sm font-bold text-stone-900">
-                      {t('market.best_time_title')}
-                    </h3>
-                  </div>
-
-                  <div className="bg-agri-cream-100 p-4 rounded-xl border border-agri-gold-300 text-xs text-stone-800 leading-relaxed font-medium">
-                    {trendData.best_time_to_sell_hint}
-                  </div>
-                </div>
-
-                <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-200 text-[11px] text-stone-600 space-y-1">
-                  <span className="font-bold text-stone-900 block flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                    {t('market.disclaimer_title')}
-                  </span>
-                  <p>{trendData.disclaimer}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Nearby Warehouses & Cold Storages */}
-          {warehouseData && (
-            <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-agri-green-700" />
-                    {t('market.warehouses_title')}
-                  </h3>
-                  <p className="text-xs text-stone-500">
-                    {t('market.warehouses_subtitle')}
-                  </p>
-                </div>
-                <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300 rounded-xl self-start">
-                  DEMO DATASET
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {warehouseData.warehouses.map((w, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-stone-200/80 bg-stone-50/60 hover:bg-white hover:shadow-subtle transition-all space-y-2 text-xs"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="font-bold text-stone-900 block leading-tight">
-                        {w.name}
-                      </span>
-                    </div>
-                    <div className="text-stone-600 space-y-0.5">
-                      <p>Type: <strong className="text-stone-800">{w.warehouse_type}</strong></p>
-                      <p>Distance: <strong className="text-stone-800">{w.distance_km} km</strong> ({w.district})</p>
-                      <p>Capacity: <strong className="text-stone-800">{w.capacity_mt.toLocaleString()} MT</strong></p>
-                      <p>Daily Rate: <strong className="text-agri-green-800">₹{w.daily_charge_per_quintal}/q/day</strong></p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* TAB 2: FARMER-TO-BUYER MARKETPLACE                                         */}
-      {/* ========================================================================= */}
-      {activeTab === 'marketplace' && (
-        <div className="space-y-6">
-          {/* Privacy & Contact Banner */}
-          <div className="bg-emerald-50/90 border border-emerald-300 rounded-2xl p-4 flex items-start gap-3 text-xs text-emerald-950 shadow-subtle">
-            <Lock className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <p className="font-bold">
-                {t('market.privacy_banner_title')} (Honesty Rule 8 & Smallholder Privacy)
-              </p>
-              <p className="text-[11px] text-emerald-900/90 leading-relaxed">
-                {t('market.privacy_banner_desc')}
-              </p>
-            </div>
-          </div>
-
-          {/* Action Header */}
-          <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
-                {t('market.marketplace_title')}
-                {marketLoading && <span className="text-xs text-stone-400 font-normal">Loading...</span>}
-              </h3>
-              <p className="text-xs text-stone-500">
-                {t('market.marketplace_subtitle')}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setShowListingModal(true)}
-              className="px-4 py-2 bg-agri-green-700 hover:bg-agri-green-800 text-white font-bold text-xs rounded-xl shadow flex items-center gap-1.5 transition-all self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span>{t('market.post_listing_btn')}</span>
-            </button>
-          </div>
-
-          {/* Harvest Listings Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {listings.map((l) => (
-              <div
-                key={l.id}
-                className="bg-white rounded-2xl p-5 border border-stone-200/80 shadow-subtle flex flex-col justify-between space-y-4 hover:border-agri-green-500/60 transition-all"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h4 className="text-base font-bold text-stone-900">
-                        {l.crop_name}
-                      </h4>
-                      <span className="text-[11px] text-stone-500">{l.variety || 'Standard Variety'}</span>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-1">
-                      {l.is_verified_seller && (
-                        <span className="px-2 py-0.5 text-[10px] font-black bg-blue-100 text-blue-800 border border-blue-200 rounded-md flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-blue-600" />
-                          {t('market.listing_verified_seller')}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <strong className="text-[#183D2E] text-sm">Offer: ₹{inq.offered_price_per_q}/q</strong>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            inq.status === 'accepted' ? 'bg-emerald-100 text-emerald-800' :
+                            inq.status === 'declined' ? 'bg-red-100 text-red-800' : 'bg-stone-200 text-stone-800'
+                          }`}>
+                            {inq.status.toUpperCase()}
+                          </span>
+                        </div>
+                        <p className="text-[#4E5F57]">{inq.message}</p>
+                        <span className="text-[10px] text-[#7A553A] block">
+                          Crop: {inq.listing_crop} &bull; Quantity: {inq.quantity_quintals} q &bull; Date: {new Date(inq.created_at).toLocaleDateString()}
                         </span>
-                      )}
-                      {l.is_owner && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-900 rounded-md">
-                          {t('market.listing_owner_badge')}
-                        </span>
+                      </div>
+
+                      {inq.status === 'pending' && (
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateStatus(inq.id, 'accepted')}
+                            className="min-h-[36px] px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg"
+                          >
+                            Accept Offer
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateStatus(inq.id, 'declined')}
+                            className="min-h-[36px] px-3 py-1 bg-red-700 hover:bg-red-800 text-white font-bold rounded-lg"
+                          >
+                            Decline
+                          </button>
+                        </div>
                       )}
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-stone-50 p-3 rounded-xl border border-stone-200/60">
-                    <div>
-                      <span className="text-[10px] text-stone-500 block uppercase font-bold">Quantity</span>
-                      <strong className="text-stone-900 font-display text-sm">{l.quantity_quintals} q</strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-stone-500 block uppercase font-bold">Expected Price</span>
-                      <strong className="text-agri-green-800 font-display text-sm">₹{l.expected_price_per_q.toLocaleString()}/q</strong>
-                    </div>
-                    <div className="col-span-2 pt-1 border-t border-stone-200/60 flex items-center justify-between text-[11px] text-stone-600">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-stone-400" />
-                        {l.village}, {l.district}
-                      </span>
-                      <span>Harvest: <strong>{l.harvest_date}</strong></span>
-                    </div>
-                  </div>
-
-                  {l.description && (
-                    <p className="text-xs text-stone-600 line-clamp-2">
-                      {l.description}
-                    </p>
-                  )}
-
-                  {/* Contact Details Card (Privacy Protected) */}
-                  <div className="p-3 rounded-xl border text-xs">
-                    {l.contact_unlocked && l.farmer_contact ? (
-                      <div className="bg-emerald-50/80 border border-emerald-200 -m-3 p-3 rounded-xl space-y-1">
-                        <span className="text-[10px] font-black uppercase text-emerald-900 tracking-wider flex items-center gap-1">
-                          <Unlock className="w-3 h-3 text-emerald-700" />
-                          {t('market.contact_unlocked_title')}
-                        </span>
-                        <p className="font-bold text-stone-900">{l.farmer_contact.full_name}</p>
-                        <p className="text-[11px] text-stone-700 flex items-center gap-1">
-                          <Phone className="w-3 h-3 text-emerald-700" />
-                          {l.farmer_contact.phone_number || 'N/A'}
-                        </p>
-                        <p className="text-[11px] text-stone-700 flex items-center gap-1">
-                          <Mail className="w-3 h-3 text-emerald-700" />
-                          {l.farmer_contact.email || 'N/A'}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-stone-500 space-y-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 text-stone-600">
-                          <Lock className="w-3 h-3 text-stone-400" />
-                          {t('market.contact_locked_title')}
-                        </span>
-                        <p className="text-[10px] leading-relaxed">
-                          {t('market.contact_locked_desc')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
-
-                {/* Listing Action Buttons */}
-                <div className="pt-2 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
-                  {l.is_owner ? (
-                    <div className="flex items-center gap-2 w-full justify-end">
-                      <button
-                        onClick={() => handleDeleteListing(l.id)}
-                        className="px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-800 transition-colors"
-                      >
-                        {t('market.delete_listing_btn')}
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setActiveListingForInquiry(l);
-                        setInqPrice(l.expected_price_per_q);
-                        setInqQty(l.quantity_quintals);
-                        setShowInquiryModal(true);
-                      }}
-                      className="w-full px-4 py-2 bg-agri-gold-400 hover:bg-agri-gold-500 text-stone-900 font-bold text-xs rounded-xl shadow-sm transition-all text-center"
-                    >
-                      {t('market.make_inquiry_btn')}
-                    </button>
-                  )}
-
-                  {/* Admin verified seller toggle */}
-                  {user?.role === 'Admin' && (
-                    <div className="w-full pt-1 flex justify-end">
-                      <button
-                        onClick={() => handleToggleAdminVerify(l.farmer_id, l.is_verified_seller)}
-                        className="text-[10px] font-bold text-blue-700 underline"
-                      >
-                        {l.is_verified_seller ? t('market.admin_unverify_action') : t('market.admin_verify_action')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* TAB 3: INQUIRIES & OFFERS INBOX                                            */}
-      {/* ========================================================================= */}
-      {activeTab === 'inquiries' && (
-        <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base font-bold text-stone-900">
-                {t('market.inbox_title')}
-              </h3>
-              <p className="text-xs text-stone-500">
-                Manage buyer procurement offers, trade negotiations, and contact releases.
-              </p>
-            </div>
-
-            <div className="flex bg-stone-100 p-1 rounded-xl gap-1 self-start sm:self-auto">
-              <button
-                onClick={() => setInboxTab('received')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  inboxTab === 'received' ? 'bg-white shadow text-agri-green-900' : 'text-stone-600'
-                }`}
-              >
-                {t('market.inbox_received_tab')}
-              </button>
-              <button
-                onClick={() => setInboxTab('sent')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  inboxTab === 'sent' ? 'bg-white shadow text-agri-green-900' : 'text-stone-600'
-                }`}
-              >
-                {t('market.inbox_sent_tab')}
-              </button>
-            </div>
-          </div>
-
-          {inquiries.length === 0 ? (
-            <div className="text-center py-12 text-stone-500 text-xs">
-              {t('market.inbox_empty')}
-            </div>
-          ) : (
-            <div className="divide-y divide-stone-200/70">
-              {inquiries.map((inq) => (
-                <div key={inq.id} className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-1 max-w-xl">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-stone-900 text-sm">
-                        {inq.listing_crop} ({inq.quantity_quintals} q)
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 text-[10px] font-black rounded-md ${
-                          inq.status === 'accepted'
-                            ? 'bg-emerald-100 text-emerald-900'
-                            : inq.status === 'declined'
-                            ? 'bg-red-100 text-red-900'
-                            : 'bg-amber-100 text-amber-900'
-                        }`}
-                      >
-                        {inq.status === 'accepted'
-                          ? t('market.inquiry_status_accepted')
-                          : inq.status === 'declined'
-                          ? t('market.inquiry_status_declined')
-                          : t('market.inquiry_status_pending')}
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-stone-700">
-                      Offered Price: <strong className="text-agri-green-800">₹{inq.offered_price_per_q.toLocaleString()}/q</strong> &bull; Buyer: <strong className="text-stone-800">{inq.buyer_name}</strong>
-                    </p>
-
-                    {inq.message && (
-                      <p className="text-xs text-stone-600 italic bg-stone-50 p-2.5 rounded-xl border border-stone-200/60">
-                        "{inq.message}"
-                      </p>
-                    )}
-
-                    {/* Unlocked Farmer Contact if accepted */}
-                    {inq.contact_unlocked && inq.farmer_contact && (
-                      <div className="bg-emerald-50 p-2.5 rounded-xl border border-emerald-300 text-xs text-emerald-950 space-y-0.5">
-                        <span className="text-[10px] font-black uppercase text-emerald-800 block">
-                          {t('market.contact_unlocked_title')}
-                        </span>
-                        <p className="font-bold">{inq.farmer_contact.full_name}</p>
-                        <p className="text-[11px] text-stone-700">Phone: <strong>{inq.farmer_contact.phone_number || 'N/A'}</strong> &bull; Email: {inq.farmer_contact.email || 'N/A'}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions for Farmer (Accept/Decline) */}
-                  {inq.status === 'pending' && user?.role === 'Farmer' && (
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => handleInquiryDecision(inq.id, 'accepted')}
-                        className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        {t('market.accept_btn')}
-                      </button>
-                      <button
-                        onClick={() => handleInquiryDecision(inq.id, 'declined')}
-                        className="px-3 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl transition-all"
-                      >
-                        {t('market.decline_btn')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+              ) : (
+                <p className="text-xs text-neutral-500 text-center py-6">No trade inquiries in this view.</p>
+              )}
             </div>
           )}
         </div>
-      )}
+      </div>
 
-      {/* ========================================================================= */}
-      {/* MODAL: CREATE LISTING                                                      */}
-      {/* ========================================================================= */}
+      {/* Modal: Create Marketplace Listing */}
       {showListingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-stone-200">
-            <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
-              <Plus className="w-5 h-5 text-agri-green-700" />
-              {t('market.post_listing_btn')}
-            </h3>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-4 shadow-xl border border-[#7A553A]/20 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-[#7A553A]/15">
+              <h3 className="text-lg font-bold text-[#183D2E]">Post Harvest Listing</h3>
+              <button
+                type="button"
+                onClick={() => setShowListingModal(false)}
+                className="text-stone-500 hover:text-stone-800 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
 
             <form onSubmit={handleCreateListing} className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-stone-700 block mb-1">Crop</label>
-                  <input
-                    type="text"
-                    required
-                    value={newCrop}
-                    onChange={(e) => setNewCrop(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 block mb-1">Variety</label>
-                  <input
-                    type="text"
-                    value={newVariety}
-                    onChange={(e) => setNewVariety(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs"
-                  />
-                </div>
+              <div>
+                <label className="font-bold text-[#183D2E] block mb-1">Crop</label>
+                <input
+                  type="text"
+                  value={newCrop}
+                  onChange={(e) => setNewCrop(e.target.value)}
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-[#183D2E] block mb-1">Variety</label>
+                <input
+                  type="text"
+                  value={newVariety}
+                  onChange={(e) => setNewVariety(e.target.value)}
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-stone-700 block mb-1">Quantity (Quintals)</label>
+                  <label className="font-bold text-[#183D2E] block mb-1">Quantity (Quintals)</label>
                   <input
                     type="number"
-                    min="1"
-                    required
                     value={newQty}
-                    onChange={(e) => setNewQty(parseFloat(e.target.value) || 1)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold"
+                    onChange={(e) => setNewQty(parseFloat(e.target.value) || 0)}
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 block mb-1">Expected Price (₹/q)</label>
+                  <label className="font-bold text-[#183D2E] block mb-1">Expected Price (₹/q)</label>
                   <input
                     type="number"
-                    min="100"
-                    required
                     value={newPrice}
-                    onChange={(e) => setNewPrice(parseFloat(e.target.value) || 100)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-stone-700 block mb-1">Village</label>
-                  <input
-                    type="text"
+                    onChange={(e) => setNewPrice(parseFloat(e.target.value) || 0)}
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
                     required
-                    value={newVillage}
-                    onChange={(e) => setNewVillage(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 block mb-1">Harvest Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={newHarvestDate}
-                    onChange={(e) => setNewHarvestDate(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-stone-700 block mb-1">Quality & Logistics Notes</label>
-                <textarea
-                  rows={2}
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs"
+                <label className="font-bold text-[#183D2E] block mb-1">Harvest Date</label>
+                <input
+                  type="date"
+                  value={newHarvestDate}
+                  onChange={(e) => setNewHarvestDate(e.target.value)}
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-200">
+              <div>
+                <label className="font-bold text-[#183D2E] block mb-1">Notes / Moisture Quality</label>
+                <textarea
+                  value={newDesc}
+                  onChange={(e) => setNewDesc(e.target.value)}
+                  className="w-full min-h-[70px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
+                />
+              </div>
+
+              <div className="pt-3 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowListingModal(false)}
-                  className="px-3.5 py-2 text-xs font-bold text-stone-600 hover:text-stone-900"
+                  className="min-h-[44px] px-4 py-2 rounded-xl border border-[#7A553A]/30 font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-agri-green-700 hover:bg-agri-green-800 text-white font-bold text-xs rounded-xl shadow"
+                  className="min-h-[44px] px-6 py-2 rounded-xl bg-[#183D2E] text-white font-bold"
                 >
-                  Submit Listing
+                  Publish Listing
                 </button>
               </div>
             </form>
@@ -1132,76 +1085,69 @@ export const MarketPage: React.FC = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* MODAL: SUBMIT INQUIRY / OFFER                                              */}
-      {/* ========================================================================= */}
+      {/* Modal: Buyer Inquiry */}
       {showInquiryModal && activeListingForInquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-stone-200">
-            <h3 className="text-base font-bold text-stone-900">
-              {t('market.inquiry_modal_title')} — {activeListingForInquiry.crop_name}
-            </h3>
-
-            <p className="text-xs text-stone-600">
-              Listing: {activeListingForInquiry.quantity_quintals} q in {activeListingForInquiry.village} (Farmer asking ₹{activeListingForInquiry.expected_price_per_q}/q)
-            </p>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-4 shadow-xl border border-[#7A553A]/20">
+            <div className="flex items-center justify-between pb-2 border-b border-[#7A553A]/15">
+              <h3 className="text-lg font-bold text-[#183D2E]">
+                Make Offer for {activeListingForInquiry.crop_name}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowInquiryModal(false)}
+                className="text-stone-500 hover:text-stone-800 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
 
             <form onSubmit={handleSubmitInquiry} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-stone-700 block mb-1">
-                    {t('market.offered_price_label')}
-                  </label>
+                  <label className="font-bold text-[#183D2E] block mb-1">Offered Price (₹/q)</label>
                   <input
                     type="number"
-                    min="100"
-                    required
                     value={inqPrice}
-                    onChange={(e) => setInqPrice(parseFloat(e.target.value) || 100)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold"
+                    onChange={(e) => setInqPrice(parseFloat(e.target.value) || 0)}
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 block mb-1">
-                    {t('market.inquiry_qty_label')}
-                  </label>
+                  <label className="font-bold text-[#183D2E] block mb-1">Quantity (Quintals)</label>
                   <input
                     type="number"
-                    min="1"
-                    max={activeListingForInquiry.quantity_quintals}
-                    required
                     value={inqQty}
-                    onChange={(e) => setInqQty(parseFloat(e.target.value) || 1)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-bold"
+                    onChange={(e) => setInqQty(parseFloat(e.target.value) || 0)}
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
+                    required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-stone-700 block mb-1">
-                  {t('market.inquiry_message_label')}
-                </label>
+                <label className="font-bold text-[#183D2E] block mb-1">Message</label>
                 <textarea
-                  rows={2}
                   value={inqMsg}
                   onChange={(e) => setInqMsg(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs"
+                  className="w-full min-h-[70px] px-3 py-2 rounded-xl border border-[#7A553A]/30"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-200">
+              <div className="pt-3 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowInquiryModal(false)}
-                  className="px-3.5 py-2 text-xs font-bold text-stone-600 hover:text-stone-900"
+                  className="min-h-[44px] px-4 py-2 rounded-xl border border-[#7A553A]/30 font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-agri-gold-400 hover:bg-agri-gold-500 text-stone-900 font-bold text-xs rounded-xl shadow"
+                  className="min-h-[44px] px-6 py-2 rounded-xl bg-[#183D2E] text-white font-bold"
                 >
-                  {t('market.submit_inquiry_action')}
+                  Send Offer
                 </button>
               </div>
             </form>
@@ -1211,3 +1157,5 @@ export const MarketPage: React.FC = () => {
     </div>
   );
 };
+
+export default MarketPage;

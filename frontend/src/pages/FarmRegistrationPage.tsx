@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Tractor, Plus, MapPin, AlertCircle, CheckCircle2, ChevronRight, Layers } from 'lucide-react';
+import {
+  Tractor,
+  Plus,
+  MapPin,
+  AlertCircle,
+  CheckCircle2,
+  Layers,
+  ArrowRight,
+  Sparkles,
+} from 'lucide-react';
 import { farmsApi } from '../api/farms';
 import { Farm, OwnershipType, IrrigationMethod } from '../types/api';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
-import { StatusBadge } from '../components/common/StatusBadge';
+import { usePictorial } from '../context/PictorialContext';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorState } from '../components/common/ErrorState';
 import { EmptyState } from '../components/common/EmptyState';
+import { PageHeader } from '../components/common/PageHeader';
+import { WhatThisMeans } from '../components/common/WhatThisMeans';
+import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { WateringFieldIllustration } from '../components/common/FarmerIllustrations';
 
 export const FarmRegistrationPage: React.FC = () => {
-  const { t } = useTranslation();
-  const { setActiveFarmId, refreshFarms, activeFarmId } = useAuth();
-  const navigate = useNavigate();
+  const { t, language } = useTranslation();
+  const { isPictorial } = usePictorial();
+  const { setActiveFarmId, refreshFarms, activeFarmId, activeFarm } = useAuth();
 
   const [farms, setFarms] = useState<Farm[]>([]);
   const [isLoadingFarms, setIsLoadingFarms] = useState<boolean>(true);
   const [errorFarms, setErrorFarms] = useState<string | null>(null);
+
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'register' | 'holdings'>('register');
+  const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
 
   // Form State
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -79,7 +95,7 @@ export const FarmRegistrationPage: React.FC = () => {
     setFormSuccess(null);
 
     if (area <= 0) {
-      setFormError(t('farms.positive_area_error'));
+      setFormError(t('farms.positive_area_error', { defaultValue: 'Farm acreage must be greater than zero.' }));
       return;
     }
 
@@ -92,6 +108,7 @@ export const FarmRegistrationPage: React.FC = () => {
             owned: ownedArea,
             leased: leasedArea,
             total: area,
+            defaultValue: `Acreage mismatch: Owned (${ownedArea}) + Leased (${leasedArea}) != Total (${area})`,
           })
         );
         return;
@@ -118,12 +135,12 @@ export const FarmRegistrationPage: React.FC = () => {
         longitude,
       });
 
-      setFormSuccess(t('farms.success_created'));
+      setFormSuccess(t('farms.success_created', { defaultValue: 'Farm parcel successfully registered and activated!' }));
       setFarms((prev) => [...prev, newFarm]);
       setActiveFarmId(newFarm.id);
       await refreshFarms();
-      // Reset form fields
       setName('New Farm Holding');
+      setActiveTab('holdings');
     } catch (err: unknown) {
       setFormError(err instanceof Error ? err.message : 'Error creating farm holding.');
     } finally {
@@ -131,428 +148,712 @@ export const FarmRegistrationPage: React.FC = () => {
     }
   };
 
-  return (
-    <div className="space-y-8">
-      {/* Page Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-agri-gold-600">
-              Tier 1 Land Tenure Engine
-            </span>
-            <StatusBadge status="WORKING" />
+  const plainMeaning = activeFarm
+    ? `Active parcel: ${activeFarm.name} (${activeFarm.area} acres, ${activeFarm.ownership_type} tenure) in ${activeFarm.village}. Soil: ${activeFarm.soil_type || 'Black Cotton'}, Irrigation: ${activeFarm.irrigation_method}.`
+    : 'No active parcel selected. Register or choose a parcel below.';
+
+  // PICTORIAL MODE
+  if (isPictorial) {
+    return (
+      <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
+        <PageHeader
+          icon={Tractor}
+          title={language === 'te' ? 'నా పొలం వివరాలు' : language === 'hi' ? 'खेत का विवरण' : 'My Farm Holdings'}
+          purpose={language === 'te' ? 'భూమి వివరాలు మరియు హక్కుల రకం నమోదు చేసుకోండి' : language === 'hi' ? 'जमीन का रकबा और मालिकाना हक़ दर्ज करें' : 'Visual farm parcel registration and holding summary.'}
+        />
+
+        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
+          <div className="flex justify-center">
+            <WateringFieldIllustration className="w-48 h-36 drop-shadow-sm" />
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-stone-900">
-            {t('farms.title')}
-          </h1>
-          <p className="text-xs sm:text-sm text-stone-500">
-            {t('farms.subtitle')}
-          </p>
+
+          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
+            {activeFarm?.name || 'My Farmland'}
+          </h2>
+
+          <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-3 text-left">
+            <div className="flex justify-between items-center">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#183D2E] text-white">
+                Active Holding
+              </span>
+              <span className="text-sm font-bold text-[#7A553A]">
+                {activeFarm?.village}, {activeFarm?.district}
+              </span>
+            </div>
+            <div className="text-3xl font-display font-black text-[#183D2E]">
+              {activeFarm?.area || area} <span className="text-sm text-[#7A553A]">Acres Total</span>
+            </div>
+            <div className="text-xs text-[#4E5F57] space-y-1">
+              <p>Tenure: <strong>{activeFarm?.ownership_type || ownershipType}</strong></p>
+              <p>Irrigation: <strong>{activeFarm?.irrigation_method || irrigationMethod}</strong></p>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <ReadAloudButton text={`Your farm is ${activeFarm?.name || 'Registered Farm'}. ${plainMeaning}`} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-6 pb-16 animate-fadeIn">
+      {/* PAGE HEADER */}
+      <PageHeader
+        icon={Tractor}
+        title={t('farms.title', { defaultValue: 'Farm Parcel Registration & Land Holdings' })}
+        purpose={t('farms.subtitle', { defaultValue: 'Register individual land parcels, verify owned vs leased acreage math, and configure irrigation profiles.' })}
+        whatIsThis={{
+          summary: language === 'te'
+            ? 'మీ సొంత మరియు కౌలు భూమి వివరాలను నమోదు చేసి, నీటి పారుదల మరియు ఎరువుల బడ్జెట్‌ను ఖచ్చితంగా లెక్కించడానికి ఉపయోగపడుతుంది.'
+            : language === 'hi'
+            ? 'अपनी खुद की और बटाई (पट्टे) वाली जमीन का रकबा दर्ज करें ताकि सिंचाई और खाद की सही योजना बन सके।'
+            : 'Allows farmers to register parcels with accurate owned and leased acreages so all water budgets and crop cost models calculate correctly.',
+          whatToEnter: language === 'te'
+            ? 'పొలం పేరు, విస్తీర్ణం (ఎకరాల్లో), భూమి రకం (సొంతం/కౌలు), నేల స్వభావం మరియు గ్రామం.'
+            : language === 'hi'
+            ? 'खेत का नाम, रकबा (एकड़ में), जमीन का प्रकार (खुद की/बटाई), मिट्टी का प्रकार और गांव।'
+            : 'Parcel name, total acres, tenure breakdown (owned/leased), soil type, water source, and village.',
+          whatYouGet: language === 'te'
+            ? 'ఖచ్చితమైన భూమి లెక్కలు మరియు యాక్టివ్ ఫామ్ ప్రొఫైల్.'
+            : language === 'hi'
+            ? 'जमीन का सटीक हिसाब और ऐप में सक्रिय खेत की प्रोफाइल।'
+            : 'Verified parcel acreage and active farm state used across weather, irrigation, and economics tools.',
+        }}
+      />
+
+      {/* LEAD SUMMARY SECTION */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card 1: Active Farm Holding */}
+        <div className="bg-gradient-to-br from-[#FEF6E9] to-white rounded-2xl border-2 border-[#DA9A4C] p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
+                Active Farm Holding
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
+                Selected
+              </span>
+            </div>
+
+            <div className="flex items-baseline justify-between pt-1">
+              <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-[#183D2E]">
+                {activeFarm ? activeFarm.name : name}
+              </h2>
+              <span className="text-xs font-semibold text-[#7A553A]">
+                {activeFarm ? `${activeFarm.area} acres` : `${area} acres`}
+              </span>
+            </div>
+
+            <p className="text-xs text-[#4E5F57] leading-relaxed">
+              Location: <strong>{activeFarm ? `${activeFarm.village}, ${activeFarm.district}` : `${village}, ${district}`}</strong> &bull; Tenure: <strong className="capitalize">{activeFarm ? activeFarm.ownership_type : ownershipType}</strong>
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">
+            <ReadAloudButton text={`Active farm is ${activeFarm ? activeFarm.name : name}. ${plainMeaning}`} />
+            <button
+              type="button"
+              onClick={() => setActiveTab('holdings')}
+              className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
+            >
+              <span>View All Holdings ({farms.length})</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="inline-flex items-center gap-2 px-5 py-3 bg-agri-green-700 hover:bg-agri-green-800 text-white rounded-2xl text-xs font-bold shadow-md transition-all active:scale-95 self-start sm:self-auto"
-        >
-          <span>{t('nav.dashboard')}</span>
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
+        {/* Card 2: Land Tenure Breakdown */}
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-[#DA9A4C]" />
+                Tenure & Lease Status
+              </span>
+              <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
+                Holding Balance
+              </span>
+            </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left: Farm Registration Form */}
-        <div className="lg:col-span-7 bg-white border border-agri-soil-200/80 rounded-3xl p-6 sm:p-8 shadow-warm space-y-6">
-          <div className="flex items-center gap-2.5 border-b border-stone-100 pb-3">
-            <div className="p-2 bg-agri-green-100 text-agri-green-800 rounded-xl">
-              <Plus className="w-5 h-5" />
+            <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Total Acreage:</span>
+                <strong className="text-[#183D2E]">{activeFarm ? activeFarm.area : area} Acres</strong>
+              </div>
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Owned Land:</span>
+                <strong className="text-[#183D2E]">{activeFarm ? activeFarm.owned_area : ownedArea} Acres</strong>
+              </div>
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Leased Land:</span>
+                <strong className="text-[#7A553A]">{activeFarm ? activeFarm.leased_area : leasedArea} Acres</strong>
+              </div>
+              {(activeFarm?.lease_amount || leaseAmount) > 0 && (
+                <div className="flex justify-between text-amber-800 border-t border-[#7A553A]/10 pt-1 font-semibold">
+                  <span>Annual Lease Rent:</span>
+                  <strong>₹{(activeFarm ? activeFarm.lease_amount : leaseAmount).toLocaleString('en-IN')}</strong>
+                </div>
+              )}
             </div>
-            <div>
-              <h3 className="font-display text-base font-bold text-stone-900">
-                {t('farms.register_heading')}
-              </h3>
-              <p className="text-xs text-stone-500">
-                Mathematical verification of owned vs leased acreage
-              </p>
+
+            <WhatThisMeans
+              message={plainMeaning}
+              confidenceNote="Tenure math ensures that lease rent is accurately subtracted from net farmer profits."
+            />
+          </div>
+        </div>
+
+        {/* Card 3: Soil & Irrigation Configuration */}
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
+                <Tractor className="w-4 h-4 text-[#DA9A4C]" />
+                Agronomic Attributes
+              </span>
+              <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
+                Water & Soil
+              </span>
             </div>
+
+            <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Soil Type:</span>
+                <strong className="text-[#183D2E]">{activeFarm ? activeFarm.soil_type : soilType}</strong>
+              </div>
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Water Source:</span>
+                <strong className="text-[#183D2E]">{activeFarm ? activeFarm.water_source : waterSource}</strong>
+              </div>
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Irrigation Method:</span>
+                <strong className="text-[#183D2E] capitalize">{activeFarm ? activeFarm.irrigation_method : irrigationMethod}</strong>
+              </div>
+              <div className="flex justify-between text-[#4E5F57]">
+                <span>Seasonal Budget:</span>
+                <strong className="text-[#183D2E]">₹{(activeFarm ? activeFarm.budget : budget).toLocaleString('en-IN')}</strong>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-[#7A553A]">
+              Irrigation method directly influences application efficiency (Drip 90%, Flood 60%).
+            </p>
           </div>
 
-          {formError && (
-            <div className="p-3.5 bg-rose-50 border border-rose-300 rounded-2xl text-rose-800 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
-              <span>{formError}</span>
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => setActiveTab('register')}
+            className="w-full min-h-[44px] py-2 px-3 rounded-xl border border-[#DA9A4C] bg-[#FEF6E9] hover:bg-[#FAF8F5] font-bold text-xs text-[#183D2E] flex items-center justify-center gap-2 transition-all shadow-sm"
+          >
+            <Plus className="w-4 h-4 text-[#DA9A4C]" />
+            <span>Register Another Parcel</span>
+          </button>
+        </div>
+      </div>
 
-          {formSuccess && (
-            <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-emerald-800 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span>{formSuccess}</span>
-            </div>
-          )}
+      {/* DETAIL TABS */}
+      <div className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+        <div className="flex border-b border-[#7A553A]/15 bg-[#FAF8F5] px-3 sm:px-6 overflow-x-auto scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setActiveTab('register')}
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
+              activeTab === 'register'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <Plus className="w-4 h-4 text-[#DA9A4C]" />
+            <span>Register Land Parcel</span>
+          </button>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Farm Name & Total Area */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  {t('farms.name_label')}
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-agri-green-600"
-                />
-              </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab('holdings')}
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
+              activeTab === 'holdings'
+                ? 'border-[#183D2E] text-[#183D2E] bg-white'
+                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+            }`}
+          >
+            <Tractor className="w-4 h-4 text-[#DA9A4C]" />
+            <span>Registered Holdings ({farms.length})</span>
+          </button>
+        </div>
 
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  {t('farms.area_label')}
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0.1"
-                  required
-                  value={area}
-                  onChange={(e) => setArea(parseFloat(e.target.value) || 0)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-agri-green-600"
-                />
-              </div>
-            </div>
-
-            {/* Ownership Type (Radio Pills) */}
-            <div>
-              <label className="block text-xs font-bold text-stone-700 mb-2">
-                {t('farms.tenure_label')}
-              </label>
-              <div className="grid grid-cols-3 gap-2.5">
-                {(['owned', 'leased', 'mixed'] as OwnershipType[]).map((type) => (
+        <div className="p-4 sm:p-6">
+          {/* TAB 1: STEP-BY-STEP REGISTRATION WIZARD */}
+          {activeTab === 'register' && (
+            <div className="max-w-2xl mx-auto space-y-6">
+              {/* Wizard Steps Navigation */}
+              <div className="flex items-center justify-between border-b border-[#7A553A]/15 pb-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                   <button
-                    key={type}
                     type="button"
-                    onClick={() => setOwnershipType(type)}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-center ${
-                      ownershipType === type
-                        ? 'bg-agri-green-700 text-white border-agri-green-800 shadow-sm'
-                        : 'bg-agri-cream-50 text-stone-700 border-stone-200 hover:border-agri-green-600/40'
+                    onClick={() => setFormStep(1)}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
+                      formStep === 1 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
                     }`}
                   >
-                    {t(`farms.${type}_option`)}
+                    <span>1. Land & Tenure</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormStep(2)}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
+                      formStep === 2 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
+                    }`}
+                  >
+                    <span>2. Soil & Water</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormStep(3)}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
+                      formStep === 3 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
+                    }`}
+                  >
+                    <span>3. Location & GPS</span>
+                  </button>
+                </div>
+                <span className="text-xs text-[#7A553A] font-semibold hidden sm:inline">
+                  Step {formStep} of 3
+                </span>
+              </div>
+
+              {formError && (
+                <div className="p-3.5 bg-rose-50 border border-rose-300 rounded-2xl text-rose-800 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              {formSuccess && (
+                <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-emerald-800 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>{formSuccess}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* STEP 1: LAND & TENURE */}
+                {formStep === 1 && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                          {t('farms.name_label', { defaultValue: 'Parcel Name or Identifier' })}
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-sm focus:ring-2 focus:ring-[#183D2E]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                          {t('farms.area_label', { defaultValue: 'Total Land Holding (Acres)' })}
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0.1"
+                          required
+                          value={area}
+                          onChange={(e) => setArea(parseFloat(e.target.value) || 0)}
+                          className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-sm focus:ring-2 focus:ring-[#183D2E]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#183D2E] mb-2">
+                        {t('farms.tenure_label', { defaultValue: 'Ownership / Land Tenure Model' })}
+                      </label>
+                      <div className="grid grid-cols-3 gap-2.5">
+                        {(['owned', 'leased', 'mixed'] as OwnershipType[]).map((type) => (
+                          <button
+                            key={type}
+                            type="button"
+                            onClick={() => setOwnershipType(type)}
+                            className={`min-h-[44px] py-2 px-3 rounded-xl text-xs font-bold border transition-all text-center ${
+                              ownershipType === type
+                                ? 'bg-[#183D2E] text-white border-[#183D2E] shadow-sm'
+                                : 'bg-[#FAF8F5] text-[#7A553A] border-[#7A553A]/20 hover:border-[#183D2E]'
+                            }`}
+                          >
+                            {t(`farms.${type}_option`, { defaultValue: type.toUpperCase() })}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {(ownershipType === 'leased' || ownershipType === 'mixed') && (
+                      <div className="p-4 bg-[#FAF8F5] border border-[#DA9A4C]/40 rounded-2xl space-y-3">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#183D2E]">
+                          <Layers className="w-4 h-4 text-[#DA9A4C]" />
+                          <span>{t('farms.tenure_breakdown_heading', { defaultValue: 'Tenure Breakdown & Rent Math' })}</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {ownershipType === 'mixed' && (
+                            <div>
+                              <label className="block text-[11px] font-bold text-[#7A553A] mb-1">
+                                {t('farms.owned_area_label', { defaultValue: 'Owned Acreage' })}
+                              </label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                value={ownedArea}
+                                onChange={(e) => setOwnedArea(parseFloat(e.target.value) || 0)}
+                                className="w-full min-h-[40px] px-3 py-2 rounded-lg border border-[#7A553A]/30 text-xs bg-white"
+                              />
+                            </div>
+                          )}
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-[#7A553A] mb-1">
+                              {t('farms.leased_area_label', { defaultValue: 'Leased Acreage' })}
+                            </label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              value={leasedArea}
+                              onChange={(e) => setLeasedArea(parseFloat(e.target.value) || 0)}
+                              className="w-full min-h-[40px] px-3 py-2 rounded-lg border border-[#7A553A]/30 text-xs bg-white"
+                            />
+                          </div>
+
+                          <div className={ownershipType === 'mixed' ? 'sm:col-span-2' : ''}>
+                            <label className="block text-[11px] font-bold text-[#7A553A] mb-1">
+                              {t('farms.lease_amount_label', { defaultValue: 'Annual Lease Amount (₹)' })}
+                            </label>
+                            <input
+                              type="number"
+                              step="100"
+                              min="0"
+                              value={leaseAmount}
+                              onChange={(e) => setLeaseAmount(parseFloat(e.target.value) || 0)}
+                              className="w-full min-h-[40px] px-3 py-2 rounded-lg border border-[#7A553A]/30 text-xs bg-white"
+                            />
+                          </div>
+                        </div>
+
+                        {ownershipType === 'mixed' && (
+                          <div
+                            className={`text-[11px] font-semibold flex items-center justify-between p-2.5 rounded-xl ${
+                              isTenureValid()
+                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                : 'bg-rose-100 text-rose-900 border border-rose-300'
+                            }`}
+                          >
+                            <span>
+                              Owned ({ownedArea} ac) + Leased ({leasedArea} ac) = {(ownedArea + leasedArea).toFixed(1)} ac
+                            </span>
+                            <span>Target: {area} ac</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setFormStep(2)}
+                        disabled={!isTenureValid()}
+                        className="min-h-[44px] px-6 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
+                      >
+                        <span>Continue to Soil & Water</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 2: SOIL & IRRIGATION */}
+                {formStep === 2 && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                          {t('farms.soil_type_label', { defaultValue: 'Soil Texture & Type' })}
+                        </label>
+                        <select
+                          value={soilType}
+                          onChange={(e) => setSoilType(e.target.value)}
+                          className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-xs bg-white"
+                        >
+                          <option value="Black Cotton">{t('farms.soil_black_cotton', { defaultValue: 'Black Cotton' })}</option>
+                          <option value="Red Loam">{t('farms.soil_red_loam', { defaultValue: 'Red Loam' })}</option>
+                          <option value="Alluvial">{t('farms.soil_alluvial', { defaultValue: 'Alluvial' })}</option>
+                          <option value="Sandy Loam">{t('farms.soil_sandy_loam', { defaultValue: 'Sandy Loam' })}</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                          {t('farms.water_source_label', { defaultValue: 'Water Source' })}
+                        </label>
+                        <input
+                          type="text"
+                          value={waterSource}
+                          onChange={(e) => setWaterSource(e.target.value)}
+                          placeholder="e.g. Borewell / Canal"
+                          className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                          {t('farms.irrigation_label', { defaultValue: 'Irrigation System' })}
+                        </label>
+                        <select
+                          value={irrigationMethod}
+                          onChange={(e) => setIrrigationMethod(e.target.value as IrrigationMethod)}
+                          className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-xs bg-white"
+                        >
+                          <option value="drip">{t('farms.irrigation_drip', { defaultValue: 'Drip Irrigation (90% Eff)' })}</option>
+                          <option value="sprinkler">{t('farms.irrigation_sprinkler', { defaultValue: 'Sprinkler (75% Eff)' })}</option>
+                          <option value="flood">{t('farms.irrigation_flood', { defaultValue: 'Surface Flood (60% Eff)' })}</option>
+                          <option value="furrow">{t('farms.irrigation_furrow', { defaultValue: 'Furrow Irrigation' })}</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                          {t('farms.budget_label', { defaultValue: 'Seasonal Working Capital Budget (₹)' })}
+                        </label>
+                        <input
+                          type="number"
+                          step="1000"
+                          min="0"
+                          value={budget}
+                          onChange={(e) => setBudget(parseFloat(e.target.value) || 0)}
+                          className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#7A553A]/30 text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setFormStep(1)}
+                        className="min-h-[44px] px-4 py-2 border border-[#7A553A]/30 rounded-xl text-xs font-bold text-[#7A553A]"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormStep(3)}
+                        className="min-h-[44px] px-6 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all"
+                      >
+                        <span>Continue to Location & GPS</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 3: LOCATION & GPS */}
+                {formStep === 3 && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.state_label', { defaultValue: 'State' })}</label>
+                        <input
+                          type="text"
+                          value={state}
+                          onChange={(e) => setState(e.target.value)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.district_label', { defaultValue: 'District' })}</label>
+                        <input
+                          type="text"
+                          value={district}
+                          onChange={(e) => setDistrict(e.target.value)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.village_label', { defaultValue: 'Village' })}</label>
+                        <input
+                          type="text"
+                          value={village}
+                          onChange={(e) => setVillage(e.target.value)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.latitude_label', { defaultValue: 'Latitude' })}</label>
+                        <input
+                          type="number"
+                          step="0.0001"
+                          value={latitude}
+                          onChange={(e) => setLatitude(parseFloat(e.target.value) || 0)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.longitude_label', { defaultValue: 'Longitude' })}</label>
+                        <input
+                          type="number"
+                          step="0.0001"
+                          value={longitude}
+                          onChange={(e) => setLongitude(parseFloat(e.target.value) || 0)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setFormStep(2)}
+                        className="min-h-[44px] px-4 py-2 border border-[#7A553A]/30 rounded-xl text-xs font-bold text-[#7A553A]"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !isTenureValid()}
+                        className="min-h-[48px] px-8 py-3 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 disabled:opacity-50 text-xs sm:text-sm flex items-center gap-2"
+                      >
+                        <Sparkles className="w-4 h-4 text-[#DA9A4C]" />
+                        <span>{isSubmitting ? t('common.loading', { defaultValue: 'Saving...' }) : t('farms.submit_btn', { defaultValue: 'Complete Parcel Registration' })}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </form>
+            </div>
+          )}
+
+          {/* TAB 2: REGISTERED HOLDINGS LIST */}
+          {activeTab === 'holdings' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-[#7A553A]/15 pb-3">
+                <h3 className="text-sm font-bold text-[#183D2E] flex items-center gap-2">
+                  <Tractor className="w-5 h-5 text-[#DA9A4C]" />
+                  <span>{t('farms.list_heading', { defaultValue: 'Active and Registered Parcels' })} ({farms.length})</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={fetchFarms}
+                  className="text-xs text-[#183D2E] font-bold hover:underline"
+                >
+                  Refresh Holdings
+                </button>
+              </div>
+
+              {isLoadingFarms && <LoadingSkeleton lines={4} />}
+
+              {errorFarms && (
+                <ErrorState
+                  title="Unable to load holdings"
+                  message={errorFarms}
+                  onRetry={fetchFarms}
+                />
+              )}
+
+              {!isLoadingFarms && !errorFarms && farms.length === 0 && (
+                <EmptyState
+                  title={t('farms.no_farms', { defaultValue: 'No Registered Farm Holdings' })}
+                  description="Enter your land parcel details to calculate water and cost budgets for your crops."
+                />
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {farms.map((farm) => (
+                  <div
+                    key={farm.id}
+                    className={`rounded-2xl p-5 border transition-all space-y-3 ${
+                      farm.id === activeFarmId
+                        ? 'border-2 border-[#183D2E] bg-gradient-to-br from-[#FEF6E9]/40 to-white shadow-sm'
+                        : 'border-[#7A553A]/20 bg-[#FAF8F5] hover:border-[#183D2E]'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-display text-base font-bold text-[#183D2E]">
+                          {farm.name}
+                        </h4>
+                        <p className="text-xs text-[#7A553A] flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3.5 h-3.5 text-[#DA9A4C]" />
+                          {farm.village}, {farm.district}, {farm.state}
+                        </p>
+                      </div>
+                      <span className="inline-block px-2.5 py-0.5 bg-[#183D2E] text-white rounded-full text-xs font-bold">
+                        {farm.area} {t('common.acres', { defaultValue: 'Acres' })}
+                      </span>
+                    </div>
+
+                    {/* Tenure Breakdown Pills */}
+                    <div className="flex flex-wrap gap-2 text-xs pt-1">
+                      <span className="px-2 py-0.5 bg-white text-[#183D2E] rounded-lg font-bold border border-[#7A553A]/20">
+                        Tenure: <strong className="capitalize">{farm.ownership_type}</strong>
+                      </span>
+                      {farm.ownership_type === 'mixed' && (
+                        <>
+                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-lg font-medium border border-emerald-200">
+                            Owned: {farm.owned_area} ac
+                          </span>
+                          <span className="px-2 py-0.5 bg-amber-50 text-amber-800 rounded-lg font-medium border border-amber-200">
+                            Leased: {farm.leased_area} ac
+                          </span>
+                        </>
+                      )}
+                      {farm.lease_amount > 0 && (
+                        <span className="px-2 py-0.5 bg-[#FEF6E9] text-amber-900 rounded-lg font-medium border border-amber-200">
+                          Rent: ₹{farm.lease_amount.toLocaleString('en-IN')}/yr
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[11px] text-[#4E5F57] bg-white p-3 rounded-xl border border-[#7A553A]/15">
+                      <div>{t('farms.soil_label_short', { defaultValue: 'Soil' })}: <strong>{farm.soil_type || 'Unspecified'}</strong></div>
+                      <div>{t('farms.water_label_short', { defaultValue: 'Water' })}: <strong>{farm.water_source || 'Unspecified'}</strong></div>
+                      <div>{t('farms.method_label_short', { defaultValue: 'System' })}: <strong className="capitalize">{farm.irrigation_method}</strong></div>
+                      <div>{t('farms.coordinates_label', { defaultValue: 'GPS' })}: <strong>{farm.latitude.toFixed(2)}, {farm.longitude.toFixed(2)}</strong></div>
+                    </div>
+
+                    {/* Active Farm Switcher Action */}
+                    <div className="pt-2 flex items-center justify-between border-t border-[#7A553A]/15">
+                      {farm.id === activeFarmId ? (
+                        <span className="text-xs font-bold text-[#183D2E] bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#183D2E]" />
+                          <span>{t('farms.active_holding', { defaultValue: 'Active Farm Selected' })}</span>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setActiveFarmId(farm.id)}
+                          className="text-xs font-bold text-[#183D2E] hover:text-white bg-white hover:bg-[#183D2E] px-4 py-1.5 rounded-full border border-[#7A553A]/30 transition-all shadow-xs"
+                        >
+                          {t('farms.switch_farm', { defaultValue: 'Switch to This Farm' })}
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-
-            {/* Conditional Tenure Inputs */}
-            {(ownershipType === 'leased' || ownershipType === 'mixed') && (
-              <div className="p-4 bg-agri-cream-100/70 border border-agri-soil-200/80 rounded-2xl space-y-3">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-agri-soil-800">
-                  <Layers className="w-4 h-4 text-agri-soil-600" />
-                  <span>{t('farms.tenure_breakdown_heading')}</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {ownershipType === 'mixed' && (
-                    <div>
-                      <label className="block text-[11px] font-bold text-stone-600 mb-1">
-                        {t('farms.owned_area_label')}
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        value={ownedArea}
-                        onChange={(e) => setOwnedArea(parseFloat(e.target.value) || 0)}
-                        className="w-full px-3 py-2 rounded-lg border border-stone-300 text-xs bg-white"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-stone-600 mb-1">
-                      {t('farms.leased_area_label')}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      value={leasedArea}
-                      onChange={(e) => setLeasedArea(parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 rounded-lg border border-stone-300 text-xs bg-white"
-                    />
-                  </div>
-
-                  <div className={ownershipType === 'mixed' ? 'sm:col-span-2' : ''}>
-                    <label className="block text-[11px] font-bold text-stone-600 mb-1">
-                      {t('farms.lease_amount_label')}
-                    </label>
-                    <input
-                      type="number"
-                      step="100"
-                      min="0"
-                      value={leaseAmount}
-                      onChange={(e) => setLeaseAmount(parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 rounded-lg border border-stone-300 text-xs bg-white"
-                    />
-                  </div>
-                </div>
-
-                {ownershipType === 'mixed' && (
-                  <div
-                    className={`text-[11px] font-semibold flex items-center justify-between p-2 rounded-lg ${
-                      isTenureValid()
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-rose-100 text-rose-800'
-                    }`}
-                  >
-                    <span>
-                      Owned ({ownedArea} ac) + Leased ({leasedArea} ac) = {(ownedArea + leasedArea).toFixed(1)} ac
-                    </span>
-                    <span>Target: {area} ac</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Agronomic Attributes & Budget */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  {t('farms.soil_type_label')}
-                </label>
-                <select
-                  value={soilType}
-                  onChange={(e) => setSoilType(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs bg-white"
-                >
-                  <option value="Black Cotton">{t('farms.soil_black_cotton')}</option>
-                  <option value="Red Loam">{t('farms.soil_red_loam')}</option>
-                  <option value="Alluvial">{t('farms.soil_alluvial')}</option>
-                  <option value="Sandy Loam">{t('farms.soil_sandy_loam')}</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  {t('farms.water_source_label')}
-                </label>
-                <input
-                  type="text"
-                  value={waterSource}
-                  onChange={(e) => setWaterSource(e.target.value)}
-                  placeholder="e.g. Borewell / Canal"
-                  className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  {t('farms.irrigation_label')}
-                </label>
-                <select
-                  value={irrigationMethod}
-                  onChange={(e) => setIrrigationMethod(e.target.value as IrrigationMethod)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs bg-white"
-                >
-                  <option value="drip">{t('farms.irrigation_drip')}</option>
-                  <option value="sprinkler">{t('farms.irrigation_sprinkler')}</option>
-                  <option value="flood">{t('farms.irrigation_flood')}</option>
-                  <option value="furrow">{t('farms.irrigation_furrow')}</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  {t('farms.budget_label')}
-                </label>
-                <input
-                  type="number"
-                  step="1000"
-                  min="0"
-                  value={budget}
-                  onChange={(e) => setBudget(parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs"
-                />
-              </div>
-            </div>
-
-            {/* Location coordinates */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
-              <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.state_label')}</label>
-                <input
-                  type="text"
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  className="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.village_label')}</label>
-                <input
-                  type="text"
-                  value={village}
-                  onChange={(e) => setVillage(e.target.value)}
-                  className="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.district_label')}</label>
-                <input
-                  type="text"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.latitude_label')}</label>
-                <input
-                  type="number"
-                  step="0.0001"
-                  value={latitude}
-                  onChange={(e) => setLatitude(parseFloat(e.target.value) || 0)}
-                  className="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-stone-500 mb-0.5">{t('farms.longitude_label')}</label>
-                <input
-                  type="number"
-                  step="0.0001"
-                  value={longitude}
-                  onChange={(e) => setLongitude(parseFloat(e.target.value) || 0)}
-                  className="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 text-xs"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting || !isTenureValid()}
-              className="w-full py-3.5 px-4 bg-agri-green-700 hover:bg-agri-green-800 text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 disabled:opacity-50 text-sm mt-2"
-            >
-              {isSubmitting ? t('common.loading') : t('farms.submit_btn')}
-            </button>
-          </form>
-        </div>
-
-        {/* Right: List of Registered Holdings */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-stone-200 pb-2">
-            <h3 className="font-display text-base font-bold text-stone-900 flex items-center gap-2">
-              <Tractor className="w-5 h-5 text-agri-green-700" />
-              {t('farms.list_heading')} ({farms.length})
-            </h3>
-            <button
-              onClick={fetchFarms}
-              className="text-xs text-agri-green-700 font-bold hover:underline"
-            >
-              Refresh
-            </button>
-          </div>
-
-          {isLoadingFarms && <LoadingSkeleton lines={4} />}
-
-          {errorFarms && (
-            <ErrorState
-              title="Unable to load holdings"
-              message={errorFarms}
-              onRetry={fetchFarms}
-            />
           )}
-
-          {!isLoadingFarms && !errorFarms && farms.length === 0 && (
-            <EmptyState
-              title={t('farms.no_farms')}
-              description="Enter your land parcel details on the left to begin calculating water and cost budgets."
-            />
-          )}
-
-          <div className="space-y-3">
-            {farms.map((farm) => (
-              <div
-                key={farm.id}
-                className="bg-white border border-stone-200/80 rounded-2xl p-5 shadow-subtle hover:border-agri-green-600/50 transition-all space-y-3"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="font-display text-base font-bold text-stone-900">
-                      {farm.name}
-                    </h4>
-                    <p className="text-xs text-stone-500 flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3.5 h-3.5 text-stone-400" />
-                      {farm.village}, {farm.district}, {farm.state}
-                    </p>
-                  </div>
-                  <span className="inline-block px-2.5 py-0.5 bg-agri-cream-100 text-agri-soil-800 rounded-full text-xs font-bold border border-agri-soil-200">
-                    {farm.area} {t('common.acres')}
-                  </span>
-                </div>
-
-                {/* Tenure Breakdown Pills */}
-                <div className="flex flex-wrap gap-2 text-xs pt-1">
-                  <span className="px-2 py-0.5 bg-stone-100 text-stone-700 rounded-lg font-medium">
-                    Tenure: <strong className="capitalize">{farm.ownership_type}</strong>
-                  </span>
-                  {farm.ownership_type === 'mixed' && (
-                    <>
-                      <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-lg font-medium">
-                        Owned: {farm.owned_area} ac
-                      </span>
-                      <span className="px-2 py-0.5 bg-amber-50 text-amber-800 rounded-lg font-medium">
-                        Leased: {farm.leased_area} ac
-                      </span>
-                    </>
-                  )}
-                  {farm.lease_amount > 0 && (
-                    <span className="px-2 py-0.5 bg-agri-gold-100 text-agri-soil-900 rounded-lg font-medium">
-                      Lease: ₹{farm.lease_amount.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-stone-600 bg-agri-cream-50 p-2.5 rounded-xl border border-stone-100">
-                  <div>{t('farms.soil_label_short')}: <strong>{farm.soil_type || 'Unspecified'}</strong></div>
-                  <div>{t('farms.water_label_short')}: <strong>{farm.water_source || 'Unspecified'}</strong></div>
-                  <div>{t('farms.method_label_short')}: <strong className="capitalize">{farm.irrigation_method}</strong></div>
-                  <div>{t('farms.coordinates_label')}: <strong>{farm.latitude.toFixed(2)}, {farm.longitude.toFixed(2)}</strong></div>
-                </div>
-
-                {/* Crop cycle indicator */}
-                {farm.current_crop_cycles && farm.current_crop_cycles.length > 0 && (
-                  <div className="text-xs text-agri-green-800 bg-agri-green-50 p-2 rounded-xl flex items-center justify-between">
-                    <span>{t('farms.active_cycle_label')}: <strong>{farm.current_crop_cycles[0].crop_name}</strong></span>
-                    <span className="capitalize text-[11px] px-2 py-0.5 bg-agri-green-200/60 rounded-full font-bold">
-                      {farm.current_crop_cycles[0].current_stage}
-                    </span>
-                  </div>
-                )}
-
-                {/* Active Farm Switcher Action */}
-                <div className="pt-2 flex items-center justify-between border-t border-stone-100">
-                  {farm.id === activeFarmId ? (
-                    <span className="text-[11px] font-bold text-agri-green-800 bg-agri-green-100 px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      {t('farms.active_holding')}
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setActiveFarmId(farm.id)}
-                      className="text-[11px] font-bold text-stone-700 hover:text-agri-green-800 bg-stone-100 hover:bg-agri-green-50 px-2.5 py-1 rounded-full border border-stone-200 transition-all"
-                    >
-                      {t('farms.switch_farm')}
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
   );
 };
+
+export default FarmRegistrationPage;

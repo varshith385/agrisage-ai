@@ -52,7 +52,11 @@ export const PictorialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 export const usePictorial = (): PictorialContextType => {
   const context = useContext(PictorialContext);
   if (!context) {
-    throw new Error('usePictorial must be used within a PictorialProvider');
+    return {
+      isPictorial: false,
+      setPictorial: () => {},
+      togglePictorial: () => {},
+    };
   }
   return context;
 };
