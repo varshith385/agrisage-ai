@@ -817,6 +817,241 @@ export interface CropCalendarResponse {
   status: FeatureStatus;
 }
 
+// ==========================================
+// Community & Peer Collaboration Types
+// ==========================================
+
+export interface NearbyFarmer {
+  user_id: number;
+  alias_or_name: string;
+  village: string;
+  district: string;
+  crops_grown: string[];
+  has_shared_contact: boolean;
+  phone_number?: string | null;
+}
+
+export interface FarmerGroup {
+  id: number;
+  name: string;
+  description?: string | null;
+  village: string;
+  district: string;
+  state: string;
+  crop_focus?: string | null;
+  created_by_user_id: number;
+  member_count: number;
+  is_member: boolean;
+  user_has_consented: boolean;
+  created_at: string;
+  is_demo: boolean;
+}
+
+export interface GroupMember {
+  user_id: number;
+  alias_or_name: string;
+  village: string;
+  role: string;
+  consent_share_contact: boolean;
+  consent_at?: string | null;
+  phone_number?: string | null;
+  joined_at: string;
+}
+
+export interface GroupCreatePayload {
+  name: string;
+  description?: string;
+  village: string;
+  district: string;
+  state?: string;
+  crop_focus?: string;
+  consent_share_contact: boolean;
+}
+
+export interface ParticipantSplit {
+  name_or_alias: string;
+  weight_quintals: number;
+  pickup_distance_km: number;
+  share_percentage: number;
+  allocated_cost: number;
+  solo_cost: number;
+  savings: number;
+  savings_percentage: number;
+}
+
+export interface CostSplitResult {
+  split_method: string;
+  total_truck_cost: number;
+  total_solo_cost: number;
+  total_savings: number;
+  total_savings_percentage: number;
+  formula_breakdown: string;
+  example_breakdown: Record<string, any>;
+  participants: ParticipantSplit[];
+  notes: string[];
+}
+
+export interface Participant {
+  id: number;
+  user_id: number;
+  alias_or_name: string;
+  village: string;
+  quantity_or_weight: number;
+  distance_km: number;
+  estimated_cost?: number | null;
+  savings_vs_solo?: number | null;
+  notes?: string | null;
+  created_at: string;
+}
+
+export interface CommunityRequest {
+  id: number;
+  group_id?: number | null;
+  created_by_user_id: number;
+  creator_alias: string;
+  request_type: 'transport' | 'input_purchase' | 'pooled_sale';
+  title: string;
+  description?: string | null;
+  target_date?: string | null;
+  status: string;
+  village: string;
+  district: string;
+  state: string;
+  destination?: string | null;
+  total_capacity_quintals?: number | null;
+  current_weight_quintals: number;
+  base_truck_cost?: number | null;
+  rate_per_km?: number | null;
+  distance_km?: number | null;
+  item_name?: string | null;
+  target_quantity?: number | null;
+  unit?: string | null;
+  bulk_price_per_unit?: number | null;
+  retail_price_per_unit?: number | null;
+  crop_name?: string | null;
+  target_quantity_quintals?: number | null;
+  expected_price_per_quintal?: number | null;
+  is_demo: boolean;
+  created_at: string;
+  participants: Participant[];
+  is_participant: boolean;
+  cost_split_summary?: {
+    total_truck_cost: number;
+    total_solo_cost: number;
+    total_savings: number;
+    total_savings_pct: number;
+  } | null;
+}
+
+export interface MachineryGuideStage {
+  stage: string;
+  recommended_machinery: string;
+  category: string;
+  purpose: string;
+  operational_hours_per_acre: number;
+  cost_saving_tip: string;
+  source_note: string;
+}
+
+export interface MachineryGuideResponse {
+  crop: string;
+  stages: MachineryGuideStage[];
+  total_stages: number;
+  source_citation: string;
+  notes: string[];
+  supported_crops?: string[];
+}
+
+export interface MachineryListing {
+  id: number;
+  owner_id: number;
+  owner_name_or_alias: string;
+  owner_phone?: string | null;
+  name: string;
+  category: string;
+  hourly_rate: number;
+  daily_rate: number;
+  village: string;
+  district: string;
+  state: string;
+  latitude: number;
+  longitude: number;
+  distance_km?: number | null;
+  is_available: boolean;
+  contact_phone_opt_in: boolean;
+  description?: string | null;
+  is_demo: boolean;
+  created_at: string;
+}
+
+export interface MachineryBooking {
+  id: number;
+  listing_id: number;
+  listing_name: string;
+  owner_id: number;
+  renter_id: number;
+  renter_alias: string;
+  start_date: string;
+  end_date: string;
+  duration_hours?: number | null;
+  rate_type: 'daily' | 'hourly';
+  estimated_total: number;
+  crop_purpose?: string | null;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  notes?: string | null;
+  created_at: string;
+  booking_note: string;
+}
+
+export interface OutbreakCluster {
+  village: string;
+  district: string;
+  state: string;
+  latitude: number;
+  longitude: number;
+  predicted_disease: string;
+  raw_disease_key: string;
+  crop: string;
+  report_count: number;
+  avg_confidence: number;
+  severity: 'LOW' | 'MODERATE' | 'HIGH';
+  last_reported_at?: string | null;
+  privacy_note: string;
+}
+
+export interface OutbreakMapResponse {
+  status: FeatureStatus;
+  district: string;
+  state: string;
+  time_window_days: number;
+  crop_filter: string;
+  min_reports_threshold: number;
+  clusters: OutbreakCluster[];
+  summary: {
+    total_qualifying_clusters: number;
+    total_qualifying_reports: number;
+    total_opted_in_raw_reports: number;
+    suppressed_clusters_count: number;
+    unique_villages_displayed: number;
+    privacy_guard_enforced: boolean;
+    headline: string;
+  };
+}
+
+export interface DistrictOfficerSummary {
+  status: FeatureStatus;
+  district: string;
+  state: string;
+  time_window_days: number;
+  total_cases_in_district: number;
+  disease_breakdown: Array<{ disease: string; count: number; pct: number }>;
+  crop_breakdown: Array<{ crop: string; count: number; pct: number }>;
+  weekly_trends: Array<{ week_label: string; reports_count: number }>;
+  hotspot_villages: Array<{ village: string; count: number }>;
+  officer_action_advisories: string[];
+  data_provenance: string;
+}
+
 
 
 
