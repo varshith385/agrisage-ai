@@ -90,7 +90,23 @@ async def test_farm_health_score_computed_when_3_or_more_components():
 
     e_comp = next(c for c in breakdown.components if c.key == "economic_health")
     assert e_comp.status == "EXCLUDED"
-    assert "phase 4 economics" in e_comp.exclusion_reason.lower()
+    assert "no farm budget" in e_comp.exclusion_reason.lower() or "economics" in e_comp.exclusion_reason.lower()
+
+    # Also test when economics IS provided: economic_health transitions to INCLUDED
+    econ_out = {"net_profit": "55000.00", "margin_pct": 28.5}
+    breakdown_with_econ = agent._compute_farm_health_score(
+        weather_out=weather_out,
+        irrigation_out=irrigation_out,
+        disease_out=None,
+        stage_out=stage_out,
+        economics_out=econ_out,
+    )
+    assert breakdown_with_econ.status == "COMPUTED"
+    assert breakdown_with_econ.active_components_count == 4
+    e_comp_active = next(c for c in breakdown_with_econ.components if c.key == "economic_health")
+    assert e_comp_active.status == "INCLUDED"
+    assert e_comp_active.score == 92  # margin >= 25% -> 92
+    assert "based on 4 of 5 components" in breakdown_with_econ.formula_description.lower()
 
 
 @pytest.mark.asyncio

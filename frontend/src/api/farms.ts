@@ -18,3 +18,7 @@ export const farmsApi = {
   },
 };
 
+export const getFarms = farmsApi.getFarms;
+export const getFarmById = farmsApi.getFarmById;
+export const createFarm = farmsApi.createFarm;
+

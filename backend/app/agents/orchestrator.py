@@ -191,6 +191,41 @@ class Orchestrator:
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
         )
+
+        # Baseline farm economics telemetry (for Farm Health Score component 5)
+        economics_data = None
+        try:
+            from backend.app.services.economics import calculate_economics
+            from backend.app.schemas.economics import EconomicsCalculationRequest
+            c_name = crop_cycle.crop_name if crop_cycle else "Cotton"
+            exp_y = 8.0
+            if isinstance(yield_env.outputs, dict) and yield_env.outputs.get("expected_yield_quintals_per_acre"):
+                exp_y = float(yield_env.outputs.get("expected_yield_quintals_per_acre"))
+            own_type = farm.ownership_type.value if hasattr(farm.ownership_type, "value") else str(farm.ownership_type)
+            lease_rate = farm.lease_amount if (farm.leased_area and farm.leased_area > 0) else 10000.0
+            econ_req = EconomicsCalculationRequest(
+                crop_name=c_name,
+                area=farm.area,
+                area_unit="acres",
+                ownership_type=own_type,
+                owned_area=farm.owned_area,
+                leased_area=farm.leased_area,
+                lease_cost_per_acre=lease_rate,
+                expected_yield_q_per_acre=exp_y,
+                yield_is_user_estimate=(c_name.lower() == "cotton"),
+                expected_price_per_q=7100.0 if c_name.lower() == "cotton" else 2500.0,
+            )
+            econ_res = calculate_economics(econ_req)
+            economics_data = {
+                "net_profit": econ_res.combined_summary.net_profit,
+                "margin_pct": econ_res.combined_summary.margin_pct,
+                "break_even_price": econ_res.combined_summary.break_even_price_per_q,
+                "total_cost": econ_res.combined_summary.total_cost,
+                "gross_revenue": econ_res.combined_summary.gross_revenue,
+            }
+        except Exception:
+            economics_data = None
+
         advisory_context = {
             "weather_report": weather_report,
             "weather_status": weather_env.status,
@@ -201,6 +236,7 @@ class Orchestrator:
             "crop_name": crop_cycle.crop_name if crop_cycle else "Cotton",
             "planting_date": crop_cycle.planting_date if crop_cycle else None,
             "daily_forecast": weather_report.get("daily_forecast") if isinstance(weather_report, dict) else None,
+            "economics": economics_data,
         }
         advisory_env = await self.advisory_agent.run(
             context=advisory_context,

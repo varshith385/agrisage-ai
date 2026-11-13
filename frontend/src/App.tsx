@@ -10,6 +10,9 @@ import { FarmRegistrationPage } from './pages/FarmRegistrationPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { DiseasePage } from './pages/DiseasePage';
 import { IrrigationPage } from './pages/IrrigationPage';
+import { EconomicsPage } from './pages/EconomicsPage';
+import { CalendarPage } from './pages/CalendarPage';
+import { CropRecommendationPage } from './pages/CropRecommendationPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +38,9 @@ export const App: React.FC = () => {
                 <Route path="farms" element={<FarmRegistrationPage />} />
                 <Route path="disease" element={<DiseasePage />} />
                 <Route path="irrigation" element={<IrrigationPage />} />
+                <Route path="economics" element={<EconomicsPage />} />
+                <Route path="calendar" element={<CalendarPage />} />
+                <Route path="recommend" element={<CropRecommendationPage />} />
                 <Route path="dashboard" element={<DashboardPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>

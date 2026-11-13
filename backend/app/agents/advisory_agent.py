@@ -71,6 +71,7 @@ class AdvisoryAgent(BaseAgent):
         irrigation_out: Optional[Dict[str, Any]],
         disease_out: Optional[Dict[str, Any]],
         stage_out: Optional[Dict[str, Any]],
+        economics_out: Optional[Dict[str, Any]] = None,
     ) -> FarmHealthScoreBreakdown:
         """
         Calculates Farm Health Score (0-100) using 5 transparent components:
@@ -78,7 +79,7 @@ class AdvisoryAgent(BaseAgent):
         2. disease_status (nominal 25%)
         3. water_status (nominal 25%)
         4. stage_appropriateness (nominal 15%)
-        5. economic_health (nominal 10%) - Excluded in Phase 3
+        5. economic_health (nominal 10%) - Included when economics telemetry is present, otherwise excluded.
         """
         components: List[HealthScoreComponent] = []
 
@@ -309,19 +310,46 @@ class AdvisoryAgent(BaseAgent):
             )
 
         # 5. Economic Health Component (10%)
-        # Strictly excluded in Phase 3 per prompt instructions (Phase 4 Economics Pending)
-        components.append(
-            HealthScoreComponent(
-                name="Economic Health & Profitability",
-                key="economic_health",
-                score=None,
-                nominal_weight=0.10,
-                status="EXCLUDED",
-                exclusion_reason="Phase 4 Economics Engine Pending — excluded from calculation.",
-                rationale="Excluded from calculation until Phase 4 cost-of-cultivation engine is activated.",
-                threshold_notes="indicative, not validated",
+        # Included when economics data is provided, otherwise excluded per the exclude-if-missing rule
+        if economics_out and (economics_out.get("net_profit") is not None or economics_out.get("margin_pct") is not None):
+            margin = float(economics_out.get("margin_pct", 0.0) or 0.0)
+            if margin >= 25.0:
+                econ_score = 92
+            elif margin >= 10.0:
+                econ_score = 80
+            elif margin >= 0.0:
+                econ_score = 68
+            elif margin >= -15.0:
+                econ_score = 45
+            else:
+                econ_score = 25
+
+            components.append(
+                HealthScoreComponent(
+                    name="Economic Health & Profitability",
+                    key="economic_health",
+                    score=econ_score,
+                    nominal_weight=0.10,
+                    status="INCLUDED",
+                    exclusion_reason=None,
+                    inputs_used={"margin_pct": margin, "net_profit": str(economics_out.get("net_profit", "0.00"))},
+                    rationale=f"Projected net margin is {margin:.1f}% ({'profitable commercial return' if margin >= 0 else 'operating below cost-of-cultivation'}).",
+                    threshold_notes="indicative, not validated",
+                )
             )
-        )
+        else:
+            components.append(
+                HealthScoreComponent(
+                    name="Economic Health & Profitability",
+                    key="economic_health",
+                    score=None,
+                    nominal_weight=0.10,
+                    status="EXCLUDED",
+                    exclusion_reason="No farm budget or economics profile configured — excluded from calculation.",
+                    rationale="Excluded from calculation when economic telemetry is absent (exclude-if-missing rule).",
+                    threshold_notes="indicative, not validated",
+                )
+            )
 
         # Evaluation of Active Components
         active_comps = [c for c in components if c.status == "INCLUDED" and c.score is not None]
@@ -622,11 +650,13 @@ class AdvisoryAgent(BaseAgent):
             )
 
         # 3. Transparent Farm Health Score (0-100)
+        economics_output = context.get("economics")
         health_score_breakdown = self._compute_farm_health_score(
             weather_out=weather_output,
             irrigation_out=irrigation_output,
             disease_out=disease_output,
             stage_out=growth_stage_resp.model_dump(),
+            economics_out=economics_output,
         )
 
         # 4. 7-Day Action Plan

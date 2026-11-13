@@ -10,6 +10,9 @@
     "farms": "My Farms",
     "disease": "Disease Diagnosis",
     "irrigation": "Irrigation & Water",
+    "economics": "Economics",
+    "calendar": "Calendar",
+    "recommend": "Crop Advisory",
     "logout": "Logout"
   },
   "auth": {
@@ -103,6 +106,7 @@
     "water_label_short": "Water",
     "method_label_short": "Method",
     "coordinates_label": "Coordinates",
+    "active_holding": "Active Holding",
     "active_cycle_label": "Active"
   },
   "dashboard": {
@@ -147,6 +151,7 @@
     "ml_range": "ML 10-90% Prediction Interval",
     "cotton_yield_not_supported": "Cotton yield not supported (DES units in 170 kg bales, not tonnes)",
     "economics_title": "Cost & Profit Economics",
+    "open_economics_btn": "Open Economics Calculator",
     "economics_placeholder": "Phase 4 Economics Engine Pending: Cost of cultivation, owned vs leased tenure break-even, and profit simulator scheduled for Phase 4.",
     "seven_day_plan_title": "7-Day Coordinated Action Plan",
     "day": "Day",
@@ -185,6 +190,7 @@
     "remove": "Remove",
     "acres": "Acres",
     "inr": "₹",
+    "demo_mode": "Yuktik 2026 Demo Mode",
     "select_language": "Language"
   },
   "agents": {
@@ -336,6 +342,51 @@
     "et0_label": "Reference ET0",
     "taw_label": "Total Available Water (TAW)",
     "raw_label": "Readily Available Water (RAW)"
+  },
+  "economics": {
+    "title": "Cost of Cultivation & Economic Profit Engine",
+    "subtitle": "Transparent Decimal precision accounting across owned and leased land tenure with live sensitivity simulator.",
+    "gross_revenue": "Gross Expected Revenue",
+    "total_cost": "Total Production Cost",
+    "net_profit": "Net Operating Profit",
+    "break_even_price": "Break-Even Price",
+    "break_even_yield": "Break-Even Yield",
+    "tenure_type": "Tenure Model",
+    "tenure_comparison_title": "Land Tenure Separation Analysis",
+    "combined": "Combined Holding",
+    "owned_portion": "Owned Portion",
+    "leased_portion": "Leased Portion",
+    "scenarios_title": "Multi-Scenario Projections",
+    "what_if_title": "What-If Interactive Profit Simulator",
+    "cost_editor_title": "Per-Acre Expenditure Line Items",
+    "recalculate_btn": "Recalculate Economics",
+    "crop_comparison_title": "Comparative Crop Economics Matrix",
+    "explain_title": "Economic Formulas & Methodology Explanation",
+    "price_notice_title": "Price Source Notice",
+    "price_your_estimate": "Price: Your Estimate",
+    "msp_not_verified": "MSP Not Verified"
+  },
+  "calendar": {
+    "title": "Crop Lifecycle & Field Operation Calendar",
+    "subtitle": "Stage-by-stage agronomic timeline and RFC 5545 calendar export tied to your sowing date.",
+    "export_ics_btn": "Export Calendar (.ics)",
+    "notifications_active": "Notifications Active",
+    "enable_notifications": "Enable Task Reminders",
+    "season_awareness_title": "Agro-Climatic Season Status",
+    "lifecycle_timeline_title": "Crop Phenological Stages",
+    "events_list_title": "Scheduled Agronomic Operations",
+    "explain_title": "Calendar Logic & RFC 5545 Compliance"
+  },
+  "recommend": {
+    "title": "Crop Recommendation",
+    "rotation_title": "Crop Rotation Planner",
+    "subtitle": "Data-driven crop selection and restorative rotation schedules backed by biological soil rules.",
+    "ml_section_title": "Machine Learning Crop Recommendation",
+    "omit_soil_checkbox": "Omit Soil Telemetry",
+    "evaluate_btn": "Evaluate Crop Suitability",
+    "rotation_planner_title": "Restorative Crop Rotation Guide",
+    "previous_harvest_label": "Previous Harvested Crop",
+    "explain_title": "Recommendation Engine & Rotation Logic"
   }
 }
 

@@ -10,6 +10,9 @@
     "farms": "मेरे खेत",
     "disease": "रोग निदान",
     "irrigation": "सिंचाई एवं जल",
+    "economics": "आर्थिक विश्लेषण",
+    "calendar": "कैलेंडर व चरण",
+    "recommend": "फसल सलाह",
     "logout": "लॉग आउट"
   },
   "auth": {
@@ -103,6 +106,7 @@
     "water_label_short": "जल स्रोत",
     "method_label_short": "विधि",
     "coordinates_label": "निर्देशांक",
+    "active_holding": "सक्रिय खेत",
     "active_cycle_label": "सक्रिय फसल"
   },
   "dashboard": {
@@ -147,6 +151,7 @@
     "ml_range": "ML 10-90% पूर्वानुमान अंतराल",
     "cotton_yield_not_supported": "कपास उपज मॉडल में समर्थित नहीं (गांठों में दर्ज होने के कारण मीट्रिक टन मॉडल लागू नहीं)",
     "economics_title": "लागत एवं लाभ विश्लेषण",
+    "open_economics_btn": "आर्थिक कैलकुलेटर खोलें",
     "economics_placeholder": "फेज़ 4 अर्थशास्त्र इंजन प्रतीक्षित: खेती की लागत, स्वामित्व बनाम बटाई का ब्रेक-ईवन फेज़ 4 में सक्रिय होगा।",
     "seven_day_plan_title": "7-दिवसीय समन्वित कार्य योजना",
     "day": "दिन",
@@ -185,6 +190,7 @@
     "remove": "हटाएं",
     "acres": "एकड़",
     "inr": "₹",
+    "demo_mode": "युक्तिक 2026 डेमो मोड",
     "select_language": "भाषा"
   },
   "agents": {
@@ -336,6 +342,51 @@
     "et0_label": "संदर्भ वाष्पोत्सर्जन ET0",
     "taw_label": "कुल उपलब्ध जल (TAW)",
     "raw_label": "सहज उपलब्ध जल (RAW)"
+  },
+  "economics": {
+    "title": "खेती की लागत व लाभ विश्लेषण इंजन",
+    "subtitle": "स्वामित्व और पट्टे की भूमि के लिए सटीक दशमलव गणना और संवेदनशील लाभ सिम्युलेटर।",
+    "gross_revenue": "कुल अनुमानित आय",
+    "total_cost": "कुल उत्पादन लागत",
+    "net_profit": "शुद्ध परिचालन लाभ",
+    "break_even_price": "संतुलन मूल्य (ब्रेक-इवन)",
+    "break_even_yield": "संतुलन उपज",
+    "tenure_type": "भूमि स्वामित्व प्रकार",
+    "tenure_comparison_title": "भूमि पट्टा विभाजन विश्लेषण (स्वामित्व बनाम पट्टा)",
+    "combined": "कुल खेत",
+    "owned_portion": "स्वामित्व हिस्सा",
+    "leased_portion": "पट्टे का हिस्सा",
+    "scenarios_title": "परिदृश्य प्रक्षेपण (उपज व मूल्य संवेदनशीलता)",
+    "what_if_title": "व्हॉट-इफ़ लाइव लाभ सिम्युलेटर",
+    "cost_editor_title": "प्रति एकड़ व्यय मद विवरण",
+    "recalculate_btn": "आर्थिक गणना पुनः करें",
+    "crop_comparison_title": "तुलनात्मक फसल अर्थशास्त्र तालिका",
+    "explain_title": "आर्थिक सूत्र एवं कार्यप्रणाली स्पष्टीकरण",
+    "price_notice_title": "मूल्य स्रोत सूचना",
+    "price_your_estimate": "मूल्य: आपका अनुमान",
+    "msp_not_verified": "एमएसपी (MSP) सत्यापित नहीं"
+  },
+  "calendar": {
+    "title": "फसल जीवनचक्र एवं कृषि कार्य कैलेंडर",
+    "subtitle": "बुवाई की तिथि से जुड़े चरणबद्ध कृषि कार्य और RFC 5545 कैलेंडर निर्यात।",
+    "export_ics_btn": "कैलेंडर डाउनलोड करें (.ics)",
+    "notifications_active": "सूचनाएं सक्रिय हैं",
+    "enable_notifications": "कार्य अनुस्मारक सक्षम करें",
+    "season_awareness_title": "वर्तमान कृषि ऋतु स्थिति",
+    "lifecycle_timeline_title": "फसल विकास चरण",
+    "events_list_title": "निर्धारित कृषि कार्य",
+    "explain_title": "कैलेंडर तर्क एवं RFC 5545 मानक"
+  },
+  "recommend": {
+    "title": "फसल चयन सिफारिश",
+    "rotation_title": "फसल चक्र योजना",
+    "subtitle": "मृदा स्वास्थ्य और जैविक नियमों पर आधारित फसल चयन एवं चक्र योजना।",
+    "ml_section_title": "मशीन लर्निंग फसल सिफारिश",
+    "omit_soil_checkbox": "मृदा डेटा छोड़ें (केवल मौसम आधारित)",
+    "evaluate_btn": "फसल उपयुक्तता का मूल्यांकन करें",
+    "rotation_planner_title": "मृदा पुनरुद्धार फसल चक्र मार्गदर्शिका",
+    "previous_harvest_label": "पिछली काटी गई फसल",
+    "explain_title": "सिफारिश इंजन एवं फसल चक्र स्पष्टीकरण"
   }
 }
 

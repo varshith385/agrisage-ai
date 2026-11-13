@@ -797,7 +797,7 @@ export const IrrigationPage: React.FC = () => {
                   {t('irrigation.suggestions_heading')}
                 </h5>
                 <ul className="space-y-1">
-                  {diagnosisResult.suggestions.map((sug, idx) => (
+                  {diagnosisResult.suggestions.map((sug: string, idx: number) => (
                     <li key={idx} className="text-xs text-stone-700 flex items-start gap-2 leading-relaxed">
                       <span className="text-agri-gold-600 font-bold">•</span>
                       <span>{sug}</span>

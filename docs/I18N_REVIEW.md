@@ -58,4 +58,42 @@ The following agronomic phrases were added in Phase 3.5 for the 5-stage phenolog
 | **Guidance** | Agricultural officer disclaimer | సాధారణ మార్గదర్శకం మాత్రమే, మీ స్థానిక వ్యవసాయ అధికారిని సంప్రదించండి | सामान्य मार्गदर्शन मात्र, अपने स्थानीय कृषि अधिकारी से पुष्टि करें | **Unverified**: Needs native-speaker agronomic review. |
 | **Health Score** | Farm Health Score breakdown | వ్యవసాయ క్షేత్ర ఆరోగ్య స్కోరు విభజన | कृषि स्वास्थ्य स्कोर विवरण | **Unverified**: Needs native-speaker agronomic review. |
 
+---
+
+## 4. Phase 4 Economics, Rotation, and Calendar Translation Additions (Unverified — Awaiting Review)
+
+The following phrases were added in Phase 4 for the Economics Engine (tenure math, what-if simulator, crop matrix), Crop Recommendation & Rotation Planner, and Crop Lifecycle Calendar (RFC 5545). In accordance with honesty guidelines, these phrases are catalogued as **unverified** and strictly marked as needing native-speaker agricultural/economic review:
+
+| Phrase Category | English Phrase | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Navigation** | Economics | ఆర్థిక లెక్కలు | आर्थिक विश्लेषण | **Unverified**: Needs review. |
+| **Navigation** | Calendar & Stages | క్యాలెండర్ & దశలు | कैलेंडर व चरण | **Unverified**: Needs review. |
+| **Navigation** | Crop Advisory | పంట సలహాలు | फसल सलाह | **Unverified**: Needs review. |
+| **Economics** | Cost of Cultivation & Economic Profit Engine | సాగు ఖర్చులు & లాభాల గణాంక యంత్రం | खेती की लागत व लाभ विश्लेषण इंजन | **Unverified**: Needs review. |
+| **Economics** | Gross Expected Revenue | మొత్తం ఆశించిన ఆదాయం | कुल अनुमानित आय | **Unverified**: Needs review. |
+| **Economics** | Total Production Cost | మొత్తం ఉత్పత్తి ఖర్చు | कुल उत्पादन लागत | **Unverified**: Needs review. |
+| **Economics** | Net Operating Profit | నికర నిర్వహణ లాభం | शुद्ध परिचालन लाभ | **Unverified**: Needs review. |
+| **Economics** | Break-Even Price | సమతూక ధర (బ్రేక్-ఈవెన్) | संतुलन मूल्य (ब्रेक-इवन) | **Unverified**: Needs review. |
+| **Economics** | Break-Even Yield | సమతూక దిగుబడి | संतुलन उपज | **Unverified**: Needs review. |
+| **Economics** | Land Tenure Separation Analysis | యాజమాన్య విభజన విశ్లేషణ (సొంత vs కౌలు) | भूमि पट्टा विभाजन विश्लेषण (स्वामित्व बनाम पट्टा) | **Unverified**: Needs review. |
+| **Economics** | Combined Holding | మొత్తం పొలం | कुल खेत | **Unverified**: Needs review. |
+| **Economics** | Owned Portion | సొంత భూమి వాటా | स्वामित्व हिस्सा | **Unverified**: Needs review. |
+| **Economics** | Leased Portion | కౌలు భూమి వాటా | पट्टे का हिस्सा | **Unverified**: Needs review. |
+| **Economics** | Multi-Scenario Projections | వివిధ పరిస్థితుల అంచనాలు | परिदृश्य प्रक्षेपण | **Unverified**: Needs review. |
+| **Economics** | What-If Interactive Profit Simulator | వాట్-ఇఫ్ ప్రత్యక్ష లాభాల సిమ్యులేటర్ | व्हॉट-इफ़ लाइव लाभ सिम्युलेटर | **Unverified**: Needs review. |
+| **Economics** | Per-Acre Expenditure Line Items | ఎకరాకు అయ్యే ఖర్చుల వివరాలు | प्रति एकड़ व्यय मद विवरण | **Unverified**: Needs review. |
+| **Economics** | Price: Your Estimate | ధర: మీ అంచనా | मूल्य: आपका अनुमान | **Unverified**: Needs review. |
+| **Economics** | MSP Not Verified | కనీస మద్దతు ధర (MSP) ధృవీకరించబడలేదు | एमएसपी (MSP) सत्यापित नहीं | **Unverified**: Needs review. |
+| **Calendar** | Crop Lifecycle & Field Operation Calendar | పంట జీవన చక్రం & వ్యవసాయ పనుల క్యాలెండర్ | फसल जीवनचक्र एवं कृषि कार्य कैलेंडर | **Unverified**: Needs review. |
+| **Calendar** | Export Calendar (.ics) | క్యాలెండర్ డౌన్‌లోడ్ చేయండి (.ics) | कैलेंडर डाउनलोड करें (.ics) | **Unverified**: Needs review. |
+| **Calendar** | Agro-Climatic Season Status | ప్రస్తుత వ్యవసాయ కాలం స్థితి | वर्तमान कृषि ऋतु स्थिति | **Unverified**: Needs review. |
+| **Calendar** | Crop Phenological Stages | పంట ఎదుగుదల దశలు | फसल विकास चरण | **Unverified**: Needs review. |
+| **Calendar** | Scheduled Agronomic Operations | షెడ్యూల్ చేసిన వ్యవసాయ పనులు | निर्धारित कृषि कार्य | **Unverified**: Needs review. |
+| **Recommendation** | Crop Recommendation | పంట ఎంపిక సిఫార్సు | फसल चयन सिफारिश | **Unverified**: Needs review. |
+| **Recommendation** | Crop Rotation Planner | పంట మార్పిడి ప్రణాళిక | फसल चक्र योजना | **Unverified**: Needs review. |
+| **Recommendation** | Omit Soil Telemetry (Weather-Only) | నేల పరీక్ష వివరాలు లేకుండా (వాతావరణ ఆధారితం) | मृदा डेटा छोड़ें (केवल मौसम आधारित) | **Unverified**: Needs review. |
+| **Recommendation** | Restorative Crop Rotation Guide | నేల పునరుజ్జీవన పంట మార్పిడి మార్గదర్శి | मृदा पुनरुद्धार फसल चक्र मार्गदर्शिका | **Unverified**: Needs review. |
+| **Recommendation** | Previous Harvested Crop | గతంలో వేసిన పంట | पिछली काटी गई फसल | **Unverified**: Needs review. |
+
+
 

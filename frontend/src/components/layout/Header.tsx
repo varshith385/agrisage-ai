@@ -84,6 +84,36 @@ export const Header: React.FC = () => {
               >
                 {t('nav.irrigation')}
               </Link>
+              <Link
+                to="/economics"
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  isCurrent('/economics')
+                    ? 'bg-agri-green-700 text-white shadow-inner'
+                    : 'text-agri-cream-100 hover:bg-agri-green-700/60 hover:text-white'
+                }`}
+              >
+                {t('nav.economics')}
+              </Link>
+              <Link
+                to="/calendar"
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  isCurrent('/calendar')
+                    ? 'bg-agri-green-700 text-white shadow-inner'
+                    : 'text-agri-cream-100 hover:bg-agri-green-700/60 hover:text-white'
+                }`}
+              >
+                {t('nav.calendar')}
+              </Link>
+              <Link
+                to="/recommend"
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  isCurrent('/recommend')
+                    ? 'bg-agri-green-700 text-white shadow-inner'
+                    : 'text-agri-cream-100 hover:bg-agri-green-700/60 hover:text-white'
+                }`}
+              >
+                {t('nav.recommend')}
+              </Link>
             </nav>
           )}
 

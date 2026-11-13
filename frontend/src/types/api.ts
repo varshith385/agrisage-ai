@@ -581,5 +581,242 @@ export interface IrrigationDiagnosisResponse {
   status: FeatureStatus;
 }
 
+export interface CropCandidate {
+  crop_name: string;
+  probability: number;
+  reasons: string[];
+  climate_suitable: boolean;
+  suitability_note?: string | null;
+}
+
+export interface CropRecommendationResponse {
+  top_crops: CropCandidate[];
+  soil_values_missing: boolean;
+  fallback_used: string;
+  confidence: number;
+  confidence_type: string;
+  supported_crops: string[];
+  unsupported_common_crops: string[];
+  climate_warnings: string[];
+  explanation: ExplainabilitySchema;
+  status: FeatureStatus;
+}
+
+export interface CostLineItems {
+  seed: number;
+  fertilizer: number;
+  pesticide: number;
+  labour: number;
+  machinery: number;
+  irrigation: number;
+  fuel: number;
+  transport: number;
+  storage: number;
+  other: number;
+}
+
+export interface TenureEconomicsDetail {
+  area_acres: number;
+  operating_cost_total: string;
+  operating_cost_per_acre: string;
+  lease_cost_total: string;
+  loan_interest_total: string;
+  total_cost: string;
+  total_cost_per_acre: string;
+  gross_revenue: string;
+  gross_profit: string;
+  net_profit: string;
+  margin_pct: number;
+  break_even_price_per_q?: string | null;
+  break_even_yield_q_per_acre?: string | null;
+}
+
+export interface ScenarioOutcome {
+  name: string;
+  description: string;
+  yield_q_per_acre: number;
+  price_per_q: number;
+  gross_revenue: string;
+  total_cost: string;
+  net_profit: string;
+  margin_pct: number;
+  is_profitable: boolean;
+}
+
+export interface EconomicsCalculationRequest {
+  crop_name: string;
+  area: number;
+  area_unit?: 'acres' | 'hectares';
+  ownership_type: 'owned' | 'leased' | 'mixed';
+  owned_area?: number | null;
+  leased_area?: number | null;
+  lease_cost_per_acre?: number | null;
+  irrigation_method?: string;
+  expected_yield_q_per_acre: number;
+  yield_is_user_estimate?: boolean;
+  expected_price_per_q: number;
+  custom_costs?: CostLineItems | null;
+  loan_amount?: number;
+  loan_interest_rate_pct?: number;
+  loan_tenure_months?: number;
+}
+
+export interface EconomicsCalculationResponse {
+  crop_name: string;
+  crop_name_te?: string;
+  crop_name_hi?: string;
+  area_acres: number;
+  ownership_type: string;
+  owned_area_acres: number;
+  leased_area_acres: number;
+  expected_yield_q_per_acre: number;
+  yield_source_label: string;
+  expected_price_per_q: number;
+  price_source_label: string;
+  itemized_costs_per_acre: Record<string, number>;
+  owned_tenure?: TenureEconomicsDetail | null;
+  leased_tenure?: TenureEconomicsDetail | null;
+  combined_summary: TenureEconomicsDetail;
+  scenarios: ScenarioOutcome[];
+  disclaimer: string;
+  status: FeatureStatus;
+}
+
+export interface CropComparisonItem {
+  crop_name: string;
+  crop_name_te: string;
+  crop_name_hi: string;
+  typical_duration_days: number;
+  water_need_mm: number;
+  risk_level: string;
+  estimated_cost_per_acre: number;
+  estimated_yield_q_per_acre: number;
+  estimated_price_per_q: number;
+  estimated_revenue_per_acre: number;
+  estimated_net_profit_per_acre: number;
+  margin_pct: number;
+  break_even_price_per_q: number;
+  break_even_yield_q_per_acre: number;
+}
+
+export interface CropComparisonResponse {
+  area_acres: number;
+  ownership_type: string;
+  crops: CropComparisonItem[];
+  disclaimer: string;
+  status: FeatureStatus;
+}
+
+export interface WhatIfRequest {
+  crop_name?: string;
+  area_acres: number;
+  ownership_type: 'owned' | 'leased' | 'mixed';
+  owned_area: number;
+  leased_area: number;
+  lease_cost_per_acre: number;
+  price_per_q: number;
+  yield_q_per_acre: number;
+  operating_cost_per_acre: number;
+  loan_amount?: number;
+  loan_interest_rate_pct?: number;
+  sweep_variable: 'price' | 'yield' | 'area' | 'lease_cost';
+  sweep_range_pct?: number;
+}
+
+export interface WhatIfPoint {
+  variable_value: number;
+  revenue: number;
+  total_cost: number;
+  net_profit: number;
+  margin_pct: number;
+}
+
+export interface WhatIfResponse {
+  current_net_profit: number;
+  current_margin_pct: number;
+  break_even_price_per_q?: number | null;
+  break_even_yield_q_per_acre?: number | null;
+  sweep_variable: string;
+  sensitivity_points: WhatIfPoint[];
+  formula_used: string;
+  status: FeatureStatus;
+}
+
+export interface RotationSuggestionItem {
+  crop_name: string;
+  crop_name_te?: string;
+  crop_name_hi?: string;
+  crop_family: string;
+  benefit_category: 'nitrogen_fixation' | 'pest_cycle_break' | 'disease_prevention' | 'soil_structure' | 'moisture_conservation';
+  rationale: string;
+  precaution: string;
+  suitable_seasons: string[];
+  agronomic_source: string;
+  is_rule_based: boolean;
+}
+
+export interface CropRotationResponse {
+  previous_crop: string;
+  previous_crop_family: string;
+  primary_agronomic_risks: string[];
+  avoid_crops: string[];
+  avoid_reason: string;
+  recommended_rotations: RotationSuggestionItem[];
+  source_notes: string;
+  status: FeatureStatus;
+}
+
+export interface LifecycleStageItem {
+  stage_id: string;
+  stage_name_en: string;
+  stage_name_te?: string;
+  stage_name_hi?: string;
+  start_das: number;
+  end_das: number;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  key_activities: string[];
+}
+
+export interface CalendarEventItem {
+  event_id: string;
+  title: string;
+  title_te?: string;
+  title_hi?: string;
+  event_type: 'irrigation' | 'fertilizer' | 'scouting' | 'sowing' | 'harvest' | 'field_work';
+  start_date: string;
+  end_date?: string | null;
+  growth_stage: string;
+  priority: 'high' | 'medium' | 'low';
+  description: string;
+  notification_text: string;
+}
+
+export interface SeasonalAwarenessResponse {
+  current_season: 'Kharif' | 'Rabi' | 'Zaid';
+  season_name_te: string;
+  season_name_hi: string;
+  season_period: string;
+  current_month: string;
+  climate_expectations: Record<string, string>;
+  typical_crops: string[];
+  primary_risks: string[];
+  general_guidance: string;
+  status: FeatureStatus;
+}
+
+export interface CropCalendarResponse {
+  crop_name: string;
+  planting_date: string;
+  days_after_sowing: number;
+  current_stage: string;
+  total_duration_days: number;
+  lifecycle_stages: LifecycleStageItem[];
+  events: CalendarEventItem[];
+  status: FeatureStatus;
+}
+
+
 
 

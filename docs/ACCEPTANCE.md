@@ -261,24 +261,28 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Calculates total cost per acre (seed, fertilizer, pesticide, labour, machinery, irrigation, fuel, transport, lease, loan interest), gross revenue, net profit, break-even yield, and break-even price. All monetary math uses `Decimal`.
 - **Verification Method**: `pytest backend/tests/test_economics.py` with known input values.
 - **Pass Criteria**: Break-even price equals total cost / expected yield; calculations for owned vs leased land handled separately and combined accurately for mixed holdings.
+- **Status**: **PASS** (Verified 2026-11-13). Evaluated in `backend/tests/test_economics.py` across 7 test cases covering 10 major crops with CACP benchmark cost templates. All arithmetic operations (operating costs, revenues, lease, loan interest, margins, break-even price and yield) strictly use Python `Decimal`. Formula verified: $\text{BE Price} = \text{Total Cost} / (\text{Yield} \times \text{Area})$, $\text{BE Yield} = \text{Total Cost} / (\text{Price} \times \text{Area})$.
 
 ### `T1-33`: Owned vs Leased vs Mixed Land Economics Computation
 - **Tier**: Tier 1
 - **Observable Behaviour**: Distinguishes land tenure economics: owned land includes no lease costs; leased land calculates lease overhead; mixed land prorates costs accurately across owned and leased portions.
 - **Verification Method**: POST farm financial profile with mixed tenure to `/api/v1/economics/calculate`.
 - **Pass Criteria**: Lease cost calculated strictly for leased acreage; net profit reflects combined tenure economics without double-counting.
+- **Status**: **PASS** (Verified 2026-11-13). Tested via `test_economics_service_tenure_separation` and `test_economics_calculate_api_endpoint`. For Farmer Ramesh's 5-acre holding (3 ac owned + 2 ac leased @ ₹10,000/ac): owned cost center incurs ₹0 lease, leased cost center incurs ₹20,000 lease; combined total expenditure equals ₹195,000; owned net profit is ₹65,400 (38.4% margin) while leased net profit is ₹23,600 (20.8% margin), combining to ₹89,000 (31.3% margin). Validates $A_{\text{owned}} + A_{\text{leased}} = A_{\text{total}}$ with HTTP 422 if mismatched.
 
 ### `T1-34`: Interactive What-If Scenario Simulator & Live Profit Slider
 - **Tier**: Tier 1
 - **Observable Behaviour**: Frontend slider UI allows farmer to adjust crop price, expected yield, lease cost, and area, instantly recalculating profit/loss and displaying an updated scenario chart.
 - **Verification Method**: Navigate to Economics page in browser agent, move price slider, and observe dynamic profit chart update.
 - **Pass Criteria**: Calculations match backend formulas; handles extreme values ($0$ price or negative profit) gracefully.
+- **Status**: **PASS** (Verified 2026-11-13). Verified via live browser walkthrough and test `test_what_if_client_server_parity`. Client-side TypeScript formula matches backend Python Decimal calculation exactly across price sweeps (₹3,000 to ₹15,000), yield sweeps (2 to 25 q/ac), acreage, and lease rate. Displays 7-point sensitivity chart (±30% variation) and Best/Base/Worst case scenarios. Extreme values (₹0 price or negative yields) handled without crashing. Evidence: `economics_desktop_en.png`, `economics_mobile_en.png`.
 
 ### `T1-35`: Side-by-Side Candidate Crop Economic Comparison
 - **Tier**: Tier 1
 - **Observable Behaviour**: Displays side-by-side comparison of candidate crops showing estimated investment, projected revenue, net profit range, water requirement, and duration in days.
 - **Verification Method**: Query `/api/v1/economics/compare?crops=cotton,groundnut,chilli`.
 - **Pass Criteria**: Returns comparative matrix; all values labelled as indicative estimates.
+- **Status**: **PASS** (Verified 2026-11-13). Evaluated via `GET /api/v1/economics/compare` and browser walkthrough. Returns a sorted 10-crop matrix (Cotton, Rice, Maize, Groundnut, Chilli, Tomato, Sugarcane, Soybean, Pulses, Wheat) with duration, water need ($mm$), expenditure/ac, expected yield, price, net profit, margin %, and risk tier. All benchmark values labeled as 'indicative estimate, edit to your actual cost; monetary calculations use Decimal arithmetic'.
 
 ---
 
@@ -289,18 +293,21 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Recommends next crop based on previous crop family (e.g., legumes after cereals to restore nitrogen; avoiding repeated solanaceous crops to break pest cycles).
 - **Verification Method**: Call `/api/v1/rotation/recommend?previous_crop=cotton`.
 - **Pass Criteria**: Recommends legume/pulse rotations with explicit agronomic reasons citing nitrogen fixation and soil health; labelled as rule-based.
+- **Status**: **PASS** (Verified 2026-11-13). Evaluated via `backend/tests/test_rotation.py` (4 of 4 tests passed) and `/recommend` UI page. For preceding Cotton crop: flags repeat cotton, chilli, and okra as avoid-crops (pink bollworm carryover and malvaceous viral complex); recommends Pulses/Legumes for biological nitrogen fixation (30–40 kg N/ha) and Maize/Sorghum for pest cycle disruption. Cites ICAR IIFSR Modipuram and CRIDA dryland guidelines; labeled 'rule_based'. Evidence: `recommend_desktop_en.png`.
 
 ### `T1-37`: Crop Lifecycle Timeline, Reminders & `.ics` Calendar Export
 - **Tier**: Tier 1
 - **Observable Behaviour**: Generates dated agricultural calendar events (sowing, scouting, fertilizer windows, harvest) based on planting date, with browser in-app reminders and an endpoint to export an `.ics` calendar file.
 - **Verification Method**: `Invoke-RestMethod -Uri http://127.0.0.1:8000/api/v1/calendar/export.ics?cycle_id=1`.
 - **Pass Criteria**: Returns valid iCalendar RFC 5545 `.ics` payload that can be parsed by calendar clients.
+- **Status**: **PASS** (Verified 2026-11-13). Evaluated via `backend/tests/test_calendar.py` and `/calendar` UI page. Generates 7 sequential lifecycle stages (Pre-sowing, Sowing, Vegetative, Flowering, Boll/Pod Filling, Ripening, Harvest & Sale) with DAS ranges, stage-specific tasks, and calendar events with categories (`irrigation`, `fertilizer`, `scouting`, `sowing`, `harvest`). Endpoint `GET /api/v1/calendar/export.ics` generates strictly valid RFC 5545 output with `\r\n` CRLF endings, `BEGIN:VCALENDAR`, `VERSION:2.0`, `BEGIN:VEVENT`, unique `UID`, `DTSTAMP`, `DTSTART`, and `SUMMARY`. Evidence: `calendar_desktop_en.png`, `calendar_telugu.png`.
 
 ### `T1-38`: Seasonal Awareness Engine (Kharif, Rabi, Zaid Expectations)
 - **Tier**: Tier 1
 - **Observable Behaviour**: Automatically detects seasonal window (Kharif, Rabi, Zaid) by calendar month and regional agro-climatic zone, displaying typical temperature, rain expectations, and seasonal risk warnings.
 - **Verification Method**: Query `/api/v1/calendar/season?lat=17.38&lon=78.48`.
 - **Pass Criteria**: Returns active season name, expected weather trends, and season-specific crop recommendations.
+- **Status**: **PASS** (Verified 2026-11-13). Tested via `test_seasonal_awareness_endpoint` and verified in UI banner. Correctly maps calendar months to Kharif (June–October, South-West Monsoon), Rabi (November–March, Post-Monsoon / Winter), and Zaid (April–May, Pre-Monsoon / Summer). Returns temperature range, rainfall characterization, primary crops, and agro-climatic risk factors. Labelled 'rule_based'.
 
 ---
 
