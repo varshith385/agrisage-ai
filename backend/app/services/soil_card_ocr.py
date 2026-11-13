@@ -295,7 +295,7 @@ def analyze_soil_impact(
 ) -> SoilImpactAnalysisResponse:
     """
     Compares crop recommendation and yield predictions with and without confirmed soil card values.
-    Demonstrates transparent shift from weather-only fallback to full multi-feature model.
+    Uses real model outputs from crop_recommender_engine and yield_model_engine with ZERO synthetic adjustments.
     """
     has_soil = (n is not None and p is not None and k is not None and ph is not None)
 
@@ -309,7 +309,7 @@ def analyze_soil_impact(
         district=district,
     )
 
-    # 2. Recommendation WITH soil card (full 7-feature model)
+    # 2. Recommendation WITH soil card (full 7-feature model if soil provided)
     rec_with = crop_recommender_engine.recommend(
         n=n,
         p=p,
@@ -319,107 +319,61 @@ def analyze_soil_impact(
         district=district,
     ) if has_soil else rec_without
 
-    # 3. Yield predictions
-    yield_without = yield_model_engine.predict_yield(
+    # 3. Real Yield predictions (zero synthetic yield adjustments)
+    yield_res = yield_model_engine.predict_yield(
         crop_name=crop_name,
         state=state,
         district=district,
         area_acres=area_acres,
     )
 
-    # Calculate soil fertility adjustment factor
-    soil_adj_pct = 0.0
-    soil_reasons: List[str] = []
+    # Extract real model confidences without hardcoded fallbacks
+    # Returns null (None) if the model returned no confidence
+    conf_before: Optional[float] = rec_without.get("confidence")
+    conf_after: Optional[float] = rec_with.get("confidence") if has_soil else conf_before
 
-    if has_soil and ph is not None:
-        # pH evaluation
-        if 6.2 <= ph <= 7.8:
-            soil_adj_pct += 4.0
-            soil_reasons.append("Optimal soil pH reaction (6.2 - 7.8) enhances macro-nutrient assimilation (+4.0%).")
-        elif ph < 5.8:
-            soil_adj_pct -= 6.0
-            soil_reasons.append(f"Acidic soil stress (pH {ph:.1f}) reduces phosphorus availability (-6.0%).")
-        elif ph > 8.2:
-            soil_adj_pct -= 5.0
-            soil_reasons.append(f"Alkaline soil stress (pH {ph:.1f}) limits micronutrient uptake (-5.0%).")
-
-        # Organic Carbon evaluation
-        if oc is not None:
-            if oc >= 0.75:
-                soil_adj_pct += 5.0
-                soil_reasons.append(f"High organic carbon ({oc:.2f}%) improves soil microbial activity and moisture retention (+5.0%).")
-            elif oc < 0.40:
-                soil_adj_pct -= 4.0
-                soil_reasons.append(f"Low organic carbon ({oc:.2f}%) reduces nutrient-holding capacity (-4.0%).")
-
-        # EC evaluation
-        if ec is not None:
-            if ec > 2.0:
-                soil_adj_pct -= 8.0
-                soil_reasons.append(f"Elevated electrical conductivity ({ec:.2f} dS/m) indicates salinity hazard (-8.0%).")
-
-    # Clone yield prediction and apply soil adjustment
-    yield_with = dict(yield_without)
-    base_expected = yield_without.get("expected_yield_quintals_per_acre")
-    if base_expected is not None and has_soil:
-        mult = 1.0 + (soil_adj_pct / 100.0)
-        adj_expected = round(base_expected * mult, 2)
-        base_low = yield_without.get("yield_range_lower") or base_expected * 0.8
-        base_high = yield_without.get("yield_range_upper") or base_expected * 1.2
-        adj_low = round(base_low * mult, 2)
-        adj_high = round(base_high * mult, 2)
-
-        yield_with["expected_yield_quintals_per_acre"] = adj_expected
-        yield_with["yield_range_lower"] = adj_low
-        yield_with["yield_range_upper"] = adj_high
-        yield_with["expected_total_quintals"] = round(adj_expected * area_acres, 1)
-        yield_with["total_range_lower"] = round(adj_low * area_acres, 1)
-        yield_with["total_range_upper"] = round(adj_high * area_acres, 1)
-
-        # Append soil fertility factor
-        adj_factors = list(yield_without.get("adjustment_factors", []))
-        adj_factors.append({
-            "factor_name": "Soil Fertility Index (Soil Health Card)",
-            "adjustment_pct": soil_adj_pct,
-            "rationale": "; ".join(soil_reasons) if soil_reasons else "Soil chemical properties evaluated.",
-            "citation": "indicative assumption, no source",
-        })
-        yield_with["adjustment_factors"] = adj_factors
-
-    # Synthesize impact summary statements
+    # Synthesize honest impact summary statements
     impact_summary: List[str] = []
     if has_soil:
-        top_crop_before = rec_without["top_crops"][0]["crop_name"] if rec_without.get("top_crops") else "None"
-        top_crop_after = rec_with["top_crops"][0]["crop_name"] if rec_with.get("top_crops") else "None"
-        conf_before = rec_without.get("confidence", 0.50) * 100
-        conf_after = rec_with.get("confidence", 0.88) * 100
+        top_crop_before = rec_without["top_crops"][0]["crop_name"] if rec_without.get("top_crops") else None
+        top_crop_after = rec_with["top_crops"][0]["crop_name"] if rec_with.get("top_crops") else None
 
-        impact_summary.append(
-            f"Crop recommendation confidence increased from {conf_before:.0f}% (weather-only fallback) "
-            f"to {conf_after:.0f}% (full 7-feature N-P-K model)."
-        )
-        if top_crop_before.lower() != top_crop_after.lower():
+        if conf_before is not None and conf_after is not None:
             impact_summary.append(
-                f"Top recommended crop shifted from '{top_crop_before.capitalize()}' to '{top_crop_after.capitalize()}' "
-                f"based on your soil's actual N={n} kg/ha, P={p} kg/ha, K={k} kg/ha test results."
+                f"Crop recommendation confidence: {conf_before * 100:.0f}% (weather-only model) vs "
+                f"{conf_after * 100:.0f}% (full 7-feature N-P-K model)."
             )
+        elif conf_after is not None:
+            impact_summary.append(f"Full 7-feature N-P-K model confidence: {conf_after * 100:.0f}%.")
         else:
-            impact_summary.append(
-                f"Top recommended crop '{top_crop_after.capitalize()}' was re-confirmed with high confidence by soil chemical metrics."
-            )
+            impact_summary.append("Model confidence is not available.")
 
-        if base_expected is not None:
-            new_exp = yield_with["expected_yield_quintals_per_acre"]
-            diff = round(new_exp - base_expected, 2)
-            sign = "+" if diff >= 0 else ""
+        if top_crop_before and top_crop_after:
+            if top_crop_before.lower() != top_crop_after.lower():
+                impact_summary.append(
+                    f"Top recommended crop shifted from '{top_crop_before.capitalize()}' to '{top_crop_after.capitalize()}' "
+                    f"based on your soil's actual N={n} kg/ha, P={p} kg/ha, K={k} kg/ha test results."
+                )
+            else:
+                impact_summary.append(
+                    f"Top recommended crop '{top_crop_after.capitalize()}' was re-confirmed by soil chemical metrics."
+                )
+
+        exp_yield = yield_res.get("expected_yield_quintals_per_acre")
+        if exp_yield is not None:
             impact_summary.append(
-                f"Yield expectation adjusted by {sign}{soil_adj_pct:.1f}% ({sign}{diff} q/acre) based on measured pH {ph} and fertility balance "
-                f"(indicative assumption, no source)."
+                f"Expected yield: {exp_yield:.2f} quintals/acre based on historical district/season records. "
+                "No arbitrary soil adjustments applied (yield regressor is trained on production data, not soil tests)."
             )
     else:
         impact_summary.append(
-            "No confirmed soil health card on file. Recommendations currently rely on the weather-only fallback model (~50% confidence)."
+            "No confirmed soil health card on file. Recommendations currently evaluate the weather-only fallback model."
         )
+
+    scope_note = (
+        "Confirmed soil values are evaluated only within this comparison screen and are not yet passed "
+        "to the farm's main recommendation (/api/v1/crop-recommendation) and yield (/api/v1/yield) endpoints."
+    )
 
     soil_vals = None
     if has_soil:
@@ -439,19 +393,20 @@ def analyze_soil_impact(
         soil_values=soil_vals,
         without_soil_card={
             "top_crops": rec_without.get("top_crops", [])[:3],
-            "confidence": rec_without.get("confidence", 0.50),
+            "confidence": conf_before,
             "fallback_used": rec_without.get("fallback_used", "weather_only_model"),
-            "expected_yield_q_acre": yield_without.get("expected_yield_quintals_per_acre"),
-            "yield_range": [yield_without.get("yield_range_lower"), yield_without.get("yield_range_upper")],
+            "expected_yield_q_acre": yield_res.get("expected_yield_quintals_per_acre"),
+            "yield_range": [yield_res.get("yield_range_lower"), yield_res.get("yield_range_upper")],
         },
         with_soil_card={
             "top_crops": rec_with.get("top_crops", [])[:3],
-            "confidence": rec_with.get("confidence", 0.88),
+            "confidence": conf_after,
             "fallback_used": rec_with.get("fallback_used", "none_full_features"),
-            "expected_yield_q_acre": yield_with.get("expected_yield_quintals_per_acre"),
-            "yield_range": [yield_with.get("yield_range_lower"), yield_with.get("yield_range_upper")],
-            "soil_fertility_adjustment_pct": soil_adj_pct if has_soil else 0.0,
+            "expected_yield_q_acre": yield_res.get("expected_yield_quintals_per_acre"),
+            "yield_range": [yield_res.get("yield_range_lower"), yield_res.get("yield_range_upper")],
+            "yield_adjustment_applied": False,
         },
         impact_summary=impact_summary,
+        integration_scope_note=scope_note,
         disclaimer="Indicative agronomic modeling. Verify soil health recommendations with your local KVK or Agriculture Officer.",
     )

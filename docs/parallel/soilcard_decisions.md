@@ -33,9 +33,20 @@
 
 ---
 
-### Decision 4: Agronomic Impact Analysis (Before vs After Comparison)
-- **Context**: Farmers need to see how uploading a Soil Health Card improves their farm advisory and why testing soil matters.
+### Decision 4: Real Model Outputs Only (Zero Synthetic Yield Adjustments)
+- **Context**: Agronomic models should not invent unverified percentage adjustments.
 - **Decision**:
-  - Without confirmed soil card: AgriSage activates the weather-only crop recommendation model (temperature, humidity, rainfall) with an honest lower confidence (~50%) and unadjusted district-mean baseline yields.
-  - With confirmed soil card: The full 7-feature N-P-K-pH model is activated with high confidence (~88-99%), and yield predictions receive an indicative soil fertility factor based on optimal pH (6.2-7.8) and organic carbon balance.
-  - All adjustments are accompanied by transparent disclaimers: *"Indicative agronomic modeling. Verify soil health recommendations with your local KVK or Agriculture Officer."*
+  - Removed all hardcoded soil fertility adjustments (e.g. "optimal pH 6.2-7.8 (+4.0%)").
+  - The impact analysis displays the real outputs of `crop_recommender_engine` and `yield_model_engine` before vs after.
+  - Removed the hardcoded fallback confidence of 0.88 or 0.50. If the model returns no confidence, `confidence` is returned as `null` (displayed as *"Not Available"* in UI).
+  - All comparisons carry the transparent disclaimer: *"Indicative agronomic modeling. Verify soil health recommendations with your local KVK or Agriculture Officer."*
+
+---
+
+### Decision 5: Explicit Scope Isolation (Partial Pipeline Integration)
+- **Context**: Other multi-agent teammates depend on the stable contracts of `crop_recommendation.py`, `yield_service.py`, and domain agents.
+- **Decision**:
+  - Neither `crop_recommendation.py`, `yield_service.py`, nor any domain agents were modified.
+  - Confirmed soil health values are evaluated within this comparison screen only.
+  - A prominent `integration_scope_note` response field and UI banner explicitly state: *"Confirmed soil values are evaluated only within this comparison screen and are not yet passed to the farm's main recommendation (/api/v1/crop-recommendation) and yield (/api/v1/yield) endpoints."*
+  - This limitation is formally recorded as `PARTIAL` in `docs/parallel/soilcard_feature_status.md`.

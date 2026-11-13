@@ -54,3 +54,4 @@
 | `placeholders_admin_title` | Admin & Governance Placeholders | నిర్వాహక మరియు నియంత్రణ విభాగాలు | प्रशासन एवं नियंत्रण अनुभाग |
 | `admin_console_desc` | Admin moderation and data deletion modules are scheduled for the next phase. | అడ్మిన్ నియంత్రణ విభాగాలు తదుపరి దశలో చేర్చబడతాయి. | व्यवस्थापक नियंत्रण सुविधाएं अगले चरण में शामिल की जाएंगी। |
 | `reupload_btn` | Upload / Calibrate New Card | కొత్త కార్డ్ అప్‌లోడ్ చేయండి | नया कार्ड अपलोड करें |
+

@@ -752,19 +752,23 @@ export const SchemesPage: React.FC = () => {
                 <div className="space-y-3">
                   <div>
                     <span className="text-xs text-gray-500 block">{t('soilcard.confidence_label')}</span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex-1 bg-gray-200 h-2.5 rounded-full overflow-hidden">
-                        <div
-                          className="bg-amber-500 h-2.5 rounded-full"
-                          style={{ width: `${Math.round(impactData.without_soil_card.confidence * 100)}%` }}
-                        />
+                    {impactData.without_soil_card.confidence !== null ? (
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-amber-500 h-2.5 rounded-full"
+                            style={{ width: `${Math.round(impactData.without_soil_card.confidence * 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-gray-700">
+                          {Math.round(impactData.without_soil_card.confidence * 100)}%
+                        </span>
                       </div>
-                      <span className="text-xs font-bold text-gray-700">
-                        {Math.round(impactData.without_soil_card.confidence * 100)}%
-                      </span>
-                    </div>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic block mt-1">Not Available</span>
+                    )}
                     <span className="text-[10px] text-gray-400 mt-0.5 block">
-                      Heuristic penalty applied due to missing soil N-P-K-pH metrics
+                      Weather-only model evaluated (temperature, humidity, rainfall)
                     </span>
                   </div>
 
@@ -784,7 +788,7 @@ export const SchemesPage: React.FC = () => {
                     <p className="text-sm font-bold text-gray-800 mt-0.5">
                       {impactData.without_soil_card.expected_yield_q_acre ?? 'N/A'} quintals/acre
                     </p>
-                    <span className="text-[10px] text-gray-400">Baseline district production average</span>
+                    <span className="text-[10px] text-gray-400">Baseline district production records</span>
                   </div>
                 </div>
               </div>
@@ -803,19 +807,23 @@ export const SchemesPage: React.FC = () => {
                 <div className="space-y-3">
                   <div>
                     <span className="text-xs text-gray-600 block">{t('soilcard.confidence_label')}</span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex-1 bg-gray-200 h-2.5 rounded-full overflow-hidden">
-                        <div
-                          className="bg-emerald-600 h-2.5 rounded-full"
-                          style={{ width: `${Math.round(impactData.with_soil_card.confidence * 100)}%` }}
-                        />
+                    {impactData.with_soil_card.confidence !== null ? (
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-emerald-600 h-2.5 rounded-full"
+                            style={{ width: `${Math.round(impactData.with_soil_card.confidence * 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-emerald-800">
+                          {Math.round(impactData.with_soil_card.confidence * 100)}%
+                        </span>
                       </div>
-                      <span className="text-xs font-bold text-emerald-800">
-                        {Math.round(impactData.with_soil_card.confidence * 100)}%
-                      </span>
-                    </div>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic block mt-1">Not Available</span>
+                    )}
                     <span className="text-[10px] text-emerald-700 mt-0.5 block font-medium">
-                      High confidence: Validated against actual soil test chemistry
+                      Full 7-feature model evaluated with confirmed N-P-K-pH values
                     </span>
                   </div>
 
@@ -832,24 +840,29 @@ export const SchemesPage: React.FC = () => {
 
                   <div>
                     <span className="text-xs text-gray-600 block">{t('soilcard.expected_yield_label')}</span>
-                    <div className="flex items-baseline gap-2 mt-0.5">
-                      <p className="text-base font-bold text-emerald-950">
-                        {impactData.with_soil_card.expected_yield_q_acre ?? 'N/A'} quintals/acre
-                      </p>
-                      {impactData.with_soil_card.soil_fertility_adjustment_pct !== 0 && (
-                        <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
-                          {impactData.with_soil_card.soil_fertility_adjustment_pct > 0 ? '+' : ''}
-                          {impactData.with_soil_card.soil_fertility_adjustment_pct}% Fertility Factor
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-base font-bold text-emerald-950 mt-0.5">
+                      {impactData.with_soil_card.expected_yield_q_acre ?? 'N/A'} quintals/acre
+                    </p>
                     <span className="text-[10px] text-gray-500">
-                      Adjusted based on confirmed soil pH {impactData.soil_values?.ph ?? ''} and organic carbon {impactData.soil_values?.organic_carbon_pct ?? ''}%
+                      Real regressor output from historical production records (zero unvalidated soil adjustments)
                     </span>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Pipeline Integration Scope Limitation Callout */}
+            {impactData.integration_scope_note && (
+              <div className="bg-amber-50/80 border border-amber-300 rounded-xl p-3.5 flex items-start gap-2.5 text-xs text-amber-900">
+                <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <span className="font-bold block">Pipeline Scope Limitation (Partial Integration):</span>
+                  <p className="text-amber-800 leading-relaxed">
+                    {impactData.integration_scope_note}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Disclaimer */}
             <div className="pt-2 border-t border-gray-100 text-[11px] text-gray-500 italic">

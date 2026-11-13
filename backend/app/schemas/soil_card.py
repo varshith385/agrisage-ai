@@ -70,4 +70,9 @@ class SoilImpactAnalysisResponse(BaseModel):
     without_soil_card: Dict[str, Any]
     with_soil_card: Dict[str, Any]
     impact_summary: List[str]
+    integration_scope_note: str = Field(
+        default="Confirmed soil values are evaluated only within this comparison screen and are not yet passed to the farm's main recommendation (/api/v1/crop-recommendation) and yield (/api/v1/yield) endpoints.",
+        description="Scope limitation note",
+    )
     disclaimer: str = "Indicative agronomic modeling. Verify soil health recommendations with your local KVK or Agriculture Officer."
+

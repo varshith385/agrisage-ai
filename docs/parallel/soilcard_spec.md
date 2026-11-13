@@ -195,30 +195,32 @@
   },
   "without_soil_card": {
     "top_crops": [
-      { "crop_name": "jute", "probability": 0.32 },
-      { "crop_name": "rice", "probability": 0.28 }
+      { "crop_name": "mango", "probability": 0.32 },
+      { "crop_name": "coffee", "probability": 0.15 }
     ],
     "confidence": 0.50,
     "fallback_used": "weather_only_model (soil N, P, K, pH not provided)",
-    "expected_yield_q_acre": 12.8,
-    "yield_range": [10.2, 15.4]
+    "expected_yield_q_acre": 8.23,
+    "yield_range": [6.58, 9.88]
   },
   "with_soil_card": {
     "top_crops": [
-      { "crop_name": "rice", "probability": 0.94 },
-      { "crop_name": "blackgram", "probability": 0.04 }
+      { "crop_name": "coffee", "probability": 0.27 },
+      { "crop_name": "grapes", "probability": 0.15 }
     ],
     "confidence": 0.88,
     "fallback_used": "none_full_features",
-    "expected_yield_q_acre": 13.82,
-    "yield_range": [11.02, 16.63],
-    "soil_fertility_adjustment_pct": 8.0
+    "expected_yield_q_acre": 8.23,
+    "yield_range": [6.58, 9.88],
+    "yield_adjustment_applied": false
   },
   "impact_summary": [
-    "Crop recommendation confidence increased from 50% (weather-only fallback) to 88% (full 7-feature N-P-K model).",
-    "Top recommended crop shifted from 'Jute' to 'Rice' based on your soil's actual N=280.5 kg/ha, P=18.2 kg/ha, K=310.0 kg/ha test results.",
-    "Yield expectation adjusted by +8.0% (+1.02 q/acre) based on measured pH 7.2 and fertility balance (indicative assumption, no source)."
+    "Crop recommendation confidence: 50% (weather-only model) vs 88% (full 7-feature N-P-K model).",
+    "Top recommended crop shifted from 'Mango' to 'Coffee' based on your soil's actual N=280.5 kg/ha, P=18.2 kg/ha, K=310.0 kg/ha test results.",
+    "Expected yield: 8.23 quintals/acre based on historical district/season records. No arbitrary soil adjustments applied (yield regressor is trained on production data, not soil tests)."
   ],
+  "integration_scope_note": "Confirmed soil values are evaluated only within this comparison screen and are not yet passed to the farm's main recommendation (/api/v1/crop-recommendation) and yield (/api/v1/yield) endpoints.",
   "disclaimer": "Indicative agronomic modeling. Verify soil health recommendations with your local KVK or Agriculture Officer."
 }
 ```
+

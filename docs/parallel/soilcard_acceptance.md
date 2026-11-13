@@ -35,14 +35,24 @@
 ---
 
 ### Criteria 4: Agronomic Impact (Before vs After Comparison)
-- [x] Without Soil Card: Weather-only crop recommendation model evaluates temperature, humidity, rainfall with baseline confidence (~50%) and standard district-mean yield.
-- [x] With Confirmed Soil Card: Full 7-feature N-P-K-pH model activates with ~88-99% confidence; top crops re-ranked based on soil nutrient profile.
-- [x] Yield Adjustment: Soil fertility factor (+/- %) applied based on optimal pH (6.2-7.8) and organic carbon balance with transparent rationale.
+- [x] Without Soil Card: Weather-only crop recommendation model evaluates temperature, humidity, rainfall with baseline model confidence and standard district-mean yield.
+- [x] With Confirmed Soil Card: Full 7-feature N-P-K-pH model activates; top crops re-ranked based on soil nutrient profile.
+- [x] Real Model Outputs Only: Zero synthetic yield adjustments (+4% removed). Real regressor predictions returned before vs after.
+- [x] No Hardcoded Fallback Confidence: Real model confidence returned directly (or null / 'not available' if model returns None; 0.88 fallback removed).
 - [x] Disclaimers: Clear notice displayed: *"Indicative agronomic modeling. Verify soil health recommendations with your local KVK or Agriculture Officer."*
 
 ---
 
-### Criteria 5: URL & Navigation
+### Criteria 5: Downstream Pipeline Scope Isolation (Known Gap)
+- [x] `crop_recommendation.py`, `yield_service.py`, and domain agents remain untouched.
+- [x] Confirmed soil values are used strictly for this page's comparison.
+- [x] Explicit `integration_scope_note` returned in API response and displayed in UI.
+- [x] Gap recorded as `PARTIAL` in `docs/parallel/soilcard_feature_status.md`.
+
+---
+
+### Criteria 6: URL & Navigation
 - [x] Accessible at `/schemes#soil-card-upload`.
 - [x] Nav item added in `Header.tsx` (`t('nav.schemes')`).
 - [x] Placeholder cards provided for Admin Console, Consent Audit Log, Listing Moderation, and Privacy Page.
+

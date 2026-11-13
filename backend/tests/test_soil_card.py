@@ -318,8 +318,72 @@ def test_impact_analysis_shows_before_and_after_shift():
     assert impact.without_soil_card["fallback_used"] == "weather_only_model (soil N, P, K, pH not provided)"
     assert impact.with_soil_card["fallback_used"] == "none_full_features"
     assert len(impact.impact_summary) >= 2
-    assert "confidence increased" in impact.impact_summary[0]
     assert "Indicative agronomic modeling" in impact.disclaimer
+
+
+def test_impact_no_hardcoded_yield_adjustment_and_scope_note():
+    """
+    Point 1: Ensures NO hardcoded pH 6.2-7.8 (+4.0%) or arbitrary fertility factor adjustments are applied.
+    Point 3: Ensures integration_scope_note explicitly states values are comparison-only.
+    """
+    impact = analyze_soil_impact(
+        farm_id=1,
+        state="Telangana",
+        district="Warangal",
+        area_acres=3.0,
+        crop_name="Rice",
+        n=280.0,
+        p=20.0,
+        k=300.0,
+        ph=7.2,
+        oc=0.55,
+        ec=0.40,
+    )
+
+    # 1. Zero unvalidated yield adjustment
+    assert impact.with_soil_card["yield_adjustment_applied"] is False
+    assert impact.without_soil_card["expected_yield_q_acre"] == impact.with_soil_card["expected_yield_q_acre"]
+    # Ensure no "+4.0%" or hardcoded fertility percentage
+    assert not any("+4.0%" in s for s in impact.impact_summary)
+    assert not any("Fertility Factor" in s for s in impact.impact_summary)
+
+    # 2. Integration scope note
+    assert "Confirmed soil values are evaluated only within this comparison screen" in impact.integration_scope_note
+    assert "/api/v1/crop-recommendation" in impact.integration_scope_note
+
+
+def test_impact_confidence_returns_null_when_model_returns_none(monkeypatch):
+    """
+    Point 2: Verifies that when recommender model returns None/no confidence,
+    it returns None (null) and does NOT fallback to 0.88 or 0.50.
+    """
+    from backend.app.ml.crop_recommender import crop_recommender_engine
+
+    def mock_recommend(*args, **kwargs):
+        return {
+            "top_crops": [{"crop_name": "rice", "probability": 0.8}],
+            "confidence": None,
+            "fallback_used": "missing_artifact_demo",
+        }
+
+    monkeypatch.setattr(crop_recommender_engine, "recommend", mock_recommend)
+
+    impact = analyze_soil_impact(
+        farm_id=1,
+        state="Telangana",
+        district="Warangal",
+        area_acres=3.0,
+        crop_name="Rice",
+        n=280.0,
+        p=20.0,
+        k=300.0,
+        ph=7.2,
+    )
+
+    # Must be None, NEVER 0.88 or 0.50
+    assert impact.without_soil_card["confidence"] is None
+    assert impact.with_soil_card["confidence"] is None
+    assert "Model confidence is not available." in impact.impact_summary
 
 
 def test_impact_api_endpoint(client: TestClient, farmer_headers: dict, test_farm: Farm):
@@ -349,3 +413,6 @@ def test_impact_api_endpoint(client: TestClient, farmer_headers: dict, test_farm
     assert data["soil_values"]["nitrogen_kg_ha"] == 275.0
     assert data["with_soil_card"]["confidence"] > data["without_soil_card"]["confidence"]
     assert len(data["impact_summary"]) > 0
+    assert "integration_scope_note" in data
+    assert "comparison screen" in data["integration_scope_note"]
+

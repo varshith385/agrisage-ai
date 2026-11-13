@@ -62,20 +62,21 @@ export interface SoilImpactAnalysisResponse {
   soil_values?: Record<string, any> | null;
   without_soil_card: {
     top_crops: Array<{ crop_name: string; probability: number }>;
-    confidence: number;
+    confidence: number | null;
     fallback_used: string;
     expected_yield_q_acre?: number | null;
     yield_range?: [number | null, number | null];
   };
   with_soil_card: {
     top_crops: Array<{ crop_name: string; probability: number }>;
-    confidence: number;
+    confidence: number | null;
     fallback_used: string;
     expected_yield_q_acre?: number | null;
     yield_range?: [number | null, number | null];
-    soil_fertility_adjustment_pct: number;
+    yield_adjustment_applied?: boolean;
   };
   impact_summary: string[];
+  integration_scope_note: string;
   disclaimer: string;
 }
 
@@ -119,3 +120,4 @@ export async function getSoilImpact(farmId: number, cropName?: string): Promise<
     body: JSON.stringify({ farm_id: farmId, crop_name: cropName || 'Rice' }),
   });
 }
+

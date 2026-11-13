@@ -37,3 +37,4 @@ class SoilHealthCard(Base):
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
 
     farm = relationship("Farm", backref="soil_cards")
+
