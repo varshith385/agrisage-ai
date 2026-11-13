@@ -47,8 +47,8 @@
 | **Seasonal Awareness Engine (Kharif/Rabi)** | Tier 1 | WORKING | `WORKING` | `GET /api/v1/calendar/season` | Automatic calendar-month seasonal window detection for Kharif, Rabi, and Zaid with typical climatic expectations, risk factors, and recommended crops. |
 | **Mobile-First Design System** | Tier 1 | WORKING | `WORKING` | `frontend/src/` | Warm earthy AgriTech theme, 44px tap targets, bottom navigation, evaluated at 390px. |
 | **Multilingual i18n (`en`, `te`, `hi`)** | Tier 1 | WORKING | `WORKING` | `frontend/src/i18n/` | Full i18n dictionary for English, Telugu, and Hindi; Noto Sans Telugu & Devanagari fonts. |
-| **Voice Assistant (STT & TTS)** | Tier 1 | NOT STARTED | `NOT STARTED` | `<VoiceAssistant/>` global FAB | Awaiting Phase 2/6 implementation. |
-| **Voice Capability Detection & Fallback** | Tier 1 | NOT STARTED | `NOT STARTED` | `POST /api/v1/voice/query` | Awaiting Phase 2/6 implementation. |
+| **Voice Assistant (STT & TTS)** | Tier 1 | WORKING | `WORKING` | `<VoiceAssistant/>` global FAB, Module 21 | Web Speech Recognition in `en-IN`, `te-IN`, `hi-IN` matched to language; SpeechSynthesis TTS with voice preference matching; floating FAB on every page (#global-voice-assistant-slot). (Note: automated browser lacks hardware mic; live audio recording requires real phone test). |
+| **Voice Capability Detection & Fallback** | Tier 1 | WORKING | `WORKING` | `POST /api/v1/voice/query` | Backend intent routing (weather, irrigation, disease, cost, scheme, price, general) with farm-aware answers, strict zero chemical dosages, no-key LLM fallback, browser capability warnings (recommending Chrome), and 100% interactive typed fallback. |
 | **Community Groups & Peer Boards** | Tier 2 | NOT STARTED | `NOT STARTED` | `POST /api/v1/community/groups` | Awaiting Phase 5 implementation. |
 | **Pooled Transport & Input Purchasing** | Tier 2 | NOT STARTED | `NOT STARTED` | `POST /api/v1/community/requests` | Awaiting Phase 5 implementation. |
 | **Opt-in Contact Sharing Flow** | Tier 2 | NOT STARTED | `NOT STARTED` | `group_members.consent_*` | Awaiting Phase 5 implementation. |

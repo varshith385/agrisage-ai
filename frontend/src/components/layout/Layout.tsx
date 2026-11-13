@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { BottomNav } from './BottomNav';
+import { VoiceAssistant } from '../voice/VoiceAssistant';
 
 export const Layout: React.FC = () => {
   return (
@@ -12,13 +13,12 @@ export const Layout: React.FC = () => {
       </main>
       <BottomNav />
 
-      {/* Global Floating Voice Assistant Container (Reserved for future Phase) */}
+      {/* Global Floating Voice Assistant Container on EVERY page */}
       <div
         id="global-voice-assistant-slot"
-        className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-30 pointer-events-none"
-        aria-hidden="true"
+        className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-30"
       >
-        {/* Intentionally unoccupied for Tier 1 slice; component will mount here */}
+        <VoiceAssistant />
       </div>
     </div>
   );

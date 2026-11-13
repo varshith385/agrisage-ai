@@ -95,5 +95,31 @@ The following phrases were added in Phase 4 for the Economics Engine (tenure mat
 | **Recommendation** | Restorative Crop Rotation Guide | నేల పునరుజ్జీవన పంట మార్పిడి మార్గదర్శి | मृदा पुनरुद्धार फसल चक्र मार्गदर्शिका | **Unverified**: Needs review. |
 | **Recommendation** | Previous Harvested Crop | గతంలో వేసిన పంట | पिछली काटी गई फसल | **Unverified**: Needs review. |
 
+---
+
+## 5. Phase 6.1 Voice Assistant & Multilingual Translation Registry (Unverified — Awaiting Review)
+
+The following multilingual phrases were added in Phase 6.1 for the global voice assistant floating action button, capability detection, microphone fallbacks, and quick agricultural prompts across English, Telugu, and Hindi:
+
+| Phrase Category | English Phrase | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Voice UI** | AgriSage Voice Assistant | అగ్రిసేజ్ వాయిస్ అసిస్టెంట్ | एग्रीसेज वॉयस सहायक | **Unverified**: Needs review. |
+| **Voice UI** | Listening... Speak now | వింటున్నాను... మాట్లాడండి | सुन रहा हूँ... बोलिए | **Unverified**: Needs review. |
+| **Voice UI** | Ask in English, Telugu, or Hindi | తెలుగు, హిందీ లేదా ఇంగ్లీషులో ప్రశ్న అడగండి | हिन्दी, तेलुगु या अंग्रेजी में पूछें | **Unverified**: Needs review. |
+| **Voice UI** | Analyzing your agricultural query... | మీ వ్యవసాయ ప్రశ్నకు సమాధానాన్ని విశ్లేషిస్తున్నాను... | आपके कृषि प्रश्न का विश्लेषण हो रहा है... | **Unverified**: Needs review. |
+| **Voice UI** | Speech Recognition Not Supported | వాయిస్ గుర్తింపు మద్దతు లేదు | वॉयस पहचान समर्थित नहीं | **Unverified**: Needs review. |
+| **Voice UI** | Browser Speech Unsupported Advisory | మీ బ్రౌజర్ వెబ్ స్పీచ్ రికగ్నిషన్‌కు మద్దతు ఇవ్వదు. మీరు క్రింద ప్రశ్నను టైప్ చేయవచ్చు. | आपका ब्राउज़र वेब स्पीच रिकग्निशन का समर्थन नहीं करता। आप नीचे प्रश्न टाइप कर सकते हैं। | **Unverified**: Needs review. |
+| **Voice UI** | Microphone Access Denied | మైక్రోఫోన్ అనుమతి నిరాకరించబడింది | माइक्रोफोन अनुमति अस्वीकृत | **Unverified**: Needs review. |
+| **Voice UI** | Browser Voice Unavailable | బ్రౌజర్ వాయిస్ అందుబాటులో లేదు | ब्राउज़र वॉयस अनुपलब्ध | **Unverified**: Needs review. |
+| **Voice UI** | Browser Recommendation | సూచన: భారతీయ భాషలలో స్పష్టమైన వాయిస్ గుర్తింపు కొరకు ఆండ్రాయిడ్ లేదా డెస్క్‌టాప్‌లోని గూగుల్ క్రోమ్ ఉత్తమం. | अनुशंसा: भारतीय भाषाओं में सटीक आवाज पहचान हेतु एंड्रॉइड या डेस्कटॉप पर गूगल क्रोम का उपयोग करें। | **Unverified**: Needs review. |
+| **Voice Prompt** | Will it rain today? | ఈరోజు వర్షం పడుతుందా? | क्या आज बारिश होगी? | **Unverified**: Needs review. |
+| **Voice Prompt** | Should I irrigate today? | ఈరోజు నీరు పెట్టాలా? | क्या आज सिंचाई करनी चाहिए? | **Unverified**: Needs review. |
+| **Voice Prompt** | How to check leaf disease? | ఆకు తెగులు ఎలా గుర్తించాలి? | पत्ती रोग की पहचान कैसे करें? | **Unverified**: Needs review. |
+| **Voice Prompt** | Cultivation cost per acre | ఎకరాకు సాగు ఖర్చు ఎంత? | प्रति एकड़ खेती लागत कितनी है? | **Unverified**: Needs review. |
+| **Voice Prompt** | Rythu Bandhu & PM-KISAN info | రైతు బంధు & పీఎం-కిసాన్ వివరాలు | पीएम-किसान व रायथू बंधु जानकारी | **Unverified**: Needs review. |
+| **Voice Prompt** | Cotton mandi price | పత్తి మార్కెట్ ధర | कपास का मंडी भाव | **Unverified**: Needs review. |
+| **Voice Safety** | Zero Chemical Dosages | రసాయన మోతాదులు లేవు | रासायनिक खुराक वर्जित | **Unverified**: Needs review. |
+
+
 
 

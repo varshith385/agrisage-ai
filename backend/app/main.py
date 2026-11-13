@@ -23,6 +23,7 @@ from backend.app.api.v1.advisory import router as advisory_router
 from backend.app.api.v1.economics import router as economics_router
 from backend.app.api.v1.rotation import router as rotation_router
 from backend.app.api.v1.calendar import router as calendar_router
+from backend.app.api.v1.voice import router as voice_router
 
 
 @asynccontextmanager
@@ -133,3 +134,4 @@ app.include_router(advisory_router, prefix=settings.API_V1_PREFIX)
 app.include_router(economics_router, prefix=settings.API_V1_PREFIX)
 app.include_router(rotation_router, prefix=settings.API_V1_PREFIX)
 app.include_router(calendar_router, prefix=settings.API_V1_PREFIX)
+app.include_router(voice_router, prefix=settings.API_V1_PREFIX)
