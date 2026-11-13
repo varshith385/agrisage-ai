@@ -25,10 +25,17 @@ CROP_FAMILY_MAP: Dict[str, str] = {
     "greengram": "Fabaceae (Leguminosae)",
 }
 
-ICAR_CITATION = "ICAR Indian Institute of Farming Systems Research (IIFSR) Modipuram — Cropping Systems Management Manual; to verify"
-TNAU_CITATION = "Tamil Nadu Agricultural University (TNAU) Agronomy Guide on Crop Rotations & Soil Restoration; to verify"
-CRIDA_CITATION = "ICAR Central Research Institute for Dryland Agriculture (CRIDA) Hyderabad — Dryland Rotation Advisory; to verify"
-IIHR_CITATION = "ICAR Indian Institute of Horticultural Research (IIHR) Bangalore — Nematode & Wilt Disruption Protocols; to verify"
+# Agronomic citation notes strictly marked per Yuktik Honesty Rules
+LEGUME_FIXATION_CITATION = "Biological nitrogen fixation principles (to verify - source not checked)"
+PEST_BREAK_CITATION = "Crop family pathogen and pest cycle break principles (to verify - source not checked)"
+SOIL_STRUCTURE_CITATION = "Soil aeration and moisture conservation rotation principles (to verify - source not checked)"
+NEMATODE_BREAK_CITATION = "Nematode disruption and bio-fumigant green manure principles (to verify - source not checked)"
+
+# Backwards compatibility aliases
+ICAR_CITATION = LEGUME_FIXATION_CITATION
+TNAU_CITATION = PEST_BREAK_CITATION
+CRIDA_CITATION = SOIL_STRUCTURE_CITATION
+IIHR_CITATION = NEMATODE_BREAK_CITATION
 
 
 def recommend_rotations(previous_crop: str) -> CropRotationResponse:
@@ -53,7 +60,7 @@ def recommend_rotations(previous_crop: str) -> CropRotationResponse:
                     crop_name_hi="मूंगफली",
                     crop_family="Fabaceae (Leguminosae)",
                     benefit_category="nitrogen_fixation",
-                    rationale="Nodulating Rhizobia biologically fix 30-40 kg N/ha, replenishing soil fertility mined by cotton while breaking bollworm life cycles.",
+                    rationale="Nodulating Rhizobia biologically fix atmospheric nitrogen (indicative estimate 30-40 kg N/ha, to verify), replenishing soil fertility mined by cotton while breaking bollworm life cycles.",
                     precaution="Ensure adequate gypsum application at flowering for pod filling in light loamy soils.",
                     suitable_seasons=["Rabi", "Summer"],
                     agronomic_source=CRIDA_CITATION,
@@ -105,7 +112,7 @@ def recommend_rotations(previous_crop: str) -> CropRotationResponse:
                     crop_name_hi="उड़द / मूंग",
                     crop_family="Fabaceae (Leguminosae)",
                     benefit_category="moisture_conservation",
-                    rationale="Zero-tillage broadcasting into standing stubbles utilizes residual moisture without extra irrigation and adds 25 kg organic N/acre.",
+                    rationale="Zero-tillage broadcasting into standing stubbles utilizes residual moisture without extra irrigation and contributes organic nitrogen to the soil (indicative, to verify).",
                     precaution="Broadcast seeds 2-3 days before paddy harvest while soil is moist but not saturated.",
                     suitable_seasons=["Rabi"],
                     agronomic_source=ICAR_CITATION,
@@ -129,7 +136,7 @@ def recommend_rotations(previous_crop: str) -> CropRotationResponse:
                     crop_name_hi="मक्का",
                     crop_family="Poaceae (Gramineae)",
                     benefit_category="soil_structure",
-                    rationale="Broad-bed and furrow rabi maize produces exceptional yields in rice-fallow soils using 50% less water than summer paddy.",
+                    rationale="Broad-bed and furrow rabi maize performs well in rice-fallow soils while consuming substantially less water than summer paddy (indicative, to verify).",
                     precaution="Ensure good drainage channels to prevent seedling collar dampening.",
                     suitable_seasons=["Rabi"],
                     agronomic_source=TNAU_CITATION,
@@ -170,7 +177,7 @@ def recommend_rotations(previous_crop: str) -> CropRotationResponse:
                     crop_name_hi="सनई / लोबिया",
                     crop_family="Fabaceae (Leguminosae)",
                     benefit_category="pest_cycle_break",
-                    rationale="Roots release natural nematicidal exudates that suppress root-knot nematodes while fixing up to 50 kg N/ha.",
+                    rationale="Roots release natural nematicidal exudates that suppress root-knot nematodes while fixing atmospheric nitrogen (indicative estimate up to 50 kg N/ha, to verify).",
                     precaution="Incorporate into soil at 50% flowering (45-50 DAS) before lignification.",
                     suitable_seasons=["Summer", "Kharif"],
                     agronomic_source=IIHR_CITATION,

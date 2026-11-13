@@ -30,6 +30,7 @@ def test_cotton_rotation_rules():
         assert item.is_rule_based is True
         assert item.agronomic_source is not None
         assert "to verify" in item.agronomic_source.lower()
+        assert "source not checked" in item.agronomic_source.lower()
         assert len(item.rationale) > 20
 
 

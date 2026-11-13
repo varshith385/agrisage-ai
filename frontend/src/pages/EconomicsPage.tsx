@@ -789,8 +789,7 @@ export const EconomicsPage: React.FC = () => {
             "What-if simulator lets you test vulnerability against crop price collapses or adverse weather yield shocks.",
           ],
           sources: [
-            "Directorate of Economics and Statistics (DES), Ministry of Agriculture — Comprehensive Cost of Cultivation Scheme (CACP Reports)",
-            "Telangana State Agricultural University (PJTSAU) — Crop-wise Farm Budget Guidelines",
+            "Indicative estimates entered by the project team, not taken from any published report; edit to your actual cost; verify with your local KVK or agriculture officer.",
           ],
           limitations: [
             "Mandi market price service is not yet integrated; price is user's estimate and MSP is unverified.",

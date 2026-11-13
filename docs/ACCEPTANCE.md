@@ -261,7 +261,7 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Calculates total cost per acre (seed, fertilizer, pesticide, labour, machinery, irrigation, fuel, transport, lease, loan interest), gross revenue, net profit, break-even yield, and break-even price. All monetary math uses `Decimal`.
 - **Verification Method**: `pytest backend/tests/test_economics.py` with known input values.
 - **Pass Criteria**: Break-even price equals total cost / expected yield; calculations for owned vs leased land handled separately and combined accurately for mixed holdings.
-- **Status**: **PASS** (Verified 2026-11-13). Evaluated in `backend/tests/test_economics.py` across 7 test cases covering 10 major crops with CACP benchmark cost templates. All arithmetic operations (operating costs, revenues, lease, loan interest, margins, break-even price and yield) strictly use Python `Decimal`. Formula verified: $\text{BE Price} = \text{Total Cost} / (\text{Yield} \times \text{Area})$, $\text{BE Yield} = \text{Total Cost} / (\text{Price} \times \text{Area})$.
+- **Status**: **PASS** (Verified 2026-11-13). Evaluated in `backend/tests/test_economics.py` across 7 test cases covering 10 major crops with indicative cost templates entered by the project team. All arithmetic operations (operating costs, revenues, lease, loan interest, margins, break-even price and yield) strictly use Python `Decimal`. Formula verified: $\text{BE Price} = \text{Total Cost} / (\text{Yield} \times \text{Area})$, $\text{BE Yield} = \text{Total Cost} / (\text{Price} \times \text{Area})$.
 
 ### `T1-33`: Owned vs Leased vs Mixed Land Economics Computation
 - **Tier**: Tier 1
@@ -293,7 +293,7 @@ According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier
 - **Observable Behaviour**: Recommends next crop based on previous crop family (e.g., legumes after cereals to restore nitrogen; avoiding repeated solanaceous crops to break pest cycles).
 - **Verification Method**: Call `/api/v1/rotation/recommend?previous_crop=cotton`.
 - **Pass Criteria**: Recommends legume/pulse rotations with explicit agronomic reasons citing nitrogen fixation and soil health; labelled as rule-based.
-- **Status**: **PASS** (Verified 2026-11-13). Evaluated via `backend/tests/test_rotation.py` (4 of 4 tests passed) and `/recommend` UI page. For preceding Cotton crop: flags repeat cotton, chilli, and okra as avoid-crops (pink bollworm carryover and malvaceous viral complex); recommends Pulses/Legumes for biological nitrogen fixation (30–40 kg N/ha) and Maize/Sorghum for pest cycle disruption. Cites ICAR IIFSR Modipuram and CRIDA dryland guidelines; labeled 'rule_based'. Evidence: `recommend_desktop_en.png`.
+- **Status**: **PASS** (Verified 2026-11-13). Evaluated via `backend/tests/test_rotation.py` (4 of 4 tests passed) and `/recommend` UI page. For preceding Cotton crop: flags repeat cotton, chilli, and okra as avoid-crops (pink bollworm carryover and malvaceous viral complex); recommends Pulses/Legumes for biological nitrogen fixation (indicative estimate 30–40 kg N/ha, to verify) and Maize/Sorghum for pest cycle disruption; all citations marked 'to verify - source not checked' without unconfirmed document titles; labeled 'rule_based'. Evidence: `recommend_desktop_en.png`.
 
 ### `T1-37`: Crop Lifecycle Timeline, Reminders & `.ics` Calendar Export
 - **Tier**: Tier 1

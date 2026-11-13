@@ -233,3 +233,11 @@ def test_api_economics_calculate_and_compare(farmer_headers):
     # Sorted descending by estimated net profit per acre
     profits = [c["estimated_net_profit_per_acre"] for c in comp_data["crops"]]
     assert profits == sorted(profits, reverse=True)
+
+    # Templates endpoint provenance check
+    r_tmpl = client.get("/api/v1/economics/templates", headers=farmer_headers)
+    assert r_tmpl.status_code == 200
+    tmpl_data = r_tmpl.json()
+    meta = tmpl_data["_metadata"]
+    assert "not taken from any published report" in meta["verification_status"].lower()
+    assert "indicative estimate, edit to your actual cost" in meta["disclaimer"].lower()

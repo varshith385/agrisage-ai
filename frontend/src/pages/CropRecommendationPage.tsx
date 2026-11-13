@@ -368,13 +368,12 @@ export const CropRecommendationPage: React.FC = () => {
           confidence: 0.92,
           confidence_type: 'rule',
           reasons: [
-            "Crop rotation rules prioritize leguminous biological nitrogen fixation (30-40 kg N/ha) after heavy-feeding cotton.",
+            "Crop rotation rules prioritize leguminous biological nitrogen fixation (indicative 30-40 kg N/ha, to verify) after heavy-feeding cotton.",
             "Monoculture cotton and Solanaceous crops (Chilli/Tomato) are strictly flagged due to soil-borne nematode and wilt accumulation.",
             "Weather-only fallback protects model credibility by lowering confidence when soil parameters are unavailable.",
           ],
           sources: [
-            "ICAR Indian Institute of Farming Systems Research (IIFSR) Modipuram",
-            "CRIDA Hyderabad — Dryland Cropping Sequence Guidelines",
+            "General agronomic rotation and biological nitrogen fixation principles (to verify - source not checked)",
           ],
           limitations: [
             "Field pest and nematode presence must be confirmed visually before finalizing pulse varieties.",
