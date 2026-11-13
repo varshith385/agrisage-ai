@@ -32,14 +32,13 @@ async def generate_irrigation_plan(
     and litres saved if rain is forecast.
     """
     farm = None
-    crop_name = payload.crop_name or "Cotton"
-    planting_date = payload.planting_date
-    soil_type = payload.soil_type or "Black Cotton"
-    irrigation_method = payload.irrigation_method or "drip"
-    area_acres = payload.area_acres or 1.0
-
     lat = payload.latitude
     lon = payload.longitude
+    crop_name = payload.crop_name
+    planting_date = payload.planting_date
+    soil_type = payload.soil_type
+    irrigation_method = payload.irrigation_method
+    area_acres = payload.area_acres
 
     # 1. If farm_id provided, look up registered farm holding & verify ownership
     if payload.farm_id is not None:
@@ -55,24 +54,34 @@ async def generate_irrigation_plan(
                 detail="Not authorized to access this farm holding.",
             )
 
-        lat = farm.latitude
-        lon = farm.longitude
-        soil_type = farm.soil_type or soil_type
-        if farm.irrigation_method:
+        lat = farm.latitude if lat is None else lat
+        lon = farm.longitude if lon is None else lon
+        if not soil_type and farm.soil_type:
+            soil_type = farm.soil_type
+        if not irrigation_method and farm.irrigation_method:
             irrigation_method = (
                 farm.irrigation_method.value
                 if hasattr(farm.irrigation_method, "value")
                 else str(farm.irrigation_method)
             )
-        area_acres = farm.area or area_acres
+        if not area_acres and farm.area:
+            area_acres = farm.area
 
         # Look up active crop cycle
         if farm.current_crop_cycles:
             active_cycles = [c for c in farm.current_crop_cycles if c.is_active]
             if active_cycles:
                 cycle = active_cycles[0]
-                crop_name = cycle.crop_name
-                planting_date = cycle.planting_date
+                if not crop_name:
+                    crop_name = cycle.crop_name
+                if not planting_date:
+                    planting_date = cycle.planting_date
+
+    # 2. Defaults if still unspecified
+    crop_name = crop_name or "Cotton"
+    soil_type = soil_type or "Black Cotton"
+    irrigation_method = irrigation_method or "drip"
+    area_acres = area_acres or 1.0
 
     # Default planting date if unspecified: 35 days ago (mid-vegetative stage)
     if not planting_date:

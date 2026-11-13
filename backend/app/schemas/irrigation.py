@@ -5,11 +5,11 @@ from pydantic import BaseModel, Field
 
 class IrrigationPlanRequest(BaseModel):
     farm_id: Optional[int] = Field(None, description="Optional registered farm ID to auto-populate location, soil, and active crop.")
-    crop_name: Optional[str] = Field("Cotton", description="Crop name (e.g. Cotton, Rice, Wheat, Maize, Chilli, Tomato, etc.)")
+    crop_name: Optional[str] = Field(None, description="Crop name (e.g. Cotton, Rice, Wheat, Maize, Chilli, Tomato, etc.)")
     planting_date: Optional[date] = Field(None, description="Sowing date to determine DAS and FAO-56 phenological growth stage.")
-    soil_type: Optional[str] = Field("Black Cotton", description="Soil type classification (e.g. Sandy, Loam, Black Cotton, Red Loam, etc.)")
-    irrigation_method: Optional[str] = Field("drip", description="Irrigation method: flood, furrow, sprinkler, drip.")
-    area_acres: Optional[float] = Field(1.0, ge=0.01, description="Farm holding area in acres.")
+    soil_type: Optional[str] = Field(None, description="Soil type classification (e.g. Sandy, Loam, Black Cotton, Red Loam, etc.)")
+    irrigation_method: Optional[str] = Field(None, description="Irrigation method: flood, furrow, sprinkler, drip.")
+    area_acres: Optional[float] = Field(None, ge=0.01, description="Farm holding area in acres.")
     latitude: Optional[float] = Field(None, ge=-90.0, le=90.0)
     longitude: Optional[float] = Field(None, ge=-180.0, le=180.0)
     reference_et0_mm: Optional[float] = Field(None, ge=0.0, description="Override reference ET0 in mm/day.")

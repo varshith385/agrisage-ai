@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   Droplets,
@@ -14,6 +14,7 @@ import {
   Compass,
   TrendingDown,
   Layers,
+  HelpCircle,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -42,6 +43,8 @@ import {
 import { ExplainCard } from '../components/common/ExplainCard';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
+import { EmptyState } from '../components/common/EmptyState';
+import { ErrorState } from '../components/common/ErrorState';
 
 const SUPPORTED_CROPS = [
   'Cotton',
@@ -128,28 +131,62 @@ export const IrrigationPage: React.FC = () => {
     }
   };
 
+  // Results Ref for scrolling into view
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Restore last result from localStorage if available
+  const [cachedPlan, setCachedPlan] = useState<IrrigationPlanResponse | null>(() => {
+    try {
+      const stored = localStorage.getItem('agrisage_last_irrigation_plan');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
   // Plan Query
   const planPayload: IrrigationPlanPayload = useMemo(() => {
     return {
-      farm_id: selectedFarmId,
+      farm_id: selectedFarmId || activeFarm?.id,
       crop_name: cropName,
       planting_date: plantingDate,
       soil_type: soilType,
       irrigation_method: irrigationMethod,
       area_acres: areaAcres,
     };
-  }, [selectedFarmId, cropName, plantingDate, soilType, irrigationMethod, areaAcres]);
+  }, [selectedFarmId, activeFarm, cropName, plantingDate, soilType, irrigationMethod, areaAcres]);
 
   const {
-    data: plan,
+    data: planData,
     isLoading: isLoadingPlan,
     isRefetching: isRefetchingPlan,
+    isError: isPlanError,
     refetch: refetchPlan,
   } = useQuery<IrrigationPlanResponse>({
     queryKey: ['irrigationPlan', planPayload],
-    queryFn: () => getIrrigationPlan(planPayload),
+    queryFn: async () => {
+      const res = await getIrrigationPlan(planPayload);
+      try {
+        localStorage.setItem('agrisage_last_irrigation_plan', JSON.stringify(res));
+      } catch {
+        // ignore storage errors
+      }
+      setCachedPlan(res);
+      return res;
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutes
+    gcTime: 1000 * 60 * 60,    // 1 hour
     enabled: !!cropName,
   });
+
+  const plan = planData || cachedPlan;
+
+  const handleComputeBudget = async () => {
+    await refetchPlan();
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  };
 
   // Diagnostic State
   const [problemText, setProblemText] = useState<string>('');
@@ -336,279 +373,376 @@ export const IrrigationPage: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {/* Action Button Bar */}
+        <div className="mt-6 pt-4 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-stone-500">
+            {t('irrigation.suitability_desc')}
+          </p>
+          <button
+            id="compute-crop-water-budget-btn"
+            onClick={handleComputeBudget}
+            disabled={isLoadingPlan || isRefetchingPlan}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs font-bold bg-agri-green-800 text-white hover:bg-agri-green-900 transition-colors shadow-sm disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefetchingPlan || isLoadingPlan ? 'animate-spin' : ''}`} />
+            {isRefetchingPlan || isLoadingPlan ? t('irrigation.computing') : t('irrigation.calculate_btn')}
+          </button>
+        </div>
       </section>
 
-      {/* Plan Results Loading */}
-      {isLoadingPlan && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <LoadingSkeleton className="h-64 rounded-3xl" />
-          <LoadingSkeleton className="h-64 rounded-3xl md:col-span-2" />
-        </div>
-      )}
+      {/* Plan Results Container directly below button */}
+      <div ref={resultsRef} className="space-y-6">
+        {/* Loading State */}
+        {isLoadingPlan && !plan && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <LoadingSkeleton className="h-64 rounded-3xl" />
+            <LoadingSkeleton className="h-64 rounded-3xl md:col-span-2" />
+          </div>
+        )}
 
-      {/* Hero Recommendation Cards */}
-      {plan && !isLoadingPlan && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Action Card */}
-          <div
-            className={`rounded-3xl p-6 text-white shadow-md relative overflow-hidden flex flex-col justify-between ${
-              plan.rain_skip_triggered
-                ? 'bg-gradient-to-br from-emerald-800 via-teal-900 to-agri-green-900 border border-teal-500/40'
-                : plan.should_irrigate
-                ? 'bg-gradient-to-br from-agri-soil-800 via-amber-900 to-agri-green-950 border border-amber-500/40'
-                : 'bg-gradient-to-br from-agri-green-800 via-agri-green-900 to-stone-900 border border-agri-green-600/40'
-            }`}
-          >
-            <div>
-              {/* Badge */}
-              <div className="flex items-center justify-between mb-4">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md">
-                  <Droplets className="w-3.5 h-3.5 text-agri-gold-400" />
-                  {t('irrigation.next_irrigation_title')}
-                </span>
-                <span className="text-xs font-mono text-white/80 bg-black/20 px-2.5 py-1 rounded-lg">
-                  {plan.crop_name} • {plan.growth_stage}
-                </span>
-              </div>
+        {/* Error State */}
+        {isPlanError && !plan && (
+          <ErrorState
+            title={t('irrigation.error_plan_title')}
+            message={t('irrigation.error_plan_desc')}
+            onRetry={handleComputeBudget}
+          />
+        )}
 
-              {/* Status Header */}
-              {plan.rain_skip_triggered ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-teal-300">
-                    <CloudRain className="w-6 h-6 animate-bounce" />
-                    <h3 className="font-display text-xl sm:text-2xl font-black">
-                      {t('irrigation.rain_skip_active')}
-                    </h3>
+        {/* Empty State */}
+        {!plan && !isLoadingPlan && !isPlanError && (
+          <EmptyState
+            title={t('irrigation.empty_plan_title')}
+            description={t('irrigation.empty_plan_desc')}
+            action={
+              <button
+                onClick={handleComputeBudget}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-agri-green-800 text-white hover:bg-agri-green-900 transition-colors"
+              >
+                <Droplets className="w-4 h-4" />
+                {t('irrigation.calculate_btn')}
+              </button>
+            }
+          />
+        )}
+
+        {/* When Plan is Present */}
+        {plan && (
+          <div className="space-y-6">
+            {/* Honesty Note: Soil moisture is modelled, not measured */}
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs font-semibold text-amber-900 flex items-center gap-2.5 shadow-sm">
+              <Info className="w-5 h-5 text-amber-700 flex-shrink-0" />
+              <span>{t('irrigation.modelled_not_measured')}</span>
+            </div>
+
+            {/* Hero Recommendation Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Main Action Card */}
+              <div
+                className={`rounded-3xl p-6 text-white shadow-md relative overflow-hidden flex flex-col justify-between ${
+                  plan.rain_skip_triggered
+                    ? 'bg-gradient-to-br from-emerald-800 via-teal-900 to-agri-green-900 border border-teal-500/40'
+                    : plan.should_irrigate
+                    ? 'bg-gradient-to-br from-agri-soil-800 via-amber-900 to-agri-green-950 border border-amber-500/40'
+                    : 'bg-gradient-to-br from-agri-green-800 via-agri-green-900 to-stone-900 border border-agri-green-600/40'
+                }`}
+              >
+                <div>
+                  {/* Badge & StatusBadge */}
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md">
+                      <Droplets className="w-3.5 h-3.5 text-agri-gold-400" />
+                      {t('irrigation.next_irrigation_title')}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-white/80 bg-black/20 px-2.5 py-1 rounded-lg">
+                        {plan.crop_name} • {plan.growth_stage}
+                      </span>
+                      <StatusBadge status={plan.status} />
+                    </div>
                   </div>
-                  <p className="text-xs text-white/90 leading-relaxed font-medium">
-                    {plan.recommendation_text}
-                  </p>
-                </div>
-              ) : plan.should_irrigate ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-agri-gold-400">
-                    <AlertTriangle className="w-6 h-6" />
-                    <h3 className="font-display text-xl sm:text-2xl font-black">
-                      {t('irrigation.irrigate_now')}
-                    </h3>
+
+                  {/* Status Header */}
+                  {plan.rain_skip_triggered ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-teal-300">
+                        <CloudRain className="w-6 h-6 animate-bounce" />
+                        <h3 className="font-display text-xl sm:text-2xl font-black">
+                          {t('irrigation.rain_skip_active')}
+                        </h3>
+                      </div>
+                      <p className="text-xs text-white/90 leading-relaxed font-medium">
+                        {plan.recommendation_text}
+                      </p>
+                    </div>
+                  ) : plan.should_irrigate ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-agri-gold-400">
+                        <AlertTriangle className="w-6 h-6" />
+                        <h3 className="font-display text-xl sm:text-2xl font-black">
+                          {t('irrigation.irrigate_now')}
+                        </h3>
+                      </div>
+                      <p className="text-xs text-white/90 leading-relaxed font-medium">
+                        {plan.recommendation_text}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-emerald-300">
+                        <CheckCircle2 className="w-6 h-6" />
+                        <h3 className="font-display text-xl sm:text-2xl font-black">
+                          {t('irrigation.adequate_moisture')}
+                        </h3>
+                      </div>
+                      <p className="text-xs text-white/90 leading-relaxed font-medium">
+                        {plan.recommendation_text}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Why Line */}
+                  <div className="mt-4 p-3 bg-white/10 rounded-2xl border border-white/20 backdrop-blur-sm">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-white/70 block flex items-center gap-1">
+                      <HelpCircle className="w-3.5 h-3.5 text-white/80" />
+                      {t('irrigation.why_label')}:
+                    </span>
+                    <p className="text-xs text-white/95 leading-relaxed font-semibold mt-1">
+                      {plan.recommendation_text}
+                    </p>
+                    {plan.explanation?.reasons?.[0] && (
+                      <p className="text-[11px] text-white/80 mt-1">
+                        {plan.explanation.reasons[0]}
+                      </p>
+                    )}
                   </div>
-                  <p className="text-xs text-white/90 leading-relaxed font-medium">
-                    {plan.recommendation_text}
-                  </p>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-emerald-300">
-                    <CheckCircle2 className="w-6 h-6" />
-                    <h3 className="font-display text-xl sm:text-2xl font-black">
-                      {t('irrigation.adequate_moisture')}
-                    </h3>
+
+                {/* Depth & Litres Metric */}
+                <div className="mt-6 pt-5 border-t border-white/20 grid grid-cols-2 gap-3">
+                  <div className="bg-white/10 rounded-2xl p-3">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-white/70 block">
+                      {t('irrigation.gross_depth')}
+                    </span>
+                    <span className="text-xl font-black font-display text-white">
+                      {plan.gross_depth_mm.toFixed(1)} mm
+                    </span>
+                    <span className="text-[10px] text-white/60 block mt-0.5">
+                      ({t('irrigation.net_depth')}: {plan.net_depth_mm.toFixed(1)} mm • {plan.irrigation_method} {(plan.method_efficiency * 100).toFixed(0)}%)
+                    </span>
                   </div>
-                  <p className="text-xs text-white/90 leading-relaxed font-medium">
-                    {plan.recommendation_text}
-                  </p>
+
+                  <div className="bg-white/10 rounded-2xl p-3">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-white/70 block">
+                      {t('irrigation.water_volume')}
+                    </span>
+                    <span className="text-xl font-black font-display text-agri-gold-300">
+                      {plan.litres_needed.toLocaleString()} L
+                    </span>
+                    <span className="text-[10px] text-white/60 block mt-0.5">
+                      {areaAcres} {t('irrigation.farm_area')}
+                    </span>
+                  </div>
                 </div>
-              )}
-            </div>
-
-            {/* Depth & Litres Metric */}
-            <div className="mt-6 pt-5 border-t border-white/20 grid grid-cols-2 gap-3">
-              <div className="bg-white/10 rounded-2xl p-3">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-white/70 block">
-                  {t('irrigation.gross_depth')}
-                </span>
-                <span className="text-xl font-black font-display text-white">
-                  {plan.gross_depth_mm.toFixed(1)} mm
-                </span>
-                <span className="text-[10px] text-white/60 block mt-0.5">
-                  ({plan.irrigation_method} • {(plan.method_efficiency * 100).toFixed(0)}%)
-                </span>
               </div>
 
-              <div className="bg-white/10 rounded-2xl p-3">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-white/70 block">
-                  {t('irrigation.water_volume')}
-                </span>
-                <span className="text-xl font-black font-display text-agri-gold-300">
-                  {plan.litres_needed.toLocaleString()} L
-                </span>
-                <span className="text-[10px] text-white/60 block mt-0.5">
-                  {areaAcres} {t('irrigation.farm_area')}
-                </span>
+              {/* Conservation & Phenology Strip */}
+              <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Litres Saved Highlight */}
+                <div className="bg-gradient-to-br from-blue-50 to-teal-50 border border-teal-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <CloudRain className="w-4 h-4 text-teal-600" />
+                        {t('irrigation.litres_saved_title')}
+                      </span>
+                      <span className="text-xs font-semibold px-2 py-0.5 bg-teal-200/70 text-teal-900 rounded-full">
+                        {plan.rain_skip_triggered ? 'Rain Active' : 'Optimal'}
+                      </span>
+                    </div>
+                    <div className="text-3xl font-extrabold font-display text-teal-950 my-2">
+                      {plan.litres_saved.toLocaleString()} <span className="text-base font-normal text-teal-700">Litres</span>
+                    </div>
+                    <p className="text-xs text-teal-800 leading-relaxed">
+                      {t('irrigation.litres_saved_desc')}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-teal-200/60 flex items-center justify-between text-xs text-teal-900 font-semibold">
+                    <span>{t('irrigation.next_irrigation_title')}:</span>
+                    <span className="font-mono bg-white px-2 py-1 rounded-md border border-teal-300">
+                      {plan.next_irrigation_date}
+                    </span>
+                  </div>
+                </div>
+
+                {/* FAO-56 Soil & Stage Telemetry Card */}
+                <div className="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
+                      <Gauge className="w-4 h-4 text-agri-green-700" />
+                      FAO-56 Soil Bucket Model
+                    </h4>
+                    <StatusBadge status={plan.status} />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
+                      <span className="text-[10px] text-stone-500 block uppercase font-bold">
+                        {t('irrigation.growth_stage_label')}
+                      </span>
+                      <span className="font-bold text-stone-900 capitalize">
+                        {plan.growth_stage} (DAS {plan.days_after_sowing})
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
+                      <span className="text-[10px] text-stone-500 block uppercase font-bold">
+                        {t('irrigation.kc_label')}
+                      </span>
+                      <span className="font-bold text-stone-900 font-mono">
+                        {plan.kc.toFixed(2)}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
+                      <span className="text-[10px] text-stone-500 block uppercase font-bold">
+                        {t('irrigation.et0_label')}
+                      </span>
+                      <span className="font-bold text-stone-900 font-mono">
+                        {plan.reference_et0_mm.toFixed(1)} mm/day
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
+                      <span className="text-[10px] text-stone-500 block uppercase font-bold">
+                        {t('irrigation.etc_label')}
+                      </span>
+                      <span className="font-bold text-agri-green-800 font-mono">
+                        {plan.etc_today_mm.toFixed(1)} mm/day
+                      </span>
+                    </div>
+
+                    <div className="col-span-2 p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
+                      <span className="text-[10px] text-stone-500 block uppercase font-bold">
+                        Soil-Bucket: Depletion / RAW
+                      </span>
+                      <span className="font-bold text-stone-900 font-mono">
+                        {plan.depletion_today_mm.toFixed(1)} / {plan.raw_mm.toFixed(1)} mm (TAW: {plan.taw_mm.toFixed(1)} mm)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="w-full bg-stone-200 rounded-full h-2 overflow-hidden">
+                      <div
+                        className={`h-2 transition-all ${
+                          plan.depletion_today_mm >= plan.raw_mm
+                            ? 'bg-amber-600'
+                            : 'bg-agri-green-600'
+                        }`}
+                        style={{
+                          width: `${Math.min(100, (plan.depletion_today_mm / Math.max(1, plan.taw_mm)) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                    {/* Trigger Condition Line */}
+                    <div className="p-2 bg-stone-50 rounded-xl border border-stone-200/70 text-[11px]">
+                      <span className="text-[10px] text-stone-500 uppercase font-bold block">
+                        {t('irrigation.trigger_label')}
+                      </span>
+                      <span className="font-semibold text-stone-800">
+                        {plan.rain_skip_triggered
+                          ? 'Rain-Skip Active (Rain >= 15 mm cancels irrigation)'
+                          : plan.should_irrigate
+                          ? `Triggered: Depletion (${plan.depletion_today_mm.toFixed(1)} mm) >= RAW (${plan.raw_mm.toFixed(1)} mm)`
+                          : `Adequate: Depletion (${plan.depletion_today_mm.toFixed(1)} mm) < RAW (${plan.raw_mm.toFixed(1)} mm)`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* 7-Day Water Balance Chart */}
+            {chartData.length > 0 && (
+              <section className="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-stone-900 flex items-center gap-2">
+                      <TrendingDown className="w-5 h-5 text-agri-green-700" />
+                      {t('irrigation.water_balance_heading')}
+                    </h3>
+                    <p className="text-xs text-stone-500">
+                      Comparing forecasted rainfall, crop evapotranspiration demand (ETc), and soil root-zone depletion against RAW limit.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-semibold">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-full bg-[#0284c7]" />
+                      {t('irrigation.rain_mm')}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-full bg-[#d97706]" />
+                      {t('irrigation.etc_mm')}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-3 h-0.5 bg-[#b45309]" />
+                      {t('irrigation.depletion_mm')}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="h-72 w-full pt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                      <XAxis dataKey="name" stroke="#6b7280" tick={{ fontSize: 11 }} />
+                      <YAxis
+                        stroke="#6b7280"
+                        tick={{ fontSize: 11 }}
+                        label={{ value: 'mm', angle: -90, position: 'insideLeft', fontSize: 11 }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#ffffff',
+                          borderRadius: '1rem',
+                          border: '1px solid #e2e8f0',
+                          fontSize: '12px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        }}
+                      />
+                      <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                      <ReferenceLine
+                        y={plan.raw_mm}
+                        stroke="#dc2626"
+                        strokeDasharray="4 4"
+                        label={{
+                          value: `RAW Limit (${plan.raw_mm.toFixed(1)} mm)`,
+                          fill: '#dc2626',
+                          fontSize: 10,
+                          position: 'top',
+                        }}
+                      />
+                      <Bar dataKey="rain" name={t('irrigation.rain_mm')} fill="#0284c7" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="etc" name={t('irrigation.etc_mm')} fill="#d97706" radius={[6, 6, 0, 0]} />
+                      <Line
+                        type="monotone"
+                        dataKey="depletion"
+                        name={t('irrigation.depletion_mm')}
+                        stroke="#b45309"
+                        strokeWidth={2.5}
+                        dot={{ r: 4 }}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </section>
+            )}
           </div>
-
-          {/* Conservation & Phenology Strip */}
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Litres Saved Highlight */}
-            <div className="bg-gradient-to-br from-blue-50 to-teal-50 border border-teal-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
-                    <CloudRain className="w-4 h-4 text-teal-600" />
-                    {t('irrigation.litres_saved_title')}
-                  </span>
-                  <span className="text-xs font-semibold px-2 py-0.5 bg-teal-200/70 text-teal-900 rounded-full">
-                    {plan.rain_skip_triggered ? 'Rain Active' : 'Optimal'}
-                  </span>
-                </div>
-                <div className="text-3xl font-extrabold font-display text-teal-950 my-2">
-                  {plan.litres_saved.toLocaleString()} <span className="text-base font-normal text-teal-700">Litres</span>
-                </div>
-                <p className="text-xs text-teal-800 leading-relaxed">
-                  {t('irrigation.litres_saved_desc')}
-                </p>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-teal-200/60 flex items-center justify-between text-xs text-teal-900 font-semibold">
-                <span>{t('irrigation.next_irrigation_title')}:</span>
-                <span className="font-mono bg-white px-2 py-1 rounded-md border border-teal-300">
-                  {plan.next_irrigation_date}
-                </span>
-              </div>
-            </div>
-
-            {/* FAO-56 Soil & Stage Telemetry Card */}
-            <div className="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
-                  <Gauge className="w-4 h-4 text-agri-green-700" />
-                  FAO-56 Soil Bucket Model
-                </h4>
-                <StatusBadge status={plan.status} />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                    {t('irrigation.growth_stage_label')}
-                  </span>
-                  <span className="font-bold text-stone-900 capitalize">
-                    {plan.growth_stage} (DAS {plan.days_after_sowing})
-                  </span>
-                </div>
-
-                <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                    {t('irrigation.kc_label')}
-                  </span>
-                  <span className="font-bold text-stone-900 font-mono">
-                    {plan.kc.toFixed(2)}
-                  </span>
-                </div>
-
-                <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                    Daily Demand (ETc)
-                  </span>
-                  <span className="font-bold text-agri-green-800 font-mono">
-                    {plan.etc_today_mm.toFixed(1)} mm/day
-                  </span>
-                </div>
-
-                <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200/70">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                    Depletion / RAW
-                  </span>
-                  <span className="font-bold text-stone-900 font-mono">
-                    {plan.depletion_today_mm.toFixed(1)} / {plan.raw_mm.toFixed(1)} mm
-                  </span>
-                </div>
-              </div>
-
-              <div className="w-full bg-stone-200 rounded-full h-2 overflow-hidden">
-                <div
-                  className={`h-2 transition-all ${
-                    plan.depletion_today_mm >= plan.raw_mm
-                      ? 'bg-amber-600'
-                      : 'bg-agri-green-600'
-                  }`}
-                  style={{
-                    width: `${Math.min(100, (plan.depletion_today_mm / Math.max(1, plan.taw_mm)) * 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 7-Day Water Balance Chart */}
-      {plan && !isLoadingPlan && chartData.length > 0 && (
-        <section className="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h3 className="font-display text-lg font-bold text-stone-900 flex items-center gap-2">
-                <TrendingDown className="w-5 h-5 text-agri-green-700" />
-                {t('irrigation.water_balance_heading')}
-              </h3>
-              <p className="text-xs text-stone-500">
-                Comparing forecasted rainfall, crop evapotranspiration demand (ETc), and soil root-zone depletion against RAW limit.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 text-xs font-semibold">
-              <span className="inline-flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-[#0284c7]" />
-                {t('irrigation.rain_mm')}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-[#d97706]" />
-                {t('irrigation.etc_mm')}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-[#b45309]" />
-                {t('irrigation.depletion_mm')}
-              </span>
-            </div>
-          </div>
-
-          <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="name" stroke="#6b7280" tick={{ fontSize: 11 }} />
-                <YAxis
-                  stroke="#6b7280"
-                  tick={{ fontSize: 11 }}
-                  label={{ value: 'mm', angle: -90, position: 'insideLeft', fontSize: 11 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#ffffff',
-                    borderRadius: '1rem',
-                    border: '1px solid #e2e8f0',
-                    fontSize: '12px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                <ReferenceLine
-                  y={plan.raw_mm}
-                  stroke="#dc2626"
-                  strokeDasharray="4 4"
-                  label={{
-                    value: `RAW Limit (${plan.raw_mm.toFixed(1)} mm)`,
-                    fill: '#dc2626',
-                    fontSize: 10,
-                    position: 'top',
-                  }}
-                />
-                <Bar dataKey="rain" name={t('irrigation.rain_mm')} fill="#0284c7" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="etc" name={t('irrigation.etc_mm')} fill="#d97706" radius={[6, 6, 0, 0]} />
-                <Line
-                  type="monotone"
-                  dataKey="depletion"
-                  name={t('irrigation.depletion_mm')}
-                  stroke="#b45309"
-                  strokeWidth={2.5}
-                  dot={{ r: 4 }}
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-      )}
+        )}
+      </div>
 
       {/* "Should I Grow This Crop Now?" (Water Availability Feasibility) */}
       <section className="bg-gradient-to-br from-agri-cream-100 to-white border border-agri-soil-200 rounded-3xl p-6 shadow-sm space-y-3">

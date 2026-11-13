@@ -427,3 +427,55 @@ def test_api_irrigation_diagnose_image_and_text(client: TestClient, farmer_heade
     assert res_data["status"] == "PARTIAL"
     assert res_data["visual_cues"] is not None
     assert "visual_indicator_disclaimer" in res_data["visual_cues"]
+
+
+def test_fao56_hand_calculated_plan_regression(client: TestClient, farmer_headers: dict):
+    """
+    Regression Test for BUG 4: Hand-calculated FAO-56 crop water budget example.
+    Crop: Cotton planted 90 days ago (DAS 90 -> Mid-stage, Kc = 1.20).
+    Reference ET0: 5.0 mm/day.
+    Expected ETc = 1.20 * 5.0 = 6.0 mm/day.
+    Soil: Black Cotton (AWC = 190 mm/m, root depth = 1.0m, p = 0.65).
+    TAW = 190.0 mm, RAW = 123.5 mm.
+    Current depletion passed: 120.0 mm.
+    Rain 24h: 0.0 mm -> Peff = 0.0 mm.
+    Depletion today = 120.0 + 6.0 - 0.0 = 126.0 mm.
+    Since 126.0 >= RAW (123.5) => should_irrigate is True.
+    Net depth = 126.0 mm.
+    Method: drip (efficiency = 0.90) => Gross depth = 126.0 / 0.90 = 140.0 mm.
+    Area: 2.0 acres.
+    Expected volume: 140.0 * 2.0 * 4046.8564224 = 1,133,120 litres.
+    """
+    today = date.today()
+    planting = today - timedelta(days=90)
+    payload = {
+        "crop_name": "Cotton",
+        "planting_date": planting.isoformat(),
+        "area_acres": 2.0,
+        "soil_type": "Black Cotton",
+        "irrigation_method": "drip",
+        "reference_et0_mm": 5.0,
+        "rain_forecast_24h_mm": 0.0,
+        "current_depletion_mm": 120.0,
+    }
+    resp = client.post("/api/v1/irrigation/plan", json=payload, headers=farmer_headers)
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+
+    assert data["crop_name"] == "Cotton"
+    assert data["growth_stage"] == "mid"
+    assert data["days_after_sowing"] == 90
+    assert data["kc"] == 1.20
+    assert data["reference_et0_mm"] == 5.0
+    assert data["etc_today_mm"] == 6.0
+    assert data["taw_mm"] == 190.0
+    assert data["raw_mm"] == 123.5
+    assert data["depletion_today_mm"] == 126.0
+    assert data["should_irrigate"] is True
+    assert data["net_depth_mm"] == 126.0
+    assert data["gross_depth_mm"] == 140.0
+    assert data["litres_needed"] == 1133120.0
+    assert data["litres_saved"] == 0.0
+    assert data["rain_skip_triggered"] is False
+    assert data["next_irrigation_date"] == today.isoformat()
+    assert data["status"] == "WORKING"
