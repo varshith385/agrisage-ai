@@ -12,7 +12,7 @@ export interface VoiceQueryRequest {
 }
 
 export interface VoiceQueryResponse {
-  intent: 'weather' | 'irrigation' | 'disease' | 'cost' | 'scheme' | 'price' | 'general';
+  intent: 'weather' | 'irrigation' | 'disease' | 'cost' | 'scheme' | 'price' | 'greeting' | 'about' | 'thanks' | 'bye' | 'general' | string;
   confidence: number;
   confidence_type: 'rule' | 'model' | 'fallback';
   spoken_text: string;
@@ -23,6 +23,7 @@ export interface VoiceQueryResponse {
   structured_data?: Record<string, any>;
   limitations: string[];
   upstream_status?: string;
+  suggestion_chips?: string[];
   timestamp: string;
 }
 

@@ -42,7 +42,51 @@ export function getAvailableVoices(): SpeechSynthesisVoice[] {
 }
 
 /**
- * Finds best-matching voice for language preference (e.g. te-IN > te > default).
+ * Loads synthesis voices, awaiting the voiceschanged event if initially empty.
+ */
+export function loadVoices(): Promise<SpeechSynthesisVoice[]> {
+  return new Promise((resolve) => {
+    if (!isSpeechSynthesisSupported()) {
+      resolve([]);
+      return;
+    }
+    const currentVoices = window.speechSynthesis.getVoices();
+    if (currentVoices.length > 0) {
+      resolve(currentVoices);
+      return;
+    }
+    const onVoicesChanged = () => {
+      const updated = window.speechSynthesis.getVoices();
+      window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
+      resolve(updated);
+    };
+    window.speechSynthesis.addEventListener('voiceschanged', onVoicesChanged);
+    setTimeout(() => {
+      resolve(window.speechSynthesis.getVoices());
+    }, 1500);
+  });
+}
+
+/**
+ * Finds all matching voices for language preference (exact locale match or language prefix).
+ */
+export function findVoicesForLanguage(
+  lang: SupportedLanguage,
+  voices: SpeechSynthesisVoice[]
+): SpeechSynthesisVoice[] {
+  if (!voices || voices.length === 0) return [];
+  const targetCode = LANGUAGE_LOCALE_MAP[lang].toLowerCase();
+  const prefix = lang.toLowerCase();
+
+  return voices.filter((v) => {
+    const vLang = v.lang.toLowerCase().replace('_', '-');
+    return vLang === targetCode || vLang.startsWith(prefix);
+  });
+}
+
+/**
+ * Finds best-matching voice for language preference (e.g. te-IN > te > null).
+ * NEVER returns an English voice when Telugu or Hindi is requested.
  */
 export function findVoiceForLanguage(
   lang: SupportedLanguage,
@@ -53,29 +97,35 @@ export function findVoiceForLanguage(
   const prefix = lang.toLowerCase(); // e.g. "te"
 
   // 1. Exact locale match (e.g. te-IN)
-  const exact = voices.find((v) => v.lang.toLowerCase() === targetCode || v.lang.toLowerCase().replace('_', '-') === targetCode);
+  const exact = voices.find((v) => {
+    const vLang = v.lang.toLowerCase().replace('_', '-');
+    return vLang === targetCode;
+  });
   if (exact) return exact;
 
   // 2. Language prefix match (e.g. te)
   const prefixMatch = voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
   if (prefixMatch) return prefixMatch;
 
-  // 3. Fallback for English only if language is English
+  // 3. Fallback for English ONLY if current language is English
   if (lang === 'en') {
     const enFallback = voices.find((v) => v.lang.toLowerCase().startsWith('en'));
     if (enFallback) return enFallback;
   }
 
+  // Never return an English voice for Telugu or Hindi!
   return null;
 }
 
 /**
  * Reads aloud text via SpeechSynthesis with preferred voice matching.
+ * Never silently speaks English when Telugu or Hindi has no voice pack.
  */
 export function speakText(
   text: string,
   lang: SupportedLanguage,
   options?: {
+    customVoice?: SpeechSynthesisVoice | null;
     onStart?: () => void;
     onEnd?: () => void;
     onError?: (err: any) => void;
@@ -90,10 +140,16 @@ export function speakText(
   window.speechSynthesis.cancel();
 
   const voices = window.speechSynthesis.getVoices();
-  const selectedVoice = findVoiceForLanguage(lang, voices);
+  const selectedVoice = options?.customVoice || findVoiceForLanguage(lang, voices);
+
+  // If no matching voice exists for non-English languages, never silently speak English!
+  if (!selectedVoice && lang !== 'en') {
+    options?.onError?.(new Error(`NO_VOICE_FOR_LANG:${lang}`));
+    return { cancel: () => {}, voiceFound: false };
+  }
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = LANGUAGE_LOCALE_MAP[lang];
+  utterance.lang = selectedVoice?.lang || LANGUAGE_LOCALE_MAP[lang];
   utterance.rate = 0.95; // Slightly slower for clarity in rural agriculture advisory
   utterance.pitch = 1.0;
 

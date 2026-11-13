@@ -21,5 +21,6 @@ class VoiceQueryResponse(BaseModel):
     structured_data: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Key domain payload")
     limitations: List[str] = Field(default_factory=list, description="Explicit caveats and limitations")
     upstream_status: Optional[str] = Field(None, description="Status of upstream meteorological or domain APIs")
+    suggestion_chips: List[str] = Field(default_factory=list, description="Tappable quick suggestion chips")
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="UTC timestamp")
 

@@ -3,11 +3,13 @@ AgriSage AI — Voice Assistant Query Service
 Module 21: /api/v1/voice
 
 Features:
-- Multilingual intent classification (en, te, hi) for weather, irrigation, disease, cost, scheme, price, general
+- Multilingual intent classification (en, te, hi) for weather, irrigation, disease, cost, scheme, price, small talk, general
 - Farm-aware routing to live domain engines (Open-Meteo, FAO-56, Economics, Disease KB)
 - Safe agricultural sanitizer: strictly ZERO chemical dosages, zero absolute yield guarantees
-- Graceful fallback when GEMINI_API_KEY is not set: "I don't know, please consult an agriculture officer"
-- Transparent explainability labels (sources, confidence, status, limitations)
+- Dedicated small talk handlers: greetings, about ("who are you"), thanks, bye
+- Honest topic reporting: weather (live), irrigation (live), disease (live), economics (live), market (demo), schemes (not built)
+- Graceful fallback when GEMINI_API_KEY is not set or times out, returning polite multilingual response with suggestion chips
+- Safe default exception handler so no input can ever trigger an unhandled 500 error
 """
 
 import re
@@ -19,102 +21,66 @@ import httpx
 from sqlalchemy.orm import Session
 
 from backend.app.config import settings
+from backend.app.keywords import KEYWORDS_BY_LANG, en as kw_en, te as kw_te, hi as kw_hi
+from backend.app.ml.irrigation import FAO56IrrigationEngine
 from backend.app.models.farm import CurrentCropCycle, Farm
 from backend.app.models.user import User
-from backend.app.ml.irrigation import FAO56IrrigationEngine
 from backend.app.schemas.economics import EconomicsCalculationRequest
 from backend.app.schemas.voice import VoiceQueryRequest, VoiceQueryResponse
 from backend.app.services.economics import calculate_economics
 from backend.app.services.open_meteo import get_weather_forecast
 
-# Multilingual Intent Keywords
+# Multilingual Intent Keywords sourced from dedicated language files
 INTENT_KEYWORDS: Dict[str, Dict[str, List[str]]] = {
+    "greeting": {
+        "en": kw_en.GREETINGS,
+        "te": kw_te.GREETINGS,
+        "hi": kw_hi.GREETINGS,
+    },
+    "about": {
+        "en": kw_en.ABOUT,
+        "te": kw_te.ABOUT,
+        "hi": kw_hi.ABOUT,
+    },
+    "thanks": {
+        "en": kw_en.THANKS,
+        "te": kw_te.THANKS,
+        "hi": kw_hi.THANKS,
+    },
+    "bye": {
+        "en": kw_en.BYE,
+        "te": kw_te.BYE,
+        "hi": kw_hi.BYE,
+    },
     "weather": {
-        "en": [
-            "weather", "rain", "temperature", "forecast", "climate", "storm",
-            "wind", "humidity", "hot", "cloud", "cloudy", "sunny", "precipitation"
-        ],
-        "te": [
-            "వాతావరణం", "వర్షం", "వాన", "ఎండ", "ఉష్ణోగ్రత", "తేమ", "గాలులు",
-            "మేఘాలు", "తుఫాను", "వాతావరణ"
-        ],
-        "hi": [
-            "मौसम", "बारिश", "बरसात", "तापमान", "हवा", "धूप", "नमी", "बादल",
-            "तूफान", "जलवायु"
-        ],
+        "en": kw_en.WEATHER_KEYWORDS,
+        "te": kw_te.WEATHER_KEYWORDS,
+        "hi": kw_hi.WEATHER_KEYWORDS,
     },
     "irrigation": {
-        "en": [
-            "water", "irrigate", "irrigation", "moisture", "dry", "soil water",
-            "watering", "drip", "sprinkler", "flood", "bucket", "pump", "fao-56",
-            "fao56", "thirst"
-        ],
-        "te": [
-            "నీరు", "నీళ్ళు", "సాగునీరు", "తడి", "డ్రిప్", "స్ప్రింక్లర్", "నీరు పెట్టాలా",
-            "తడులు", "మోటారు", "బోరు", "నీటి ఎద్దడి"
-        ],
-        "hi": [
-            "पानी", "सिंचाई", "सींचना", "ड्रिप", "नमी", "पानी देना", "फसल को पानी",
-            "सूखा", "जल", "मोटर", "नहर"
-        ],
+        "en": kw_en.IRRIGATION_KEYWORDS,
+        "te": kw_te.IRRIGATION_KEYWORDS,
+        "hi": kw_hi.IRRIGATION_KEYWORDS,
     },
     "disease": {
-        "en": [
-            "disease", "pest", "leaf", "blight", "fungus", "spot", "insect",
-            "yellowing", "rot", "sick", "infection", "curl", "wilt", "diagnos",
-            "scab", "mildew", "spray", "pesticide", "insecticide", "fungicide",
-            "chemical", "monocrotophos", "chlorpyrifos"
-        ],
-        "te": [
-            "తెగులు", "వ్యాధి", "పురుగు", "ఆకు", "మచ్చలు", "ఎండిపోవడం", "పసుపు",
-            "కుళ్లు", "నల్లి", "ముడత", "రోగం", "మందు", "స్ప్రే", "పురుగుమందు"
-        ],
-        "hi": [
-            "रोग", "बीमारी", "कीड़ा", "पत्ता", "पत्ती", "धब्बे", "फंगस", "सड़न",
-            "पीला", "मुरझाना", "झुलसा", "दवा", "स्प्रे", "कीटनाशक"
-        ],
+        "en": kw_en.DISEASE_KEYWORDS,
+        "te": kw_te.DISEASE_KEYWORDS,
+        "hi": kw_hi.DISEASE_KEYWORDS,
     },
     "cost": {
-        "en": [
-            "cost", "expense", "budget", "profit", "margin", "economics",
-            "spending", "money", "rupees", "investment", "per acre", "cultivation cost"
-        ],
-        "te": [
-            "ఖర్చు", "వ్యయం", "లాభం", "బడ్జెట్", "పెట్టుబడి", "రూపాయలు",
-            "సాగు ఖర్చు", "ఎకరాకు ఖర్చు", "ఆదాయం"
-        ],
-        "hi": [
-            "खर्च", "लागत", "मुनाफा", "लाभ", "बजट", "रुपये", "खेती की लागत",
-            "कमाई", "निवेश"
-        ],
+        "en": kw_en.COST_KEYWORDS,
+        "te": kw_te.COST_KEYWORDS,
+        "hi": kw_hi.COST_KEYWORDS,
     },
     "scheme": {
-        "en": [
-            "scheme", "subsidy", "government", "rythu bandhu", "rythu bharosa",
-            "pm kisan", "pm-kisan", "bima", "yojana", "assistance", "grant",
-            "pension", "portal", "loan waiver"
-        ],
-        "te": [
-            "పథకం", "సబ్సిడీ", "రైతు బంధు", "రైతు భరోసా", "పీఎం కిసాన్", "రైతు బీమా",
-            "ప్రభుత్వ", "సహాయం", "రుణం", "యోజన"
-        ],
-        "hi": [
-            "योजना", "सब्सिडी", "सरकार", "सरकारी", "पीएम किसान", "बीमा", "अनुदान",
-            "ऋण", "सहायता", "किसान क्रेडिट"
-        ],
+        "en": kw_en.SCHEME_KEYWORDS,
+        "te": kw_te.SCHEME_KEYWORDS,
+        "hi": kw_hi.SCHEME_KEYWORDS,
     },
     "price": {
-        "en": [
-            "mandi", "market", "price", "rate", "msp", "bhav", "selling price",
-            "commodity", "auction", "yard"
-        ],
-        "te": [
-            "ధర", "రేటు", "మార్కెట్", "మండి", "మద్దతు ధర", "అమ్మకం ధర", "యార్డు"
-        ],
-        "hi": [
-            "दाम", "भाव", "कीमत", "मंडी", "बाजार", "एमएसपी", "समर्थन मूल्य",
-            "बिक्री मूल्य"
-        ],
+        "en": kw_en.PRICE_KEYWORDS,
+        "te": kw_te.PRICE_KEYWORDS,
+        "hi": kw_hi.PRICE_KEYWORDS,
     },
 }
 
@@ -152,7 +118,7 @@ def sanitize_agronomic_speech(text: str) -> str:
 def classify_intent(query: str) -> Tuple[str, float]:
     """
     Scores query against keyword sets across en, te, and hi.
-    Uses regex word boundaries for English tokens and substring matching for Indic scripts.
+    Uses regex word boundaries for Latin tokens and substring matching for Indic scripts.
     Returns (intent, confidence).
     """
     cleaned = query.strip().lower()
@@ -162,19 +128,21 @@ def classify_intent(query: str) -> Tuple[str, float]:
         for lang, words in lang_map.items():
             for w in words:
                 w_clean = w.lower()
-                if lang == "en":
-                    # Use regex word boundaries for English to avoid false matches (e.g. 'rain' in 'rainbow')
+                # If token has ASCII alphabetical characters, use word boundary regex to avoid partial substring false positives
+                if any(ord(c) < 128 and c.isalpha() for c in w_clean):
                     pattern = rf"\b{re.escape(w_clean)}\b"
                     if re.search(pattern, cleaned):
-                        scores[intent] += 2 if " " in w_clean else 1
+                        weight = 4 if intent in ["greeting", "about", "thanks", "bye"] else (2 if " " in w_clean else 1)
+                        scores[intent] += weight
                 else:
                     if w_clean in cleaned:
-                        scores[intent] += 2 if " " in w_clean else 1
+                        weight = 4 if intent in ["greeting", "about", "thanks", "bye"] else (2 if " " in w_clean else 1)
+                        scores[intent] += weight
 
     best_intent = "general"
     best_score = 0
-    # Tie-breaking priority order
-    priority = ["price", "scheme", "disease", "irrigation", "cost", "weather"]
+    # Priority order: greetings/small talk first, then domain intents
+    priority = ["greeting", "about", "thanks", "bye", "price", "scheme", "disease", "irrigation", "cost", "weather"]
     for p in priority:
         if scores[p] > best_score:
             best_score = scores[p]
@@ -183,7 +151,7 @@ def classify_intent(query: str) -> Tuple[str, float]:
     if best_score == 0:
         return "general", 0.50
 
-    confidence = min(0.95, 0.65 + 0.10 * best_score)
+    confidence = min(0.98, 0.70 + 0.08 * best_score)
     return best_intent, round(confidence, 2)
 
 
@@ -196,9 +164,92 @@ class VoiceAssistantService:
         self.default_crop = "cotton"
         self.default_area = 5.0
 
+    def _handle_greeting(self, lang: str) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
+        return VoiceQueryResponse(
+            intent="greeting",
+            confidence=0.98,
+            confidence_type="rule",
+            spoken_text=sanitize_agronomic_speech(kw.RESPONSES["greeting"]),
+            status="WORKING",
+            sources=["AgriSage Assistant Capabilities Registry"],
+            action_link="/dashboard",
+            action_label="Open Dashboard",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
+            structured_data={
+                "features": {
+                    "weather": "LIVE",
+                    "irrigation": "LIVE",
+                    "disease": "LIVE",
+                    "economics": "LIVE",
+                    "market": "DEMO",
+                    "schemes": "NOT_BUILT",
+                }
+            },
+            limitations=["Honesty label: schemes are not built on this branch and are not listed as a working feature."],
+            upstream_status="Ready",
+        )
+
+    def _handle_about(self, lang: str) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
+        return VoiceQueryResponse(
+            intent="about",
+            confidence=0.98,
+            confidence_type="rule",
+            spoken_text=sanitize_agronomic_speech(kw.RESPONSES["about"]),
+            status="WORKING",
+            sources=["AgriSage System Specification"],
+            action_link="/dashboard",
+            action_label="Explore Features",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
+            structured_data={
+                "features": {
+                    "weather": "LIVE",
+                    "irrigation": "LIVE",
+                    "disease": "LIVE",
+                    "economics": "LIVE",
+                    "market": "DEMO",
+                    "schemes": "NOT_BUILT",
+                }
+            },
+            limitations=["Honesty label: schemes are not built on this branch."],
+            upstream_status="Ready",
+        )
+
+    def _handle_thanks(self, lang: str) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
+        return VoiceQueryResponse(
+            intent="thanks",
+            confidence=0.98,
+            confidence_type="rule",
+            spoken_text=sanitize_agronomic_speech(kw.RESPONSES["thanks"]),
+            status="WORKING",
+            sources=["AgriSage Assistant"],
+            action_link="/dashboard",
+            action_label="Back to Dashboard",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
+            upstream_status="Ready",
+        )
+
+    def _handle_bye(self, lang: str) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
+        return VoiceQueryResponse(
+            intent="bye",
+            confidence=0.98,
+            confidence_type="rule",
+            spoken_text=sanitize_agronomic_speech(kw.RESPONSES["bye"]),
+            status="WORKING",
+            sources=["AgriSage Assistant"],
+            action_link="/dashboard",
+            action_label="Session Closed",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
+            upstream_status="Ready",
+        )
+
     async def _handle_weather(
         self, user: User, farm: Optional[Farm], lang: str, db: Session
     ) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
         lat = farm.latitude if farm else self.default_lat
         lon = farm.longitude if farm else self.default_lon
         location_name = farm.village if farm else self.default_village
@@ -250,6 +301,7 @@ class VoiceAssistantService:
             sources=["Open-Meteo Weather API", "IMD Gridded Historical Weather"],
             action_link="/weather",
             action_label="View 7-Day Forecast",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
             structured_data={
                 "temperature_c": temp,
                 "precipitation_today_mm": rain_today,
@@ -263,6 +315,7 @@ class VoiceAssistantService:
         self, user: User, farm: Optional[Farm], lang: str, db: Session
     ) -> VoiceQueryResponse:
         from datetime import date, timedelta
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
         crop_name = self.default_crop
         area = self.default_area
         soil_type = "sandy loam"
@@ -329,6 +382,7 @@ class VoiceAssistantService:
             sources=["FAO-56 Irrigation and Drainage Paper", "Daily Soil Water Balance Bucket Model"],
             action_link="/irrigation",
             action_label="Open Water Budget Planner",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
             structured_data={
                 "irrigate_now": irrigate_today,
                 "net_depth_mm": depth_mm,
@@ -340,6 +394,7 @@ class VoiceAssistantService:
         )
 
     def _handle_disease(self, lang: str) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
         if lang == "te":
             spoken = (
                 "పైరు తెగులును గుర్తించడానికి, వ్యాధి సోకిన ఆకు యొక్క స్పష్టమైన ఫోటో తీసి డిసీజ్ స్కానర్‌లో అప్‌లోడ్ చేయండి. "
@@ -366,6 +421,7 @@ class VoiceAssistantService:
             sources=["PlantVillage Disease Diagnostic Engine (CPU)", "ICAR Integrated Pest Management Guidelines"],
             action_link="/disease",
             action_label="Open Disease Scanner",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
             structured_data={"supported_crops": ["cotton", "tomato", "potato", "corn", "rice"]},
             limitations=["Zero chemical dosages prescribed per safety policy. Visual symptoms require physical field confirmation."],
             upstream_status="Local CNN Engine Ready",
@@ -374,6 +430,7 @@ class VoiceAssistantService:
     def _handle_cost(
         self, user: User, farm: Optional[Farm], lang: str
     ) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
         crop_name = self.default_crop
         area = self.default_area
         ownership = "owned"
@@ -426,6 +483,7 @@ class VoiceAssistantService:
             sources=["Indicative estimates entered by the project team, not taken from any published report; edit to your actual cost; verify with your local KVK or agriculture officer."],
             action_link="/economics",
             action_label="Open Economics Dashboard",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
             structured_data={
                 "total_cost": total_cost,
                 "cost_per_acre": cost_per_acre,
@@ -437,6 +495,7 @@ class VoiceAssistantService:
         )
 
     def _handle_scheme(self, lang: str) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
         if lang == "te":
             spoken = (
                 "ప్రభుత్వ పథకాల మార్గదర్శకాలు మరియు సబ్సిడీ వివరాలు ఎప్పటికప్పుడు మారుతుంటాయి, "
@@ -464,6 +523,7 @@ class VoiceAssistantService:
             sources=["Official government agriculture portal or local Mandal Agriculture Office (details to verify)"],
             action_link="/dashboard",
             action_label="Consult Mandal Office",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
             structured_data={
                 "schemes_list_available": False,
                 "verification_status": "details to verify",
@@ -475,7 +535,7 @@ class VoiceAssistantService:
         )
 
     def _handle_price(self, lang: str) -> VoiceQueryResponse:
-        # Latest mandi modal price from mandi dataset for default crop (Cotton)
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
         modal_price = 7180
         min_price = 6850
         max_price = 7450
@@ -520,6 +580,7 @@ class VoiceAssistantService:
             ],
             action_link="/market",
             action_label="Open Market Intelligence",
+            suggestion_chips=kw.SUGGESTION_CHIPS,
             structured_data={
                 "crop": "Cotton",
                 "mandi": mandi_name,
@@ -539,26 +600,23 @@ class VoiceAssistantService:
     async def _handle_general_llm_or_fallback(
         self, query: str, lang: str
     ) -> VoiceQueryResponse:
-        # Fallback responses when no GEMINI_API_KEY
-        fallback_map = {
-            "en": "I don't know, please consult an agriculture officer.",
-            "te": "నాకు ఈ విషయం తెలియదు, దయచేసి మీ స్థానిక వ్యవసాయ అధికారిని సంప్రదించండి.",
-            "hi": "मुझे इसकी जानकारी नहीं है, कृपया अपने स्थानीय कृषि अधिकारी से संपर्क करें।",
-        }
-        fallback_text = fallback_map.get(lang, fallback_map["en"])
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
+        fallback_text = kw.RESPONSES["unknown"]
+        suggestion_chips = kw.SUGGESTION_CHIPS
 
         if not settings.GEMINI_API_KEY:
             return VoiceQueryResponse(
                 intent="general",
                 confidence=0.10,
                 confidence_type="fallback",
-                spoken_text=fallback_text,
+                spoken_text=sanitize_agronomic_speech(fallback_text),
                 status="DEMO",
                 sources=["Local Agriculture Officer recommendation"],
                 action_link="/dashboard",
                 action_label="Consult Local Officer",
+                suggestion_chips=suggestion_chips,
                 structured_data={"gemini_configured": False},
-                limitations=["LLM key not configured. Query is outside predefined rule coverage."],
+                limitations=["GEMINI_API_KEY not configured. Query routed to safe agricultural fallback."],
                 upstream_status="No LLM Key Configured",
             )
 
@@ -566,10 +624,11 @@ class VoiceAssistantService:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
         system_instruction = (
             "You are AgriSage AI, an agronomic assistant for smallholder Indian farmers. "
-            "Answer ONLY using sustainable, safe farming practices. "
+            "Answer ONLY using sustainable, safe farming practices based on our verified features: "
+            "weather, irrigation budgeting, plant pathology, and farm economics. "
             "Strictly NEVER prescribe chemical pesticides, herbicides, or specific chemical dosages. "
             "Keep the response to 1-2 spoken sentences only. "
-            "If the question cannot be answered safely from verified agricultural principles, "
+            f"If the question cannot be answered safely from verified agricultural principles, "
             f"respond exactly with: '{fallback_text}'. "
             f"Respond in language: {lang}."
         )
@@ -581,7 +640,7 @@ class VoiceAssistantService:
         }
 
         try:
-            async with httpx.AsyncClient(timeout=6.0) as client:
+            async with httpx.AsyncClient(timeout=5.0) as client:
                 res = await client.post(url, json=payload)
                 if res.status_code == 200:
                     data = res.json()
@@ -599,6 +658,7 @@ class VoiceAssistantService:
                                 sources=["Gemini 1.5 Flash Agricultural Reasoning (Constrained)"],
                                 action_link="/dashboard",
                                 action_label="Open Dashboard",
+                                suggestion_chips=suggestion_chips,
                                 structured_data={"gemini_configured": True},
                                 limitations=["LLM output. Verify agronomic recommendations with local KVK."],
                                 upstream_status="Gemini API Online",
@@ -610,13 +670,14 @@ class VoiceAssistantService:
             intent="general",
             confidence=0.10,
             confidence_type="fallback",
-            spoken_text=fallback_text,
+            spoken_text=sanitize_agronomic_speech(fallback_text),
             status="DEMO",
             sources=["Local Agriculture Officer recommendation"],
             action_link="/dashboard",
             action_label="Consult Local Officer",
+            suggestion_chips=suggestion_chips,
             structured_data={"gemini_configured": True, "call_failed": True},
-            limitations=["Upstream generative service failed. Reverting to safe agricultural officer referral."],
+            limitations=["Upstream generative service failed or timed out. Reverting to safe agricultural referral."],
             upstream_status="Gemini API Failed / Fallback",
         )
 
@@ -626,30 +687,56 @@ class VoiceAssistantService:
         lang = (request.language or "en").strip().lower()
         if lang not in ["en", "te", "hi"]:
             lang = "en"
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
 
-        intent, confidence = classify_intent(request.query)
+        try:
+            intent, confidence = classify_intent(request.query)
 
-        # Retrieve farm
-        farm: Optional[Farm] = None
-        if request.farm_id:
-            farm = db.query(Farm).filter(Farm.id == request.farm_id, Farm.user_id == user.id).first()
-        if not farm:
-            farm = db.query(Farm).filter(Farm.user_id == user.id).first()
+            # Retrieve farm
+            farm: Optional[Farm] = None
+            if request.farm_id:
+                farm = db.query(Farm).filter(Farm.id == request.farm_id, Farm.user_id == user.id).first()
+            if not farm:
+                farm = db.query(Farm).filter(Farm.user_id == user.id).first()
 
-        if intent == "weather":
-            return await self._handle_weather(user, farm, lang, db)
-        elif intent == "irrigation":
-            return await self._handle_irrigation(user, farm, lang, db)
-        elif intent == "disease":
-            return self._handle_disease(lang)
-        elif intent == "cost":
-            return self._handle_cost(user, farm, lang)
-        elif intent == "scheme":
-            return self._handle_scheme(lang)
-        elif intent == "price":
-            return self._handle_price(lang)
-        else:
-            return await self._handle_general_llm_or_fallback(request.query, lang)
+            if intent == "greeting":
+                return self._handle_greeting(lang)
+            elif intent == "about":
+                return self._handle_about(lang)
+            elif intent == "thanks":
+                return self._handle_thanks(lang)
+            elif intent == "bye":
+                return self._handle_bye(lang)
+            elif intent == "weather":
+                return await self._handle_weather(user, farm, lang, db)
+            elif intent == "irrigation":
+                return await self._handle_irrigation(user, farm, lang, db)
+            elif intent == "disease":
+                return self._handle_disease(lang)
+            elif intent == "cost":
+                return self._handle_cost(user, farm, lang)
+            elif intent == "scheme":
+                return self._handle_scheme(lang)
+            elif intent == "price":
+                return self._handle_price(lang)
+            else:
+                return await self._handle_general_llm_or_fallback(request.query, lang)
+        except Exception as exc:
+            # Absolute default branch: ensures no input can cause an unhandled error
+            return VoiceQueryResponse(
+                intent="general",
+                confidence=0.50,
+                confidence_type="fallback",
+                spoken_text=sanitize_agronomic_speech(kw.RESPONSES["unknown"]),
+                status="DEMO",
+                sources=["Local Agriculture Officer recommendation"],
+                action_link="/dashboard",
+                action_label="Consult Local Officer",
+                suggestion_chips=kw.SUGGESTION_CHIPS,
+                structured_data={"error_handled": True, "error_type": type(exc).__name__},
+                limitations=["An unexpected processing error was safely handled. Safe agriculture advice returned."],
+                upstream_status="Error Handled Fallback",
+            )
 
 
 voice_service = VoiceAssistantService()

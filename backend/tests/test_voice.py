@@ -289,3 +289,109 @@ def test_sanitize_agronomic_speech_direct():
     assert "Zero chemical dosages are prescribed per safety policy" in sanitized
     assert "Monocrotophos" not in sanitized
     assert "guarantee" not in sanitized
+
+
+# 7. BUG 1 Regression Tests: Small Talk & Greetings (5 per language), Fallback & Language Parity
+GREETINGS_5_EN = ["hi", "hello", "hey", "namaste", "good morning"]
+GREETINGS_5_TE = ["నమస్కారం", "హలో", "నమస్తే", "బాగున్నారా", "నమస్కారాలు"]
+GREETINGS_5_HI = ["नमस्ते", "नमस्कार", "हेलो", "हाय", "प्रणाम"]
+
+
+@pytest.mark.parametrize("greeting", GREETINGS_5_EN)
+def test_greetings_english_5_utterances(client, setup_voice_db, greeting):
+    headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+    res = client.post("/api/v1/voice/query", json={"query": greeting, "language": "en"}, headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["intent"] == "greeting"
+    assert data["status"] == "WORKING"
+    assert "AgriSage AI" in data["spoken_text"]
+    assert "Live Weather" in data["spoken_text"]
+    assert "Live Irrigation" in data["spoken_text"]
+    # Schemes must NOT be listed as a working feature
+    assert "Live Schemes" not in data["spoken_text"]
+    assert len(data["suggestion_chips"]) > 0
+
+
+@pytest.mark.parametrize("greeting", GREETINGS_5_TE)
+def test_greetings_telugu_5_utterances(client, setup_voice_db, greeting):
+    headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+    res = client.post("/api/v1/voice/query", json={"query": greeting, "language": "te"}, headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["intent"] == "greeting"
+    assert data["status"] == "WORKING"
+    assert "అగ్రిసేజ్" in data["spoken_text"]
+    assert len(data["suggestion_chips"]) > 0
+    # Response must be in Telugu
+    assert any(ord(c) >= 0x0C00 and ord(c) <= 0x0C7F for c in data["spoken_text"])
+
+
+@pytest.mark.parametrize("greeting", GREETINGS_5_HI)
+def test_greetings_hindi_5_utterances(client, setup_voice_db, greeting):
+    headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+    res = client.post("/api/v1/voice/query", json={"query": greeting, "language": "hi"}, headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["intent"] == "greeting"
+    assert data["status"] == "WORKING"
+    assert "एग्रीसेज" in data["spoken_text"]
+    assert len(data["suggestion_chips"]) > 0
+    # Response must be in Hindi (Devanagari)
+    assert any(ord(c) >= 0x0900 and ord(c) <= 0x097F for c in data["spoken_text"])
+
+
+def test_unknown_query_no_exception(client, setup_voice_db):
+    """Verifies that unknown or bizarre queries never crash and return a polite fallback in requested language."""
+    headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+    unknown_queries = [
+        ("zzzzzz123987_gibberish_nonword", "en"),
+        ("@@@###$$$%%^^^", "te"),
+        ("अजीबो गरीब बिना मतलब का सवाल 9988", "hi"),
+    ]
+    for q, lang in unknown_queries:
+        res = client.post("/api/v1/voice/query", json={"query": q, "language": lang}, headers=headers)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["intent"] == "general"
+        assert len(data["suggestion_chips"]) > 0
+        assert data["spoken_text"] is not None
+        if lang == "te":
+            assert any(ord(c) >= 0x0C00 and ord(c) <= 0x0C7F for c in data["spoken_text"])
+        elif lang == "hi":
+            assert any(ord(c) >= 0x0900 and ord(c) <= 0x097F for c in data["spoken_text"])
+        else:
+            assert "agriculture officer" in data["spoken_text"].lower()
+
+
+def test_reply_language_matches_setting(client, setup_voice_db):
+    """Verifies that replies strictly match the user's selected language setting."""
+    headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+
+    # English
+    r_en = client.post("/api/v1/voice/query", json={"query": "hello", "language": "en"}, headers=headers)
+    assert r_en.status_code == 200
+    assert "AgriSage" in r_en.json()["spoken_text"]
+
+    # Telugu
+    r_te = client.post("/api/v1/voice/query", json={"query": "హలో", "language": "te"}, headers=headers)
+    assert r_te.status_code == 200
+    assert any(ord(c) >= 0x0C00 and ord(c) <= 0x0C7F for c in r_te.json()["spoken_text"])
+
+    # Hindi
+    r_hi = client.post("/api/v1/voice/query", json={"query": "हेलो", "language": "hi"}, headers=headers)
+    assert r_hi.status_code == 200
+    assert any(ord(c) >= 0x0900 and ord(c) <= 0x097F for c in r_hi.json()["spoken_text"])
+
+
+def test_who_are_you_smalltalk(client, setup_voice_db):
+    """Verifies 'who are you' introduces the assistant and lists live vs demo topics."""
+    headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+    res = client.post("/api/v1/voice/query", json={"query": "who are you?", "language": "en"}, headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["intent"] == "about"
+    assert "AgriSage AI" in data["spoken_text"]
+    assert "Live Weather" in data["spoken_text"]
+    assert "schemes are not" in data["spoken_text"].lower()
+    assert data["structured_data"]["features"]["schemes"] == "NOT_BUILT"

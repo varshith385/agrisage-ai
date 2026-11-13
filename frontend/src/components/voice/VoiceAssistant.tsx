@@ -22,9 +22,12 @@ import {
   startSpeechRecognition,
   speakText,
   getAvailableVoices,
+  loadVoices,
+  findVoicesForLanguage,
   findVoiceForLanguage,
   SupportedLanguage,
   LANGUAGE_LOCALE_MAP,
+  LANGUAGE_DISPLAY_NAMES,
 } from '../../services/speech';
 import { StatusBadge } from '../common/StatusBadge';
 
@@ -48,16 +51,19 @@ export const VoiceAssistant: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
 
-  // Capability states
+  // Capability & voice states
   const [recognitionSupported, setRecognitionSupported] = useState(true);
   const [synthesisSupported, setSynthesisSupported] = useState(true);
   const [micPermissionDenied, setMicPermissionDenied] = useState(false);
   const [voiceAvailableForLang, setVoiceAvailableForLang] = useState(true);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [matchingVoices, setMatchingVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoiceName, setSelectedVoiceName] = useState<string>('');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeRecognizerRef = useRef<{ stop: () => void; abort: () => void } | null>(null);
 
-  // Capability detection on mount & language change
+  // Capability detection & voiceschanged handler
   useEffect(() => {
     const hasRec = isSpeechRecognitionSupported();
     const hasSyn = isSpeechSynthesisSupported();
@@ -65,15 +71,29 @@ export const VoiceAssistant: React.FC = () => {
     setSynthesisSupported(hasSyn);
 
     if (hasSyn) {
-      const checkVoice = () => {
+      const updateVoices = () => {
         const voices = getAvailableVoices();
-        const matched = findVoiceForLanguage(currentLang, voices);
-        setVoiceAvailableForLang(matched !== null || currentLang === 'en');
+        setAvailableVoices(voices);
+        const matched = findVoicesForLanguage(currentLang, voices);
+        setMatchingVoices(matched);
+        const defaultVoice = findVoiceForLanguage(currentLang, voices);
+        if (defaultVoice) {
+          setSelectedVoiceName(defaultVoice.name);
+          setVoiceAvailableForLang(true);
+        } else {
+          setSelectedVoiceName('');
+          setVoiceAvailableForLang(currentLang === 'en');
+        }
       };
 
-      checkVoice();
+      updateVoices();
+      loadVoices().then(updateVoices);
+
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = checkVoice;
+        window.speechSynthesis.addEventListener('voiceschanged', updateVoices);
+        return () => {
+          window.speechSynthesis.removeEventListener('voiceschanged', updateVoices);
+        };
       }
     }
   }, [currentLang]);
@@ -207,8 +227,15 @@ export const VoiceAssistant: React.FC = () => {
       return;
     }
 
+    if (!voiceAvailableForLang && currentLang !== 'en') {
+      // Never silently speak English when voice pack is missing for selected language!
+      return;
+    }
+
     setCurrentlySpeakingId(msgId);
+    const chosenVoice = availableVoices.find((v) => v.name === selectedVoiceName) || null;
     speakText(text, currentLang, {
+      customVoice: chosenVoice,
       onEnd: () => setCurrentlySpeakingId(null),
       onError: () => setCurrentlySpeakingId(null),
     });
@@ -282,7 +309,10 @@ export const VoiceAssistant: React.FC = () => {
                 <div>
                   <div className="flex items-center space-x-2">
                     <h2 className="text-base sm:text-lg font-bold">{t('voice.panel_title')}</h2>
-                    <span className="px-2 py-0.5 text-xs font-semibold bg-agri-green-600 text-white rounded-full border border-agri-green-400">
+                    <span
+                      className="px-2 py-0.5 text-xs font-semibold bg-agri-green-600 text-white rounded-full border border-agri-green-400"
+                      title={LANGUAGE_DISPLAY_NAMES[currentLang]}
+                    >
                       {LANGUAGE_LOCALE_MAP[currentLang]}
                     </span>
                   </div>
@@ -291,6 +321,21 @@ export const VoiceAssistant: React.FC = () => {
               </div>
 
               <div className="flex items-center space-x-2">
+                {synthesisSupported && matchingVoices.length > 0 && (
+                  <select
+                    value={selectedVoiceName}
+                    onChange={(e) => setSelectedVoiceName(e.target.value)}
+                    className="bg-agri-green-800/90 text-white text-[11px] font-medium rounded-lg px-2 py-1 border border-agri-green-400 focus:ring-1 focus:ring-white max-w-[140px] truncate"
+                    title="Select voice"
+                    aria-label="Voice picker"
+                  >
+                    {matchingVoices.map((v) => (
+                      <option key={v.name} value={v.name}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
                 <StatusBadge status="WORKING" />
                 {messages.length > 0 && (
                   <button
@@ -460,6 +505,22 @@ export const VoiceAssistant: React.FC = () => {
                                 <span className="font-semibold">{t('voice.confidence_label')}:</span>{' '}
                                 {Math.round(msg.responseData.confidence * 100)}% ({msg.responseData.confidence_type})
                               </p>
+                            </div>
+                          )}
+
+                          {/* Tappable Suggestion Chips */}
+                          {msg.responseData?.suggestion_chips && msg.responseData.suggestion_chips.length > 0 && (
+                            <div className="pt-2 border-t border-stone-100 flex flex-wrap gap-1.5">
+                              {msg.responseData.suggestion_chips.map((chip, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => handleSendQuery(chip)}
+                                  className="text-[11px] font-medium bg-agri-cream-100/90 hover:bg-agri-cream-200 text-agri-green-900 border border-agri-green-700/20 px-2.5 py-1 rounded-full transition-all hover:scale-[1.02] active:scale-95 text-left"
+                                >
+                                  {chip}
+                                </button>
+                              ))}
                             </div>
                           )}
                         </div>
