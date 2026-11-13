@@ -515,7 +515,6 @@ export const SchemesPage: React.FC = () => {
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">kg/ha</span>
                   </div>
-                  <span className="text-[10px] text-gray-400">Normal range: 100 - 600 kg/ha</span>
                 </div>
 
                 {/* Phosphorus */}
@@ -537,7 +536,6 @@ export const SchemesPage: React.FC = () => {
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">kg/ha</span>
                   </div>
-                  <span className="text-[10px] text-gray-400">Normal range: 5 - 50 kg/ha</span>
                 </div>
 
                 {/* Potassium */}
@@ -559,7 +557,6 @@ export const SchemesPage: React.FC = () => {
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">kg/ha</span>
                   </div>
-                  <span className="text-[10px] text-gray-400">Normal range: 100 - 800 kg/ha</span>
                 </div>
 
                 {/* pH */}
@@ -581,7 +578,6 @@ export const SchemesPage: React.FC = () => {
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">pH (0-14)</span>
                   </div>
-                  <span className="text-[10px] text-gray-400">Optimal: 6.2 - 7.8</span>
                 </div>
 
                 {/* Organic Carbon */}
@@ -603,7 +599,6 @@ export const SchemesPage: React.FC = () => {
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">%</span>
                   </div>
-                  <span className="text-[10px] text-gray-400">Typical: 0.3 - 1.2 %</span>
                 </div>
 
                 {/* Electrical Conductivity */}
@@ -625,7 +620,6 @@ export const SchemesPage: React.FC = () => {
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">dS/m</span>
                   </div>
-                  <span className="text-[10px] text-gray-400">Non-saline: &lt; 1.0 dS/m</span>
                 </div>
               </div>
 
