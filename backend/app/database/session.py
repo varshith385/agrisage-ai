@@ -37,5 +37,6 @@ def init_db() -> None:
     import backend.app.models.weather
     import backend.app.models.agent_run
     import backend.app.models.disease_prediction
+    import backend.app.models.soil_card
 
     Base.metadata.create_all(bind=engine)
