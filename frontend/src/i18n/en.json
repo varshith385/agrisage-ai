@@ -16,6 +16,8 @@
     "recommend": "Crop Advisory",
     "schemes": "Schemes & Soil Card",
     "community": "Community & Map",
+    "how_to": "How to use AgriSage",
+    "watch": "Watch Video Guide",
     "logout": "Logout"
   },
   "auth": {
@@ -200,7 +202,15 @@
     "acres": "Acres",
     "inr": "₹",
     "demo_mode": "Yuktik 2026 Demo Mode",
-    "select_language": "Language"
+    "select_language": "Language",
+    "what_this_means": "What this means for you",
+    "what_is_this": "What is this?",
+    "farmer_guide": "Farmer Guide",
+    "what_this_does": "What this tool does",
+    "what_to_enter": "What you need to provide",
+    "what_you_get": "What result you will get",
+    "listen_guide": "Listen in audio",
+    "got_it": "Understood"
   },
   "agents": {
     "title": "Autonomous Multi-Agent Intelligence Engine",
