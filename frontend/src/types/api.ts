@@ -717,6 +717,7 @@ export interface WhatIfRequest {
   price_per_q: number;
   yield_q_per_acre: number;
   operating_cost_per_acre: number;
+  irrigation_type?: string;
   loan_amount?: number;
   loan_interest_rate_pct?: number;
   sweep_variable: 'price' | 'yield' | 'area' | 'lease_cost';
@@ -734,6 +735,8 @@ export interface WhatIfPoint {
 export interface WhatIfResponse {
   current_net_profit: number;
   current_margin_pct: number;
+  total_cost?: number;
+  gross_revenue?: number;
   break_even_price_per_q?: number | null;
   break_even_yield_q_per_acre?: number | null;
   sweep_variable: string;

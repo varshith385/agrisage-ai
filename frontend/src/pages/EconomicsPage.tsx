@@ -11,7 +11,18 @@ import {
   FileSpreadsheet,
   Store,
   Check,
+  RotateCcw,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ReferenceLine,
+} from 'recharts';
 import { useTranslation } from '../context/LanguageContext';
 import { getFarms } from '../api/farms';
 import { getMandiPrices } from '../api/market';
@@ -30,6 +41,7 @@ import {
 } from '../types/api';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { ExplainCard } from '../components/common/ExplainCard';
+import { computeProfit } from '../utils/profitCalculator';
 
 export const EconomicsPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -75,6 +87,7 @@ export const EconomicsPage: React.FC = () => {
   const [sliderYield, setSliderYield] = useState<number>(8.0);
   const [sliderArea, setSliderArea] = useState<number>(5.0);
   const [sliderLeaseRate, setSliderLeaseRate] = useState<number>(10000);
+  const [irrigationType, setIrrigationType] = useState<string>('drip');
 
   const [showCostEditor, setShowCostEditor] = useState<boolean>(true);
   const [tenureTab, setTenureTab] = useState<'combined' | 'owned' | 'leased'>('combined');
@@ -111,6 +124,7 @@ export const EconomicsPage: React.FC = () => {
           setOwnershipType(f.ownership_type as any);
           setOwnedArea(f.owned_area);
           setLeasedArea(f.leased_area);
+          setSliderArea(f.area);
           if (f.lease_amount && f.lease_amount > 0) {
             setLeaseCostPerAcre(f.lease_amount);
             setSliderLeaseRate(f.lease_amount);
@@ -145,22 +159,6 @@ export const EconomicsPage: React.FC = () => {
       });
       setEconResult(res);
 
-      // Also trigger what-if backend check
-      const wRes = await simulateWhatIf({
-        crop_name: selectedCrop,
-        area_acres: area,
-        ownership_type: ownershipType,
-        owned_area: ownedArea,
-        leased_area: leasedArea,
-        lease_cost_per_acre: leaseCostPerAcre,
-        price_per_q: expectedPrice,
-        yield_q_per_acre: expectedYield,
-        operating_cost_per_acre: Object.values(costs).reduce((a, b) => a + b, 0),
-        loan_amount: loanAmount,
-        loan_interest_rate_pct: loanInterestPct,
-        sweep_variable: whatIfVar,
-      });
-      setWhatIfResult(wRes);
     } catch (err) {
       console.error('Calculation error:', err);
     } finally {
@@ -175,18 +173,189 @@ export const EconomicsPage: React.FC = () => {
       .catch((err) => console.error('Failed to load crop comparisons:', err));
   }, [selectedCrop, area, ownershipType, ownedArea, leasedArea, leaseCostPerAcre, expectedYield, expectedPrice]);
 
-  // Client-side instantaneous What-If calculation formula (verified identically with backend)
-  const clientWhatIfProfit = useMemo(() => {
-    const opPerAcre = Object.values(costs).reduce((a, b) => a + b, 0);
-    const totOp = opPerAcre * sliderArea;
-    const leasedRatio = area > 0 ? leasedArea / area : 0;
-    const curLeasedA = ownershipType === 'mixed' ? sliderArea * leasedRatio : (ownershipType === 'leased' ? sliderArea : 0);
-    const totLease = curLeasedA * sliderLeaseRate;
-    const totLoanInterest = (loanAmount * loanInterestPct) / 100;
-    const totCost = totOp + totLease + totLoanInterest;
-    const rev = sliderYield * sliderArea * sliderPrice;
-    return rev - totCost;
-  }, [sliderPrice, sliderYield, sliderArea, sliderLeaseRate, costs, area, leasedArea, ownershipType, loanAmount, loanInterestPct]);
+  // Baseline calculation using pure computeProfit
+  const baselineResult = useMemo(() => {
+    return computeProfit({
+      crop: selectedCrop,
+      area: area,
+      irrigation_type: irrigationType,
+      lease_cost: leaseCostPerAcre,
+      yield_per_acre: expectedYield,
+      price_per_quintal: expectedPrice,
+      editable_costs: costs,
+      ownership_type: ownershipType,
+      leased_area: leasedArea,
+      loan_amount: loanAmount,
+      loan_interest_rate_pct: loanInterestPct,
+    });
+  }, [
+    selectedCrop,
+    area,
+    irrigationType,
+    leaseCostPerAcre,
+    expectedYield,
+    expectedPrice,
+    costs,
+    ownershipType,
+    leasedArea,
+    loanAmount,
+    loanInterestPct,
+  ]);
+
+  // Client-side instantaneous What-If calculation using pure computeProfit
+  const liveResult = useMemo(() => {
+    const calcLeasedArea =
+      ownershipType === 'mixed'
+        ? (area > 0 ? sliderArea * (leasedArea / area) : 0)
+        : (ownershipType === 'leased' ? sliderArea : 0);
+
+    return computeProfit({
+      crop: selectedCrop,
+      area: sliderArea,
+      irrigation_type: irrigationType,
+      lease_cost: sliderLeaseRate,
+      yield_per_acre: sliderYield,
+      price_per_quintal: sliderPrice,
+      editable_costs: costs,
+      ownership_type: ownershipType,
+      leased_area: calcLeasedArea,
+      loan_amount: loanAmount,
+      loan_interest_rate_pct: loanInterestPct,
+    });
+  }, [
+    selectedCrop,
+    sliderArea,
+    irrigationType,
+    sliderLeaseRate,
+    sliderYield,
+    sliderPrice,
+    costs,
+    ownershipType,
+    leasedArea,
+    area,
+    loanAmount,
+    loanInterestPct,
+  ]);
+
+  const changeVsBaseline = liveResult.net_profit - baselineResult.net_profit;
+
+  const handleResetWhatIf = () => {
+    setSliderPrice(expectedPrice);
+    setSliderYield(expectedYield);
+    setSliderArea(area);
+    setSliderLeaseRate(leaseCostPerAcre);
+    setIrrigationType('drip');
+  };
+
+  const chartPoints = useMemo(() => {
+    const points = [];
+    const steps = 7;
+    let minVal = Math.max(1000, sliderPrice * 0.7);
+    let maxVal = sliderPrice * 1.3;
+    if (whatIfVar === 'yield') {
+      minVal = Math.max(1, sliderYield * 0.6);
+      maxVal = sliderYield * 1.4;
+    } else if (whatIfVar === 'area') {
+      minVal = Math.max(1, sliderArea * 0.5);
+      maxVal = sliderArea * 1.5;
+    } else if (whatIfVar === 'lease_cost') {
+      minVal = Math.max(0, sliderLeaseRate * 0.6);
+      maxVal = sliderLeaseRate * 1.4;
+    }
+
+    const stepSize = (maxVal - minVal) / (steps - 1);
+    for (let i = 0; i < steps; i++) {
+      const v = minVal + i * stepSize;
+      const roundedV = Math.round(v * 10) / 10;
+      const testInputs = {
+        crop: selectedCrop,
+        area: whatIfVar === 'area' ? roundedV : sliderArea,
+        irrigation_type: irrigationType,
+        lease_cost: whatIfVar === 'lease_cost' ? roundedV : sliderLeaseRate,
+        yield_per_acre: whatIfVar === 'yield' ? roundedV : sliderYield,
+        price_per_quintal: whatIfVar === 'price' ? roundedV : sliderPrice,
+        editable_costs: costs,
+        ownership_type: ownershipType,
+        leased_area:
+          ownershipType === 'mixed'
+            ? (area > 0 ? (whatIfVar === 'area' ? roundedV : sliderArea) * (leasedArea / area) : 0)
+            : (ownershipType === 'leased' ? (whatIfVar === 'area' ? roundedV : sliderArea) : 0),
+        loan_amount: loanAmount,
+        loan_interest_rate_pct: loanInterestPct,
+      };
+      const res = computeProfit(testInputs);
+      let label = `${roundedV}`;
+      if (whatIfVar === 'price' || whatIfVar === 'lease_cost') {
+        label = `₹${Math.round(roundedV).toLocaleString('en-IN')}`;
+      } else if (whatIfVar === 'yield') {
+        label = `${roundedV.toFixed(1)} q/ac`;
+      } else if (whatIfVar === 'area') {
+        label = `${roundedV.toFixed(1)} ac`;
+      }
+      points.push({
+        variable_value: roundedV,
+        label,
+        net_profit: res.net_profit,
+        revenue: res.gross_revenue,
+        total_cost: res.total_cost,
+        margin_pct: res.margin_pct,
+      });
+    }
+    return points;
+  }, [
+    whatIfVar,
+    sliderPrice,
+    sliderYield,
+    sliderArea,
+    sliderLeaseRate,
+    selectedCrop,
+    irrigationType,
+    costs,
+    ownershipType,
+    leasedArea,
+    area,
+    loanAmount,
+    loanInterestPct,
+  ]);
+
+  // Debounced backend simulation (350ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      simulateWhatIf({
+        crop_name: selectedCrop,
+        area_acres: sliderArea,
+        ownership_type: ownershipType,
+        owned_area: ownedArea,
+        leased_area: leasedArea,
+        lease_cost_per_acre: sliderLeaseRate,
+        price_per_q: sliderPrice,
+        yield_q_per_acre: sliderYield,
+        operating_cost_per_acre: liveResult.operating_cost_per_acre,
+        irrigation_type: irrigationType,
+        loan_amount: loanAmount,
+        loan_interest_rate_pct: loanInterestPct,
+        sweep_variable: whatIfVar,
+      })
+        .then((res) => setWhatIfResult(res))
+        .catch((err) => console.error('What-if backend error:', err));
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [
+    selectedCrop,
+    sliderPrice,
+    sliderYield,
+    sliderArea,
+    sliderLeaseRate,
+    irrigationType,
+    whatIfVar,
+    liveResult.operating_cost_per_acre,
+    ownershipType,
+    ownedArea,
+    leasedArea,
+    loanAmount,
+    loanInterestPct,
+  ]);
 
   const operatingPerAcre = useMemo(() => {
     return Object.values(costs).reduce((a, b) => a + b, 0);
@@ -225,22 +394,28 @@ export const EconomicsPage: React.FC = () => {
             onChange={(e) => {
               const c = e.target.value;
               setSelectedCrop(c);
+              let y = 8.0;
+              let p = 7100.0;
               if (c === 'Cotton') {
-                setExpectedYield(8.0);
-                setExpectedPrice(7100.0);
+                y = 8.0;
+                p = 7100.0;
               } else if (c === 'Rice') {
-                setExpectedYield(22.0);
-                setExpectedPrice(2200.0);
+                y = 22.0;
+                p = 2200.0;
               } else if (c === 'Maize') {
-                setExpectedYield(24.0);
-                setExpectedPrice(2050.0);
+                y = 24.0;
+                p = 2050.0;
               } else if (c === 'Chilli') {
-                setExpectedYield(14.0);
-                setExpectedPrice(15500.0);
+                y = 14.0;
+                p = 15500.0;
               } else if (c === 'Groundnut') {
-                setExpectedYield(9.5);
-                setExpectedPrice(6400.0);
+                y = 9.5;
+                p = 6400.0;
               }
+              setExpectedYield(y);
+              setExpectedPrice(p);
+              setSliderYield(y);
+              setSliderPrice(p);
             }}
             className="bg-white border border-stone-300 text-stone-900 font-bold rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-agri-green-600"
           >
@@ -503,17 +678,28 @@ export const EconomicsPage: React.FC = () => {
       )}
 
       {/* Interactive What-If Simulator */}
-      <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-subtle space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-agri-green-700" />
             <h3 className="text-base font-bold text-stone-900">
-              {t('economics.what_if_title')} (Live Profit Simulator)
+              {t('economics.what_if_title')}
             </h3>
           </div>
-          <span className="text-[11px] text-stone-500 bg-stone-100 px-2.5 py-1 rounded-lg">
-            Instant client-side calculation verified against Python backend
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleResetWhatIf}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl border border-stone-300 transition-all shadow-sm"
+              title="Reset all simulator values to baseline defaults"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              {t('economics.what_if_reset_btn')}
+            </button>
+            <span className="text-[11px] text-stone-500 bg-stone-100 px-2.5 py-1 rounded-lg">
+              {whatIfResult ? 'Instant pure-function model • backend synced' : 'Instant pure-function model'}
+            </span>
+          </div>
         </div>
 
         {/* Sweep Variable Selector */}
@@ -535,117 +721,285 @@ export const EconomicsPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Live Sliders */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-stone-50 rounded-2xl border border-stone-200">
-          <div>
-            <div className="flex justify-between text-xs font-bold mb-1">
-              <label>Expected Price (₹/q):</label>
-              <span className="text-agri-green-800">₹{sliderPrice}</span>
+        {/* Live Controls: Synchronized Sliders + Number Inputs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-stone-50 rounded-2xl border border-stone-200">
+          {/* Price */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-xs font-bold">
+              <label htmlFor="whatif-price">Expected Price (₹/q):</label>
             </div>
             <input
+              id="whatif-price-number"
+              type="number"
+              min="1000"
+              max="30000"
+              step="50"
+              value={sliderPrice}
+              onChange={(e) => setSliderPrice(Math.max(0, Number(e.target.value) || 0))}
+              className="w-full bg-white border border-stone-300 rounded-lg px-2 py-1 text-xs font-bold text-agri-green-800 focus:ring-2 focus:ring-agri-green-600 mb-1"
+            />
+            <input
+              id="whatif-price"
               type="range"
-              min="3000"
-              max="15000"
-              step="100"
+              min="1000"
+              max="25000"
+              step="50"
               value={sliderPrice}
               onChange={(e) => setSliderPrice(Number(e.target.value))}
               className="w-full accent-agri-green-700 cursor-pointer"
             />
-            <span className="text-[10px] text-stone-500">₹3,000 to ₹15,000</span>
+            <div className="flex justify-between text-[10px] text-stone-500">
+              <span>₹1,000</span>
+              <span>₹25,000</span>
+            </div>
           </div>
 
-          <div>
-            <div className="flex justify-between text-xs font-bold mb-1">
-              <label>Harvest Yield (q/ac):</label>
-              <span className="text-agri-green-800">{sliderYield} q</span>
+          {/* Yield */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-xs font-bold">
+              <label htmlFor="whatif-yield">Harvest Yield (q/ac):</label>
             </div>
             <input
+              id="whatif-yield-number"
+              type="number"
+              min="1"
+              max="40"
+              step="0.5"
+              value={sliderYield}
+              onChange={(e) => setSliderYield(Math.max(0, Number(e.target.value) || 0))}
+              className="w-full bg-white border border-stone-300 rounded-lg px-2 py-1 text-xs font-bold text-agri-green-800 focus:ring-2 focus:ring-agri-green-600 mb-1"
+            />
+            <input
+              id="whatif-yield"
               type="range"
-              min="2"
-              max="25"
+              min="1"
+              max="40"
               step="0.5"
               value={sliderYield}
               onChange={(e) => setSliderYield(Number(e.target.value))}
               className="w-full accent-agri-green-700 cursor-pointer"
             />
-            <span className="text-[10px] text-stone-500">2.0 to 25.0 q/acre</span>
+            <div className="flex justify-between text-[10px] text-stone-500">
+              <span>1.0 q</span>
+              <span>40.0 q</span>
+            </div>
           </div>
 
-          <div>
-            <div className="flex justify-between text-xs font-bold mb-1">
-              <label>Total Land Area:</label>
-              <span className="text-agri-green-800">{sliderArea} acres</span>
+          {/* Area */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-xs font-bold">
+              <label htmlFor="whatif-area">Total Area (acres):</label>
             </div>
             <input
+              id="whatif-area-number"
+              type="number"
+              min="0.5"
+              max="50"
+              step="0.5"
+              value={sliderArea}
+              onChange={(e) => setSliderArea(Math.max(0, Number(e.target.value) || 0))}
+              className="w-full bg-white border border-stone-300 rounded-lg px-2 py-1 text-xs font-bold text-agri-green-800 focus:ring-2 focus:ring-agri-green-600 mb-1"
+            />
+            <input
+              id="whatif-area"
               type="range"
-              min="1"
-              max="20"
+              min="0.5"
+              max="50"
               step="0.5"
               value={sliderArea}
               onChange={(e) => setSliderArea(Number(e.target.value))}
               className="w-full accent-agri-green-700 cursor-pointer"
             />
-            <span className="text-[10px] text-stone-500">1 to 20 acres</span>
+            <div className="flex justify-between text-[10px] text-stone-500">
+              <span>0.5 ac</span>
+              <span>50 ac</span>
+            </div>
           </div>
 
-          <div>
-            <div className="flex justify-between text-xs font-bold mb-1">
-              <label>Lease Rate (₹/ac):</label>
-              <span className="text-agri-green-800">₹{sliderLeaseRate}</span>
+          {/* Lease Rate */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-xs font-bold">
+              <label htmlFor="whatif-lease">Lease Rate (₹/ac):</label>
             </div>
             <input
+              id="whatif-lease-number"
+              type="number"
+              min="0"
+              max="40000"
+              step="500"
+              value={sliderLeaseRate}
+              onChange={(e) => setSliderLeaseRate(Math.max(0, Number(e.target.value) || 0))}
+              className="w-full bg-white border border-stone-300 rounded-lg px-2 py-1 text-xs font-bold text-agri-green-800 focus:ring-2 focus:ring-agri-green-600 mb-1"
+            />
+            <input
+              id="whatif-lease"
               type="range"
-              min="4000"
-              max="25000"
+              min="0"
+              max="40000"
               step="500"
               value={sliderLeaseRate}
               onChange={(e) => setSliderLeaseRate(Number(e.target.value))}
               className="w-full accent-agri-green-700 cursor-pointer"
             />
-            <span className="text-[10px] text-stone-500">₹4,000 to ₹25,000</span>
-          </div>
-        </div>
-
-        {/* Live Simulator Outcome Callout */}
-        <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-agri-cream-100 rounded-xl border border-agri-gold-300 gap-4">
-          <div>
-            <span className="text-xs font-bold text-stone-700 block">Simulated Net Profit Result:</span>
-            <div className={`text-2xl font-black ${clientWhatIfProfit >= 0 ? 'text-agri-green-800' : 'text-red-600'}`}>
-              ₹{clientWhatIfProfit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+            <div className="flex justify-between text-[10px] text-stone-500">
+              <span>₹0</span>
+              <span>₹40,000</span>
             </div>
           </div>
-          <div className="text-xs text-stone-600 text-right">
-            <span>Operating Cost Base: ₹{operatingPerAcre.toLocaleString()}/ac</span> &bull;{' '}
-            <span>Total Production: {(sliderYield * sliderArea).toFixed(1)} quintals</span>
-          </div>
-        </div>
 
-        {/* Sensitivity Visual Points Chart */}
-        {whatIfResult && (
-          <div className="space-y-2">
-            <span className="text-xs font-bold text-stone-700 block">
-              Profit Sensitivity Across {whatIfResult.sweep_variable.toUpperCase()} Variances (±30%):
+          {/* Irrigation Method */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-xs font-bold">
+              <label htmlFor="whatif-irrigation">{t('economics.what_if_irrigation_method')}:</label>
+            </div>
+            <select
+              id="whatif-irrigation"
+              value={irrigationType}
+              onChange={(e) => setIrrigationType(e.target.value)}
+              className="w-full bg-white border border-stone-300 rounded-lg px-2 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-agri-green-600"
+            >
+              <option value="drip">Drip (-10% cost)</option>
+              <option value="sprinkler">Sprinkler (Baseline)</option>
+              <option value="furrow">Furrow (+15% cost)</option>
+              <option value="flood">Flood (+30% cost)</option>
+            </select>
+            <span className="text-[10px] text-stone-500 block pt-1">
+              Adjusts water cost factor
             </span>
-            <div className="grid grid-cols-7 gap-1.5 text-center text-[10px]">
-              {whatIfResult.sensitivity_points.map((pt, idx) => (
-                <div
-                  key={idx}
-                  className={`p-2 rounded-xl border ${
-                    pt.net_profit >= 0
-                      ? 'bg-emerald-50/80 border-emerald-200'
-                      : 'bg-red-50/80 border-red-200'
-                  }`}
-                >
-                  <span className="font-bold text-stone-800 block">₹{Math.round(pt.variable_value)}</span>
-                  <span className={`block font-extrabold ${pt.net_profit >= 0 ? 'text-emerald-800' : 'text-red-700'}`}>
-                    ₹{Math.round(pt.net_profit / 1000)}k
-                  </span>
-                  <span className="text-stone-500 text-[9px]">{pt.margin_pct.toFixed(0)}%</span>
-                </div>
-              ))}
+          </div>
+        </div>
+
+        {/* Live Simulator Outcome Cards: Total Cost, Revenue, Net Profit, Margin, Break-even, Change vs Baseline */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Net Profit */}
+          <div className={`p-3.5 rounded-xl border col-span-2 sm:col-span-1 lg:col-span-1 ${
+            liveResult.net_profit >= 0
+              ? 'bg-emerald-50/90 border-emerald-300 text-emerald-950'
+              : 'bg-red-50/90 border-red-300 text-red-950'
+          }`}>
+            <span className="text-[11px] font-bold text-stone-600 block">
+              {t('economics.what_if_live_net_profit')}
+            </span>
+            <div className={`text-xl font-black mt-0.5 ${
+              liveResult.net_profit >= 0 ? 'text-emerald-700' : 'text-red-700'
+            }`}>
+              ₹{liveResult.net_profit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
             </div>
           </div>
-        )}
+
+          {/* Change vs Baseline */}
+          <div className="p-3.5 rounded-xl border bg-stone-50 border-stone-200">
+            <span className="text-[11px] font-bold text-stone-600 block">
+              {t('economics.what_if_change_vs_baseline')}
+            </span>
+            <div className={`text-base font-extrabold mt-0.5 ${
+              changeVsBaseline > 0 ? 'text-emerald-700' : changeVsBaseline < 0 ? 'text-red-700' : 'text-stone-700'
+            }`}>
+              {changeVsBaseline > 0 ? '+' : ''}₹{Math.round(changeVsBaseline).toLocaleString('en-IN')}
+            </div>
+          </div>
+
+          {/* Revenue */}
+          <div className="p-3.5 rounded-xl border bg-stone-50 border-stone-200">
+            <span className="text-[11px] font-bold text-stone-600 block">
+              {t('economics.what_if_live_revenue')}
+            </span>
+            <div className="text-base font-extrabold text-stone-900 mt-0.5">
+              ₹{liveResult.gross_revenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+            </div>
+          </div>
+
+          {/* Total Cost */}
+          <div className="p-3.5 rounded-xl border bg-stone-50 border-stone-200">
+            <span className="text-[11px] font-bold text-stone-600 block">
+              {t('economics.what_if_live_total_cost')}
+            </span>
+            <div className="text-base font-extrabold text-stone-900 mt-0.5">
+              ₹{liveResult.total_cost.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+            </div>
+          </div>
+
+          {/* Profit Margin */}
+          <div className="p-3.5 rounded-xl border bg-stone-50 border-stone-200">
+            <span className="text-[11px] font-bold text-stone-600 block">
+              {t('economics.what_if_profit_margin')}
+            </span>
+            <div className={`text-base font-extrabold mt-0.5 ${
+              liveResult.margin_pct >= 0 ? 'text-emerald-700' : 'text-red-700'
+            }`}>
+              {liveResult.margin_pct.toFixed(1)}%
+            </div>
+          </div>
+
+          {/* Break-Even Price */}
+          <div className="p-3.5 rounded-xl border bg-stone-50 border-stone-200">
+            <span className="text-[11px] font-bold text-stone-600 block">
+              {t('economics.what_if_break_even_price')}
+            </span>
+            <div className="text-base font-extrabold text-stone-900 mt-0.5">
+              {liveResult.break_even_price !== null
+                ? `₹${liveResult.break_even_price.toLocaleString('en-IN', { maximumFractionDigits: 1 })}/q`
+                : 'N/A'}
+            </div>
+          </div>
+        </div>
+
+        {/* Profit-vs-Variable Chart */}
+        <div className="p-4 bg-stone-50/70 rounded-2xl border border-stone-200 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <span className="text-xs font-bold text-stone-800">
+              {t('economics.what_if_chart_heading')} ({whatIfVar.replace('_', ' ').toUpperCase()})
+            </span>
+            <span className="text-[11px] text-stone-500">
+              Green line represents simulated net profit curve
+            </span>
+          </div>
+          <div className="h-56 w-full pt-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartPoints} margin={{ top: 10, right: 20, left: 15, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#78716c' }} />
+                <YAxis
+                  tick={{ fontSize: 10, fill: '#78716c' }}
+                  tickFormatter={(val) => `₹${Math.round(val / 1000)}k`}
+                />
+                <Tooltip
+                  formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Net Profit']}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#d6d3d1', borderRadius: '0.75rem', fontSize: '12px' }}
+                />
+                <ReferenceLine y={0} stroke="#dc2626" strokeDasharray="4 4" strokeWidth={1.5} />
+                <Line
+                  type="monotone"
+                  dataKey="net_profit"
+                  stroke="#15803d"
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: '#15803d' }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Sensitivity Point Badges */}
+          <div className="grid grid-cols-7 gap-1.5 text-center text-[10px] pt-1">
+            {chartPoints.map((pt, idx) => (
+              <div
+                key={idx}
+                className={`p-1.5 rounded-lg border ${
+                  pt.net_profit >= 0
+                    ? 'bg-emerald-50/80 border-emerald-200'
+                    : 'bg-red-50/80 border-red-200'
+                }`}
+              >
+                <span className="font-bold text-stone-800 block truncate">{pt.label}</span>
+                <span className={`block font-extrabold ${pt.net_profit >= 0 ? 'text-emerald-800' : 'text-red-700'}`}>
+                  ₹{Math.round(pt.net_profit / 1000)}k
+                </span>
+                <span className="text-stone-500 text-[9px]">{pt.margin_pct.toFixed(0)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Itemized Cost-of-Cultivation Editor */}

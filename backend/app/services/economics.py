@@ -437,6 +437,8 @@ def simulate_what_if(req: WhatIfRequest) -> WhatIfResponse:
     return WhatIfResponse(
         current_net_profit=float(base_net_profit.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)),
         current_margin_pct=base_margin,
+        total_cost=float(base_tot_cost.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)),
+        gross_revenue=float(base_revenue.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)),
         break_even_price_per_q=be_price,
         break_even_yield_q_per_acre=be_yield,
         sweep_variable=req.sweep_variable,

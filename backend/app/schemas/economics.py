@@ -152,6 +152,7 @@ class WhatIfRequest(BaseModel):
     price_per_q: float = Field(default=7100.0, ge=0.0)
     yield_q_per_acre: float = Field(default=8.0, ge=0.0)
     operating_cost_per_acre: float = Field(default=35000.0, ge=0.0)
+    irrigation_type: Optional[str] = Field(default="drip")
     loan_amount: float = Field(default=0.0, ge=0.0)
     loan_interest_rate_pct: float = Field(default=0.0, ge=0.0)
     sweep_variable: Literal["price", "yield", "area", "lease_cost"] = "price"
@@ -169,6 +170,8 @@ class WhatIfPoint(BaseModel):
 class WhatIfResponse(BaseModel):
     current_net_profit: float
     current_margin_pct: float
+    total_cost: Optional[float] = None
+    gross_revenue: Optional[float] = None
     break_even_price_per_q: Optional[float] = None
     break_even_yield_q_per_acre: Optional[float] = None
     sweep_variable: str
