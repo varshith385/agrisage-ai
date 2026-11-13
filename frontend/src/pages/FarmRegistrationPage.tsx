@@ -12,7 +12,7 @@ import { EmptyState } from '../components/common/EmptyState';
 
 export const FarmRegistrationPage: React.FC = () => {
   const { t } = useTranslation();
-  const { setActiveFarm } = useAuth();
+  const { setActiveFarmId, refreshFarms, activeFarmId } = useAuth();
   const navigate = useNavigate();
 
   const [farms, setFarms] = useState<Farm[]>([]);
@@ -46,8 +46,8 @@ export const FarmRegistrationPage: React.FC = () => {
     try {
       const data = await farmsApi.getFarms();
       setFarms(data);
-      if (data.length > 0) {
-        setActiveFarm(data[0]);
+      if (data.length > 0 && !activeFarmId) {
+        setActiveFarmId(data[0].id);
       }
     } catch (err: unknown) {
       setErrorFarms(err instanceof Error ? err.message : 'Failed to retrieve farm holdings.');
@@ -120,7 +120,8 @@ export const FarmRegistrationPage: React.FC = () => {
 
       setFormSuccess(t('farms.success_created'));
       setFarms((prev) => [...prev, newFarm]);
-      setActiveFarm(newFarm);
+      setActiveFarmId(newFarm.id);
+      await refreshFarms();
       // Reset form fields
       setName('New Farm Holding');
     } catch (err: unknown) {
@@ -529,6 +530,24 @@ export const FarmRegistrationPage: React.FC = () => {
                     </span>
                   </div>
                 )}
+
+                {/* Active Farm Switcher Action */}
+                <div className="pt-2 flex items-center justify-between border-t border-stone-100">
+                  {farm.id === activeFarmId ? (
+                    <span className="text-[11px] font-bold text-agri-green-800 bg-agri-green-100 px-2.5 py-1 rounded-full flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {t('farms.active_holding')}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setActiveFarmId(farm.id)}
+                      className="text-[11px] font-bold text-stone-700 hover:text-agri-green-800 bg-stone-100 hover:bg-agri-green-50 px-2.5 py-1 rounded-full border border-stone-200 transition-all"
+                    >
+                      {t('farms.switch_farm')}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

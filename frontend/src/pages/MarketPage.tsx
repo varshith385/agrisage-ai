@@ -56,13 +56,13 @@ import {
 
 export const MarketPage: React.FC = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, activeFarm, activeCrop, location } = useAuth();
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<'mandi' | 'marketplace' | 'inquiries'>('mandi');
 
   // Mandi & Ranking States
-  const [selectedCrop, setSelectedCrop] = useState<string>('Cotton');
+  const [selectedCrop, setSelectedCrop] = useState<string>(activeCrop || 'Cotton');
   const [quantity, setQuantity] = useState<number>(20.0);
   const [transportRate, setTransportRate] = useState<number>(2.50);
   const [marketFeePct, setMarketFeePct] = useState<number>(1.0);
@@ -86,13 +86,25 @@ export const MarketPage: React.FC = () => {
   const [activeListingForInquiry, setActiveListingForInquiry] = useState<ListingResponse | null>(null);
 
   // New Listing Form
-  const [newCrop, setNewCrop] = useState<string>('Cotton');
+  const [newCrop, setNewCrop] = useState<string>(activeCrop || 'Cotton');
   const [newVariety, setNewVariety] = useState<string>('Bollgard II Hybrid');
   const [newQty, setNewQty] = useState<number>(30.0);
   const [newPrice, setNewPrice] = useState<number>(7250.0);
-  const [newVillage, setNewVillage] = useState<string>('Geikonda');
+  const [newVillage, setNewVillage] = useState<string>(
+    activeFarm?.village || location?.village || 'Geikonda'
+  );
   const [newHarvestDate, setNewHarvestDate] = useState<string>('2027-01-20');
   const [newDesc, setNewDesc] = useState<string>('Quality harvested crop, moisture below 8%.');
+
+  useEffect(() => {
+    if (activeCrop) {
+      setSelectedCrop(activeCrop);
+      setNewCrop(activeCrop);
+    }
+    if (activeFarm?.village) {
+      setNewVillage(activeFarm.village);
+    }
+  }, [activeFarm, activeCrop]);
 
   // Inquiry Form
   const [inqPrice, setInqPrice] = useState<number>(7200.0);
@@ -161,9 +173,9 @@ export const MarketPage: React.FC = () => {
         variety: newVariety,
         quantity_quintals: newQty,
         expected_price_per_q: newPrice,
-        state: 'Telangana',
-        district: 'Warangal',
-        village: newVillage,
+        state: activeFarm?.state || location?.state || 'Telangana',
+        district: activeFarm?.district || location?.district || 'Warangal',
+        village: newVillage || activeFarm?.village || 'Geikonda',
         harvest_date: newHarvestDate,
         description: newDesc,
       });

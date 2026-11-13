@@ -20,13 +20,11 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
 import { weatherApi } from '../api/weather';
-import { farmsApi } from '../api/farms';
 import { agentsApi } from '../api/agents';
 import { advisoryApi } from '../api/advisory';
 import { calculateEconomics } from '../api/economics';
 import {
   CurrentWeather,
-  Farm,
   AgentRunItem,
   OrchestratorRunResult,
   GrowthStageResponse,
@@ -44,11 +42,11 @@ import { AgentFlowDiagram } from '../components/agents/AgentFlowDiagram';
 import { AgentActivityLog } from '../components/agents/AgentActivityLog';
 
 export const DashboardPage: React.FC = () => {
-  const { user, activeFarm, activeCrop } = useAuth();
+  const { user, activeFarm, activeFarmId, activeCrop } = useAuth();
   const { t, language } = useTranslation();
   const navigate = useNavigate();
 
-  const [farmData, setFarmData] = useState<Farm | null>(null);
+  const farmData = activeFarm;
   const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState<boolean>(true);
   const [weatherError, setWeatherError] = useState<string | null>(null);
@@ -72,7 +70,7 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     if (farmData) {
       calculateEconomics({
-        crop_name: 'Cotton',
+        crop_name: activeCrop || 'Cotton',
         area: farmData.area,
         area_unit: 'acres',
         ownership_type: farmData.ownership_type as any,
@@ -86,7 +84,7 @@ export const DashboardPage: React.FC = () => {
         .then((data) => setEconomicsSummary(data))
         .catch((err) => console.error('Failed to load economics summary', err));
     }
-  }, [farmData]);
+  }, [farmData, activeCrop]);
 
   // Web Speech API State
   const [speechSpeaking, setSpeechSpeaking] = useState<boolean>(false);
@@ -105,19 +103,7 @@ export const DashboardPage: React.FC = () => {
     };
   }, []);
 
-  // Fetch full farm details
-  useEffect(() => {
-    farmsApi
-      .getFarms()
-      .then((farms) => {
-        if (farms.length > 0) {
-          setFarmData(farms[0]);
-        }
-      })
-      .catch((err) => console.error('Error fetching farm list', err));
-  }, []);
 
-  const activeFarmId = farmData?.id || activeFarm?.id;
 
   const loadAgentRuns = useCallback(async () => {
     if (!activeFarmId) return;
@@ -266,6 +252,26 @@ export const DashboardPage: React.FC = () => {
 
   const irrigationOutputs = irrigationEnvelope?.outputs as Record<string, any> | undefined;
   const diseaseOutputs = diseaseEnvelope?.outputs as Record<string, any> | undefined;
+
+  if (!activeFarm) {
+    return (
+      <div className="space-y-6">
+        <div className="p-8 text-center max-w-xl mx-auto space-y-4 bg-white border border-stone-200 rounded-3xl shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 mx-auto flex items-center justify-center font-bold">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <h2 className="text-lg font-bold text-stone-900">{t('farms.no_farm_selected')}</h2>
+          <p className="text-xs text-stone-600">{t('farms.complete_profile_prompt')}</p>
+          <button
+            onClick={() => navigate('/farms')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-agri-green-800 hover:bg-agri-green-700 text-white font-bold text-xs rounded-xl shadow transition-all"
+          >
+            {t('farms.complete_profile_cta')} &rarr;
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -24,7 +24,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { useTranslation } from '../context/LanguageContext';
-import { getFarms } from '../api/farms';
+import { useAuth } from '../context/AuthContext';
 import { getMandiPrices } from '../api/market';
 import {
   calculateEconomics,
@@ -33,7 +33,6 @@ import {
   getCostTemplates,
 } from '../api/economics';
 import {
-  Farm,
   EconomicsCalculationResponse,
   CropComparisonResponse,
   WhatIfResponse,
@@ -45,9 +44,8 @@ import { computeProfit } from '../utils/profitCalculator';
 
 export const EconomicsPage: React.FC = () => {
   const { t, language } = useTranslation();
+  const { activeFarm, activeFarmId, setActiveFarmId, farms } = useAuth();
 
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
   const [selectedCrop, setSelectedCrop] = useState<string>('Cotton');
 
   // Input states
@@ -112,27 +110,29 @@ export const EconomicsPage: React.FC = () => {
     }
   };
 
-  // Load farms on mount
+  // Synchronize inputs with active farm
   useEffect(() => {
-    getFarms()
-      .then((data: Farm[]) => {
-        setFarms(data);
-        if (data.length > 0) {
-          const f = data[0];
-          setSelectedFarm(f);
-          setArea(f.area);
-          setOwnershipType(f.ownership_type as any);
-          setOwnedArea(f.owned_area);
-          setLeasedArea(f.leased_area);
-          setSliderArea(f.area);
-          if (f.lease_amount && f.lease_amount > 0) {
-            setLeaseCostPerAcre(f.lease_amount);
-            setSliderLeaseRate(f.lease_amount);
-          }
-        }
-      })
-      .catch((err: unknown) => console.error('Failed to load farms:', err));
+    if (activeFarm) {
+      setArea(activeFarm.area);
+      setOwnershipType(activeFarm.ownership_type as any);
+      setOwnedArea(activeFarm.owned_area);
+      setLeasedArea(activeFarm.leased_area);
+      setSliderArea(activeFarm.area);
+      if (activeFarm.lease_amount && activeFarm.lease_amount > 0) {
+        setLeaseCostPerAcre(activeFarm.lease_amount);
+        setSliderLeaseRate(activeFarm.lease_amount);
+      }
+      if (activeFarm.irrigation_method) {
+        setIrrigationType(activeFarm.irrigation_method);
+      }
+      const activeCycle = activeFarm.current_crop_cycles?.find((c) => c.is_active);
+      if (activeCycle) {
+        setSelectedCrop(activeCycle.crop_name);
+      }
+    }
+  }, [activeFarm]);
 
+  useEffect(() => {
     getCostTemplates()
       .then((data: Record<string, any>) => setTemplates(data))
       .catch((err: unknown) => console.error('Failed to load templates:', err));
@@ -384,9 +384,21 @@ export const EconomicsPage: React.FC = () => {
         {/* Farm & Crop Selection */}
         <div className="flex flex-wrap items-center gap-3">
           {farms.length > 0 && (
-            <div className="bg-agri-cream-100/70 border border-agri-green-800/20 rounded-xl px-3 py-1.5 text-xs font-semibold text-agri-green-900">
-              <span className="text-[10px] uppercase text-stone-500 block">{t('farms.active_holding')}</span>
-              {selectedFarm?.name || 'Rameshwaram Farm'} ({area} ac)
+            <div className="flex items-center gap-2 bg-agri-cream-100/70 border border-agri-green-800/20 rounded-xl px-3 py-1.5 text-xs font-semibold text-agri-green-900">
+              <div>
+                <span className="text-[10px] uppercase text-stone-500 block">{t('farms.active_holding')}</span>
+                <select
+                  value={activeFarmId || ''}
+                  onChange={(e) => setActiveFarmId(Number(e.target.value))}
+                  className="bg-transparent font-bold text-stone-900 focus:outline-none cursor-pointer"
+                >
+                  {farms.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name} ({f.area} ac)
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           )}
           <select

@@ -110,7 +110,13 @@
     "method_label_short": "विधि",
     "coordinates_label": "निर्देशांक",
     "active_holding": "सक्रिय खेत",
-    "active_cycle_label": "सक्रिय फसल"
+    "active_cycle_label": "सक्रिय फसल",
+    "banner_title": "सक्रिय कृषि जोत",
+    "switch_farm": "खेत बदलें",
+    "no_farm_selected": "कोई खेत नहीं चुना गया",
+    "complete_profile_cta": "अपना फार्म प्रोफाइल पूरा करें",
+    "complete_profile_prompt": "कोई सक्रिय फार्म प्रोफाइल नहीं मिला। व्यक्तिगत सलाह सक्षम करने के लिए कृपया अपना खेत पंजीकृत करें।",
+    "register_new": "+ नया खेत पंजीकृत करें"
   },
   "dashboard": {
     "title": "किसान मुख्य डैशबोर्ड",

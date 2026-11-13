@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Users, Truck, Calculator, Wrench, AlertTriangle, Database } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { GroupsSection } from '../components/community/GroupsSection';
 import { RequestsSection } from '../components/community/RequestsSection';
@@ -11,6 +12,7 @@ import { OutbreakMapSection } from '../components/community/OutbreakMapSection';
 
 export const CommunityPage: React.FC = () => {
   const { t } = useTranslation();
+  const { activeFarm, location: userLoc } = useAuth();
   const location = useLocation();
 
   const [activeTab, setActiveTab] = useState<'groups' | 'requests' | 'calculator' | 'machinery' | 'outbreak'>('groups');
@@ -47,7 +49,7 @@ export const CommunityPage: React.FC = () => {
           </div>
         </div>
         <div className="text-[11px] font-semibold text-purple-300 bg-purple-950/60 px-3 py-1.5 rounded-xl border border-purple-800/80 shrink-0">
-          Centroid: Geikonda (Warangal)
+          Centroid: {activeFarm?.village || userLoc?.village || 'Geikonda'} ({activeFarm?.district || userLoc?.district || 'Warangal'})
         </div>
       </div>
 

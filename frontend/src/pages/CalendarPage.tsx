@@ -10,10 +10,9 @@ import {
   Sprout,
 } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
-import { getFarms } from '../api/farms';
+import { useAuth } from '../context/AuthContext';
 import { getCropCalendar, getSeasonalAwareness } from '../api/economics';
 import {
-  Farm,
   CropCalendarResponse,
   SeasonalAwarenessResponse,
 } from '../types/api';
@@ -22,9 +21,8 @@ import { ExplainCard } from '../components/common/ExplainCard';
 
 export const CalendarPage: React.FC = () => {
   const { t, language } = useTranslation();
+  const { activeFarm, activeFarmId, setActiveFarmId, farms } = useAuth();
 
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
   const [cropName, setCropName] = useState<string>('Cotton');
   const [plantingDate, setPlantingDate] = useState<string>('2026-08-15');
 
@@ -40,13 +38,18 @@ export const CalendarPage: React.FC = () => {
   const [notificationMsg, setNotificationMsg] = useState<string>('');
 
   useEffect(() => {
-    getFarms().then((data: Farm[]) => {
-      setFarms(data);
-      if (data.length > 0) {
-        setSelectedFarm(data[0]);
+    if (activeFarm) {
+      const activeCycle = activeFarm.current_crop_cycles?.find((c) => c.is_active);
+      if (activeCycle) {
+        setCropName(activeCycle.crop_name);
+        if (activeCycle.planting_date) {
+          setPlantingDate(activeCycle.planting_date);
+        }
       }
-    });
+    }
+  }, [activeFarm]);
 
+  useEffect(() => {
     getSeasonalAwareness().then((data) => setSeasonData(data));
   }, []);
 
@@ -122,11 +125,8 @@ export const CalendarPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-stone-100">
             {farms.length > 0 && (
               <select
-                value={selectedFarm?.id || ''}
-                onChange={(e) => {
-                  const f = farms.find((farm) => farm.id === Number(e.target.value));
-                  if (f) setSelectedFarm(f);
-                }}
+                value={activeFarmId || ''}
+                onChange={(e) => setActiveFarmId(Number(e.target.value))}
                 className="text-xs font-bold bg-stone-100 text-stone-800 rounded-lg px-2.5 py-1.5 border border-stone-300"
               >
                 {farms.map((f) => (
@@ -171,11 +171,10 @@ export const CalendarPage: React.FC = () => {
 
           <button
             onClick={requestNotificationOptIn}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-all ${
-              notificationPermission === 'granted'
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-all ${notificationPermission === 'granted'
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                 : 'bg-stone-50 text-stone-700 border-stone-300 hover:bg-stone-100'
-            }`}
+              }`}
           >
             {notificationPermission === 'granted' ? (
               <>
@@ -271,16 +270,14 @@ export const CalendarPage: React.FC = () => {
             {calendarData.lifecycle_stages.map((st) => (
               <div
                 key={st.stage_id}
-                className={`p-3 rounded-xl border transition-all ${
-                  st.is_active
+                className={`p-3 rounded-xl border transition-all ${st.is_active
                     ? 'bg-agri-gold-50 border-agri-gold-400 shadow-sm ring-2 ring-agri-gold-400/40'
                     : 'bg-stone-50/70 border-stone-200'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className={`text-[10px] font-black uppercase px-1.5 py-0.5 rounded ${
-                    st.is_active ? 'bg-agri-gold-400 text-stone-900' : 'bg-stone-200 text-stone-700'
-                  }`}>
+                  <span className={`text-[10px] font-black uppercase px-1.5 py-0.5 rounded ${st.is_active ? 'bg-agri-gold-400 text-stone-900' : 'bg-stone-200 text-stone-700'
+                    }`}>
                     {st.is_active ? 'Current' : `DAS ${st.start_das}`}
                   </span>
                 </div>
@@ -313,9 +310,8 @@ export const CalendarPage: React.FC = () => {
               <button
                 key={filterKey}
                 onClick={() => setEventTypeFilter(filterKey)}
-                className={`px-2.5 py-1 rounded-lg font-bold capitalize transition-all ${
-                  eventTypeFilter === filterKey ? 'bg-white shadow text-agri-green-900' : 'text-stone-600'
-                }`}
+                className={`px-2.5 py-1 rounded-lg font-bold capitalize transition-all ${eventTypeFilter === filterKey ? 'bg-white shadow text-agri-green-900' : 'text-stone-600'
+                  }`}
               >
                 {filterKey}
               </button>
@@ -335,9 +331,8 @@ export const CalendarPage: React.FC = () => {
                   <span className="px-2 py-0.5 bg-agri-cream-200 text-agri-green-900 text-[10px] font-black uppercase rounded-md tracking-wider">
                     {evt.event_type}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
-                    evt.priority === 'high' ? 'bg-red-100 text-red-800' : 'bg-stone-200 text-stone-700'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${evt.priority === 'high' ? 'bg-red-100 text-red-800' : 'bg-stone-200 text-stone-700'
+                    }`}>
                     {evt.priority} Priority
                   </span>
                 </div>

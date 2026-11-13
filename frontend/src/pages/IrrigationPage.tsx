@@ -34,9 +34,7 @@ import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { getIrrigationPlan, diagnoseIrrigationIssue } from '../api/irrigation';
 import { validateImageFile, compressImage } from '../utils/imageCompressor';
-import { farmsApi } from '../api/farms';
 import {
-  Farm,
   CurrentCropCycle,
   IrrigationPlanResponse,
   IrrigationDiagnosisResponse,
@@ -79,16 +77,9 @@ const IRRIGATION_METHODS = [
 
 export const IrrigationPage: React.FC = () => {
   const { t, language } = useTranslation();
-  const { activeFarm } = useAuth();
+  const { activeFarm, activeFarmId, setActiveFarmId, farms } = useAuth();
 
-  // Farm holdings
-  const { data: farms = [] } = useQuery<Farm[]>({
-    queryKey: ['farms'],
-    queryFn: farmsApi.getFarms,
-  });
-
-  // Selected parameters
-  const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>(undefined);
+  // Selected parameters synchronized with global activeFarm
   const [cropName, setCropName] = useState<string>('Cotton');
   const [plantingDate, setPlantingDate] = useState<string>(
     new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -97,16 +88,14 @@ export const IrrigationPage: React.FC = () => {
   const [irrigationMethod, setIrrigationMethod] = useState<string>('drip');
   const [areaAcres, setAreaAcres] = useState<number>(2.5);
 
-  // Initialize farm parameters from active farm or first farm
+  // Initialize and synchronize parameters from active farm
   useEffect(() => {
-    if (farms.length > 0 && selectedFarmId === undefined) {
-      const targetFarm = activeFarm ? farms.find((f) => f.id === activeFarm.id) || farms[0] : farms[0];
-      setSelectedFarmId(targetFarm.id);
-      setAreaAcres(targetFarm.area || 2.5);
-      if (targetFarm.soil_type) setSoilType(targetFarm.soil_type);
-      if (targetFarm.irrigation_method) setIrrigationMethod(targetFarm.irrigation_method);
+    if (activeFarm) {
+      setAreaAcres(activeFarm.area || 2.5);
+      if (activeFarm.soil_type) setSoilType(activeFarm.soil_type);
+      if (activeFarm.irrigation_method) setIrrigationMethod(activeFarm.irrigation_method);
 
-      const activeCycle = targetFarm.current_crop_cycles?.find((c: CurrentCropCycle) => c.is_active);
+      const activeCycle = activeFarm.current_crop_cycles?.find((c: CurrentCropCycle) => c.is_active);
       if (activeCycle) {
         setCropName(activeCycle.crop_name);
         if (activeCycle.planting_date) {
@@ -114,23 +103,12 @@ export const IrrigationPage: React.FC = () => {
         }
       }
     }
-  }, [farms, activeFarm, selectedFarmId]);
+  }, [activeFarm]);
 
   // When farmer selects a different holding
   const handleFarmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const fId = Number(e.target.value);
-    setSelectedFarmId(fId);
-    const chosen = farms.find((f) => f.id === fId);
-    if (chosen) {
-      setAreaAcres(chosen.area || 2.5);
-      if (chosen.soil_type) setSoilType(chosen.soil_type);
-      if (chosen.irrigation_method) setIrrigationMethod(chosen.irrigation_method);
-      const activeCycle = chosen.current_crop_cycles?.find((c: CurrentCropCycle) => c.is_active);
-      if (activeCycle) {
-        setCropName(activeCycle.crop_name);
-        if (activeCycle.planting_date) setPlantingDate(activeCycle.planting_date);
-      }
-    }
+    setActiveFarmId(fId);
   };
 
   // Results Ref for scrolling into view
@@ -149,14 +127,14 @@ export const IrrigationPage: React.FC = () => {
   // Plan Query
   const planPayload: IrrigationPlanPayload = useMemo(() => {
     return {
-      farm_id: selectedFarmId || activeFarm?.id,
+      farm_id: activeFarmId || activeFarm?.id,
       crop_name: cropName,
       planting_date: plantingDate,
       soil_type: soilType,
       irrigation_method: irrigationMethod,
       area_acres: areaAcres,
     };
-  }, [selectedFarmId, activeFarm, cropName, plantingDate, soilType, irrigationMethod, areaAcres]);
+  }, [activeFarmId, activeFarm, cropName, plantingDate, soilType, irrigationMethod, areaAcres]);
 
   const {
     data: planData,
@@ -233,8 +211,8 @@ export const IrrigationPage: React.FC = () => {
         const compressed = await compressImage(photoFile);
         formData.append('file', compressed);
       }
-      if (selectedFarmId) {
-        formData.append('farm_id', String(selectedFarmId));
+      if (activeFarmId) {
+        formData.append('farm_id', String(activeFarmId));
       }
       formData.append('confirmed', String(confirmOverride ?? isConfirmed));
       formData.append('language', language);
@@ -331,7 +309,7 @@ export const IrrigationPage: React.FC = () => {
               {t('irrigation.select_farm')}
             </label>
             <select
-              value={selectedFarmId || ''}
+              value={activeFarmId || ''}
               onChange={handleFarmChange}
               className="w-full px-3 py-2.5 rounded-xl border border-stone-300 bg-stone-50 text-xs font-semibold text-stone-900 focus:bg-white focus:ring-2 focus:ring-agri-green-600 focus:outline-none"
             >

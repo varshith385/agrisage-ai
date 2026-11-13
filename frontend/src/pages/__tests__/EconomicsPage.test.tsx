@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { EconomicsPage } from '../EconomicsPage';
 import { LanguageProvider } from '../../context/LanguageContext';
+import { AuthProvider } from '../../context/AuthContext';
 import * as economicsApi from '../../api/economics';
 import * as farmsApi from '../../api/farms';
 import * as marketApi from '../../api/market';
@@ -145,7 +146,9 @@ describe('EconomicsPage What-If Simulator', () => {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <LanguageProvider>
-            <EconomicsPage />
+            <AuthProvider>
+              <EconomicsPage />
+            </AuthProvider>
           </LanguageProvider>
         </BrowserRouter>
       </QueryClientProvider>

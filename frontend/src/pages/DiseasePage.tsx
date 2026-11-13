@@ -17,9 +17,9 @@ import {
 } from 'lucide-react';
 
 import { useTranslation } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { predictPlantDisease, getSupportedCrops, getDiseaseHistory } from '../api/disease';
 import { validateImageFile, compressImage } from '../utils/imageCompressor';
-import { farmsApi } from '../api/farms';
 import {
   DiseasePredictionResponse,
   SupportedCropsResponse,
@@ -38,7 +38,7 @@ export const DiseasePage: React.FC = () => {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>(undefined);
+  const { activeFarm, activeFarmId, setActiveFarmId, farms } = useAuth();
   const [cropHint, setCropHint] = useState<string>('');
   const [reportToOutbreak, setReportToOutbreak] = useState<boolean>(false);
   const [speechSpeaking, setSpeechSpeaking] = useState<boolean>(false);
@@ -73,20 +73,15 @@ export const DiseasePage: React.FC = () => {
     queryFn: getSupportedCrops,
   });
 
-  const { data: farms = [] } = useQuery<Farm[]>({
-    queryKey: ['farms'],
-    queryFn: farmsApi.getFarms,
-  });
-
+  // Synchronize crop hint with active farm
   useEffect(() => {
-    if (farms && farms.length > 0 && selectedFarmId === undefined) {
-      setSelectedFarmId(farms[0].id);
-      const activeCycle = farms[0].current_crop_cycles?.find((c: CurrentCropCycle) => c.is_active);
+    if (activeFarm) {
+      const activeCycle = activeFarm.current_crop_cycles?.find((c: CurrentCropCycle) => c.is_active);
       if (activeCycle) {
         setCropHint(activeCycle.crop_name);
       }
     }
-  }, [farms, selectedFarmId]);
+  }, [activeFarm]);
 
   const { data: history = [] } = useQuery<DiseaseHistoryItem[]>({
     queryKey: ['diseaseHistory'],
@@ -103,8 +98,8 @@ export const DiseasePage: React.FC = () => {
       if (cropHint.trim()) {
         formData.append('crop_hint', cropHint.trim());
       }
-      if (selectedFarmId !== undefined) {
-        formData.append('farm_id', String(selectedFarmId));
+      if (activeFarmId !== null && activeFarmId !== undefined) {
+        formData.append('farm_id', String(activeFarmId));
       }
       formData.append('report_to_outbreak', String(reportToOutbreak));
       formData.append('confirmed', String(confirmOverride ?? isConfirmed));
@@ -185,15 +180,10 @@ export const DiseasePage: React.FC = () => {
   const handleFarmSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     if (!val) {
-      setSelectedFarmId(undefined);
+      setActiveFarmId(null);
     } else {
       const farmId = parseInt(val, 10);
-      setSelectedFarmId(farmId);
-      const farm = (farms as Farm[]).find((f: Farm) => f.id === farmId);
-      const activeCycle = farm?.current_crop_cycles?.find((c: CurrentCropCycle) => c.is_active);
-      if (activeCycle) {
-        setCropHint(activeCycle.crop_name);
-      }
+      setActiveFarmId(farmId);
     }
   };
 
@@ -420,7 +410,7 @@ export const DiseasePage: React.FC = () => {
                 {t('disease.select_farm_label')}
               </label>
               <select
-                value={selectedFarmId || ''}
+                value={activeFarmId || ''}
                 onChange={handleFarmSelect}
                 className="w-full px-3.5 py-2.5 rounded-2xl border border-agri-cream-300 bg-white text-xs text-agri-green-900 font-medium focus:ring-2 focus:ring-agri-green-600 focus:outline-none"
               >

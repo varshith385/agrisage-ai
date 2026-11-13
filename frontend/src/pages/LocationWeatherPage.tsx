@@ -11,23 +11,35 @@ import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorState } from '../components/common/ErrorState';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { useTranslation } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 export const LocationWeatherPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { activeFarm, location, setLocation } = useAuth();
 
-  // Location Selector State
+  // Location Selector State (defaulting to activeFarm/global location)
   const [states, setStates] = useState<string[]>([]);
-  const [selectedState, setSelectedState] = useState<string>('Telangana');
+  const [selectedState, setSelectedState] = useState<string>(
+    activeFarm?.state || location?.state || 'Telangana'
+  );
   const [districts, setDistricts] = useState<string[]>([]);
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('Warangal');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(
+    activeFarm?.district || location?.district || 'Warangal'
+  );
   const [villages, setVillages] = useState<VillageItem[]>([]);
-  const [selectedVillage, setSelectedVillage] = useState<string>('Geikonda');
+  const [selectedVillage, setSelectedVillage] = useState<string>(
+    activeFarm?.village || location?.village || 'Geikonda'
+  );
   const [isPartialNotice, setIsPartialNotice] = useState<boolean>(true);
 
   // Weather & Agronomic State
-  const [currentLat, setCurrentLat] = useState<number>(17.9689);
-  const [currentLon, setCurrentLon] = useState<number>(79.5941);
+  const [currentLat, setCurrentLat] = useState<number>(
+    activeFarm?.latitude || location?.latitude || 17.9689
+  );
+  const [currentLon, setCurrentLon] = useState<number>(
+    activeFarm?.longitude || location?.longitude || 79.5941
+  );
   const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
   const [dailyForecast, setDailyForecast] = useState<DailyForecastItem[]>([]);
   const [suitability, setSuitability] = useState<CropSuitabilityResponse | null>(null);
@@ -112,12 +124,29 @@ export const LocationWeatherPage: React.FC = () => {
     }
   }, [currentLat, currentLon]);
 
+  useEffect(() => {
+    if (activeFarm) {
+      if (activeFarm.state) setSelectedState(activeFarm.state);
+      if (activeFarm.district) setSelectedDistrict(activeFarm.district);
+      if (activeFarm.village) setSelectedVillage(activeFarm.village);
+      if (activeFarm.latitude) setCurrentLat(activeFarm.latitude);
+      if (activeFarm.longitude) setCurrentLon(activeFarm.longitude);
+    }
+  }, [activeFarm]);
+
   const handleVillageChange = (villageName: string) => {
     setSelectedVillage(villageName);
     const item = villages.find((v) => v.village === villageName);
     if (item) {
       setCurrentLat(item.lat);
       setCurrentLon(item.lon);
+      setLocation({
+        state: selectedState,
+        district: selectedDistrict,
+        village: item.village,
+        latitude: item.lat,
+        longitude: item.lon,
+      });
     }
   };
 

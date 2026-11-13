@@ -7,6 +7,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { getRotationRecommendations } from '../api/economics';
 import { apiRequest } from '../api/client';
 import {
@@ -20,6 +21,7 @@ import { ExplainCard } from '../components/common/ExplainCard';
 
 export const CropRecommendationPage: React.FC = () => {
   const { t } = useTranslation();
+  const { activeCrop } = useAuth();
 
   // ML Recommendation Inputs
   const [n, setN] = useState<number>(50.0);
@@ -34,10 +36,16 @@ export const CropRecommendationPage: React.FC = () => {
   const [mlResult, setMlResult] = useState<CropRecommendationResponse | null>(null);
   const [loadingMl, setLoadingMl] = useState<boolean>(false);
 
-  // Crop Rotation Inputs
-  const [prevCrop, setPrevCrop] = useState<string>('Cotton');
+  // Crop Rotation Inputs (synchronized with active crop)
+  const [prevCrop, setPrevCrop] = useState<string>(activeCrop || 'Cotton');
   const [rotationData, setRotationData] = useState<CropRotationResponse | null>(null);
   const [loadingRotation, setLoadingRotation] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (activeCrop) {
+      setPrevCrop(activeCrop);
+    }
+  }, [activeCrop]);
 
   const fetchRecommendation = async () => {
     setLoadingMl(true);

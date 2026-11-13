@@ -110,7 +110,13 @@
     "method_label_short": "Method",
     "coordinates_label": "Coordinates",
     "active_holding": "Active Holding",
-    "active_cycle_label": "Active"
+    "active_cycle_label": "Active",
+    "banner_title": "Active Farm Holding",
+    "switch_farm": "Switch Farm",
+    "no_farm_selected": "No Farm Selected",
+    "complete_profile_cta": "Complete your farm profile",
+    "complete_profile_prompt": "No active farm profile found. Please register your farm to enable personalized advisories.",
+    "register_new": "+ Register New Farm"
   },
   "dashboard": {
     "title": "Executive Farmer Dashboard",
