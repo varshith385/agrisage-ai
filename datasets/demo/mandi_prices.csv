@@ -1,0 +1,30 @@
+mandi,district,state,latitude,longitude,commodity,variety,arrival_date,min_price,max_price,modal_price,is_demo,source,last_verified
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Cotton,Bollgard II Hybrid,2026-11-12,6850,7450,7180,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Khammam APMC,Khammam,Telangana,17.2473,80.1514,Cotton,Medium Staple,2026-11-12,6700,7350,7100,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Nizamabad APMC,Nizamabad,Telangana,18.6725,78.0941,Cotton,Long Staple,2026-11-11,7000,7600,7320,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Suryapet APMC,Suryapet,Telangana,17.1439,79.6239,Cotton,Medium Staple,2026-11-12,6650,7250,7050,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Badepally APMC,Mahabubnagar,Telangana,16.7667,78.1333,Cotton,Bollgard II Hybrid,2026-11-12,6800,7400,7150,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Adilabad APMC,Adilabad,Telangana,19.6641,78.5320,Cotton,Long Staple,2026-11-11,6950,7550,7290,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Karimnagar APMC,Karimnagar,Telangana,18.4386,79.1288,Cotton,Medium Staple,2026-11-12,6750,7380,7120,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Siddipet APMC,Siddipet,Telangana,18.1018,78.8520,Cotton,Medium Staple,2026-11-12,6800,7420,7160,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Chilli,Teja,2026-11-12,14500,16800,15800,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Khammam APMC,Khammam,Telangana,17.2473,80.1514,Chilli,Guntur Sannam,2026-11-12,15000,17200,16200,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Guntur APMC,Guntur,Andhra Pradesh,16.3067,80.4365,Chilli,Teja Dry,2026-11-12,15500,17800,16650,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Paddy,Common (BPT 5204),2026-11-12,2250,2420,2340,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Suryapet APMC,Suryapet,Telangana,17.1439,79.6239,Paddy,Grade A,2026-11-12,2300,2460,2390,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Nalgonda APMC,Nalgonda,Telangana,17.0575,79.2684,Paddy,Common,2026-11-12,2200,2380,2310,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Karimnagar APMC,Karimnagar,Telangana,18.4386,79.1288,Paddy,Common,2026-11-12,2240,2410,2330,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Rice,Common (Sona Masuri),2026-11-12,2250,2420,2340,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Suryapet APMC,Suryapet,Telangana,17.1439,79.6239,Rice,Common,2026-11-12,2300,2460,2390,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Maize,Yellow Hybrid,2026-11-12,1980,2300,2150,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Nizamabad APMC,Nizamabad,Telangana,18.6725,78.0941,Maize,Yellow,2026-11-11,2050,2350,2220,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Khammam APMC,Khammam,Telangana,17.2473,80.1514,Maize,Yellow,2026-11-12,1950,2280,2120,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Groundnut,Pod,2026-11-12,6200,6900,6650,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Badepally APMC,Mahabubnagar,Telangana,16.7667,78.1333,Groundnut,Pod,2026-11-12,6350,7100,6800,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Adilabad APMC,Adilabad,Telangana,19.6641,78.5320,Soybean,Yellow,2026-11-11,4600,5200,4950,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Nizamabad APMC,Nizamabad,Telangana,18.6725,78.0941,Soybean,Yellow,2026-11-11,4700,5280,5020,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Tur / Arhar,Red Gram,2026-11-12,7400,8200,7850,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Nizamabad APMC,Nizamabad,Telangana,18.6725,78.0941,Wheat,Lokwan,2026-11-11,2350,2650,2480,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Enumamula (Warangal),Warangal,Telangana,17.9943,79.6200,Tomato,Desi,2026-11-12,1200,1800,1500,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+Khammam APMC,Khammam,Telangana,17.2473,80.1514,Tomato,Hybrid,2026-11-12,1300,1950,1650,True,AgriSage Synthetic Demo Dataset (datasets/demo/mandi_prices.csv),2026-11-13
+

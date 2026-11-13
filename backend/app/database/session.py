@@ -40,5 +40,6 @@ def init_db() -> None:
     import backend.app.models.soil_card
     import backend.app.models.community
     import backend.app.models.machinery
+    import backend.app.models.market
 
     Base.metadata.create_all(bind=engine)

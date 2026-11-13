@@ -226,9 +226,9 @@ def test_voice_api_market_price_notice(client, setup_voice_db):
     assert res.status_code == 200
     data = res.json()
     assert data["intent"] == "price"
-    assert "not available yet" in data["spoken_text"].lower()
-    assert data["status"] == "PARTIAL"
-    assert data["action_link"] == "/economics"
+    assert "mandi price" in data["spoken_text"].lower() or "enumamula" in data["spoken_text"].lower()
+    assert data["action_link"] == "/market"
+    assert data["structured_data"]["market_data_available"] is True
 
 
 # 4. No-Key LLM Fallback Test
