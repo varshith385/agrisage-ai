@@ -9,9 +9,12 @@ import {
   ChevronUp,
   AlertTriangle,
   FileSpreadsheet,
+  Store,
+  Check,
 } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
 import { getFarms } from '../api/farms';
+import { getMandiPrices } from '../api/market';
 import {
   calculateEconomics,
   compareCrops,
@@ -75,6 +78,26 @@ export const EconomicsPage: React.FC = () => {
 
   const [showCostEditor, setShowCostEditor] = useState<boolean>(true);
   const [tenureTab, setTenureTab] = useState<'combined' | 'owned' | 'leased'>('combined');
+  const [mandiPriceLoading, setMandiPriceLoading] = useState<boolean>(false);
+  const [mandiFeedback, setMandiFeedback] = useState<string | null>(null);
+
+  const handleUseMandiPrice = async () => {
+    setMandiPriceLoading(true);
+    try {
+      const res = await getMandiPrices({ crop: selectedCrop });
+      if (res.prices && res.prices.length > 0) {
+        const modal = res.prices[0].modal_price;
+        setExpectedPrice(modal);
+        setSliderPrice(modal);
+        setMandiFeedback(`${t('market.use_mandi_price_success')} ${modal} (${res.prices[0].mandi})`);
+        setTimeout(() => setMandiFeedback(null), 4000);
+      }
+    } catch (err) {
+      console.error('Failed to fetch mandi price:', err);
+    } finally {
+      setMandiPriceLoading(false);
+    }
+  };
 
   // Load farms on mount
   useEffect(() => {
@@ -230,8 +253,26 @@ export const EconomicsPage: React.FC = () => {
             <option value="Soybean">Soybean (సోయాచిక్కుడు / सोयाबीन)</option>
             <option value="Pulses">Pulses (కందులు / दालें)</option>
           </select>
+
+          <button
+            type="button"
+            onClick={handleUseMandiPrice}
+            disabled={mandiPriceLoading}
+            className="flex items-center gap-1.5 px-3 py-2 bg-agri-gold-400 hover:bg-agri-gold-500 text-stone-900 font-bold text-xs rounded-xl shadow-sm transition-all disabled:opacity-50"
+            title="Use current APMC mandi modal price for this crop"
+          >
+            <Store className="w-4 h-4 text-agri-green-900" />
+            <span>{mandiPriceLoading ? '...' : t('market.use_mandi_price')}</span>
+          </button>
         </div>
       </div>
+
+      {mandiFeedback && (
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 animate-fadeIn">
+          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{mandiFeedback}</span>
+        </div>
+      )}
 
       {/* Honest Price & Yield Disclaimer Banner */}
       <div className="bg-amber-50/90 border border-amber-200/80 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-900">

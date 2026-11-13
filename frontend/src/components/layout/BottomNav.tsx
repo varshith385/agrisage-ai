@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, DollarSign, Calendar, Leaf, Droplets } from 'lucide-react';
+import { LayoutDashboard, DollarSign, Store, Calendar, Droplets, Leaf } from 'lucide-react';
 import { useTranslation } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +12,7 @@ export const BottomNav: React.FC = () => {
 
   const navItems = [
     { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
+    { to: '/market', label: t('nav.market'), icon: Store },
     { to: '/economics', label: t('nav.economics'), icon: DollarSign },
     { to: '/calendar', label: t('nav.calendar'), icon: Calendar },
     { to: '/irrigation', label: t('nav.irrigation'), icon: Droplets },

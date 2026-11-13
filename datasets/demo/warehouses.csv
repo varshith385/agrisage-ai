@@ -1,0 +1,7 @@
+name,warehouse_type,district,state,latitude,longitude,capacity_mt,daily_charge_per_quintal,source,last_verified
+Telangana State Warehousing Corporation (TSWC) Enumamula,Dry Storage,Warangal,Telangana,17.9850,79.6120,15000,0.45,AgriSage Demo Warehouse Dataset (datasets/demo/warehouses.csv),
+Central Warehousing Corporation (CWC) Warangal,Dry Storage,Warangal,Telangana,17.9620,79.5840,25000,0.50,AgriSage Demo Warehouse Dataset (datasets/demo/warehouses.csv),
+Kakatiya Agro Cold Storage,Cold Storage,Warangal,Telangana,18.0120,79.6450,5000,1.20,AgriSage Demo Warehouse Dataset (datasets/demo/warehouses.csv),
+Khammam District Cooperative Central Bank Godown,Dry Storage,Khammam,Telangana,17.2510,80.1420,8000,0.40,AgriSage Demo Warehouse Dataset (datasets/demo/warehouses.csv),
+Nizamabad Agro Logistic Hub,Dry & Silo Storage,Nizamabad,Telangana,18.6650,78.0850,20000,0.48,AgriSage Demo Warehouse Dataset (datasets/demo/warehouses.csv),
+Badepally Rural Warehouse Facility,Dry Storage,Mahabubnagar,Telangana,16.7720,78.1410,6500,0.42,AgriSage Demo Warehouse Dataset (datasets/demo/warehouses.csv),

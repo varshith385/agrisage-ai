@@ -817,6 +817,233 @@ export interface CropCalendarResponse {
   status: FeatureStatus;
 }
 
+// ==========================================
+// Market & Marketplace Types (Module 12 & 13)
+// ==========================================
+
+export interface MandiPriceRecord {
+  mandi: string;
+  district: string;
+  state: string;
+  commodity: string;
+  variety?: string | null;
+  arrival_date: string;
+  min_price: number;
+  max_price: number;
+  modal_price: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  distance_km?: number | null;
+  is_demo: boolean;
+  source: string;
+  last_verified?: string | null;
+}
+
+export interface MandiPriceResponse {
+  crop: string;
+  district?: string | null;
+  state?: string | null;
+  prices: MandiPriceRecord[];
+  total_records: number;
+  source: string;
+  fetched_at: string;
+  demo: boolean;
+}
+
+export interface NetRealizationItem {
+  mandi: string;
+  district: string;
+  state: string;
+  modal_price: number;
+  quantity_quintals: number;
+  distance_km: number;
+  transport_rate_per_km_per_q: number;
+  transport_cost: number;
+  market_fee_pct: number;
+  market_fee: number;
+  gross_revenue: number;
+  net_realization: number;
+  net_realization_per_q: number;
+  rank: number;
+  reasoning: string;
+  is_demo: boolean;
+  source: string;
+}
+
+export interface NetRealizationRankingResponse {
+  crop: string;
+  quantity_quintals: number;
+  farmer_latitude: number;
+  farmer_longitude: number;
+  transport_rate_assumption: number;
+  market_fee_pct_assumption: number;
+  assumptions_note: string;
+  rankings: NetRealizationItem[];
+  best_mandi?: NetRealizationItem | null;
+  source: string;
+  fetched_at: string;
+  demo: boolean;
+}
+
+export interface MSPBenchmarkItem {
+  crop: string;
+  variety: string;
+  season: string;
+  year: string;
+  msp_per_quintal?: number | null;
+  source_url: string;
+  source_organization: string;
+  last_verified?: string | null;
+}
+
+export interface MSPComparisonResponse {
+  crop: string;
+  expected_price_per_q: number;
+  msp_verified: boolean;
+  benchmark?: MSPBenchmarkItem | null;
+  status_label: 'above_msp' | 'below_msp' | 'at_msp' | 'msp_not_verified';
+  variance_amount?: number | null;
+  variance_pct?: number | null;
+  explanation: string;
+  source_url?: string | null;
+  last_verified?: string | null;
+  status?: string;
+  demo: boolean;
+}
+
+export interface HistoricalPricePoint {
+  month_year: string;
+  date: string;
+  modal_price: number;
+  min_price: number;
+  max_price: number;
+  arrivals_tonnes?: number | null;
+  is_forecast?: boolean;
+}
+
+export interface PriceTrendResponse {
+  crop: string;
+  mandi: string;
+  historical_prices: HistoricalPricePoint[];
+  forecast_prices: HistoricalPricePoint[];
+  trend_direction: 'rising' | 'stable' | 'falling';
+  best_time_to_sell_hint: string;
+  seasonal_pattern_summary: string;
+  error_margin_pct?: number | null;
+  disclaimer: string;
+  is_indicative: boolean;
+  status?: string;
+  source: string;
+  demo: boolean;
+}
+
+export interface WarehouseItem {
+  name: string;
+  warehouse_type: string;
+  district: string;
+  state: string;
+  distance_km?: number | null;
+  capacity_mt: number;
+  daily_charge_per_quintal: number;
+  source: string;
+  demo: boolean;
+}
+
+export interface WarehouseResponse {
+  warehouses: WarehouseItem[];
+  farmer_latitude?: number | null;
+  farmer_longitude?: number | null;
+  source: string;
+  demo: boolean;
+}
+
+export interface FarmerContactDetails {
+  full_name: string;
+  phone_number?: string | null;
+  email?: string | null;
+}
+
+export interface ListingResponse {
+  id: number;
+  farmer_id: number;
+  farmer_name: string;
+  crop_name: string;
+  variety?: string | null;
+  quantity_quintals: number;
+  expected_price_per_q: number;
+  state: string;
+  district: string;
+  village: string;
+  harvest_date: string;
+  description?: string | null;
+  status: string;
+  is_verified_seller: boolean;
+  is_owner: boolean;
+  farmer_contact?: FarmerContactDetails | null;
+  contact_unlocked: boolean;
+  inquiry_count: number;
+  average_rating?: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ListingCreatePayload {
+  crop_name: string;
+  variety?: string;
+  quantity_quintals: number;
+  expected_price_per_q: number;
+  state: string;
+  district: string;
+  village: string;
+  harvest_date: string;
+  description?: string;
+}
+
+export interface InquiryResponse {
+  id: number;
+  listing_id: number;
+  listing_crop: string;
+  listing_village: string;
+  buyer_id: number;
+  buyer_name: string;
+  buyer_phone?: string | null;
+  buyer_email?: string | null;
+  offered_price_per_q: number;
+  quantity_quintals: number;
+  message?: string | null;
+  status: 'pending' | 'accepted' | 'declined';
+  farmer_contact?: FarmerContactDetails | null;
+  contact_unlocked: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InquiryCreatePayload {
+  listing_id: number;
+  offered_price_per_q: number;
+  quantity_quintals: number;
+  message?: string;
+}
+
+export interface ReviewResponse {
+  id: number;
+  farmer_id: number;
+  buyer_id: number;
+  buyer_name: string;
+  listing_id?: number | null;
+  rating: number;
+  comment?: string | null;
+  created_at: string;
+}
+
+export interface ReviewCreatePayload {
+  farmer_id: number;
+  listing_id?: number;
+  rating: number;
+  comment?: string;
+}
+
+
 
 
 

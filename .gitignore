@@ -56,6 +56,7 @@ model_artifacts/*
 !model_artifacts/.gitkeep
 datasets/*
 !datasets/demo/
+!datasets/msp.csv
 !datasets/README.md
 *.bin
 *.pt

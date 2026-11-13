@@ -22,6 +22,7 @@ from backend.app.models.farm import (
     CurrentCropCycle,
     CropStage,
 )
+from backend.app.models.market import MarketplaceListing, MarketplaceInquiry, FarmerRating
 from backend.app.security.auth import hash_password
 
 
@@ -156,6 +157,55 @@ def seed_database():
             )
             db.add(admin)
             db.commit()
+
+        # 6. Seed Demo Marketplace Listings and Inquiries
+        listing_cotton = db.query(MarketplaceListing).filter(
+            MarketplaceListing.farmer_id == farmer.id,
+            MarketplaceListing.crop_name == "Cotton",
+        ).first()
+        if not listing_cotton:
+            print("Creating Ramesh's demo cotton harvest listing...")
+            listing_cotton = MarketplaceListing(
+                farmer_id=farmer.id,
+                crop_name="Cotton",
+                variety="Bollgard II Hybrid",
+                quantity_quintals=40.0,
+                expected_price_per_q=7250.0,
+                state="Telangana",
+                district="Warangal",
+                village="Geikonda",
+                harvest_date="2027-01-15",
+                description="Quality Bollgard II cotton harvest from drip-irrigated holding in Geikonda. Moisture below 8%, clean staple.",
+                status="active",
+                is_verified_seller=True,
+            )
+            db.add(listing_cotton)
+            db.commit()
+            db.refresh(listing_cotton)
+
+            # Seed Buyer inquiry from Suresh Reddy
+            inq = MarketplaceInquiry(
+                listing_id=listing_cotton.id,
+                buyer_id=buyer.id,
+                offered_price_per_q=7200.0,
+                quantity_quintals=40.0,
+                message="Warangal Cotton FPO procurement offer. Immediate electronic settlement on mandi weighment.",
+                status="pending",
+            )
+            db.add(inq)
+            db.commit()
+
+            # Seed demo rating
+            review = FarmerRating(
+                farmer_id=farmer.id,
+                buyer_id=buyer.id,
+                listing_id=listing_cotton.id,
+                rating=5,
+                comment="Reliable harvest, genuine sample quality and prompt communication.",
+            )
+            db.add(review)
+            db.commit()
+            print("Demo marketplace listing, inquiry, and review seeded.")
 
         print("\n=== Idempotent Seeding Completed Successfully! ===")
         print(f"Demo Farmer : {farmer_email} (One-Click Demo Mode supported)")
