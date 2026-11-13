@@ -88,9 +88,13 @@ class YieldEstimate(BaseModel):
 class AdvisoryPlan(BaseModel):
     status: Literal["WORKING", "PARTIAL", "DEMO", "stub"] = "stub"
     message: str = "not implemented yet"
-    # Prediction fields must be None in stub
+    # Numeric prediction fields are None in stub
     farm_health_score: Optional[int] = None
-    seven_day_plan: Optional[List[str]] = None
+    farm_health_breakdown: Optional[Dict[str, Any]] = None
+    seven_day_plan: Optional[List[Any]] = None
+    headline_yield: Optional[Dict[str, Any]] = None
+    growth_stage: Optional[Dict[str, Any]] = None
+    risk_alerts: List[str] = Field(default_factory=list)
     summary: Optional[str] = None
     explainable_cards: List[ExplainabilitySchema] = Field(default_factory=list)
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)

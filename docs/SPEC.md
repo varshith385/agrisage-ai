@@ -355,6 +355,11 @@ erDiagram
 - `GET /runs?farm_id={id}`: Lists historical agent runs with execution time and status.
 - `GET /runs/{id}`: Retrieves detailed inputs, outputs, and JSON telemetry for single run.
 
+### Module 5b: Advisory & Growth Stage (`/api/v1/advisory`)
+- `GET /stage?crop={crop}&planting_date={YYYY-MM-DD}`: Computes DAS, 5-stage phenological timeline mapped onto FAO-56 4 stages, stage progress %, cycle progress %, and next stage countdown.
+- `GET /tasks?crop={crop}&planting_date={YYYY-MM-DD}`: Returns stage-appropriate agronomic tasks (fertilizer window, scouting, spraying window, irrigation sensitivity) as general guidance with zero chemical dosages.
+- `POST /plan`: Synthesizes or retrieves the full coordinated `AdvisoryPlan` (7-day action plan with agent tracing and explainable "because..." rationales, transparent 5-component Farm Health Score formula, headline yield, risk alerts).
+
 ### Module 6: Disease Diagnosis (`/api/v1/disease`)
 - `POST /predict`: Multipart form image upload (`file`, `crop_hint`, `farm_id`). Evaluates quality gate, runs CV model, returns top-3 classes, confidence, and safe IPM steps.
 

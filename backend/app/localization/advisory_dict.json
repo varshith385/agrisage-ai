@@ -1,0 +1,103 @@
+{
+  "_metadata": {
+    "description": "Deterministic agricultural phrase dictionaries for English, Telugu, and Hindi.",
+    "status": "indicative_unverified",
+    "review_note": "Added in Phase 3.5 — requires native-speaker agronomic review in docs/I18N_REVIEW.md"
+  },
+  "stages": {
+    "germination": {
+      "en": "Germination & Emergence",
+      "te": "మొలకెత్తడం మరియు నాటుకొనడం",
+      "hi": "अंकुरण और स्थापना"
+    },
+    "vegetative": {
+      "en": "Vegetative Growth",
+      "te": "శాఖా ఎదుగుదల దశ",
+      "hi": "वानस्पतिक वृद्धि"
+    },
+    "flowering": {
+      "en": "Flowering & Blossom",
+      "te": "పూత దశ",
+      "hi": "फूल आने की अवस्था"
+    },
+    "fruiting": {
+      "en": "Fruiting / Boll / Grain Filling",
+      "te": "కాయ / గింజ నిండే దశ",
+      "hi": "फल / दाना भरने की अवस्था"
+    },
+    "maturity": {
+      "en": "Maturity & Harvest",
+      "te": "పక్వత మరియు కోత దశ",
+      "hi": "परिपक्वता और कटाई"
+    }
+  },
+  "actions": {
+    "defer_irrigation_rain": {
+      "en": "Defer scheduled irrigation; upcoming rain forecast provides sufficient root moisture.",
+      "te": "నీటి తడిని వాయిదా వేయండి; రానున్న వర్షం వల్ల తగినంత తేమ లభిస్తుంది.",
+      "hi": "सिंचाई स्थगित करें; आगामी बारिश से पर्याप्त नमी मिलेगी।"
+    },
+    "apply_light_irrigation": {
+      "en": "Apply scheduled irrigation; replenish soil moisture to prevent vegetative stress.",
+      "te": "షెడ్యూల్ ప్రకారం తేలికపాటి తడి అందించండి; మొక్కలు ఒత్తిడికి గురికాకుండా చూడండి.",
+      "hi": "हल्की सिंचाई करें; फसल को नमी के तनाव से बचाएं।"
+    },
+    "scout_pests_flowering": {
+      "en": "Inspect flower buds and lower leaf surfaces for sucking pests and bollworms.",
+      "te": "పూత మొగ్గలు మరియు ఆకుల అడుగు భాగాన రసం పీల్చే పురుగులను గమనించండి.",
+      "hi": "फूलों की कलियों और पत्तियों पर रस चूसक कीटों की निगरानी करें।"
+    },
+    "scout_fungal_spots": {
+      "en": "Scout lower canopy leaves for foliar leaf spots or chlorotic lesions.",
+      "te": "మొక్కల దిగువ ఆకులపై మచ్చలు లేదా పసుపు రంగు మార్పులను పరిశీలించండి.",
+      "hi": "निचली पत्तियों पर फफूंद के धब्बों या पीलापन की जांच करें।"
+    },
+    "install_traps": {
+      "en": "Install yellow sticky traps or pheromone traps for pest population monitoring.",
+      "te": "పురుగుల ఉధృతిని గమనించడానికి పసుపు జిగురు లేదా లింగాకర్షక బుట్టలు ఏర్పాటు చేయండి.",
+      "hi": "कीटों की निगरानी के लिए पीले चिपचिपे या फेरोमोन ट्रैप लगाएं।"
+    },
+    "soil_aeration_weeding": {
+      "en": "Intercultivate or hand-weed between crop rows to preserve moisture and aerate root zone.",
+      "te": "అంతరకృషి లేదా కలుపు తీత చేపట్టి తేమ ఆవిరి కాకుండా కాపాడండి.",
+      "hi": "निराई-गुड़ाई करें ताकि जड़ों को हवा मिले और नमी बची रहे।"
+    },
+    "prepare_harvest": {
+      "en": "Prepare clean harvesting bags and inspect crop maturity for timely harvesting.",
+      "te": "పంట కోతకు సిద్ధం చేయండి; శుభ్రమైన సంచులను సిద్ధంగా ఉంచుకోండి.",
+      "hi": "फसल कटाई की तैयारी करें और साफ बोरों की व्यवस्था करें।"
+    },
+    "weather_safeguard": {
+      "en": "Clear field drainage channels to prevent water stagnation in case of heavy downpour.",
+      "te": "భారీ వర్షాలు కురిసినా నీరు నిలవకుండా మురుగు కాలువలను శుభ్రం చేయండి.",
+      "hi": "खेत में पानी भरने से रोकने के लिए जल निकासी नालियों को साफ करें।"
+    }
+  },
+  "reasons": {
+    "rain_expected": {
+      "en": "Because meteorological forecast indicates significant precipitation, conserving groundwater pumping.",
+      "te": "వాతావరణ శాఖ వర్ష సూచన ఇచ్చినందున, భూగర్భ జలాలు మరియు విద్యుత్ ఆదా అవుతాయి.",
+      "hi": "क्योंकि बारिश का पूर्वानुमान है, जिससे भूजल और बिजली की बचत होगी।"
+    },
+    "flowering_critical": {
+      "en": "Because flowering is the most moisture-sensitive phenological stage; water deficit induces flower/boll shedding.",
+      "te": "పూత దశలో నీటి ఎద్దడి ఏర్పడితే పూత మరియు పిందెలు రాలిపోయే ప్రమాదం ఉన్నందున.",
+      "hi": "क्योंकि फूल आने की अवस्था में पानी की कमी से फूल और फल झड़ने का खतरा रहता है।"
+    },
+    "fungal_humidity_driver": {
+      "en": "Because high ambient humidity (>80%) creates favorable conditions for fungal spore germination.",
+      "te": "గాలిలో తేమ శాతం ఎక్కువగా ఉన్నందున శిలీంధ్ర వ్యాధులు వ్యాపించే అవకాశం ఉన్నందున.",
+      "hi": "क्योंकि हवा में नमी अधिक होने से फफूंद रोगों का प्रकोप बढ़ सकता है।"
+    },
+    "high_et0_evaporation": {
+      "en": "Because dry atmospheric conditions and high reference ET0 accelerate root zone depletion.",
+      "te": "ఎండ తీవ్రత మరియు ఆవిరి రేటు అధికంగా ఉండటం వల్ల నేలలోని తేమ వేగంగా తగ్గుతున్నందున.",
+      "hi": "क्योंकि तेज धूप और वाष्पीकरण दर अधिक होने से मिट्टी की नमी तेजी से घट रही है।"
+    },
+    "drainage_prevention": {
+      "en": "Because standing water in clay soils causes root hypoxia and root rot.",
+      "te": "నేలలో నీరు నిలిచిపోతే వేరు వ్యవస్థకు ఆక్సిజన్ అందక వేరుకుళ్ళు వచ్చే అవకాశం ఉన్నందున.",
+      "hi": "क्योंकि खेत में पानी ठहरने से जड़ों में सड़न का खतरा होता है।"
+    }
+  }
+}

@@ -19,6 +19,7 @@ from backend.app.api.v1.disease import router as disease_router
 from backend.app.api.v1.irrigation import router as irrigation_router
 from backend.app.api.v1.crop_recommendation import router as crop_recommendation_router
 from backend.app.api.v1.yield_prediction import router as yield_router
+from backend.app.api.v1.advisory import router as advisory_router
 
 
 @asynccontextmanager
@@ -125,3 +126,4 @@ app.include_router(disease_router, prefix=settings.API_V1_PREFIX)
 app.include_router(irrigation_router, prefix=settings.API_V1_PREFIX)
 app.include_router(crop_recommendation_router, prefix=settings.API_V1_PREFIX)
 app.include_router(yield_router, prefix=settings.API_V1_PREFIX)
+app.include_router(advisory_router, prefix=settings.API_V1_PREFIX)

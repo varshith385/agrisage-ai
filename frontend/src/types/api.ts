@@ -243,11 +243,114 @@ export interface YieldEstimate {
   confidence: number;
 }
 
+export interface PhenologicalStageInfo {
+  stage_key: string;
+  stage_name_en: string;
+  stage_name_te: string;
+  stage_name_hi: string;
+  start_das: number;
+  end_das: number;
+  duration_days: number;
+  fao56_kc_stage: string;
+  is_current: boolean;
+  progress_pct: number;
+}
+
+export interface AgronomicTaskItem {
+  id: string;
+  title: string;
+  category: 'irrigation' | 'fertilizer' | 'scouting' | 'spraying' | 'cultural';
+  description: string;
+  criticality: 'high' | 'medium' | 'low';
+  guidance_disclaimer: string;
+  dosages_included: boolean;
+}
+
+export interface StageTasksResponse {
+  crop_name: string;
+  current_stage: string;
+  days_after_sowing: number;
+  tasks: AgronomicTaskItem[];
+  source_notes: string;
+}
+
+export interface GrowthStageResponse {
+  crop_name: string;
+  planting_date: string;
+  days_after_sowing: number;
+  current_stage: string;
+  current_stage_te: string;
+  current_stage_hi: string;
+  fao56_kc_stage: string;
+  stage_progress_pct: number;
+  cycle_progress_pct: number;
+  estimated_days_to_next_stage?: number | null;
+  next_stage_name?: string | null;
+  total_crop_duration_days: number;
+  stages_timeline: PhenologicalStageInfo[];
+  stage_guidance: Record<string, string>;
+  source_notes: string;
+}
+
+export interface HealthScoreComponent {
+  name: string;
+  key: string;
+  score?: number | null;
+  nominal_weight: number;
+  normalized_weight?: number | null;
+  status: 'INCLUDED' | 'EXCLUDED';
+  exclusion_reason?: string | null;
+  inputs_used: Record<string, any>;
+  rationale: string;
+  threshold_notes: string;
+}
+
+export interface FarmHealthScoreBreakdown {
+  score?: number | null;
+  status: 'COMPUTED' | 'INSUFFICIENT_DATA';
+  active_components_count: number;
+  total_components_count: number;
+  summary: string;
+  formula_description: string;
+  components: HealthScoreComponent[];
+}
+
+export interface SevenDayPlanItem {
+  day_number: number;
+  date_str: string;
+  action: string;
+  action_te?: string | null;
+  action_hi?: string | null;
+  reason: string;
+  reason_te?: string | null;
+  reason_hi?: string | null;
+  priority: 'high' | 'medium' | 'low';
+  responsible_agent: string;
+  source: string;
+  translation_status: 'translated' | 'untranslated_marked';
+}
+
+export interface HeadlineYieldSummary {
+  crop_name: string;
+  is_supported: boolean;
+  headline_yield_quintals_per_acre?: number | null;
+  headline_label: string;
+  ml_range_lower?: number | null;
+  ml_range_upper?: number | null;
+  district_mean_baseline?: number | null;
+  unit: string;
+  disclaimer: string;
+}
+
 export interface AdvisoryPlan {
   status: 'WORKING' | 'PARTIAL' | 'DEMO' | 'stub';
   message: string;
   farm_health_score?: number | null;
-  seven_day_plan?: string[] | null;
+  farm_health_breakdown?: FarmHealthScoreBreakdown | null;
+  seven_day_plan?: SevenDayPlanItem[] | string[] | null;
+  headline_yield?: HeadlineYieldSummary | null;
+  growth_stage?: GrowthStageResponse | null;
+  risk_alerts?: string[];
   summary?: string | null;
   explainable_cards: ExplainabilitySchema[];
   confidence: number;

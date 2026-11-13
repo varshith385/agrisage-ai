@@ -75,12 +75,25 @@ class WeatherAgent(BaseAgent):
                 f"Using cached meteorological forecast from {forecast.fetched_at.isoformat()}; upstream Open-Meteo was unreachable."
             )
 
+        out_dict = weather_report.model_dump()
+        out_dict["daily_forecast"] = [
+            {
+                "date": d.date.isoformat() if hasattr(d.date, "isoformat") else str(d.date),
+                "temp_min_c": d.temp_min_c,
+                "temp_max_c": d.temp_max_c,
+                "precipitation_probability_pct": d.precipitation_probability_pct,
+                "precipitation_sum_mm": d.precipitation_sum_mm,
+                "reference_et0_mm": d.reference_et0_mm,
+            }
+            for d in daily
+        ]
+
         return AgentEnvelope(
             agent_name=self.name,
             status=status_val,
             timestamp=now,
             inputs_used={"latitude": lat, "longitude": lon},
-            outputs=weather_report.model_dump(),
+            outputs=out_dict,
             confidence=0.85 if forecast.stale else 0.95,
             warnings=warnings,
         )

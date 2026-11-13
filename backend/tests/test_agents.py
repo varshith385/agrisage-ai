@@ -177,11 +177,9 @@ def test_stubs_return_no_invented_numbers(db_session: Session, test_farm: Farm):
     adv_env = asyncio.run(advisory_agent.run(adv_context))
     assert adv_env.status == "success"
     adv_out = adv_env.outputs
-    assert adv_out["status"] == "stub"
-    assert adv_out["message"] == "not implemented yet"
+    assert adv_out["status"] in ("WORKING", "PARTIAL")
+    # Health score is None because upstream stubs provide fewer than 3 active components (no invented scores)
     assert adv_out["farm_health_score"] is None
-    assert adv_out["seven_day_plan"] is None
-    assert adv_out["confidence"] == 0.0
     assert len(adv_out["explainable_cards"]) >= 1
 
 
@@ -318,9 +316,9 @@ def test_orchestrator_pipeline_flow_and_persistence(client: TestClient, farmer_h
 
     # Check advisory plan returned adheres strictly to Honesty rules (no invented numbers)
     adv = data["advisory_plan"]
-    assert adv["status"] == "stub"
-    assert adv["farm_health_score"] is None
-    assert adv["seven_day_plan"] is None
+    assert adv["status"] in ("WORKING", "PARTIAL")
+    assert adv["farm_health_score"] is not None
+    assert len(adv["seven_day_plan"]) == 7
 
     # Verify persistence: check rows in db sharing the exact run_id
     rows = db_session.query(AgentRun).filter(AgentRun.run_id == run_id).all()

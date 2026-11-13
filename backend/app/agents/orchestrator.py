@@ -198,6 +198,9 @@ class Orchestrator:
             "disease_finding": disease_env.outputs if isinstance(disease_env.outputs, dict) else {},
             "yield_estimate": yield_env.outputs if isinstance(yield_env.outputs, dict) else {},
             "conflicts": [c.model_dump() for c in conflicts],
+            "crop_name": crop_cycle.crop_name if crop_cycle else "Cotton",
+            "planting_date": crop_cycle.planting_date if crop_cycle else None,
+            "daily_forecast": weather_report.get("daily_forecast") if isinstance(weather_report, dict) else None,
         }
         advisory_env = await self.advisory_agent.run(
             context=advisory_context,
