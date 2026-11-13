@@ -439,21 +439,20 @@ class VoiceAssistantService:
     def _handle_scheme(self, lang: str) -> VoiceQueryResponse:
         if lang == "te":
             spoken = (
-                "రైతు బంధు పథకం కింద తెలంగాణ ప్రభుత్వం ఎకరాకు పెట్టుబడి సహాయం అందిస్తుంది. "
-                "పీఎం-కిసాన్ కింద కేంద్ర ప్రభుత్వం ఏడాదికి ₹6,000 మూడు విడతల్లో అందిస్తుంది. "
-                "మరిన్ని వివరాలు మరియు అర్హతల కొరకు మీ మండల వ్యవసాయ అధికారిని సంప్రదించండి."
+                "ప్రభుత్వ పథకాల మార్గదర్శకాలు మరియు సబ్సిడీ వివరాలు ఎప్పటికప్పుడు మారుతుంటాయి, "
+                "అలాగే యాప్‌లో పథకాల జాబితా ఇంకా సిద్ధం కాలేదు. "
+                "దయచేసి తాజా అర్హత వివరాల కొరకు మీ స్థానిక మండల వ్యవసాయ కార్యాలయం లేదా అధికారిక ప్రభుత్వ పోర్టల్‌ను సంప్రదించండి (వివరాలు సరిచూసుకోవాలి - details to verify)."
             )
         elif lang == "hi":
             spoken = (
-                "पीएम किसान योजना के तहत पात्र किसानों को ₹6,000 प्रति वर्ष तीन किस्तों में मिलते हैं। "
-                "तेलंगाना में रायथू बंधु निवेश सहायता उपलब्ध है। "
-                "पात्रता और आवेदन के लिए अपने स्थानीय कृषि कार्यालय से संपर्क करें।"
+                "सरकारी योजनाओं के दिशा-निर्देश व अनुदान राशि समय-समय पर बदलते रहते हैं, "
+                "और ऐप में योजनाओं की सूची अभी तैयार नहीं हुई है। "
+                "कृपया नवीनतम पात्रता के लिए अपने स्थानीय मंडल कृषि कार्यालय या आधिकारिक सरकारी पोर्टल से जानकारी प्राप्त करें (विवरण की पुष्टि करें - details to verify)।"
             )
         else:
             spoken = (
-                "Under PM-KISAN, eligible landholding farmers receive ₹6,000 per year in three direct installments. "
-                "Rythu Bandhu provides seasonal per-acre investment assistance in Telangana. "
-                "Confirm documentation and eligibility with your local Mandal Agriculture Officer."
+                "Government scheme guidelines and subsidy amounts change periodically, and the app's official schemes list is not built yet. "
+                "Please check with your local Mandal Agriculture Office or the official government agriculture portal (details to verify)."
             )
 
         return VoiceQueryResponse(
@@ -461,13 +460,18 @@ class VoiceAssistantService:
             confidence=0.85,
             confidence_type="rule",
             spoken_text=sanitize_agronomic_speech(spoken),
-            status="WORKING",
-            sources=["Government Agriculture Schemes Portal (indicative, verify with local Agriculture Officer/Mandal office)"],
+            status="PARTIAL",
+            sources=["Official government agriculture portal or local Mandal Agriculture Office (details to verify)"],
             action_link="/dashboard",
-            action_label="View Farm Dashboard",
-            structured_data={"schemes": ["PM-KISAN", "Rythu Bandhu / Rythu Bharosa", "Rythu Bima"]},
-            limitations=["Direct Benefit Transfer (DBT) requires Aadhaar seeded bank account and updated land revenue records (Pahani)."],
-            upstream_status="Public Scheme Directory",
+            action_label="Consult Mandal Office",
+            structured_data={
+                "schemes_list_available": False,
+                "verification_status": "details to verify",
+            },
+            limitations=[
+                "Government scheme rules and financial amounts change frequently. The in-app schemes registry is not built yet; details to verify with official portal or Mandal Agriculture Officer."
+            ],
+            upstream_status="Schemes Directory Not Built (details to verify)",
         )
 
     def _handle_price(self, lang: str) -> VoiceQueryResponse:

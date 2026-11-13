@@ -178,6 +178,46 @@ def test_voice_api_cost_hindi(client, setup_voice_db):
     assert "not taken from any published report" in data["sources"][0]
 
 
+def test_voice_api_scheme_intent_honesty(client, setup_voice_db):
+    headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+
+    # English: no specific scheme names, amounts, or eligibility from memory
+    payload_en = {"query": "What government subsidies and schemes am I eligible for?", "language": "en"}
+    res_en = client.post("/api/v1/voice/query", json=payload_en, headers=headers)
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    assert data_en["intent"] == "scheme"
+    assert data_en["status"] == "PARTIAL"
+    spoken_en = data_en["spoken_text"].lower()
+    assert "not built yet" in spoken_en
+    assert "mandal" in spoken_en
+    assert "details to verify" in spoken_en
+    assert "rythu bandhu" not in spoken_en
+    assert "pm-kisan" not in spoken_en
+    assert "6000" not in spoken_en and "6,000" not in spoken_en
+    assert "details to verify" in data_en["sources"][0].lower()
+
+    # Telugu: details to verify, no memory scheme amounts
+    payload_te = {"query": "ప్రభుత్వ వ్యవసాయ పథకాల వివరాలు ఏమిటి?", "language": "te"}
+    res_te = client.post("/api/v1/voice/query", json=payload_te, headers=headers)
+    assert res_te.status_code == 200
+    data_te = res_te.json()
+    assert data_te["intent"] == "scheme"
+    assert "మారుతుంటాయి" in data_te["spoken_text"]
+    assert "details to verify" in data_te["spoken_text"].lower()
+    assert "రైతు బంధు" not in data_te["spoken_text"]
+
+    # Hindi: details to verify, no memory scheme amounts
+    payload_hi = {"query": "सरकारी कृषि योजनाओं की क्या जानकारी है?", "language": "hi"}
+    res_hi = client.post("/api/v1/voice/query", json=payload_hi, headers=headers)
+    assert res_hi.status_code == 200
+    data_hi = res_hi.json()
+    assert data_hi["intent"] == "scheme"
+    assert "बदलते रहते हैं" in data_hi["spoken_text"]
+    assert "details to verify" in data_hi["spoken_text"].lower()
+    assert "पीएम किसान" not in data_hi["spoken_text"]
+
+
 # 3. Market Price Query Handling (Mandi data not yet integrated)
 def test_voice_api_market_price_notice(client, setup_voice_db):
     headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}

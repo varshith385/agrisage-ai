@@ -227,7 +227,7 @@ export const VoiceAssistant: React.FC = () => {
     { label: t('voice.chip_irrigation'), query: currentLang === 'te' ? 'ఈరోజు నా పంటకు నీరు పెట్టాలా?' : currentLang === 'hi' ? 'क्या आज फसल को पानी देना चाहिए?' : 'Should I irrigate my crop today?' },
     { label: t('voice.chip_disease'), query: currentLang === 'te' ? 'ఆకు తెగులు ఎలా గుర్తించాలి?' : currentLang === 'hi' ? 'पत्ती रोग की पहचान कैसे करें?' : 'How to diagnose crop leaf disease?' },
     { label: t('voice.chip_cost'), query: currentLang === 'te' ? 'ఎకరాకు పత్తి సాగు ఖర్చు ఎంత?' : currentLang === 'hi' ? 'प्रति एकड़ कपास खेती लागत कितनी है?' : 'What is the cultivation cost per acre for cotton?' },
-    { label: t('voice.chip_scheme'), query: currentLang === 'te' ? 'రైతు బంధు పథకం వివరాలు ఏమిటి?' : currentLang === 'hi' ? 'पीएम किसान और रायथू बंधु योजना जानकारी' : 'What government schemes am I eligible for?' },
+    { label: t('voice.chip_scheme'), query: currentLang === 'te' ? 'ప్రభుత్వ వ్యవసాయ పథకాల వివరాలు ఏమిటి?' : currentLang === 'hi' ? 'सरकारी कृषि योजनाओं की क्या जानकारी है?' : 'What government agriculture schemes are available?' },
     { label: t('voice.chip_price'), query: currentLang === 'te' ? 'పత్తి మార్కెట్ ధర ఎంత?' : currentLang === 'hi' ? 'कपास का मंडी भाव क्या है?' : 'What is the cotton mandi price today?' },
   ];
 
