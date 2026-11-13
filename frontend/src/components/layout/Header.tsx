@@ -124,6 +124,16 @@ export const Header: React.FC = () => {
               >
                 {t('nav.schemes')}
               </Link>
+              <Link
+                to="/community"
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  isCurrent('/community')
+                    ? 'bg-agri-green-700 text-white shadow-inner'
+                    : 'text-agri-cream-100 hover:bg-agri-green-700/60 hover:text-white'
+                }`}
+              >
+                {t('nav.community')}
+              </Link>
             </nav>
           )}
 

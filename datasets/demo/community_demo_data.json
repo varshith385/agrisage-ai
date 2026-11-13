@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "dataset_name": "AgriSage AI Realistic Community & Outbreak Demo Dataset",
+    "region": "Warangal District, Telangana, India",
+    "reference_farmer": "Ramesh Kumar (Demo Farmer), Geikonda Village",
+    "is_demo": true,
+    "last_verified": "2026-11-13",
+    "source_note": "Indicative, to verify. Not from a published source."
+  },
+  "demo_farmers": [
+    {
+      "email": "srinivas.demo@agrisage.demo",
+      "full_name": "Srinivas Rao (Demo)",
+      "phone_number": "+919876543220",
+      "village": "Geikonda",
+      "district": "Warangal",
+      "state": "Telangana",
+      "lat": 17.9689,
+      "lon": 79.5941,
+      "crops": ["Cotton", "Maize"]
+    },
+    {
+      "email": "mallesh.demo@agrisage.demo",
+      "full_name": "Mallesh Goud (Demo)",
+      "phone_number": "+919876543221",
+      "village": "Dharmasagar",
+      "district": "Warangal",
+      "state": "Telangana",
+      "lat": 17.9944,
+      "lon": 79.4589,
+      "crops": ["Cotton", "Chilli"]
+    },
+    {
+      "email": "kavitha.demo@agrisage.demo",
+      "full_name": "Kavitha Reddy (Demo)",
+      "phone_number": "+919876543222",
+      "village": "Hasanparthy",
+      "district": "Warangal",
+      "state": "Telangana",
+      "lat": 18.0667,
+      "lon": 79.5333,
+      "crops": ["Chilli", "Tomato"]
+    },
+    {
+      "email": "venkatesh.demo@agrisage.demo",
+      "full_name": "Venkatesh V. (Demo)",
+      "phone_number": "+919876543223",
+      "village": "Wardhannapet",
+      "district": "Warangal",
+      "state": "Telangana",
+      "lat": 17.7667,
+      "lon": 79.6000,
+      "crops": ["Cotton", "Groundnut"]
+    },
+    {
+      "email": "lakshmi.demo@agrisage.demo",
+      "full_name": "Lakshmi Bai (Demo)",
+      "phone_number": "+919876543224",
+      "village": "Atmakur",
+      "district": "Warangal",
+      "state": "Telangana",
+      "lat": 18.0833,
+      "lon": 79.7167,
+      "crops": ["Rice", "Pulses"]
+    }
+  ],
+  "farmer_groups": [
+    {
+      "name": "Warangal Cotton Collective",
+      "description": "Farmer producer collective pooling logistics freight to Enumamula Mandi and coordinating shared seed/fertilizer procurement.",
+      "village": "Geikonda",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_focus": "Cotton"
+    },
+    {
+      "name": "Kakatiya Agri Mechanization Club",
+      "description": "Peer equipment sharing hub: tractors, rotavators, and high-clearance sprayers across Geikonda and Hasanparthy.",
+      "village": "Hasanparthy",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_focus": "Cotton & Chilli"
+    },
+    {
+      "name": "Geikonda Natural Farming Sangh",
+      "description": "Community group for biological IPM inputs, neem cake, and organic Trichoderma bulk orders.",
+      "village": "Geikonda",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_focus": "Organic Multi-Crop"
+    }
+  ],
+  "requests": [
+    {
+      "request_type": "transport",
+      "title": "Pooled 10-Tonne Eicher Truck to Enumamula Mandi (Warangal)",
+      "description": "Joint freight dispatch for harvested seed cotton. Weight-share cost breakdown saving ~30% vs solo tempo trips.",
+      "village": "Geikonda",
+      "district": "Warangal",
+      "destination": "Enumamula Agricultural Market Yard, Warangal",
+      "total_capacity_quintals": 100.0,
+      "base_truck_cost": 3000.0,
+      "rate_per_km": 35.0,
+      "distance_km": 28.0,
+      "creator_quantity": 25.0
+    },
+    {
+      "request_type": "input_purchase",
+      "title": "Bulk Certified Bt-Cotton Seed & Bio-Fertilizer Order",
+      "description": "Joint purchase directly from approved cooperative depot to secure wholesale quantity discount.",
+      "village": "Geikonda",
+      "district": "Warangal",
+      "item_name": "Certified Bt-Cotton BG-II Seed (450g Pack) & Neem Cake",
+      "target_quantity": 50.0,
+      "unit": "packs",
+      "bulk_price_per_unit": 780.0,
+      "retail_price_per_unit": 890.0,
+      "creator_quantity": 10.0
+    },
+    {
+      "request_type": "pooled_sale",
+      "title": "Pooled High-Grade Long-Staple Cotton 60-Quintal Lot",
+      "description": "Aggregating 60 quintals to negotiate direct mill procurement premium above APMC gate quote.",
+      "village": "Hasanparthy",
+      "district": "Warangal",
+      "crop_name": "Cotton",
+      "target_quantity_quintals": 60.0,
+      "expected_price_per_quintal": 7450.0,
+      "creator_quantity": 20.0
+    }
+  ],
+  "machinery_listings": [
+    {
+      "name": "Mahindra 575 DI 45HP Tractor",
+      "category": "tractor",
+      "hourly_rate": 650.0,
+      "daily_rate": 4500.0,
+      "village": "Geikonda",
+      "district": "Warangal",
+      "lat": 17.9689,
+      "lon": 79.5941,
+      "contact_phone_opt_in": true,
+      "description": "Well-maintained 45HP tractor with power steering and dual clutch. Ideal for deep ploughing and trolley transport."
+    },
+    {
+      "name": "Shaktiman Regular Light 6-Foot Rotavator",
+      "category": "rotavator",
+      "hourly_rate": 400.0,
+      "daily_rate": 2800.0,
+      "village": "Dharmasagar",
+      "district": "Warangal",
+      "lat": 17.9944,
+      "lon": 79.4589,
+      "contact_phone_opt_in": true,
+      "description": "6-foot rotary tiller with boron steel L-blades. Produces superior seedbed in dry and semi-wet soils."
+    },
+    {
+      "name": "ASPEE Hi-Clearance Battery-Assisted Sprayer",
+      "category": "sprayer",
+      "hourly_rate": 180.0,
+      "daily_rate": 1200.0,
+      "village": "Hasanparthy",
+      "district": "Warangal",
+      "lat": 18.0667,
+      "lon": 79.5333,
+      "contact_phone_opt_in": false,
+      "description": "16-litre motorized knapsack with brass telescopic lance. Excellent under-leaf coverage for cotton/chilli."
+    },
+    {
+      "name": "Preet 987 Self-Propelled Combine Harvester",
+      "category": "harvester",
+      "hourly_rate": 1800.0,
+      "daily_rate": 14000.0,
+      "village": "Wardhannapet",
+      "district": "Warangal",
+      "lat": 17.7667,
+      "lon": 79.6000,
+      "contact_phone_opt_in": true,
+      "description": "Multi-crop combine harvester with grain tank and straw walker. Fast harvesting for paddy and maize."
+    },
+    {
+      "name": "National 9-Tyne Seed-cum-Fertilizer Drill",
+      "category": "seed_drill",
+      "hourly_rate": 350.0,
+      "daily_rate": 2200.0,
+      "village": "Atmakur",
+      "district": "Warangal",
+      "lat": 18.0833,
+      "lon": 79.7167,
+      "contact_phone_opt_in": false,
+      "description": "Tractor-mounted precision metering box for simultaneous seed and fertilizer band placement."
+    }
+  ],
+  "disease_outbreaks": [
+    {
+      "village": "Geikonda",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_hint": "Tomato",
+      "predicted_disease": "Tomato___Early_blight",
+      "confidence": 0.88,
+      "count": 4
+    },
+    {
+      "village": "Dharmasagar",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_hint": "Potato",
+      "predicted_disease": "Potato___Early_blight",
+      "confidence": 0.84,
+      "count": 5
+    },
+    {
+      "village": "Hasanparthy",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_hint": "Tomato",
+      "predicted_disease": "Tomato___Late_blight",
+      "confidence": 0.91,
+      "count": 4
+    },
+    {
+      "village": "Wardhannapet",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_hint": "Corn",
+      "predicted_disease": "Corn_(maize)___Common_rust_",
+      "confidence": 0.86,
+      "count": 3
+    },
+    {
+      "village": "Atmakur",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_hint": "Chilli",
+      "predicted_disease": "Pepper__bell___Bacterial_spot",
+      "confidence": 0.79,
+      "count": 1
+    },
+    {
+      "village": "Inavolu",
+      "district": "Warangal",
+      "state": "Telangana",
+      "crop_hint": "Tomato",
+      "predicted_disease": "Tomato___Early_blight",
+      "confidence": 0.82,
+      "count": 2
+    }
+  ]
+}
+
