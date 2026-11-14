@@ -348,7 +348,7 @@ export const DiseasePage: React.FC = () => {
           {/* Tile 2: PyTorch MobileNetV2 Diagnosis Status */}
           <PictorialTile
             title={language === 'te' ? 'తెగులు నిర్ధారణ' : language === 'hi' ? 'रोग पहचान' : 'Disease Diagnosis'}
-            phrase={isDiagnosed ? `${result?.predicted_crop}: ${result?.predicted_disease}` : (language === 'te' ? 'ఆకు ఫోటో స్కాన్ కోసం వేచి ఉంది' : language === 'hi' ? 'पत्ती स्कैन की प्रतीक्षा' : 'Awaiting leaf photo scan')}
+            phrase={isDiagnosed ? `${result?.predicted_crop}: ${result?.predicted_disease}` : (language === 'te' ? 'ఇంకా స్కాన్ చేయలేదు' : language === 'hi' ? 'अभी कोई स्कैन नहीं' : 'No scan yet')}
             illustration={isDiagnosed ? <LeafScanIllustration size={80} /> : <NoDataIllustration size={80} />}
             status={isDiagnosed ? (isHealthy ? 'success' : 'danger') : 'nodata'}
             statusWord={isDiagnosed ? (isHealthy ? (language === 'te' ? 'ఆరోగ్యకరం' : language === 'hi' ? 'स्वस्थ पत्ती' : 'Healthy Leaf') : (language === 'te' ? 'తెగులు గుర్తింపు' : language === 'hi' ? 'रोग मिला' : 'Pest Detected')) : (language === 'te' ? 'స్కాన్ లేదు' : language === 'hi' ? 'स्कैन नहीं' : 'No scan yet')}

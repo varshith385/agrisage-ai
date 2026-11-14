@@ -244,9 +244,10 @@ export const DashboardPage: React.FC = () => {
   // Derive "What should I do today?" strictly from actual outputs
   const todayActionItem = planItems.length > 0 ? planItems[0] : null;
 
-  // Real advisory fields or honest awaiting run state
+  // Real advisory fields or honest awaiting run state - NO invented thresholds
+  const hasIrrigationBackend = irrigationOutputs != null && typeof irrigationOutputs.irrigate_now === 'boolean';
   const isIrrigateNow = Boolean(irrigationOutputs?.irrigate_now);
-  const waterDepth = irrigationOutputs?.root_zone_depletion_mm ?? irrigationOutputs?.recommended_depth_mm;
+  const recDepthMm = Number(irrigationOutputs?.recommended_depth_mm ?? 0);
 
   let todayActionTitle = language === 'te'
     ? 'ఈరోజు సలహా ఇంకా సిద్ధం కాలేదు'
@@ -260,7 +261,7 @@ export const DashboardPage: React.FC = () => {
     ? 'आज की व्यक्तिगत कार्य योजना के लिए Multi-Agent सलाह चलाएं।'
     : 'Click Run Advisory below to analyze live field conditions and generate today\'s action.';
 
-  if (todayActionItem) {
+  if (todayActionItem && hasIrrigationBackend) {
     todayActionTitle = language === 'te' && todayActionItem.action_te
       ? todayActionItem.action_te
       : language === 'hi' && todayActionItem.action_hi
@@ -273,18 +274,18 @@ export const DashboardPage: React.FC = () => {
       ? todayActionItem.reason_hi
       : todayActionItem.reason;
 
-    // Resolve any contradiction between action text and irrigation water balance
-    if (!isIrrigateNow && (waterDepth !== undefined && waterDepth <= 15) && todayActionTitle.toLowerCase().startsWith('irrigate')) {
+    // Resolve any contradiction strictly using backend irrigate_now and recommended_depth_mm
+    if (!isIrrigateNow && todayActionTitle.toLowerCase().includes('irrigate')) {
       todayActionTitle = language === 'te'
         ? 'నేలలో తేమను పరిశీలించండి'
         : language === 'hi'
         ? 'मिट्टी की नमी का निरीक्षण करें'
         : 'Inspect soil moisture (adequate reserves)';
       todayActionReason = language === 'te'
-        ? 'నేలలో తగినంత తేమ ఉంది. ఈరోజు నీరు పెట్టవలసిన అవసరం లేదు.'
+        ? `నేలలో తేమ సరిపడా ఉంది (సిఫార్సు లోతు: ${recDepthMm} మి.మీ). ఈరోజు నీరు పెట్టవలసిన అవసరం లేదు.`
         : language === 'hi'
-        ? 'मिट्टी में पर्याप्त नमी है, आज सिंचाई की आवश्यकता नहीं है।'
-        : 'Current root-zone moisture reserves are adequate; defer irrigation.';
+        ? `मिट्टी में नमी पर्याप्त है (सिफारिश गहराई: ${recDepthMm} मिमी)। आज सिंचाई की आवश्यकता नहीं है।`
+        : `Backend irrigation model indicates no watering needed today (${recDepthMm} mm recommended depth).`;
     }
   }
 
@@ -322,7 +323,7 @@ export const DashboardPage: React.FC = () => {
         <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div className="w-20 h-20 rounded-2xl bg-[#FFF8E1] border-2 border-[#F2B01E] flex items-center justify-center shrink-0 shadow-sm">
-              {todayActionItem ? (
+              {todayActionItem && hasIrrigationBackend ? (
                 isIrrigateNow ? <WateringCanIllustration size={64} /> : <LeafScanIllustration size={64} />
               ) : (
                 <NoDataIllustration size={64} />
@@ -334,8 +335,8 @@ export const DashboardPage: React.FC = () => {
                   {language === 'te' ? 'ఈరోజు చేయాల్సిన పని' : language === 'hi' ? 'आज का मुख्य कार्य' : 'Do This Today'}
                 </span>
                 <StatusBadge
-                  status={todayActionItem ? 'warning' : 'nodata'}
-                  label={todayActionItem ? (language === 'te' ? 'ముఖ్యమైన పని' : language === 'hi' ? 'प्राथमिकता' : 'Priority Action') : (language === 'te' ? 'సలహా పెండింగ్' : language === 'hi' ? 'लंबित' : 'Awaiting Run')}
+                  status={todayActionItem && hasIrrigationBackend ? 'warning' : 'nodata'}
+                  label={todayActionItem && hasIrrigationBackend ? (language === 'te' ? 'ముఖ్యమైన పని' : language === 'hi' ? 'प्राथमिकता' : 'Priority Action') : (language === 'te' ? 'సలహా పెండింగ్' : language === 'hi' ? 'लंबित' : 'Awaiting Run')}
                   size="sm"
                 />
               </div>
@@ -352,7 +353,7 @@ export const DashboardPage: React.FC = () => {
               text={`${todayActionTitle}. ${todayActionReason}`}
               label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
             />
-            {todayActionItem ? (
+            {todayActionItem && hasIrrigationBackend ? (
               <Link
                 to={isIrrigateNow ? '/irrigation' : '/disease'}
                 className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
@@ -526,8 +527,10 @@ export const DashboardPage: React.FC = () => {
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
                 {language === 'te' ? 'ఈరోజు చేయాల్సిన ముఖ్య పని' : language === 'hi' ? 'आज का मुख्य कार्य' : 'What Should I Do Today?'}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#DA9A4C]/20 text-[#7A553A]">
-                Day 1 Priority
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                todayActionItem && hasIrrigationBackend ? 'bg-[#DA9A4C]/20 text-[#7A553A]' : 'bg-stone-200 text-stone-700'
+              }`}>
+                {todayActionItem && hasIrrigationBackend ? 'Day 1 Priority' : 'No data yet'}
               </span>
             </div>
             <h2 className="font-display text-xl font-bold text-[#183D2E]">

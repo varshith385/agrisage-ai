@@ -189,6 +189,7 @@ export const EmptyPlotIllustration: React.FC<SvgProps> = ({ className = 'w-24 h-
  */
 export const NoDataIllustration: React.FC<SvgProps> = ({ className = 'w-24 h-24', size = 96 }) => (
   <svg
+    data-testid="no-data-illustration"
     viewBox="0 0 120 120"
     width={size}
     height={size}

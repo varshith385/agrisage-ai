@@ -61,7 +61,7 @@ Every status badge, gauge bar, and pictorial illustration in AgriSage AI is grou
 | **Calendar** | Tile 2: Next Task | `CheckCircle2` icon | `warning` (`Scheduled`) | Shows `NoDataIllustration` with status `nodata` | `nextEvent.activity_name`, `nextEvent.target_date` |
 | **Calendar** | Tile 3: Milestones | `Award` icon | `info` | Shows `NoDataIllustration` with status `nodata` | `stages.length` (total crop growth stages) |
 | **Market** | Tile 1: Best Mandi | `Store` icon | `success` (`Top Realization`) | Shows `NoDataIllustration` with status `nodata` | `rankingData.rankings[0].mandi_name`, `net_realization` |
-| **Market** | Tile 2: MSP Benchmark | `Store` icon | `info` (`MSP Benchmark`) | Shows `NoDataIllustration` with status `nodata` | `mspData.msp_price` (DEMO DATA unless configured) |
+| **Market** | Tile 2: MSP Benchmark | `NoDataIllustration` | `nodata` (`details to verify`) | Grey `NoDataIllustration`, status `nodata`, zero MSP number rendered | Details to verify (No unverified numbers) |
 | **Market** | Tile 3: Local Listings | `Truck` icon | `info` (`Trade`) | Shows `NoDataIllustration` with status `nodata` | `listings.length` |
 | **Community**| Tile 1: Machinery | `Wrench` icon | `info` (`Machinery`) | Shows `NoDataIllustration` with status `nodata` | Real machinery listings count |
 | **Community**| Tile 2: Transport | `Truck` icon | `info` (`Freight Pool`) | Shows `NoDataIllustration` with status `nodata` | Real pooled transport requests count |
@@ -73,10 +73,12 @@ Every status badge, gauge bar, and pictorial illustration in AgriSage AI is grou
 
 The top lead card on the Dashboard, **"Do This Today"**, derives directly from the prioritized agronomic advisory plan (`planItems[0]` returned by `/api/v1/advisory/evaluate`).
 
-- **Water Contradiction Resolution**: In previous revisions, if the first advisory plan item suggested checking soil moisture, but the FAO-56 irrigation module determined `waterDepth <= 15mm` and `!isIrrigateNow`, the hero button copy could confuse the farmer into irrigating immediately.  
-  This was resolved: when soil water reserves are adequate (`!isIrrigateNow` and `waterDepth <= 15mm`), the hero card explicitly states:  
-  `"Soil water reserves are adequate today (depletion below threshold). Next irrigation is scheduled on {date}."`  
-  The primary action button directs the user to inspect moisture or view the calendar rather than prompting an unneeded irrigation cycle.
+- **Water Contradiction Resolution (Round 4 Update)**: The previously introduced heuristic threshold of `waterDepth <= 15mm` was completely removed.  
+  The logic now strictly uses **only** the backend's `irrigationOutputs.irrigate_now` boolean and `irrigationOutputs.recommended_depth_mm`.
+  - If the backend returned no result (e.g., `irrigationOutputs` is missing or uncalculated, or `planItems` is empty), the hero card displays the grey **"No data yet"** state (`NoDataIllustration`, status `nodata`, label `"Awaiting Run"`, action button `"Run Advisory"`).
+  - When backend results exist and `irrigate_now === false`, any foliar or field action overrides potential watering suggestions:  
+    `"Backend irrigation model indicates no watering needed today ({recDepthMm} mm recommended depth)."`
+  - The primary action button dynamically routes to `/irrigation` only when `irrigate_now === true`, and to `/disease` or general advisory when false.
 
 ---
 
@@ -157,7 +159,7 @@ To maximize outdoor readability under direct sunlight and assist color-blind far
 | :--- | :---: | :---: | :---: | :--- | :---: | :--- |
 | **Dashboard** | 390px | Pictures | EN | `Farm Profit` tile displayed `Net: ₹NaN` because `economicsSummary.combined_summary.net_profit` was a formatted string with commas. | **High** | **FIXED**: Cleaned comma characters via `.replace(/,/g, '')` before numeric parsing; renders `Net: ₹85,000` or grey `NoDataIllustration`. |
 | **Dashboard** | 390px | Pictures | All | `Indicative: 88/100 (DEMO DATA)` hardcoded number `88` on lines 371, 749, and 887. | **High** | **FIXED**: Removed all hardcoded `88` references; displays dynamic `healthBreakdown.score` or `"Awaiting Run"` with `nodata` status. |
-| **Dashboard** | 390px | Pictures | All | Hero card suggested irrigation scouting even when soil water reserves were optimal, causing confusion. | **Medium** | **FIXED**: Resolved contradiction: if depletion &le; 15mm and `!isIrrigateNow`, action copy clarifies water reserves are adequate and defers irrigation. |
+| **Dashboard** | 390px | Pictures | All | Hero card suggested irrigation scouting even when soil water reserves were optimal, causing confusion. | **Medium** | **FIXED (Round 4)**: Removed invented 15mm threshold. Grounded solely in backend `irrigate_now` and `recommended_depth_mm`; renders grey `NoDataIllustration` if backend gave no result. |
 | **Global Shell** | 390px | Pictures | TE/HI | Full-page screenshot stitched fixed bottom nav bar across the page header fold at y=844px. | **Low** | **DOCUMENTED**: Identified as a Puppeteer virtual scrolling artifact for `fixed bottom-0` elements; verified normal behavior on physical viewports. |
 | **Disease** | All | Pictures | All | Disease tile showed "Canopy green & healthy" before any leaf image was uploaded or diagnosed. | **High** | **FIXED**: Updated to check `previewUrl` and `result`; renders grey `NoDataIllustration` with status `nodata` ("No scan yet") until analyzed. |
 | **Irrigation** | All | Pictures | All | Irrigation page defaulted to invented 15mm / 60,000L / Adequate values when no plan was calculated. | **High** | **FIXED**: Updated to check `plan`; renders grey `NoDataIllustration` with status `nodata` ("No Water Budget Calculated Yet") until calculated. |
@@ -165,5 +167,29 @@ To maximize outdoor readability under direct sunlight and assist color-blind far
 | **Weather** | All | Pictures | All | Weather page defaulted to 28°C / 0mm / 4.5mm ET0 when API was uninitialized. | **High** | **FIXED**: Updated to check `weatherData`; renders grey `NoDataIllustration` with status `nodata` until fetched. |
 | **Crop Rec, Cal, Mkt, Comm** | All | Pictures | All | Pictorial mode was missing on these 4 core pages in Round 2. | **High** | **COMPLETED**: Designed and implemented 3-tile Pictorial Summary mode with native voice and `"See Details"` link across all 4 pages. |
 | **Schemes** | All | Words | All | Schemes card parser implied OCR was actively executing. | **Medium** | **FIXED**: Renamed to `"Card Parser Status: Manual Entry & Text Parsing (No OCR Installed)"` and added clear documentation. |
-| **Market** | All | Both | All | Market copy referred to "live AGMARKNET" and "official MSP". | **Medium** | **FIXED**: Replaced with `"Mandi modal prices (DEMO DATA unless DATA_GOV_IN_API_KEY is set)"` and `"MSP Benchmark (Indicative)"`. |
+| **Market** | All | Both | All | Market copy referred to "live AGMARKNET" and "official MSP". | **Medium** | **FIXED (Round 4)**: Market MSP tile never shows a number (shows grey `NoDataIllustration` and "details to verify"). Mandi prices and net realization carry visible `DEMO DATA` badge unless `DATA_GOV_IN_API_KEY` is present. |
 | **Git Tracking** | Repo | -- | -- | `docs/ui-review/screens` was tracked in git (48 PNGs, ~35MB). | **Medium** | **FIXED**: Untracked directory from git cache, added to `.gitignore`, and retained all original PNG files safely on disk. |
+
+---
+
+## 8. Frontend Numeric Comparisons Audit & Source Field Grounding
+
+The following table documents every hardcoded numeric comparison in `frontend/src` used to select a status badge, gauge visual, illustration, or alert style, along with its exact source data field:
+
+| File & Line | Comparison Logic | Purpose | Source Data Field |
+| :--- | :--- | :--- | :--- |
+| `FarmerIllustrations.tsx:278` | `tempC > 36 ? '#B3261E' : tempC < 18 ? '#1565A8' : '#F2B01E'` | Thermometer SVG mercury color (red for extreme heat, blue for cold, amber for normal) | `weatherData.temperature_c` |
+| `FarmerIllustrations.tsx:365-366` | `activeSegments >= 4 ? 'bg-[#2E7D32]' : activeSegments === 3 ? 'bg-[#F2B01E]' : 'bg-[#B3261E]'` | Farm health meter bar color (green for 80-100%, amber for 60-79%, red below 60%) | `healthBreakdown.score` (`Math.ceil(score / 20)`) |
+| `DashboardPage.tsx:382-385` | `weatherRain > 0 ? 'info' : 'success'` | Weather tile status badge (`info` / Rain Likely if rain > 0, else `success` / Dry & Warm) | `weatherData.expected_rainfall_today_mm` |
+| `DashboardPage.tsx:395` | `effectiveWaterDepth > 25 ? 4 : effectiveWaterDepth > 15 ? 3 : 2` | Dashboard water drops gauge (scales 2 to 4 drops based on soil depletion) | `irrigationOutputs.root_zone_depletion_mm` or `recommended_depth_mm` |
+| `DashboardPage.tsx:420` | `estProfit >= 0 ? 'success' : 'danger'` | Economics tile status badge (`success` / Profitable vs `danger` / Operating Deficit) | `economicsSummary.combined_summary.net_profit` |
+| `DashboardPage.tsx:588` | `expected_rainfall_today_mm > 5` | Weather alert card warning badge (flags high rainfall risk exceeding 5 mm) | `weatherData.expected_rainfall_today_mm` |
+| `IrrigationPage.tsx:326` | `grossDepth > 25 ? 4 : grossDepth > 15 ? 3 : grossDepth > 5 ? 2 : 1` | Irrigation needed water drops gauge (scales 1 to 4 droplets based on irrigation depth) | `plan.gross_depth_mm` |
+| `LocationWeatherPage.tsx:181` | `expected_rainfall_today_mm > 5` | Weather forecast page high rain risk badge | `weatherData.expected_rainfall_today_mm` |
+| `LocationWeatherPage.tsx:280` | `et0Val > 5 ? 4 : et0Val > 3 ? 3 : 2` | Evapotranspiration water loss gauge droplet scale | `weatherData.reference_et0_mm` |
+| `EconomicsPage.tsx:622, 629` | `liveResult.net_profit >= 0` | Net profit badge text and color (Profitable vs Deficit) | `liveResult.net_profit` |
+| `EconomicsPage.tsx:641-642` | `changeVsBaseline >= 0` | Simulator delta text color (emerald for positive gain vs red for loss) | `liveResult.net_profit - baseline.net_profit` |
+| `EconomicsPage.tsx:1064, 1371` | `net_profit >= 0` | Cost line items and crop comparison table row styling | `pt.net_profit`, `c.estimated_net_profit_per_acre` |
+| `SchemesPage.tsx:233-249` | `conf >= 0.85` (HIGH), `conf >= 0.60` (MED), `conf > 0` (LOW) | Soil card parameter extraction confidence indicator pill | `extractionResult.confidence[field]` |
+| `FarmRegistrationPage.tsx:87, 105` | `Math.abs(sum - total) < 0.01` | Acreage validation guard (checks owned + leased acres equals total registered parcel area) | `ownedArea + leasedArea === totalArea` |
+

@@ -3,12 +3,15 @@ import React from 'react';
 import { render, screen, renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { PictorialProvider, usePictorial } from '../../../context/PictorialContext';
+import { LanguageProvider } from '../../../context/LanguageContext';
 import { StatusBadge } from '../StatusBadge';
+import { PictorialTile } from '../PictorialTile';
 import {
   WaterDropsGauge,
   ThermometerGauge,
   CoinStackGauge,
   FarmHealthMeter,
+  NoDataIllustration,
 } from '../FarmerIllustrations';
 
 describe('Pictorial Mode v2 & Readability Suite', () => {
@@ -124,6 +127,78 @@ describe('Pictorial Mode v2 & Readability Suite', () => {
       const meter = screen.getByTestId('farm-health-meter');
       expect(meter).toHaveAttribute('data-score', '88');
       expect(meter).toHaveAttribute('data-segments', '5'); // 88/20 ceiling = 5 bars
+    });
+
+    // Round 4 Test 1: Disease tile shows grey "No scan yet" before any upload
+    it('Disease tile shows grey "No scan yet" before any upload', () => {
+      render(
+        <LanguageProvider>
+          <PictorialTile
+            title="Disease Diagnosis"
+            phrase="No scan yet"
+            illustration={<NoDataIllustration size={80} />}
+            status="nodata"
+            statusWord="No scan yet"
+            spokenText="Awaiting leaf photo for automated MobileNetV2 diagnosis."
+          />
+        </LanguageProvider>
+      );
+
+      const tile = screen.getByTestId('pictorial-tile');
+      expect(tile).toBeInTheDocument();
+
+      // Confirms grey no-data status and shape
+      const badge = screen.getByTestId('status-indicator');
+      expect(badge).toHaveAttribute('data-shape', 'circle-clock');
+      expect(badge).toHaveClass('bg-[#F5F5F4]');
+
+      // Confirms "No scan yet" text is present
+      const scanTexts = screen.getAllByText('No scan yet');
+      expect(scanTexts.length).toBeGreaterThanOrEqual(1);
+
+      // Confirms grey placeholder illustration is present
+      const noDataSvg = screen.getByTestId('no-data-illustration');
+      expect(noDataSvg).toBeInTheDocument();
+
+      // Confirms never shows fake green healthy tick
+      expect(screen.queryByText('Canopy green & healthy')).not.toBeInTheDocument();
+      expect(screen.queryByText('Crop Healthy')).not.toBeInTheDocument();
+    });
+
+    // Round 4 Test 2: Market tile never renders an MSP number
+    it('Market tile never renders an MSP number and shows grey "details to verify"', () => {
+      render(
+        <LanguageProvider>
+          <PictorialTile
+            title="MSP Benchmark"
+            phrase="details to verify"
+            illustration={<NoDataIllustration size={80} />}
+            status="nodata"
+            statusWord="details to verify"
+            spokenText="Minimum Support Price benchmark details require local verification. No unverified prices are shown."
+          />
+        </LanguageProvider>
+      );
+
+      const tile = screen.getByTestId('pictorial-tile');
+      expect(tile).toBeInTheDocument();
+
+      // Confirms "details to verify" wording
+      const verifyTexts = screen.getAllByText('details to verify');
+      expect(verifyTexts.length).toBeGreaterThanOrEqual(1);
+
+      // Confirms grey no-data badge
+      const badge = screen.getByTestId('status-indicator');
+      expect(badge).toHaveAttribute('data-shape', 'circle-clock');
+
+      // Confirms grey placeholder illustration
+      const noDataSvg = screen.getByTestId('no-data-illustration');
+      expect(noDataSvg).toBeInTheDocument();
+
+      // CRITICAL: Tile text content must NEVER render any digit/number or Rupee sign
+      expect(tile.textContent).not.toMatch(/\d/);
+      expect(tile.textContent).not.toContain('₹');
+      expect(tile.textContent).not.toMatch(/MSP:\s*₹/i);
     });
   });
 });

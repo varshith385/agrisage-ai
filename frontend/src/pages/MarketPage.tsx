@@ -245,6 +245,7 @@ export const MarketPage: React.FC = () => {
   };
 
   const bestMandi = rankingData?.rankings?.[0];
+  const isLiveMandi = Boolean(rankingData?.source && !rankingData.source.toLowerCase().includes('demo'));
 
   const plainMeaning = bestMandi
     ? `Selling ${quantity} quintals of ${selectedCrop} at ${bestMandi.mandi} gives your highest net payout of ₹${bestMandi.net_realization_per_q.toFixed(0)}/q after deducting transport and mandi fees.`
@@ -253,9 +254,6 @@ export const MarketPage: React.FC = () => {
   // PICTORIAL MODE v2
   if (isPictorial) {
     const hasMandi = Boolean(bestMandi);
-    const mspVal = mspData?.benchmark?.msp_per_quintal ?? 0;
-    const hasMsp = Boolean(mspVal > 0);
-    const isLiveMandi = Boolean(rankingData?.source && !rankingData.source.toLowerCase().includes('demo'));
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
@@ -285,10 +283,19 @@ export const MarketPage: React.FC = () => {
                   size="sm"
                 />
               </div>
-              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
-                {hasMandi
-                  ? `₹${bestMandi!.net_realization_per_q.toFixed(0)}/q net (${bestMandi!.mandi}, ${bestMandi!.distance_km} km)`
-                  : (language === 'te' ? 'మండి ధరలు ఇంకా లోడ్ కాలేదు' : language === 'hi' ? 'मंडी भाव अभी लोड नहीं हुए' : 'Awaiting Mandi Prices')}
+              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug flex items-center flex-wrap gap-2">
+                {hasMandi ? (
+                  <>
+                    <span>₹{bestMandi!.net_realization_per_q.toFixed(0)}/q net ({bestMandi!.mandi}, {bestMandi!.distance_km} km)</span>
+                    {!isLiveMandi && (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                        DEMO DATA
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  language === 'te' ? 'మండి ధరలు ఇంకా లోడ్ కాలేదు' : language === 'hi' ? 'మండి भाव अभी लोड नहीं हुए' : 'Awaiting Mandi Prices'
+                )}
               </h2>
               <p className="text-[16px] text-[#4A5750] max-w-xl">
                 {hasMandi ? plainMeaning : (language === 'te' ? 'రవాణా ఖర్చులు తీసివేసిన తర్వాత అత్యధిక నికర రాబడిని చూపే మండి ర్యాంకింగ్స్.' : language === 'hi' ? 'परिवहन खर्च घटाने के बाद सर्वाधिक शुद्ध लाभ वाली मंडियों की सूची।' : 'Transport-adjusted net payout rankings comparing local APMCs.')}
@@ -318,7 +325,7 @@ export const MarketPage: React.FC = () => {
           {/* Tile 1: Best Net Mandi Realization */}
           <PictorialTile
             title={language === 'te' ? 'అత్యధిక నికర ధర' : language === 'hi' ? 'सर्वोत्तम शुद्ध भाव' : 'Best Net Mandi'}
-            phrase={hasMandi ? `${bestMandi!.mandi}: ₹${bestMandi!.net_realization_per_q.toFixed(0)}/q` : (language === 'te' ? 'మండి ధరలు లేవు' : language === 'hi' ? 'मंडी भाव नहीं हैं' : 'No mandi loaded')}
+            phrase={hasMandi ? `${bestMandi!.mandi}: ₹${bestMandi!.net_realization_per_q.toFixed(0)}/q ${!isLiveMandi ? '(DEMO DATA)' : ''}` : (language === 'te' ? 'మండి ధరలు లేవు' : language === 'hi' ? 'मंडी भाव नहीं हैं' : 'No mandi loaded')}
             illustration={hasMandi ? <CoinStackGauge netProfit={bestMandi!.net_realization} className="w-20 h-20" /> : <NoDataIllustration size={80} />}
             status={hasMandi ? (isLiveMandi ? 'success' : 'demo') : 'nodata'}
             statusWord={hasMandi ? (isLiveMandi ? 'Best Mandi' : 'DEMO DATA') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
@@ -330,11 +337,11 @@ export const MarketPage: React.FC = () => {
           {/* Tile 2: Government MSP Benchmark */}
           <PictorialTile
             title={language === 'te' ? 'కనీస మద్దతు ధర (MSP)' : language === 'hi' ? 'न्यूनतम समर्थन मूल्य (MSP)' : 'MSP Benchmark'}
-            phrase={hasMsp ? `MSP: ₹${mspVal}/q` : (language === 'te' ? 'MSP డేటా లేదు' : language === 'hi' ? 'MSP डेटा नहीं है' : 'No MSP record')}
-            illustration={<Store className="w-16 h-16 text-[#1565A8]" />}
-            status={hasMsp ? 'info' : 'nodata'}
-            statusWord={hasMsp ? 'MSP Guide' : 'No Data'}
-            spokenText={hasMsp ? `Minimum Support Price benchmark for ${selectedCrop} is rupees ${mspVal} per quintal. Details to verify.` : 'No MSP benchmark record available.'}
+            phrase={language === 'te' ? 'వివరాలు ధృవీకరించండి' : language === 'hi' ? 'सत्यापन आवश्यक (विवरण जांचें)' : 'details to verify'}
+            illustration={<NoDataIllustration size={80} />}
+            status="nodata"
+            statusWord={language === 'te' ? 'ధృవీకరించండి' : language === 'hi' ? 'सत्यापन आवश्यक' : 'details to verify'}
+            spokenText="Minimum Support Price benchmark details require local verification. No unverified prices are shown."
             onOpenDetails={() => setMode('words')}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -366,18 +373,18 @@ export const MarketPage: React.FC = () => {
           summary: language === 'te'
             ? 'రవాణా ఖర్చులు మరియు మార్కెట్ రుసుములు మినహాయించిన తర్వాత ప్రతి మార్కెట్‌లో చేతికి వచ్చే అసలు నికర ఆదాయాన్ని లెక్కిస్తుంది.'
             : language === 'hi'
-            ? 'किराया और मंडी टैक्स काटने के बाद हर मंडी में किसान के हाथ में आने वाली असली शुद्ध कमाई की गणना करता है।'
-            : 'Calculates the real in-hand cash you earn per quintal after deducting fuel and market cess for every nearby APMC mandi.',
+              ? 'किराया और मंडी टैक्स काटने के बाद हर मंडी में किसान के हाथ में आने वाली असली शुद्ध कमाई की गणना करता है।'
+              : 'Calculates the real in-hand cash you earn per quintal after deducting fuel and market cess for every nearby APMC mandi.',
           whatToEnter: language === 'te'
             ? 'పంట రకం, పరిమాణం (క్వింటాళ్లలో), మరియు రవాణా రేటు.'
             : language === 'hi'
-            ? 'अपनी फसल, मात्रा (क्विंटल में) और अनुमानित भाड़ा दर।'
-            : 'Your harvested crop, total volume in quintals, and optional transport rate assumption.',
+              ? 'अपनी फसल, मात्रा (क्विंटल में) और अनुमानित भाड़ा दर।'
+              : 'Your harvested crop, total volume in quintals, and optional transport rate assumption.',
           whatYouGet: language === 'te'
             ? 'ఏ మార్కెట్‌లో అత్యధిక లాభం వస్తుందో ర్యాంకింగ్, మరియు దళారులు లేకుండా నేరుగా కొనుగోలుదారులతో మాట్లాడే సదుపాయం.'
             : language === 'hi'
-            ? 'सबसे ज्यादा मुनाफा देने वाली मंडी की रैंकिंग और सीधे खरीदारों से जुड़ने की सुविधा।'
-            : 'Clear rankings showing where you pocket the most money, plus a direct marketplace to sell to buyers without middlemen.',
+              ? 'सबसे ज्यादा मुनाफा देने वाली मंडी की रैंकिंग और सीधे खरीदारों से जुड़ने की सुविधा।'
+              : 'Clear rankings showing where you pocket the most money, plus a direct marketplace to sell to buyers without middlemen.',
         }}
       />
 
@@ -412,13 +419,24 @@ export const MarketPage: React.FC = () => {
               </span>
             </div>
 
-            <div className="text-3xl sm:text-4xl font-display font-black text-[#183D2E]">
-              ₹{bestMandi ? bestMandi.net_realization_per_q.toFixed(0) : '7,050'}
-              <span className="text-xs font-semibold text-[#7A553A] ml-1">/ q net</span>
+            <div className="text-3xl sm:text-4xl font-display font-black text-[#183D2E] flex items-center flex-wrap gap-2">
+              {bestMandi ? (
+                <>
+                  <span>₹{bestMandi.net_realization_per_q.toFixed(0)}</span>
+                  <span className="text-xs font-semibold text-[#7A553A]">/ q net</span>
+                  {!isLiveMandi && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                      DEMO DATA
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-xl text-[#7A553A]">Awaiting prices</span>
+              )}
             </div>
 
             <p className="text-xs text-[#4E5F57] leading-relaxed">
-              Total Net Payout: <strong>₹{bestMandi ? bestMandi.net_realization.toLocaleString('en-IN') : '141,000'}</strong> for {quantity} quintals.
+              Total Net Payout: <strong>{bestMandi ? `₹${bestMandi.net_realization.toLocaleString('en-IN')}` : 'Calculating...'}</strong> for {quantity} quintals {!isLiveMandi && <span className="font-bold text-amber-800">(DEMO DATA)</span>}.
             </p>
           </div>
 
@@ -452,13 +470,17 @@ export const MarketPage: React.FC = () => {
               <div className="flex justify-between items-baseline">
                 <span className="text-xs text-[#7A553A]">MSP Benchmark:</span>
                 <strong className="text-base font-bold text-[#183D2E]">
-                  ₹{mspData?.benchmark?.msp_per_quintal ? mspData.benchmark.msp_per_quintal.toLocaleString('en-IN') : '7,121 (DEMO DATA)'} / q
+                  {mspData?.benchmark?.msp_per_quintal
+                    ? `₹${mspData.benchmark.msp_per_quintal.toLocaleString('en-IN')} / q (Indicative)`
+                    : 'Details to verify (No benchmark record)'}
                 </strong>
               </div>
               <div className="flex justify-between items-baseline">
                 <span className="text-xs text-[#7A553A]">Market Realization:</span>
                 <strong className="text-xs font-bold text-[#183D2E]">
-                  ₹{bestMandi ? bestMandi.net_realization_per_q.toFixed(0) : '7,050 (DEMO DATA)'} / q
+                  {bestMandi
+                    ? `₹${bestMandi.net_realization_per_q.toFixed(0)} / q ${!isLiveMandi ? '(DEMO DATA)' : ''}`
+                    : 'Awaiting APMC Prices'}
                 </strong>
               </div>
             </div>
@@ -486,7 +508,10 @@ export const MarketPage: React.FC = () => {
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
               <div className="flex justify-between text-[#4E5F57]">
                 <span>Gross Realization ({quantity} q):</span>
-                <strong>₹{bestMandi ? (bestMandi.modal_price * quantity).toLocaleString('en-IN') : '144,000'}</strong>
+                <strong>
+                  {bestMandi ? `₹${(bestMandi.modal_price * quantity).toLocaleString('en-IN')}` : 'Calculating...'}
+                  {!isLiveMandi && <span className="ml-1 text-[9px] font-bold text-amber-800">(DEMO DATA)</span>}
+                </strong>
               </div>
               <div className="flex justify-between text-red-700">
                 <span>Freight Logistics:</span>
@@ -523,11 +548,10 @@ export const MarketPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('mandi')}
-            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-              activeTab === 'mandi'
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'mandi'
                 ? 'border-[#183D2E] text-[#183D2E] bg-white'
                 : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
-            }`}
+              }`}
           >
             <TrendingUp className="w-4 h-4 text-[#DA9A4C]" />
             <span>Mandi Rankings & Trends</span>
@@ -537,11 +561,10 @@ export const MarketPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('marketplace')}
-            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-              activeTab === 'marketplace'
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'marketplace'
                 ? 'border-[#183D2E] text-[#183D2E] bg-white'
                 : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
-            }`}
+              }`}
           >
             <Store className="w-4 h-4 text-[#DA9A4C]" />
             <span>Farm-Gate Marketplace</span>
@@ -555,11 +578,10 @@ export const MarketPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('inquiries')}
-            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-              activeTab === 'inquiries'
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'inquiries'
                 ? 'border-[#183D2E] text-[#183D2E] bg-white'
                 : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
-            }`}
+              }`}
           >
             <Mail className="w-4 h-4 text-[#DA9A4C]" />
             <span>Buyer Inquiries & Inbox</span>
@@ -690,7 +712,7 @@ export const MarketPage: React.FC = () => {
                           <th className="p-3 font-bold">Transport Cost</th>
                           <th className="p-3 font-bold">Mandi Fee</th>
                           <th className="p-3 font-bold">Net Realization / q</th>
-                          <th className="p-3 font-bold">Total Net Payout</th>
+                          <th className="p-3 font-bold">Total Net Payout {!isLiveMandi && <span className="text-[10px] font-normal text-amber-800">(DEMO)</span>}</th>
                           <th className="p-3 font-bold text-right">Details</th>
                         </tr>
                       </thead>
@@ -698,19 +720,17 @@ export const MarketPage: React.FC = () => {
                         {rankingData.rankings.map((m) => (
                           <React.Fragment key={m.rank}>
                             <tr
-                              className={`hover:bg-[#FAF8F5]/60 transition-colors ${
-                                m.rank === 1 ? 'bg-[#FEF6E9] font-bold' : ''
-                              }`}
+                              className={`hover:bg-[#FAF8F5]/60 transition-colors ${m.rank === 1 ? 'bg-[#FEF6E9] font-bold' : ''
+                                }`}
                             >
                               <td className="p-3">
                                 <span
-                                  className={`w-6 h-6 rounded-full inline-flex items-center justify-center text-[11px] font-black ${
-                                    m.rank === 1
+                                  className={`w-6 h-6 rounded-full inline-flex items-center justify-center text-[11px] font-black ${m.rank === 1
                                       ? 'bg-[#183D2E] text-white'
                                       : m.rank === 2
-                                      ? 'bg-[#DA9A4C] text-[#183D2E]'
-                                      : 'bg-stone-200 text-stone-700'
-                                  }`}
+                                        ? 'bg-[#DA9A4C] text-[#183D2E]'
+                                        : 'bg-stone-200 text-stone-700'
+                                    }`}
                                 >
                                   {m.rank}
                                 </span>
@@ -720,16 +740,16 @@ export const MarketPage: React.FC = () => {
                                 <span className="text-[10px] text-[#7A553A]">{m.district}, {m.state}</span>
                               </td>
                               <td className="p-3 text-[#4E5F57]">{m.distance_km} km</td>
-                              <td className="p-3 text-[#4E5F57]">₹{m.modal_price.toLocaleString('en-IN')}</td>
+                              <td className="p-3 text-[#4E5F57]">₹{m.modal_price.toLocaleString('en-IN')} {!isLiveMandi && <span className="text-[10px] font-bold text-amber-800">(DEMO)</span>}</td>
                               <td className="p-3 text-red-700 font-medium">-₹{m.transport_cost.toLocaleString('en-IN')}</td>
                               <td className="p-3 text-[#7A553A]">-₹{m.market_fee.toLocaleString('en-IN')}</td>
                               <td className="p-3">
                                 <span className="font-extrabold text-[#183D2E]">
-                                  ₹{m.net_realization_per_q.toFixed(0)}
+                                  ₹{m.net_realization_per_q.toFixed(0)} {!isLiveMandi && <span className="text-[10px] font-bold text-amber-800">(DEMO)</span>}
                                 </span>
                               </td>
                               <td className="p-3 font-extrabold text-[#183D2E]">
-                                ₹{m.net_realization.toLocaleString('en-IN')}
+                                ₹{m.net_realization.toLocaleString('en-IN')} {!isLiveMandi && <span className="text-[10px] font-bold text-amber-800">(DEMO)</span>}
                               </td>
                               <td className="p-3 text-right">
                                 <button
@@ -779,13 +799,12 @@ export const MarketPage: React.FC = () => {
                       <p className="text-xs text-[#7A553A]">{trendData.seasonal_pattern_summary}</p>
                     </div>
                     <span
-                      className={`px-2.5 py-1 text-xs font-bold rounded-xl self-start ${
-                        trendData.trend_direction === 'rising'
+                      className={`px-2.5 py-1 text-xs font-bold rounded-xl self-start ${trendData.trend_direction === 'rising'
                           ? 'bg-emerald-100 text-emerald-900'
                           : trendData.trend_direction === 'falling'
-                          ? 'bg-amber-100 text-amber-900'
-                          : 'bg-stone-100 text-stone-800'
-                      }`}
+                            ? 'bg-amber-100 text-amber-900'
+                            : 'bg-stone-100 text-stone-800'
+                        }`}
                     >
                       {trendData.trend_direction.toUpperCase()}
                     </span>
@@ -979,18 +998,16 @@ export const MarketPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setInboxTab('received')}
-                  className={`min-h-[38px] px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    inboxTab === 'received' ? 'bg-[#183D2E] text-white shadow' : 'bg-[#FAF8F5] text-[#7A553A]'
-                  }`}
+                  className={`min-h-[38px] px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${inboxTab === 'received' ? 'bg-[#183D2E] text-white shadow' : 'bg-[#FAF8F5] text-[#7A553A]'
+                    }`}
                 >
                   Received Inquiries
                 </button>
                 <button
                   type="button"
                   onClick={() => setInboxTab('sent')}
-                  className={`min-h-[38px] px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    inboxTab === 'sent' ? 'bg-[#183D2E] text-white shadow' : 'bg-[#FAF8F5] text-[#7A553A]'
-                  }`}
+                  className={`min-h-[38px] px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${inboxTab === 'sent' ? 'bg-[#183D2E] text-white shadow' : 'bg-[#FAF8F5] text-[#7A553A]'
+                    }`}
                 >
                   Sent Inquiries
                 </button>
@@ -1006,10 +1023,9 @@ export const MarketPage: React.FC = () => {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <strong className="text-[#183D2E] text-sm">Offer: ₹{inq.offered_price_per_q}/q</strong>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            inq.status === 'accepted' ? 'bg-emerald-100 text-emerald-800' :
-                            inq.status === 'declined' ? 'bg-red-100 text-red-800' : 'bg-stone-200 text-stone-800'
-                          }`}>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${inq.status === 'accepted' ? 'bg-emerald-100 text-emerald-800' :
+                              inq.status === 'declined' ? 'bg-red-100 text-red-800' : 'bg-stone-200 text-stone-800'
+                            }`}>
                             {inq.status.toUpperCase()}
                           </span>
                         </div>
