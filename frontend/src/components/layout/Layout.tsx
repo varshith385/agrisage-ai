@@ -29,6 +29,12 @@ export const Layout: React.FC = () => {
     }
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    const handleStartTour = () => setTourOpen(true);
+    window.addEventListener('agrisage:start-tour', handleStartTour);
+    return () => window.removeEventListener('agrisage:start-tour', handleStartTour);
+  }, []);
+
   return (
     <div className="min-h-screen flex bg-[#FFFDF8] dark:bg-[#0D1410] text-[#1F2A24] dark:text-[#F2F5F3] transition-colors duration-200">
       {/* Collapsible Desktop Left Sidebar with 72px rail / 248px expanded */}

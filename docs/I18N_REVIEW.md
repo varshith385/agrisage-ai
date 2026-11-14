@@ -200,3 +200,33 @@ The following translations were added in Round 3 for grey no-data states, honest
 | **Community Pictorial**| Outbreak Radar | తెగుళ్ల హెచ్చరిక మ్యాప్ | कीट प्रकोप नक्शा | **Unverified**: Needs native review. |
 | **Parser Status** | Manual Entry & Text Parsing | మాన్యువల్ ఎంట్రీ & టెక్స్ట్ పార్సింగ్ (OCR లేదు) | मैन्युअल प्रविष्टि व टेक्स्ट विश्लेषण (कोई OCR नहीं) | **Unverified**: Needs native review. |
 | **Parser Status** | Verify against physical card | భద్రపరిచే ముందు మీ అసలు పత్రంతో సరిచూసుకోండి | सहेजने से पहले अपने कार्ड से मिलान अवश्य करें | **Unverified**: Needs native review. |
+
+
+---
+
+## 9. Round 5 Phase C Smart Chatbot & Voice Assistant Navigation Additions (Unverified — Awaiting Native Review)
+
+The following translations were added in Round 5 Phase C for deterministic navigation spoken confirmations, small talk responses, settings actions, and the Telugu voice guidance advisory:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Navigation** | Navigating to Irrigation & Water Budget. | నీటి పారుదల మరియు నీటి ప్రణాళిక పేజీకి వెళ్తున్నారు. | सिंचाई एवं जल बजट पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Mandi Market & Prices. | మండి మార్కెట్ మరియు నికర ధరల పేజీకి వెళ్తున్నారు. | मंडी भाव एवं शुद्ध लाभ रैंकिंग पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Weather & Farm Setup. | వాతావరణ సూచన మరియు ఉష్ణోగ్రత పేజీకి వెళ్తున్నారు. | मौसम पूर्वानुमान एवं तापमान पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Crop Calendar. | పంట క్యాలెండర్ మరియు వ్యవసాయ పనుల పేజీకి వెళ్తున్నారు. | फसल कैलेंडर एवं कार्य समय-सारणी पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Disease Diagnosis. | ఆకు తెగుళ్ల గుర్తింపు పేజీకి వెళ్తున్నారు. ఆకు ఫోటో తీసి అప్‌లోడ్ చేయండి. | पत्ती रोग पहचान पृष्ठ खोला जा रहा है। पत्ती का फोटो अपलोड करें। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Farm Economics & Net Profit Calculator. | వ్యవసాయ ఖర్చులు మరియు లాభ కాలిక్యులేటర్ పేజీకి వెళ్తున్నారు. | कृषि लागत एवं शुद्ध मुनाफा कैलकुलेटर पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to My Farms. | మీ రిజిస్టర్డ్ పొలాల నిర్వహణ పేజీకి వెళ్తున్నారు. | आपके पंजीकृत खेतों के प्रबंधन पृष्ठ पर जाया जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Reminders & Field Task Alerts. | వ్యవసాయ జ్ఞాపికలు మరియు అలర్ట్‌ల పేజీకి వెళ్తున్నారు. | कृषि स्मरणपत्र एवं अलर्ट पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Soil Health Card & Welfare Schemes. | సాయిల్ హెల్త్ కార్డ్ మరియు ప్రభుత్వ సంక్షేమ సమాచార పేజీకి వెళ్తున్నారు. | मृदा स्वास्थ्य कार्ड एवं कृषि योजनाओं के पृष्ठ पर जाया जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to Community Forum, Machinery & Outbreak Map. | రైతు సంఘం, పరికరాల అద్దె మరియు వ్యాధుల మ్యాప్ పేజీకి వెళ్తున్నారు. | किसान समुदाय, मशीनरी किराया एवं कीट प्रकोप मानचित्र पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Navigating to How to Use Guide. | అగ్రిసేజ్ యాప్ ఎలా ఉపయోగించాలో వివరించే మార్గదర్శి పేజీకి వెళ్తున్నారు. | एग्रीसेज ऐप का उपयोग कैसे करें, गाइड पृष्ठ खोला जा रहा है। | **Unverified**: Needs native review. |
+| **Navigation** | Starting interactive guided walkthrough tour. | ఇంటరాక్టివ్ గైడెడ్ టూర్ ప్రారంభమవుతోంది. | इंटरैक्टिव गाइडेड टूर शुरू किया जा रहा है। | **Unverified**: Needs native review. |
+| **Action** | Switched app language to Telugu. | యాప్ భాష తెలుగులోకి మార్చబడింది. | ऐप की भाषा तेलुगु में बदल दी गई है। | **Unverified**: Needs native review. |
+| **Action** | Switched app language to Hindi. | యాప్ భాష హిందీలోకి మార్చబడింది. | ऐप की भाषा हिन्दी में बदल दी गई है। | **Unverified**: Needs native review. |
+| **Action** | Dark mode has been enabled. | డార్క్ మోడ్ ఆన్ చేయబడింది. | डार्क मोड चालू कर दिया गया है। | **Unverified**: Needs native review. |
+| **Action** | Light mode has been enabled. | లైట్ మోడ్ ఆన్ చేయబడింది. | लाइट मोड चालू कर दिया गया है। | **Unverified**: Needs native review. |
+| **Action** | Pictures visual mode has been activated. | చిత్రాల మోడ్ ఆన్ చేయబడింది. | चित्र मोड चालू कर दिया गया है। | **Unverified**: Needs native review. |
+| **Action** | Detailed words mode has been activated. | వివరాల పాఠ్య మోడ్ ఆన్ చేయబడింది. | विस्तृत टेक्स्ट मोड चालू कर दिया गया है। | **Unverified**: Needs native review. |
+| **Smalltalk** | Glad to help! What would you like to check next on your farm? | సంతోషం! మీ పొలానికి సంబంధించి తర్వాత ఏమి తనిఖీ చేయాలనుకుంటున్నారు? | बहुत बढ़िया! आप अपने खेत के बारे में आगे क्या जानना चाहते हैं? | **Unverified**: Needs native review. |
+| **Voice Advisory** | Telugu voice not installed on this device | తెలుగు వాయిస్ ప్యాక్ లేదు (Telugu voice not installed on this device) | डिवाइस पर तेलुगु वॉयस नहीं है | **Unverified**: Needs native review. |

@@ -20,6 +20,10 @@ export interface VoiceQueryResponse {
   sources: string[];
   action_link?: string;
   action_label?: string;
+  action_type?: string;
+  confirmation_chip?: string;
+  mode?: 'ai' | 'basic' | string;
+  privacy_notice?: string;
   structured_data?: Record<string, any>;
   limitations: string[];
   upstream_status?: string;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Mic,
   MicOff,
@@ -13,8 +13,12 @@ import {
   ShieldCheck,
   Sparkles,
   Info,
+  Check,
+  Compass,
 } from 'lucide-react';
 import { useTranslation } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
+import { usePictorial } from '../../context/PictorialContext';
 import { queryVoiceAssistant, VoiceQueryResponse } from '../../api/voice';
 import {
   isSpeechRecognitionSupported,
@@ -29,7 +33,6 @@ import {
   LANGUAGE_LOCALE_MAP,
   LANGUAGE_DISPLAY_NAMES,
 } from '../../services/speech';
-import { StatusBadge } from '../common/StatusBadge';
 
 interface ChatMessage {
   id: string;
@@ -40,7 +43,10 @@ interface ChatMessage {
 }
 
 export const VoiceAssistant: React.FC = () => {
-  const { t, language } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
+  const { setTheme } = useTheme();
+  const { setPictorial } = usePictorial();
+  const navigate = useNavigate();
   const currentLang = (language as SupportedLanguage) || 'en';
 
   const [isOpen, setIsOpen] = useState(false);
@@ -51,6 +57,10 @@ export const VoiceAssistant: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
 
+  // Assistant operational mode: 'basic' or 'ai'
+  const [assistantMode, setAssistantMode] = useState<'basic' | 'ai'>('basic');
+  const [privacyNotice, setPrivacyNotice] = useState<string | null>(null);
+
   // Capability & voice states
   const [recognitionSupported, setRecognitionSupported] = useState(true);
   const [synthesisSupported, setSynthesisSupported] = useState(true);
@@ -59,6 +69,7 @@ export const VoiceAssistant: React.FC = () => {
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [matchingVoices, setMatchingVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoiceName, setSelectedVoiceName] = useState<string>('');
+  const [missingVoiceNotice, setMissingVoiceNotice] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeRecognizerRef = useRef<{ stop: () => void; abort: () => void } | null>(null);
@@ -115,10 +126,38 @@ export const VoiceAssistant: React.FC = () => {
     };
   }, []);
 
+  const handleActionDispatch = (res: VoiceQueryResponse) => {
+    if (!res.action_type) return;
+
+    if (res.action_type === 'navigate' && res.action_link) {
+      // Delay slightly so the user sees the confirmation chip in chat
+      setTimeout(() => {
+        navigate(res.action_link!);
+      }, 600);
+    } else if (res.action_type === 'start_tour') {
+      window.dispatchEvent(new CustomEvent('agrisage:start-tour'));
+    } else if (res.action_type === 'set_lang:te') {
+      setLanguage('te');
+    } else if (res.action_type === 'set_lang:hi') {
+      setLanguage('hi');
+    } else if (res.action_type === 'set_lang:en') {
+      setLanguage('en');
+    } else if (res.action_type === 'set_theme:dark') {
+      setTheme('dark');
+    } else if (res.action_type === 'set_theme:light') {
+      setTheme('light');
+    } else if (res.action_type === 'set_pictorial:true') {
+      setPictorial(true);
+    } else if (res.action_type === 'set_pictorial:false') {
+      setPictorial(false);
+    }
+  };
+
   const handleSendQuery = async (queryText: string) => {
     const text = queryText.trim();
     if (!text || isLoading) return;
 
+    setMissingVoiceNotice(null);
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
@@ -137,6 +176,14 @@ export const VoiceAssistant: React.FC = () => {
         language: currentLang,
       });
 
+      if (res.mode === 'ai') {
+        setAssistantMode('ai');
+        setPrivacyNotice(res.privacy_notice || 'Farm context is securely sent to Google to generate tailored answers.');
+      } else {
+        setAssistantMode('basic');
+        setPrivacyNotice(null);
+      }
+
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
@@ -146,6 +193,9 @@ export const VoiceAssistant: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
+
+      // Execute in-app navigation or settings action if detected
+      handleActionDispatch(res);
 
       // Automatically speak the response if speech synthesis is supported
       if (synthesisSupported && res.spoken_text) {
@@ -227,8 +277,12 @@ export const VoiceAssistant: React.FC = () => {
       return;
     }
 
+    // Honest Telugu/Hindi voice validation: never read Telugu/Hindi with an English voice
     if (!voiceAvailableForLang && currentLang !== 'en') {
-      // Never silently speak English when voice pack is missing for selected language!
+      const notice = currentLang === 'te'
+        ? 'ఈ పరికరంలో తెలుగు వాయిస్ ప్యాక్ లేదు. ఆడియో వినడానికి Windows Telugu Speech Pack లేదా Edge బ్రౌజర్ ఉపయోగించండి.'
+        : 'इस डिवाइस पर हिन्दी वॉयस पैक नहीं है। ऑडियो के लिए Windows Hindi Speech Pack या Edge ब्राउज़र का उपयोग करें।';
+      setMissingVoiceNotice(notice);
       return;
     }
 
@@ -247,6 +301,7 @@ export const VoiceAssistant: React.FC = () => {
     }
     setCurrentlySpeakingId(null);
     setMessages([]);
+    setMissingVoiceNotice(null);
   };
 
   const quickChips = [
@@ -270,7 +325,7 @@ export const VoiceAssistant: React.FC = () => {
             ? 'bg-rose-600 text-white animate-pulse ring-4 ring-rose-400'
             : currentlySpeakingId
             ? 'bg-amber-600 text-white ring-4 ring-amber-400 animate-bounce'
-            : 'bg-agri-green-600 hover:bg-agri-green-700 text-white hover:scale-110 active:scale-95'
+            : 'bg-agri-green-700 hover:bg-agri-green-800 text-white hover:scale-110 active:scale-95'
         }`}
         aria-label={t('voice.fab_label')}
         title={t('voice.fab_label')}
@@ -299,24 +354,37 @@ export const VoiceAssistant: React.FC = () => {
           aria-modal="true"
           aria-label={t('voice.panel_title')}
         >
-          <div className="relative w-full sm:max-w-xl md:max-w-2xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] overflow-hidden border border-stone-200 animate-in slide-in-from-bottom duration-300">
+          <div className="relative w-full sm:max-w-xl md:max-w-2xl bg-white dark:bg-[#121A15] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] overflow-hidden border border-stone-200 dark:border-stone-800 animate-in slide-in-from-bottom duration-300">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-agri-green-800 to-agri-green-700 text-white">
+            <div className="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-agri-green-900 to-agri-green-800 dark:from-[#0E1B13] dark:to-[#172E21] text-white border-b border-agri-green-700/50">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
                   <Sparkles className="w-5 h-5 text-agri-green-200" />
                 </div>
                 <div>
                   <div className="flex items-center space-x-2">
-                    <h2 className="text-base sm:text-lg font-bold">{t('voice.panel_title')}</h2>
+                    <h2 className="text-base font-bold text-white tracking-tight">{t('voice.panel_title')}</h2>
                     <span
-                      className="px-2 py-0.5 text-xs font-semibold bg-agri-green-600 text-white rounded-full border border-agri-green-400"
+                      className="px-2 py-0.5 text-[11px] font-semibold bg-white/15 text-white rounded-full border border-white/20"
                       title={LANGUAGE_DISPLAY_NAMES[currentLang]}
                     >
                       {LANGUAGE_LOCALE_MAP[currentLang]}
                     </span>
                   </div>
-                  <p className="text-xs text-agri-green-100">{t('voice.listening_hint')}</p>
+                  {/* Status chip: AI connected vs Basic mode */}
+                  <div className="flex items-center space-x-1.5 mt-0.5">
+                    {assistantMode === 'ai' ? (
+                      <span className="inline-flex items-center space-x-1 text-[11px] font-medium text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>AI connected</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center space-x-1 text-[11px] font-medium text-stone-300 bg-stone-800/80 px-2 py-0.5 rounded-full border border-stone-600/50">
+                        <Info className="w-3 h-3 text-stone-300" />
+                        <span>Basic mode (no AI key)</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -325,7 +393,7 @@ export const VoiceAssistant: React.FC = () => {
                   <select
                     value={selectedVoiceName}
                     onChange={(e) => setSelectedVoiceName(e.target.value)}
-                    className="bg-agri-green-800/90 text-white text-[11px] font-medium rounded-lg px-2 py-1 border border-agri-green-400 focus:ring-1 focus:ring-white max-w-[140px] truncate"
+                    className="bg-agri-green-950/80 text-white text-[11px] font-medium rounded-lg px-2 py-1 border border-agri-green-600 focus:ring-1 focus:ring-white max-w-[130px] truncate"
                     title="Select voice"
                     aria-label="Voice picker"
                   >
@@ -336,11 +404,10 @@ export const VoiceAssistant: React.FC = () => {
                     ))}
                   </select>
                 )}
-                <StatusBadge status="WORKING" />
                 {messages.length > 0 && (
                   <button
                     onClick={clearHistory}
-                    className="p-2 text-agri-green-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                     title={t('voice.clear_history')}
                     aria-label={t('voice.clear_history')}
                   >
@@ -349,7 +416,7 @@ export const VoiceAssistant: React.FC = () => {
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 text-agri-green-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={t('voice.close_panel')}
                 >
                   <X className="w-5 h-5" />
@@ -357,16 +424,37 @@ export const VoiceAssistant: React.FC = () => {
               </div>
             </div>
 
-            {/* Capability Advisories & Fallbacks Banner */}
-            {(!recognitionSupported || micPermissionDenied || !voiceAvailableForLang) && (
-              <div className="px-5 py-3 bg-amber-50 border-b border-amber-200 text-xs text-amber-900 space-y-1.5">
+            {/* Privacy notice banner (only when AI connected) */}
+            {assistantMode === 'ai' && privacyNotice && (
+              <div className="px-4 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800/50 text-[11px] text-emerald-900 dark:text-emerald-200 flex items-center space-x-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
+                <span>{privacyNotice}</span>
+              </div>
+            )}
+
+            {/* Telugu Voice Missing Guidance Card */}
+            {currentLang === 'te' && !voiceAvailableForLang && (
+              <div className="px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+                <div className="flex items-center space-x-1.5 font-semibold text-amber-950 dark:text-amber-100">
+                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <span>తెలుగు వాయిస్ ప్యాక్ లేదు (Telugu voice not installed on this device)</span>
+                </div>
+                <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-snug">
+                  ఈ పరికరంలో సహజమైన తెలుగు ఆడియో వినడానికి Windows Settings &gt; Time &amp; Language &gt; Speech లో "Telugu Speech Pack" ఇన్‌స్టాల్ చేయండి లేదా Microsoft Edge బ్రౌజర్ ఉపయోగించండి. సమాధానాలు స్క్రీన్ పై స్పష్టంగా కనిపిస్తాయి.
+                </p>
+              </div>
+            )}
+
+            {/* General Capability Advisories */}
+            {(!recognitionSupported || micPermissionDenied) && (
+              <div className="px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 space-y-1">
                 {!recognitionSupported && (
                   <div className="flex items-start space-x-2">
                     <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold">{t('voice.mic_unsupported_title')}</p>
-                      <p>{t('voice.mic_unsupported_desc')}</p>
-                      <p className="text-stone-600 mt-0.5 font-medium">{t('voice.browser_recommendation')}</p>
+                      <p className="text-[11px]">{t('voice.mic_unsupported_desc')}</p>
+                      <p className="text-stone-600 dark:text-stone-400 text-[11px] font-medium">{t('voice.browser_recommendation')}</p>
                     </div>
                   </div>
                 )}
@@ -375,53 +463,70 @@ export const VoiceAssistant: React.FC = () => {
                   <div className="flex items-start space-x-2">
                     <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-rose-800">{t('voice.mic_denied_title')}</p>
-                      <p className="text-rose-700">{t('voice.mic_denied_desc')}</p>
-                    </div>
-                  </div>
-                )}
-
-                {!voiceAvailableForLang && (
-                  <div className="flex items-start space-x-2">
-                    <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-blue-900">{t('voice.no_voice_title')}</p>
-                      <p className="text-blue-800">{t('voice.no_voice_desc')}</p>
+                      <p className="font-semibold text-rose-800 dark:text-rose-300">{t('voice.mic_denied_title')}</p>
+                      <p className="text-[11px] text-rose-700 dark:text-rose-400">{t('voice.mic_denied_desc')}</p>
                     </div>
                   </div>
                 )}
               </div>
             )}
 
+            {/* Ephemeral Notice for Missing Voice */}
+            {missingVoiceNotice && (
+              <div className="px-4 py-2 bg-blue-50 dark:bg-blue-950/40 border-b border-blue-200 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-200 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <span>{missingVoiceNotice}</span>
+                </div>
+                <button
+                  onClick={() => setMissingVoiceNotice(null)}
+                  className="text-stone-400 hover:text-stone-600"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
             {/* Conversation Transcript Area */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-stone-50">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-stone-50 dark:bg-[#0D1410]">
               {messages.length === 0 ? (
-                <div className="py-8 text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-agri-green-100 flex items-center justify-center text-agri-green-700 shadow-inner">
-                    <Mic className="w-8 h-8" />
+                <div className="py-6 text-center space-y-4">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-agri-green-100 dark:bg-agri-green-950/60 flex items-center justify-center text-agri-green-800 dark:text-agri-green-300 shadow-inner">
+                    <Mic className="w-7 h-7" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-stone-800 text-sm sm:text-base">
+                    <h3 className="font-bold text-stone-900 dark:text-stone-100 text-base">
                       {currentLang === 'te'
                         ? 'వ్యవసాయ ప్రశ్నను మాట్లాడండి లేదా టైప్ చేయండి'
                         : currentLang === 'hi'
                         ? 'कृषि प्रश्न बोलें या टाइप करें'
                         : 'Ask your farming questions by voice or text'}
                     </h3>
-                    <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-sm mx-auto">
                       {t('voice.browser_recommendation')}
                     </p>
                   </div>
 
+                  {/* Navigation Commands Help Notice */}
+                  <div className="bg-white dark:bg-[#15211B] border border-stone-200 dark:border-stone-800 rounded-xl p-3 max-w-md mx-auto text-left shadow-sm">
+                    <p className="text-xs font-semibold text-agri-green-800 dark:text-agri-green-300 flex items-center space-x-1 mb-1">
+                      <Compass className="w-3.5 h-3.5" />
+                      <span>Instant Voice Commands</span>
+                    </p>
+                    <p className="text-[11px] text-stone-600 dark:text-stone-400">
+                      Try saying: <span className="font-medium text-stone-900 dark:text-stone-200">"open irrigation"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"take me to market"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"switch to Telugu"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"turn on dark mode"</span>, or <span className="font-medium text-stone-900 dark:text-stone-200">"start the tour"</span>.
+                    </p>
+                  </div>
+
                   {/* Quick Suggestions Chips */}
-                  <div className="pt-2">
-                    <p className="text-xs font-semibold text-stone-600 mb-2">{t('voice.quick_chips_title')}</p>
+                  <div className="pt-1">
+                    <p className="text-xs font-semibold text-stone-600 dark:text-stone-400 mb-2">{t('voice.quick_chips_title')}</p>
                     <div className="flex flex-wrap justify-center gap-2">
                       {quickChips.map((chip, idx) => (
                         <button
                           key={idx}
                           onClick={() => handleSendQuery(chip.query)}
-                          className="px-3 py-1.5 rounded-full text-xs font-medium bg-white text-stone-700 border border-stone-200 hover:border-agri-green-500 hover:text-agri-green-800 hover:bg-agri-green-50 shadow-sm transition-all"
+                          className="px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-[#1A2620] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:border-agri-green-600 hover:text-agri-green-800 dark:hover:text-agri-green-300 hover:bg-agri-green-50 dark:hover:bg-agri-green-950/40 shadow-sm transition-all"
                         >
                           {chip.label}
                         </button>
@@ -439,23 +544,30 @@ export const VoiceAssistant: React.FC = () => {
                       className={`max-w-[88%] sm:max-w-[82%] rounded-2xl px-4 py-3 shadow-sm ${
                         msg.role === 'user'
                           ? 'bg-agri-green-700 text-white rounded-br-none'
-                          : 'bg-white text-stone-900 border border-stone-200 rounded-bl-none'
+                          : 'bg-white dark:bg-[#17241D] text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-800 rounded-bl-none'
                       }`}
                     >
+                      {/* Action confirmation chip if present */}
+                      {msg.responseData?.confirmation_chip && (
+                        <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 mb-2 rounded-full text-xs font-medium bg-agri-green-100 text-agri-green-900 dark:bg-agri-green-950 dark:text-agri-green-300 border border-agri-green-300 dark:border-agri-green-800">
+                          <Check className="w-3 h-3 text-agri-green-700 dark:text-agri-green-400" />
+                          <span>{msg.responseData.confirmation_chip}</span>
+                        </div>
+                      )}
+
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
 
                       {/* Assistant Response Actions & Badges */}
                       {msg.role === 'assistant' && (
-                        <div className="mt-3 pt-2.5 border-t border-stone-100 space-y-2">
-                          {/* Audio Read-Aloud & Deep Link Actions */}
+                        <div className="mt-3 pt-2.5 border-t border-stone-100 dark:border-stone-800 space-y-2">
                           <div className="flex flex-wrap items-center gap-2">
                             {synthesisSupported && (
                               <button
                                 onClick={() => playTTS(msg.id, msg.text)}
                                 className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
                                   currentlySpeakingId === msg.id
-                                    ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
-                                    : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
+                                    : 'bg-stone-50 text-stone-700 border-stone-200 dark:bg-stone-800/60 dark:text-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800'
                                 }`}
                               >
                                 {currentlySpeakingId === msg.id ? (
@@ -465,7 +577,7 @@ export const VoiceAssistant: React.FC = () => {
                                   </>
                                 ) : (
                                   <>
-                                    <Volume2 className="w-3.5 h-3.5 text-agri-green-700" />
+                                    <Volume2 className="w-3.5 h-3.5 text-agri-green-700 dark:text-agri-green-400" />
                                     <span>{t('voice.read_aloud')}</span>
                                   </>
                                 )}
@@ -476,24 +588,24 @@ export const VoiceAssistant: React.FC = () => {
                               <Link
                                 to={msg.responseData.action_link}
                                 onClick={() => setIsOpen(false)}
-                                className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-agri-green-50 text-agri-green-800 border border-agri-green-200 hover:bg-agri-green-100 transition-colors"
+                                className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-agri-green-50 text-agri-green-800 dark:bg-agri-green-950/60 dark:text-agri-green-300 border border-agri-green-200 dark:border-agri-green-800 hover:bg-agri-green-100 dark:hover:bg-agri-green-900/50 transition-colors"
                               >
                                 <span>{msg.responseData.action_label || 'View in Farm Portal'}</span>
                                 <ExternalLink className="w-3 h-3" />
                               </Link>
                             )}
 
-                            <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                            <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                              <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               <span>{t('voice.safety_badge')}</span>
                             </span>
                           </div>
 
                           {/* Explainability & Upstream Telemetry Footer */}
                           {msg.responseData && (
-                            <div className="text-[11px] text-stone-500 pt-1 space-y-0.5">
+                            <div className="text-[11px] text-stone-500 dark:text-stone-400 pt-1 space-y-0.5">
                               {msg.responseData.upstream_status && (
-                                <p className="text-amber-800 font-medium">
+                                <p className="text-amber-800 dark:text-amber-300 font-medium">
                                   Status: {msg.responseData.upstream_status}
                                 </p>
                               )}
@@ -510,13 +622,13 @@ export const VoiceAssistant: React.FC = () => {
 
                           {/* Tappable Suggestion Chips */}
                           {msg.responseData?.suggestion_chips && msg.responseData.suggestion_chips.length > 0 && (
-                            <div className="pt-2 border-t border-stone-100 flex flex-wrap gap-1.5">
+                            <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex flex-wrap gap-1.5">
                               {msg.responseData.suggestion_chips.map((chip, idx) => (
                                 <button
                                   key={idx}
                                   type="button"
                                   onClick={() => handleSendQuery(chip)}
-                                  className="text-[11px] font-medium bg-agri-cream-100/90 hover:bg-agri-cream-200 text-agri-green-900 border border-agri-green-700/20 px-2.5 py-1 rounded-full transition-all hover:scale-[1.02] active:scale-95 text-left"
+                                  className="text-[11px] font-medium bg-[#F6F3EC] dark:bg-[#1E2E25] hover:bg-[#EAE4D7] dark:hover:bg-[#25392E] text-stone-800 dark:text-stone-200 border border-stone-300/60 dark:border-stone-700 px-2.5 py-1 rounded-full transition-all hover:scale-[1.02] active:scale-95 text-left"
                                 >
                                   {chip}
                                 </button>
@@ -534,22 +646,22 @@ export const VoiceAssistant: React.FC = () => {
               {/* Interim Real-Time Speech Recognition Transcript */}
               {isListening && interimTranscript && (
                 <div className="flex flex-col items-end animate-pulse">
-                  <div className="max-w-[85%] rounded-2xl px-4 py-2.5 bg-agri-green-600 text-white shadow-sm opacity-90">
+                  <div className="max-w-[85%] rounded-2xl px-4 py-2.5 bg-agri-green-700 text-white shadow-sm opacity-90">
                     <p className="text-sm italic">{interimTranscript} ...</p>
                   </div>
-                  <span className="text-[10px] text-agri-green-700 mt-1 font-medium">
+                  <span className="text-[10px] text-agri-green-700 dark:text-agri-green-400 mt-1 font-medium">
                     {t('voice.listening_status')}
                   </span>
                 </div>
               )}
 
-              {/* Loading Indicator */}
+              {/* Animated Thinking Skeleton */}
               {isLoading && (
-                <div className="flex items-center space-x-2 text-stone-500 text-xs py-2 px-1">
-                  <div className="w-2 h-2 rounded-full bg-agri-green-600 animate-bounce" />
-                  <div className="w-2 h-2 rounded-full bg-agri-green-600 animate-bounce delay-100" />
-                  <div className="w-2 h-2 rounded-full bg-agri-green-600 animate-bounce delay-200" />
-                  <span className="italic">{t('voice.analyzing_status')}</span>
+                <div className="flex items-center space-x-2 text-stone-600 dark:text-stone-300 text-xs py-2 px-3 bg-white dark:bg-[#17241D] border border-stone-200 dark:border-stone-800 rounded-xl w-fit shadow-sm animate-pulse">
+                  <Sparkles className="w-4 h-4 text-agri-green-600 dark:text-agri-green-400 animate-spin" />
+                  <span className="font-medium">
+                    {assistantMode === 'ai' ? 'Thinking... analyzing real farm telemetry with Gemini' : 'Analyzing farm telemetry...'}
+                  </span>
                 </div>
               )}
 
@@ -558,7 +670,7 @@ export const VoiceAssistant: React.FC = () => {
 
             {/* Listening Live Status Bar */}
             {isListening && (
-              <div className="px-4 py-2 bg-rose-50 border-t border-rose-200 flex items-center justify-between text-xs text-rose-800">
+              <div className="px-4 py-2 bg-rose-50 dark:bg-rose-950/50 border-t border-rose-200 dark:border-rose-800 flex items-center justify-between text-xs text-rose-800 dark:text-rose-300">
                 <div className="flex items-center space-x-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping" />
                   <span className="font-bold">{t('voice.listening_status')}</span>
@@ -573,7 +685,7 @@ export const VoiceAssistant: React.FC = () => {
             )}
 
             {/* Input Controls (Mic + Typed Input Fallback) */}
-            <div className="p-3 sm:p-4 bg-white border-t border-stone-200">
+            <div className="p-3 sm:p-4 bg-white dark:bg-[#121A15] border-t border-stone-200 dark:border-stone-800">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -588,10 +700,10 @@ export const VoiceAssistant: React.FC = () => {
                   disabled={!recognitionSupported || micPermissionDenied}
                   className={`flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-all ${
                     !recognitionSupported || micPermissionDenied
-                      ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                      ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
                       : isListening
                       ? 'bg-rose-600 text-white animate-pulse ring-2 ring-rose-400'
-                      : 'bg-agri-green-600 hover:bg-agri-green-700 text-white shadow-md active:scale-95'
+                      : 'bg-agri-green-700 hover:bg-agri-green-800 text-white shadow-md active:scale-95'
                   }`}
                   aria-label={isListening ? t('voice.stop_listening') : t('voice.start_listening')}
                   title={
@@ -613,14 +725,14 @@ export const VoiceAssistant: React.FC = () => {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder={t('voice.input_placeholder')}
-                  className="flex-1 px-4 py-2.5 rounded-full border border-stone-300 focus:outline-none focus:ring-2 focus:ring-agri-green-500 focus:border-transparent text-sm bg-stone-50 focus:bg-white transition-all"
+                  className="flex-1 px-4 py-2.5 rounded-full border border-stone-300 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-agri-green-500 focus:border-transparent text-sm bg-stone-50 dark:bg-[#1B2720] text-stone-900 dark:text-stone-100 focus:bg-white dark:focus:bg-[#1B2720] transition-all"
                 />
 
                 {/* Send Button */}
                 <button
                   type="submit"
                   disabled={!inputText.trim() || isLoading}
-                  className="flex-shrink-0 w-11 h-11 rounded-full bg-agri-green-700 hover:bg-agri-green-800 disabled:bg-stone-200 disabled:text-stone-400 text-white flex items-center justify-center shadow-md transition-all active:scale-95"
+                  className="flex-shrink-0 w-11 h-11 rounded-full bg-agri-green-700 hover:bg-agri-green-800 disabled:bg-stone-200 dark:disabled:bg-stone-800 disabled:text-stone-400 text-white flex items-center justify-center shadow-md transition-all active:scale-95"
                   aria-label={t('voice.send_btn')}
                 >
                   <Send className="w-4 h-4" />
