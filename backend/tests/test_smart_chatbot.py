@@ -185,6 +185,7 @@ async def test_context_packet_grounding(setup_chatbot_db):
 @pytest.mark.asyncio
 async def test_grounded_llm_with_mock(client, setup_chatbot_db, monkeypatch):
     monkeypatch.setattr(settings, "GEMINI_API_KEY", "fake_test_gemini_api_key_123")
+    monkeypatch.setattr(settings, "GROQ_API_KEY", "")
     headers = {"Authorization": f"Bearer {setup_chatbot_db['token']}"}
 
     mock_llm_json = {
@@ -234,6 +235,7 @@ async def test_grounded_llm_with_mock(client, setup_chatbot_db, monkeypatch):
 # 5. Basic Mode when No Key is Set
 def test_no_key_fallback_mode_chip(client, setup_chatbot_db, monkeypatch):
     monkeypatch.setattr(settings, "GEMINI_API_KEY", "")
+    monkeypatch.setattr(settings, "GROQ_API_KEY", "")
     headers = {"Authorization": f"Bearer {setup_chatbot_db['token']}"}
 
     payload = {"query": "What is the rain forecast today?", "language": "en"}

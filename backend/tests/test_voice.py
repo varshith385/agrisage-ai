@@ -84,7 +84,13 @@ def setup_voice_db():
         db.commit()
 
     token = create_access_token(data={"sub": str(user.id), "role": user.role.value})
+    orig_groq = settings.GROQ_API_KEY
+    orig_gemini = settings.GEMINI_API_KEY
+    settings.GROQ_API_KEY = ""
+    settings.GEMINI_API_KEY = ""
     yield {"user": user, "farm": farm, "token": token}
+    settings.GROQ_API_KEY = orig_groq
+    settings.GEMINI_API_KEY = orig_gemini
     db.close()
 
 

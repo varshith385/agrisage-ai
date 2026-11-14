@@ -993,13 +993,35 @@ export const DashboardPage: React.FC = () => {
                 <div className="text-xs space-y-1.5">
                   <div>
                     <span>{t('dashboard.litres_needed', { defaultValue: 'Litres Needed:' })} </span>
-                    <strong className="text-[#183D2E]">{irrigationOutputs?.litres_needed ? Math.round(Number(irrigationOutputs.litres_needed)).toLocaleString() : '1,133,120'} L</strong>
-                    <div className="text-[10px] text-[#4E5F57] bg-white p-1.5 rounded-lg border border-[#7A553A]/15 mt-1 font-mono">
-                      {language === 'te' ? 'లెక్కింపు విధానం:' : language === 'hi' ? 'गणना सूत्र:' : 'Derivation:'} depth ({irrigationOutputs?.gross_depth_mm ?? irrigationOutputs?.recommended_depth_mm ?? 25} mm) × 4,046.86 L/(mm·ac) × area ({farmData?.area ?? activeFarm?.area ?? 4.5} ac) ÷ efficiency ({irrigationOutputs?.method_efficiency ?? 0.90})
-                    </div>
+                    <strong className="text-[#183D2E]">
+                      {isIrrigateNow && irrigationOutputs?.litres_needed != null
+                        ? `${Math.round(Number(irrigationOutputs.litres_needed)).toLocaleString()} L`
+                        : (language === 'te' ? 'ఈరోజు నీరు అవసరం లేదు (0 L)' : language === 'hi' ? 'आज सिंचाई की आवश्यकता नहीं (0 L)' : 'No watering needed today (0 L)')}
+                    </strong>
+                    {isIrrigateNow && (
+                      <div className="text-[10px] text-[#4E5F57] bg-white p-1.5 rounded-lg border border-[#7A553A]/15 mt-1 font-mono">
+                        {language === 'te' ? 'లెక్కింపు విధానం:' : language === 'hi' ? 'गणना सूत्र:' : 'Derivation:'} depth ({Number(irrigationOutputs?.gross_depth_mm ?? irrigationOutputs?.water_depth_mm ?? 25).toFixed(1)} mm) × 4,046.86 L/(mm·ac) × area ({farmData?.area ?? activeFarm?.area ?? 4.5} ac)
+                      </div>
+                    )}
                   </div>
-                  <div>{t('dashboard.next_irrigation', { defaultValue: 'Next Irrigation:' })} <strong className="text-[#183D2E]">{irrigationOutputs?.next_irrigation_date ? translateBackendString(irrigationOutputs.next_irrigation_date, language) : (language === 'te' ? 'ఈరోజు' : language === 'hi' ? 'आज' : 'Today')}</strong></div>
-                  <div>{t('dashboard.efficiency_label', { defaultValue: 'Efficiency:' })} <strong>{irrigationOutputs?.method_efficiency ? `${Math.round(irrigationOutputs.method_efficiency * 100)}%` : (language === 'te' ? '90% (డ్రిప్)' : language === 'hi' ? '90% (ड्रिप)' : '90% (Drip)')}</strong></div>
+                  <div>
+                    {t('dashboard.next_irrigation', { defaultValue: 'Next Irrigation:' })}{' '}
+                    <strong className="text-[#183D2E]">
+                      {irrigationOutputs?.next_irrigation_date
+                        ? translateBackendString(irrigationOutputs.next_irrigation_date, language)
+                        : (isIrrigateNow
+                            ? (language === 'te' ? 'ఈరోజు' : language === 'hi' ? 'आज' : 'Today')
+                            : t('common.no_data_yet', { defaultValue: 'No data yet' }))}
+                    </strong>
+                  </div>
+                  <div>
+                    {t('dashboard.efficiency_label', { defaultValue: 'Efficiency:' })}{' '}
+                    <strong>
+                      {irrigationOutputs?.method_efficiency
+                        ? `${Math.round(irrigationOutputs.method_efficiency * 100)}%`
+                        : (language === 'te' ? '90% (డ్రిప్)' : language === 'hi' ? '90% (ड्रिप)' : '90% (Drip)')}
+                    </strong>
+                  </div>
                 </div>
                 <Link to="/irrigation" className="text-xs font-bold text-[#183D2E] hover:underline block pt-2">
                   {t('dashboard.open_water_tool', { defaultValue: 'Open Crop Water Budget Calculator →' })}

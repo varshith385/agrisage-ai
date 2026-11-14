@@ -9,6 +9,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from backend.app.config import settings
 from backend.app.database.session import init_db
+from backend.app.services.llm_client import log_llm_startup_status
 from backend.app.api.v1.health import router as health_router
 from backend.app.api.v1.auth import router as auth_router
 from backend.app.api.v1.location import router as location_router
@@ -35,8 +36,9 @@ from backend.app.api.v1.reminders import router as reminders_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: ensure tables exist
+    # Startup: ensure tables exist and log provider configuration safely
     init_db()
+    log_llm_startup_status()
     yield
     # Shutdown logic if any
 

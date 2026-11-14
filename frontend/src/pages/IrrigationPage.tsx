@@ -492,14 +492,19 @@ export const IrrigationPage: React.FC = () => {
 
             <div className="py-1">
               <span className="text-2xl sm:text-[26px] font-display font-black text-[#183D2E]">
-                {plan?.litres_needed ? plan.litres_needed.toLocaleString() : '1,133,120'} L
+                {plan?.should_irrigate && plan?.litres_needed != null
+                  ? `${plan.litres_needed.toLocaleString()} L`
+                  : (language === 'te' ? 'ఈరోజు నీరు అవసరం లేదు (0 L)' : language === 'hi' ? 'आज सिंचाई की आवश्यकता नहीं (0 L)' : 'No watering needed today (0 L)')}
               </span>
               <span className="text-xs text-[#4E5F57] block mt-0.5">
-                {language === 'te' ? 'స్థూల లోతు:' : language === 'hi' ? 'సकल गहराई:' : 'Gross Depth:'} <strong>{plan?.gross_depth_mm ? plan.gross_depth_mm.toFixed(1) : '140.0'} mm</strong> ({translateBackendString(plan?.irrigation_method || 'drip', language)})
+                {language === 'te' ? 'స్థూల లోతు:' : language === 'hi' ? 'సकल गहराई:' : 'Gross Depth:'}{' '}
+                <strong>{plan?.should_irrigate && plan?.gross_depth_mm != null ? plan.gross_depth_mm.toFixed(1) : '0.0'} mm</strong> ({translateBackendString(plan?.irrigation_method || 'drip', language)})
               </span>
-              <div className="text-[10px] text-[#4E5F57] bg-[#FAF8F5] p-1.5 rounded-lg border border-[#7A553A]/15 mt-1 font-mono">
-                {language === 'te' ? 'లెక్కింపు:' : language === 'hi' ? 'सूत्र:' : 'Derivation:'} {plan?.gross_depth_mm ? plan.gross_depth_mm.toFixed(1) : '140.0'} mm × 4,046.86 L/(mm·ac) × {areaAcres} ac ÷ {plan?.method_efficiency ?? 0.90}
-              </div>
+              {plan?.should_irrigate && (
+                <div className="text-[10px] text-[#4E5F57] bg-[#FAF8F5] p-1.5 rounded-lg border border-[#7A553A]/15 mt-1 font-mono">
+                  {language === 'te' ? 'లెక్కింపు:' : language === 'hi' ? 'सूत्र:' : 'Derivation:'} {Number(plan?.gross_depth_mm ?? 0).toFixed(1)} mm × 4,046.86 L/(mm·ac) × {areaAcres} ac
+                </div>
+              )}
             </div>
 
             {/* What this means for you */}
@@ -511,7 +516,7 @@ export const IrrigationPage: React.FC = () => {
 
           <div className="pt-2 border-t border-[#7A553A]/15 text-xs text-[#4E5F57] flex justify-between">
             <span>{language === 'te' ? 'తదుపరి తడి తేదీ:' : language === 'hi' ? 'अगली सिंचाई तिथि:' : 'Next watering date:'}</span>
-            <strong className="text-[#183D2E]">{plan?.next_irrigation_date || '2026-11-14'}</strong>
+            <strong className="text-[#183D2E]">{plan?.next_irrigation_date || t('common.no_data_yet', { defaultValue: 'No data yet' })}</strong>
           </div>
         </div>
 

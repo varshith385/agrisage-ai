@@ -44,8 +44,8 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     LLM_PROVIDER_ORDER: str = "groq,gemini"
-    GROQ_MODEL: str = "llama-3.3-70b-versatile"
-    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GROQ_MODEL: str = "qwen/qwen3.8-27b"
+    GEMINI_MODEL: str = "gemini-3.8-flash"
     DATA_GOV_IN_API_KEY: str = ""
     HF_TOKEN: str = ""
 

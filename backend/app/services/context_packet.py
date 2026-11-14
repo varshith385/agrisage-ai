@@ -6,6 +6,7 @@ Marks every source explicitly as LIVE or DEMO DATA.
 Provides zero fabricated figures and zero chemical dosages.
 """
 
+from datetime import date, timedelta
 from typing import Any, Dict, Optional
 from sqlalchemy.orm import Session
 
@@ -54,12 +55,20 @@ async def build_farm_context_packet(
         "reference_et0_mm": 4.5,
         "weather_code_meaning": "Clear / Mild",
     }
+    daily_forecast_list: List[Dict[str, Any]] = []
     try:
         w_res = await get_weather_forecast(lat=lat, lon=lon)
         if w_res:
             weather_info["temperature_c"] = round(w_res.temperature_c, 1)
             weather_info["rainfall_today_mm"] = round(w_res.expected_rainfall_today_mm, 1)
             weather_info["reference_et0_mm"] = round(w_res.reference_et0_mm, 1)
+            if hasattr(w_res, "daily") and w_res.daily:
+                for d in w_res.daily[:7]:
+                    daily_forecast_list.append({
+                        "date": d.date,
+                        "reference_et0_mm": d.reference_et0_mm,
+                        "precipitation_sum_mm": d.precipitation_sum,
+                    })
     except Exception:
         pass
 
@@ -67,24 +76,48 @@ async def build_farm_context_packet(
     irrigation_info: Dict[str, Any] = {
         "status": "LIVE",
         "irrigate_now": False,
+        "should_irrigate": False,
+        "irrigate": False,
+        "gross_depth_mm": 0.0,
         "recommended_depth_mm": 0.0,
+        "litres_needed": 0.0,
+        "litres_saved": 0.0,
+        "next_irrigation_date": (date.today() + timedelta(days=4)).isoformat(),
         "root_zone_depletion_mm": 12.0,
+        "taw_mm": 160.0,
+        "raw_mm": 80.0,
         "method": irr_method,
+        "method_efficiency": 0.90,
     }
     try:
-        fao_engine = FAO56IrrigationEngine()
-        irr_res = fao_engine.calculate_daily_water_balance(
+        fao_engine = FAO56IrrigationEngine.get_instance()
+        p_date = getattr(active_cycle, "planting_date", None) if farm and farm.current_crop_cycles else None
+        if not p_date:
+            p_date = date.today() - timedelta(days=35)
+
+        plan = fao_engine.calculate_plan(
             crop_name=active_crop,
-            days_after_sowing=45,
-            soil_type=soil_type,
-            reference_et0_mm=weather_info["reference_et0_mm"],
-            rainfall_mm=weather_info["rainfall_today_mm"],
-            irrigation_method=irr_method,
+            planting_date=p_date,
             area_acres=area_acres,
+            soil_type=soil_type,
+            irrigation_method=irr_method,
+            reference_et0_mm=weather_info["reference_et0_mm"],
+            forecast_rain_24h_mm=weather_info["rainfall_today_mm"],
+            daily_forecast=daily_forecast_list,
         )
-        irrigation_info["irrigate_now"] = irr_res.irrigate_now
-        irrigation_info["recommended_depth_mm"] = round(irr_res.recommended_depth_mm, 1)
-        irrigation_info["root_zone_depletion_mm"] = round(irr_res.root_zone_depletion_mm, 1)
+        irrigation_info["irrigate_now"] = plan["should_irrigate"]
+        irrigation_info["should_irrigate"] = plan["should_irrigate"]
+        irrigation_info["irrigate"] = plan["should_irrigate"]
+        irrigation_info["gross_depth_mm"] = round(plan["gross_depth_mm"], 1)
+        irrigation_info["recommended_depth_mm"] = round(plan["gross_depth_mm"], 1)
+        irrigation_info["litres_needed"] = round(plan["litres_needed"], 0)
+        irrigation_info["litres_saved"] = round(plan["litres_saved"], 0)
+        irrigation_info["next_irrigation_date"] = plan["next_irrigation_date"]
+        irrigation_info["root_zone_depletion_mm"] = round(plan["depletion_today_mm"], 1)
+        irrigation_info["taw_mm"] = plan["taw_mm"]
+        irrigation_info["raw_mm"] = plan["raw_mm"]
+        irrigation_info["method"] = irr_method
+        irrigation_info["method_efficiency"] = plan["method_efficiency"]
     except Exception:
         pass
 
@@ -229,7 +262,7 @@ def format_context_for_prompt(context: Dict[str, Any]) -> str:
 - Farm Profile [LIVE]: {fp.get('name')} in {fp.get('village')}, {fp.get('district')}, {fp.get('state')}.
   Area: {fp.get('area_acres')} acres | Soil: {fp.get('soil_type')} | Irrigation: {fp.get('irrigation_method')} | Crop: {fp.get('crop')}
 - Weather [LIVE]: Temp {w.get('temperature_c')}°C, Rain today: {w.get('rainfall_today_mm')} mm, Reference ET0: {w.get('reference_et0_mm')} mm
-- Irrigation [LIVE]: Irrigate Now: {irr.get('irrigate_now')} | Rec Depth: {irr.get('recommended_depth_mm')} mm | Root Zone Depletion: {irr.get('root_zone_depletion_mm')} mm
+- Irrigation [LIVE]: Irrigate Now: {irr.get('irrigate_now')} | Gross Depth Needed: {irr.get('gross_depth_mm', 0.0)} mm | Litres Needed: {irr.get('litres_needed', 0)} L | Next Scheduled Irrigation: {irr.get('next_irrigation_date')} | Root Zone Depletion: {irr.get('root_zone_depletion_mm')} mm
 - Growth Stage [LIVE]: Stage: {cal.get('stage_name')} (Day {cal.get('days_after_sowing')} after sowing)
 - Disease Diagnosis [LIVE]: {dis.get('predicted_disease')} (Scanned: {dis.get('has_recent_scan')}) | Note: {dis.get('treatment_note')}
 - Farm Economics [LIVE]: Net Profit: ₹{econ.get('estimated_net_profit_rs')} | Revenue: ₹{econ.get('gross_revenue_rs')} | Cost: ₹{econ.get('total_cost_rs')}

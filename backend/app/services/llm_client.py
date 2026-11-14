@@ -31,12 +31,9 @@ def log_llm_startup_status() -> None:
     Never logs or exposes API keys.
     """
     providers = [p.strip().lower() for p in settings.LLM_PROVIDER_ORDER.split(",") if p.strip()]
-    logger.info(
-        "LLM Providers configured: groq=%s, gemini=%s, order=%s",
-        bool(settings.GROQ_API_KEY),
-        bool(settings.GEMINI_API_KEY),
-        providers,
-    )
+    msg = f"LLM Providers configured: groq={bool(settings.GROQ_API_KEY)}, gemini={bool(settings.GEMINI_API_KEY)}, order={providers}"
+    logger.info(msg)
+    print(f"INFO:     {msg}")
 
 
 async def call_groq_chat(
@@ -85,7 +82,13 @@ async def call_groq_chat(
                 logger.warning("Groq rate limit (429) hit; falling through to next provider.")
                 return None
             if resp.status_code != 200:
-                logger.warning("Groq responded with status %s; falling through.", resp.status_code)
+                err_detail = ""
+                try:
+                    err_json = resp.json()
+                    err_detail = err_json.get("error", {}).get("message", "")
+                except Exception:
+                    pass
+                logger.warning("Groq responded with status %s: %s; falling through.", resp.status_code, err_detail)
                 return None
 
             data = resp.json()
@@ -155,7 +158,13 @@ async def call_gemini_chat(
                 logger.warning("Gemini rate limit (429) hit; falling through to next provider.")
                 return None
             if resp.status_code != 200:
-                logger.warning("Gemini responded with status %s; falling through.", resp.status_code)
+                err_detail = ""
+                try:
+                    err_json = resp.json()
+                    err_detail = err_json.get("error", {}).get("message", "")
+                except Exception:
+                    pass
+                logger.warning("Gemini responded with status %s: %s; falling through.", resp.status_code, err_detail)
                 return None
 
             data = resp.json()
