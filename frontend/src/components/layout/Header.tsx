@@ -120,8 +120,8 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
       >
         <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between gap-2">
           {/* Left: Breadcrumb / Page Title */}
-          <div className="flex items-center gap-2 min-w-0">
-            <h1 className="font-display text-base sm:text-lg font-bold text-white tracking-tight truncate">
+          <div className="flex items-center gap-2 min-w-0 shrink">
+            <h1 className="font-display text-sm sm:text-lg font-bold text-white tracking-tight truncate max-w-[90px] xs:max-w-[120px] sm:max-w-none">
               {getPageTitle(location.pathname)}
             </h1>
           </div>
@@ -135,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
               onClick={() => setCommandOpen(true)}
               aria-label="Open command palette (Ctrl+K)"
               title="Search pages, tools, and actions (Ctrl+K)"
-              className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white/90 hover:text-white hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-2 transition-all text-xs font-semibold"
+              className="min-h-[36px] sm:min-h-[38px] p-2 sm:px-3 sm:py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white/90 hover:text-white hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-2 transition-all text-xs font-semibold"
             >
               <Search className="w-4 h-4 text-[#F2B01E] shrink-0" />
               <span className="hidden md:inline">Go to...</span>
@@ -146,8 +146,8 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
 
             {/* 2. Active Farm Chip with Switcher */}
             {isAuthenticated && (
-              <div className="relative flex items-center bg-[#14462C] dark:bg-[#18241E] rounded-xl px-2.5 py-1 border border-[#24784C]/60 dark:border-[#273B30] min-h-[38px] max-w-[180px] sm:max-w-[220px]">
-                <Sprout className="w-3.5 h-3.5 text-[#F2B01E] shrink-0 mr-1.5" />
+              <div className="relative flex items-center bg-[#14462C] dark:bg-[#18241E] rounded-xl px-2 sm:px-2.5 py-1 border border-[#24784C]/60 dark:border-[#273B30] min-h-[36px] sm:min-h-[38px] max-w-[85px] xs:max-w-[120px] sm:max-w-[220px]">
+                <Sprout className="w-3.5 h-3.5 text-[#F2B01E] shrink-0 mr-1 sm:mr-1.5" />
                 <select
                   value={activeFarmId ?? ''}
                   onChange={(e) => {
@@ -160,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                   }}
                   aria-label={t('farms.switch_farm', { defaultValue: 'Switch Farm' })}
                   title="Switch active farm holding"
-                  className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer truncate max-w-[140px] sm:max-w-[170px]"
+                  className="bg-transparent text-[11px] sm:text-xs font-bold text-white focus:outline-none cursor-pointer truncate max-w-[55px] xs:max-w-[85px] sm:max-w-[170px]"
                 >
                   {farms.length === 0 ? (
                     <option value="" className="text-stone-900 bg-white">
@@ -188,13 +188,13 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                 aria-expanded={langDropdownOpen}
                 aria-label="Language selection"
                 title="Select language"
-                className="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-1.5 transition-all text-xs font-bold"
+                className="min-h-[36px] sm:min-h-[38px] px-2 sm:px-2.5 py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-1 sm:gap-1.5 transition-all text-xs font-bold"
               >
                 <Globe className="w-3.5 h-3.5 text-[#F2B01E] shrink-0" />
                 <span>
                   {language === 'en' ? 'EN' : language === 'te' ? 'తెలుగు' : 'हिन्दी'}
                 </span>
-                <ChevronDown className="w-3 h-3 text-white/70 shrink-0" />
+                <ChevronDown className="hidden xs:inline w-3 h-3 text-white/70 shrink-0" />
               </button>
 
               {langDropdownOpen && (
@@ -234,7 +234,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
               to="/reminders"
               aria-label={`View reminders and field tasks (${dueReminderCount} pending)`}
               title={`Reminders & field alerts (${dueReminderCount} pending)`}
-              className="min-h-[38px] min-w-[38px] relative p-2 rounded-xl text-white/90 hover:text-white hover:bg-[#14462C] dark:hover:bg-[#18241E] transition-all flex items-center justify-center"
+              className="min-h-[36px] sm:min-h-[38px] min-w-[36px] sm:min-w-[38px] relative p-2 rounded-xl text-white/90 hover:text-white hover:bg-[#14462C] dark:hover:bg-[#18241E] transition-all flex items-center justify-center"
             >
               <Bell className="w-4 h-4 text-white" />
               {dueReminderCount > 0 ? (
@@ -252,7 +252,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
               onClick={toggleTheme}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               title={isDark ? 'Light mode' : 'Dark mode'}
-              className="min-h-[38px] min-w-[38px] p-2 rounded-xl text-white/90 hover:text-white hover:bg-[#14462C] dark:hover:bg-[#18241E] transition-all flex items-center justify-center"
+              className="min-h-[36px] sm:min-h-[38px] min-w-[36px] sm:min-w-[38px] p-2 rounded-xl text-white/90 hover:text-white hover:bg-[#14462C] dark:hover:bg-[#18241E] transition-all flex items-center justify-center"
             >
               {isDark ? (
                 <Sun className="w-4 h-4 text-[#F2B01E]" />
@@ -270,7 +270,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                   aria-expanded={avatarMenuOpen}
                   aria-label="User account menu"
                   title="Account and settings"
-                  className="min-h-[38px] min-w-[38px] p-1.5 rounded-xl bg-[#F2B01E] text-[#1F2A24] font-black text-xs hover:bg-[#E09F14] shadow-xs flex items-center justify-center transition-all"
+                  className="min-h-[36px] sm:min-h-[38px] min-w-[36px] sm:min-w-[38px] p-1.5 rounded-xl bg-[#F2B01E] text-[#1F2A24] font-black text-xs hover:bg-[#E09F14] shadow-xs flex items-center justify-center transition-all"
                 >
                   {user?.full_name ? user.full_name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
                 </button>

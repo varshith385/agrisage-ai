@@ -36,11 +36,13 @@ export const PictorialTile: React.FC<PictorialTileProps> = ({
       className={`bg-white dark:bg-[#18241E] rounded-3xl border-2 border-[#D9D4C7] dark:border-[#273B30] p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-4 hover:border-[#1B5E3B]/40 dark:hover:border-[#F2B01E]/40 transition-all ${className}`}
     >
       {/* Top Header: Tile Title & Big Status Shape */}
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="font-display text-[18px] sm:text-[20px] font-bold text-[#1B5E3B] dark:text-[#F2B01E] truncate">
+      <div className="flex items-start justify-between gap-2 min-h-[36px]">
+        <h3 className="font-display text-[16px] sm:text-[18px] font-bold text-[#1B5E3B] dark:text-[#F2B01E] leading-snug">
           {title}
         </h3>
-        <StatusBadge status={status} label={statusWord} size="md" />
+        <div className="shrink-0">
+          <StatusBadge status={status} label={statusWord} size="sm" />
+        </div>
       </div>
 
       {/* Central Big Illustration or Real-Value Gauge */}

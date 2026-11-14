@@ -187,6 +187,7 @@
     "efficiency_label": "Efficiency:",
     "expected_yield_label": "Expected Yield:",
     "est_net_profit_label": "Est. Net Profit:",
+    "assumed_price": "Assumed price (editable, demo)",
     "assumed_price_label": "Assumed price (editable, demo):",
     "multi_agent_flow": "Multi-Agent Execution Pipeline Flow",
     "historical_invocations": "Historical Agent Invocations",
@@ -251,7 +252,8 @@
     "what_to_enter": "What you need to provide",
     "what_you_get": "What result you will get",
     "listen_guide": "Listen in audio",
-    "got_it": "Understood"
+    "got_it": "Understood",
+    "no_data_yet": "No data yet"
   },
   "agents": {
     "title": "Autonomous Multi-Agent Intelligence Engine",

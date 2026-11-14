@@ -37,7 +37,7 @@ export const ActiveFarmBanner: React.FC = () => {
   return (
     <section
       aria-label={t('farms.banner_title', { defaultValue: 'Active Farm Summary' })}
-      className="mb-4 min-h-[36px] max-h-[40px] px-3.5 bg-[#FAF8F5] dark:bg-[#16221C] border border-[#D9D4C7] dark:border-[#273B30] rounded-xl flex items-center justify-between gap-3 text-xs text-[#1F2A24] dark:text-[#E2ECE6] overflow-x-auto whitespace-nowrap shadow-xs"
+      className="mb-4 min-h-[36px] max-h-[40px] px-3.5 bg-[#FAF8F5] dark:bg-[#16221C] border border-[#D9D4C7] dark:border-[#273B30] rounded-xl flex items-center justify-between gap-3 text-xs text-[#1F2A24] dark:text-[#E2ECE6] overflow-x-auto whitespace-nowrap shadow-xs max-w-full"
     >
       <div className="flex items-center gap-2.5 truncate font-medium">
         <Sprout className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E] shrink-0" />

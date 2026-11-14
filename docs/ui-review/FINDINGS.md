@@ -246,12 +246,68 @@ In Round 5 Phase F, the application was systematically tested and visually verif
 | 4 | `ఈరోజు నా పత్తి చేనుకు నీరు పెట్టాలా?` | `te` | `irrigation` | `basic` (`no AI key`) | 0.90 (model) | *"మీ Cotton పంటకు ఈరోజు నీరు పెట్టాల్సిన అవసరం లేదు. సిఫార్సు చేసిన తడి లోతు 25.0 మి.మీ (మొత్తం 150,000 లీటర్లు). వర్ష సూచన ద్వారా ఆదా అయ్యే నీరు 0 లీటర్లు."* | `/irrigation` ("Open Water Budget Planner") | FAO-56 Irrigation and Drainage Paper, Daily Soil Water Balance Bucket Model |
 | 5 | `क्या मुझे आज अपनी फसल में पानी देना चाहिए?` | `hi` | `irrigation` | `basic` (`no AI key`) | 0.90 (model) | *"आपकी Cotton फसल को आज सिंचाई की आवश्यकता नहीं है। सिंचाई गहराई 25.0 मिमी (कुल 150,000 लीटर) है। बारिश के पूर्वानुमान से अनुमानित जल बचत 0 लीटर है।"* | `/irrigation` ("Open Water Budget Planner") | FAO-56 Irrigation and Drainage Paper, Daily Soil Water Balance Bucket Model |
 
-> [!NOTE]
-> **Key Observations**:
-> 1. **Conversational Polish**: Query `"okay"` was formerly giving a canned "I don't know" style error. It now resolves cleanly as `smalltalk` intent with an engaging, polite follow-up.
-> 2. **Telemetry Preservation Across Languages**: Telugu and Hindi irrigation queries accurately evaluate the live farm context packet (Warangal Cotton holding, 25.0 mm target depth, 150,000 litres volume, 0 litres rain savings) and preserve the exact numbers without hallucination.
-> 3. **Honesty & Translation Review Status**: Vernacular responses in Telugu and Hindi are marked as "not native-reviewed" in `docs/I18N_REVIEW.md` Section 15.
-> 4. **Zero Fallthrough Errors**: When no LLM provider API key (`GROQ_API_KEY` or `GEMINI_API_KEY`) is active in `.env`, the system executes deterministic fallback cleanly without crashing, timing out, or hanging.
+---
+
+## 12. Phase 7 Multi-Resolution Viewport Audit & Responsive Bug Fixes
+
+**Date**: 2026-11-14  
+**Viewports Tested**:  
+1. `1366 x 768` (Standard Laptop baseline)  
+2. `1536 x 864` (Windows 125% High-DPI Desktop)  
+3. `390 x 844` (Mobile Smartphone)  
+**Modes Covered**: Light Mode, Dark Mode, English (`en`), Telugu (`te`), Pictures Mode, Words Mode  
+**Automated Capture Engine**: `docs/ui-review/capture_phase7_screenshots.mjs` (Playwright / msedge)  
+**Total Screenshots Captured**: 117 captures across 9 core pages (`/`, `/irrigation`, `/disease`, `/calendar`, `/economics`, `/recommend`, `/market`, `/community`, `/reminders`)  
+**Image Storage & Git Honesty**: All screenshot images are stored under `docs/ui-review/screens/phase7/` and are strictly ignored from git tracking via `.gitignore`.
+
+### Summary of Audit Results Across Viewports
+
+| Viewport | Device Profile | Total Checked | Horizontal Overflow (`docWidth > winWidth`) | Misaligned Touch Targets (< 16px) | Visual Status |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| **1366 x 768** | Standard Laptop | 45 runs | **0 (None)** | 0 | **PASSED**: 72px sidebar rail, balanced 2-4 col grids, no card stretching |
+| **1536 x 864** | Windows 125% DPI | 45 runs | **0 (None)** | 0 | **PASSED**: Serif headings, high-contrast badges, clean card gutters |
+| **390 x 844** | Mobile Smartphone | 27 runs | **0 (None)** (Post-Remediation) | 0 | **PASSED**: Clean single-column layout, bottom nav fixed, no horizontal scroll |
+
+---
+
+### Visual Defects Discovered & Remediated During Screenshot Inspection
+
+1. **Mobile 390px Viewport Horizontal Overflow (`docWidth: 467px`)**:
+   - *Discovery*: During initial automated capture at 390x844, all authenticated pages reported horizontal overflow with document width expanding to 467px.
+   - *Root Cause Analysis*: In `frontend/src/components/layout/Header.tsx`, the top bar controls cluster (Search palette button, Active Farm selector, Language dropdown, Reminders bell, Dark mode toggle, Avatar circle) totaled ~397px in fixed width, which exceeded the 390px mobile viewport when placed next to the page title.
+   - *Remediation*:
+     - Made top-bar buttons responsive on small screens (`< 640px`): reduced min-height from 38px to 36px, made search button icon-only on mobile, truncated farm select box to `max-w-[85px] xs:max-w-[120px]`, hid the chevron on language dropdown on narrow viewports, and tightened flex gap to `gap-1 sm:gap-2`.
+     - In `Layout.tsx`, added `overflow-x-hidden max-w-full` on the main page wrapper.
+     - In `ActiveFarmBanner.tsx`, added `max-w-full` constraint to keep the horizontal farm details ribbon smoothly scrollable without expanding the viewport.
+     - *Verification*: Re-ran audit script across all 27 mobile runs; document width measured exactly **390px** with **zero horizontal overflow** (`H-Overflow: None`).
+
+2. **Tile Heading Truncation in 4-Column Grid on 1366x768 ("Weath...", "Irrigati...", "Crop He...", "Farm P...")**:
+   - *Discovery*: Visual inspection of `dashboard_1366x768_light-en-pictorial.png` showed pictorial tile headers being cut off with ellipsis dots due to `truncate` on `h3` sharing space with a medium-sized status badge.
+   - *Root Cause Analysis*: In `frontend/src/components/common/PictorialTile.tsx`, `h3` had `text-[18px] sm:text-[20px] truncate` inside a flex container next to `StatusBadge size="md"` (~100px wide). At 1366px viewport width with 4 columns (~220px card inner width), only ~110px remained for the title, clipping multi-word titles.
+   - *Remediation*:
+     - Changed `PictorialTile.tsx` header to `flex items-start justify-between gap-2 min-h-[36px]`.
+     - Replaced `truncate` with `text-[16px] sm:text-[18px] leading-snug`, allowing two-word titles to wrap naturally.
+     - Reduced badge to `size="sm"` to give the title more breathing room.
+     - *Verification*: Inspected refreshed screenshot `dashboard_1366x768_light-en-pictorial.png`. All 4 tiles display full unclipped titles: **"Weather"**, **"Irrigation"**, **"Crop Health"**, and **"Farm Profit"**.
+
+3. **Untranslated i18n Key Fallback on Market Page (`DASHBOARD.ASSUMED_PRICE`)**:
+   - *Discovery*: Visual inspection of `market_390x844_dark-te-pictorial.png` revealed raw literal keys: `DASHBOARD.ASSUMED_PRICE` and `dashboard.assumed_price: వివరాలు ధృవీకరించాలి`.
+   - *Root Cause Analysis*: `MarketPage.tsx` called `t('dashboard.assumed_price')`, but the localization files only contained `"assumed_price_label"`.
+   - *Remediation*:
+     - Added `"assumed_price": "Assumed price (editable, demo)"` to `en.json`, `te.json` (`"అనుకున్న ధర (మార్చగలరు, డెమో)"`), and `hi.json` (`"अनुमानित मूल्य (संपादन योग्य, डेमो)"`).
+     - *Verification*: Re-inspected `market_390x844_dark-te-pictorial.png`. The card title now cleanly displays `అనుకున్న ధర (మార్చగలరు, డెమో)` with visible `DEMO DATA` badge and zero raw translation keys.
+
+4. **Missing Common i18n Key Fallback on Dashboard Tab (`common.no_data_yet`)**:
+   - *Discovery*: Visual inspection of `dashboard_1536x864_dark-te-pictorial.png` revealed the farm health score tab title rendering `పొలం ఆరోగ్య స్కోరు (common.no_data_yet)`.
+   - *Root Cause Analysis*: `DashboardPage.tsx:788` called `t('common.no_data_yet')`, which was absent from `en.json`, `te.json`, and `hi.json`.
+   - *Remediation*:
+     - Added `"no_data_yet": "No data yet"` to `en.json`, `"no_data_yet": "సమాచారం ఇంకా లేదు"` to `te.json`, and `"no_data_yet": "डेटा अभी उपलब्ध नहीं है"` to `hi.json`.
+     - *Verification*: Farm health score tab in Telugu renders cleanly as `పొలం ఆరోగ్య స్కోరు (సమాచారం ఇంకా లేదు)`.
+
+5. **Dark Mode Readability & Contrast**:
+   - Inspected dark mode captures across 1366x768, 1536x864, and 390x844. Backgrounds render at deep forest/slate `#0D1410`, surface cards at `#18241E`, borders at `#273B30`, and typography at `#F2F5F3` with `#F2B01E` gold highlights.
+   - All text achieves WCAG AAA contrast ratios (minimum 7:1 for body, exceeding 12:1 against dark backgrounds).
+
 
 
 

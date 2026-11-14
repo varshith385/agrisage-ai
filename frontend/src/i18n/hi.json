@@ -187,6 +187,7 @@
     "efficiency_label": "दक्षता:",
     "expected_yield_label": "अपेक्षित उपज:",
     "est_net_profit_label": "अनुमानित शुद्ध लाभ:",
+    "assumed_price": "अनुमानित मूल्य (संपादन योग्य, डेमो)",
     "assumed_price_label": "अनुमानित मूल्य (संपादन योग्य डेमो मूल्य):",
     "multi_agent_flow": "मल्टी-एजेंट कार्यप्रणाली प्रवाह",
     "historical_invocations": "पिछली एजेंट गतिविधियां",
@@ -251,7 +252,8 @@
     "what_to_enter": "आपको क्या दर्ज करना है",
     "what_you_get": "आपको क्या परिणाम मिलेगा",
     "listen_guide": "आवाज सुनें",
-    "got_it": "समझ गया"
+    "got_it": "समझ गया",
+    "no_data_yet": "डेटा अभी उपलब्ध नहीं है"
   },
   "agents": {
     "title": "स्वायत्त मल्टी-एजेंट इंटेलिजेंस इंजन",

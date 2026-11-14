@@ -42,10 +42,10 @@ export const Layout: React.FC = () => {
       {isAuthenticated && <Sidebar onStartTour={() => setTourOpen(true)} />}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden">
         <Header onStartTour={() => setTourOpen(true)} />
 
-        <main className="flex-1 w-full max-w-[1400px] mx-auto px-3 sm:px-5 lg:px-8 py-5 pb-28 md:pb-12">
+        <main className="flex-1 w-full max-w-[1400px] mx-auto px-3 sm:px-5 lg:px-8 py-5 pb-28 md:pb-12 min-w-0">
           <ActiveFarmBanner />
           <Outlet />
         </main>
