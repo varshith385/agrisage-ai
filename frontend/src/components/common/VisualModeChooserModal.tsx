@@ -80,10 +80,10 @@ export const VisualModeChooserModal: React.FC = () => {
               <ImageIcon className="w-6 h-6" />
             </div>
             <div>
-              <span className="block text-sm sm:text-base font-bold text-agri-green-900 dark:text-agri-green-200">
+              <span className="block text-sm sm:text-base font-bold text-stone-900 dark:text-white">
                 {language === 'te' ? 'చిత్రాలు' : language === 'hi' ? 'चित्र' : 'Pictures'}
               </span>
-              <span className="text-[11px] text-stone-500 dark:text-stone-400 block mt-0.5">
+              <span className="text-[11px] text-stone-600 dark:text-stone-300 block mt-0.5">
                 {language === 'te' ? 'రంగులు & బొమ్మలు' : language === 'hi' ? 'सरल दृश्य' : 'Recommended for Farmers'}
               </span>
             </div>

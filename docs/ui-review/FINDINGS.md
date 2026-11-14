@@ -193,3 +193,38 @@ The following table documents every hardcoded numeric comparison in `frontend/sr
 | `SchemesPage.tsx:233-249` | `conf >= 0.85` (HIGH), `conf >= 0.60` (MED), `conf > 0` (LOW) | Soil card parameter extraction confidence indicator pill | `extractionResult.confidence[field]` |
 | `FarmRegistrationPage.tsx:87, 105` | `Math.abs(sum - total) < 0.01` | Acreage validation guard (checks owned + leased acres equals total registered parcel area) | `ownedArea + leasedArea === totalArea` |
 
+---
+
+## 9. Round 5 Multi-Resolution and Dark Mode Audit
+
+In Round 5 Phase F, the application was systematically tested and visually verified across 4 canonical viewports under both Light and Dark mode, and across all 3 languages (English `en`, Telugu `తెలుగు`, Hindi `हिन्दी`):
+
+| Viewport | Device Profile | Width x Height | Test Results & Visual Behavior |
+| :--- | :--- | :---: | :--- |
+| **Standard Laptop** | Baseline 14" Notebook | 1366 x 768 | Sidebar collapses into a slim 72px icon rail with floating tooltips. Main content is centered within the `max-w-7xl` (1400px) container. Top bar stays at a strict 56px height. Zero horizontal scrolling. |
+| **Windows 125% Scaling** | High-DPI Windows Display | 1536 x 864 | Layout breathes comfortably. Balanced grid cards expand proportionally without clipping text or dropping Telugu/Hindi diacritic marks. High-contrast typography scale (`display` Serif headers + Sans body) renders crisply. |
+| **Full HD Desktop** | 24"-27" External Monitor | 1920 x 1080 | Sidebar can be expanded to 248px or left in 72px rail mode. 3-column pictorial tiles and physical step-flow cards align cleanly. Command Palette (`Ctrl+K`) and Voice Assistant modal center with generous backdrop blur (`bg-stone-900/60`). |
+| **Mobile Smartphone** | iPhone 14 / Modern Android | 390 x 844 | Top bar collapses to 56px with compact search icon, active farm chip, language selector, bell count badge, dark mode toggle, and profile avatar. Fixed bottom navigation bar (5 touch targets >= 48px) anchors at the base. Viewport scrolling (`pb-24`) prevents bottom-nav overlap. |
+
+---
+
+## 10. Visual Bugs Discovered & Remediated During Screenshot Inspection
+
+1. **Dark Mode Text Invisibility in First-Run Chooser Modal (`VisualModeChooserModal.tsx`)**:
+   - *Inspection Observation*: Upon capturing and opening `media_0.png` via the image viewer, the primary choice card text (`"చిత్రాలు"`) in the First-Run Visual Mode Chooser appeared virtually invisible in Dark Mode.
+   - *Root Cause Analysis*: The component used `dark:text-agri-green-200`. The Tailwind configuration defines `agri.green` values as `50, 100, 600, 700, 800, 900, 950` with no `200` token. As a result, Tailwind dropped the invalid class, falling back to `text-agri-green-900` (`#0F3B24`), which produced dark green text on a dark green/slate card background (`#14201A`).
+   - *Remediation*: Replaced with `text-stone-900 dark:text-white` for the title and `text-stone-600 dark:text-stone-300` for the subtitle. High-contrast ratio was restored to 16.2:1 (exceeding WCAG AAA).
+
+2. **Command Palette (`Ctrl+K`) Accessibility**:
+   - Verified keyboard navigation (`Up`, `Down`, `Enter`, `Escape`), search input focus trapping, and instant navigation across 10 core pages and tools.
+
+3. **Grounded Voice Assistant & Deterministic Navigation**:
+   - Tested typed voice commands and quick chips. Verified that `"open market"` or clicking `"क्या आज फसल को पानी देना चाहिए?"` invokes the backend's deterministic intent router and context packet builder, providing sourced agronomic answers (FAO-56, 90% confidence) without chemical dosages or hallucinations.
+
+4. **Reminders & Field Alerts System**:
+   - Verified 3-step creation wizard, real farm data suggestions (e.g., spray intervals, irrigation dates), snooze actions (1, 2, 3 days), RFC-5545 `.ics` export, delivery limitation honesty notice, and dynamic top bar bell count badge.
+
+5. **Universal Pictorial Mode Across 14 Pages**:
+   - Verified that all 14 pages feature dedicated pictorial views with 3-4 structured tiles, universal geometric shapes (Green Circle, Amber Square, Red Triangle, Grey Dashed Circle), step-by-step physical field flows (`StepFlow`), first-run chooser modal, and the "How to read this screen" modal (`?`).
+
+
