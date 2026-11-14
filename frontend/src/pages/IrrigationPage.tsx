@@ -43,6 +43,7 @@ import {
   WateringFieldIllustration,
   WateringCanIllustration,
   WaterDropsGauge,
+  NoDataIllustration,
 } from '../components/common/FarmerIllustrations';
 import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
@@ -247,8 +248,9 @@ export const IrrigationPage: React.FC = () => {
 
   // PICTORIAL MODE v2
   if (isPictorial) {
-    const grossDepth = plan ? plan.gross_depth_mm : 15;
-    const waterLiters = plan ? plan.litres_needed : 60000;
+    const hasPlan = Boolean(plan);
+    const grossDepth = plan?.gross_depth_mm ?? 0;
+    const waterLiters = plan?.litres_needed ?? 0;
     const isWaterNeeded = Boolean(plan?.should_irrigate);
     const isRainSkip = Boolean(plan?.rain_skip_triggered);
 
@@ -267,7 +269,7 @@ export const IrrigationPage: React.FC = () => {
         <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div className="w-20 h-20 rounded-2xl bg-[#E1F5FE] border-2 border-[#1565A8] flex items-center justify-center shrink-0 shadow-sm">
-              <WateringFieldIllustration size={64} />
+              {hasPlan ? <WateringFieldIllustration size={64} /> : <NoDataIllustration size={64} />}
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -275,28 +277,34 @@ export const IrrigationPage: React.FC = () => {
                   {language === 'te' ? 'నేటి నిర్ణయం' : language === 'hi' ? 'आज का फैसला' : 'Today\'s Decision'}
                 </span>
                 <StatusBadge
-                  status={isRainSkip ? 'info' : isWaterNeeded ? 'warning' : 'success'}
-                  label={isRainSkip ? 'Rain Skip' : isWaterNeeded ? 'Irrigate Today' : 'Water Adequate'}
+                  status={hasPlan ? (isRainSkip ? 'info' : isWaterNeeded ? 'warning' : 'success') : 'nodata'}
+                  label={hasPlan ? (isRainSkip ? (language === 'te' ? 'వర్షం వల్ల వాయిదా' : language === 'hi' ? 'बारिश के कारण टालें' : 'Rain Skip') : isWaterNeeded ? (language === 'te' ? 'ఈరోజు నీరు పెట్టాలి' : language === 'hi' ? 'सिंचाई करें' : 'Irrigate Today') : (language === 'te' ? 'తేమ సరిపడా ఉంది' : language === 'hi' ? 'नमी पर्याप्त' : 'Water Adequate')) : (language === 'te' ? 'లెక్కించలేదు' : language === 'hi' ? 'गणना नहीं' : 'No Plan Yet')}
                   size="sm"
                 />
               </div>
               <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
-                {isRainSkip
-                  ? (language === 'te' ? 'వర్షం వల్ల నీరు పెట్టవద్దు' : language === 'hi' ? 'बारिश के कारण पानी न दें' : 'Skip Irrigation: Rain Expected')
-                  : isWaterNeeded
-                  ? (language === 'te' ? 'ఈరోజు నీరు పెట్టాలి' : language === 'hi' ? 'आज खेत में पानी दें' : 'Irrigate Today: Root Moisture Low')
-                  : (language === 'te' ? 'భూమిలో తేమ సరిపడా ఉంది' : language === 'hi' ? 'मिट्टी में पर्याप्त नमी है' : 'Moisture Adequate: No Water Needed')}
+                {hasPlan
+                  ? (isRainSkip
+                    ? (language === 'te' ? 'వర్షం వల్ల నీరు పెట్టవద్దు' : language === 'hi' ? 'बारिश के कारण पानी न दें' : 'Skip Irrigation: Rain Expected')
+                    : isWaterNeeded
+                    ? (language === 'te' ? 'ఈరోజు నీరు పెట్టాలి' : language === 'hi' ? 'आज खेत में पानी दें' : 'Irrigate Today: Root Moisture Low')
+                    : (language === 'te' ? 'భూమిలో తేమ సరిపడా ఉంది' : language === 'hi' ? 'मिट्टी में पर्याप्त नमी है' : 'Moisture Adequate: No Water Needed'))
+                  : (language === 'te' ? 'నీటి బడ్జెట్ ఇంకా లెక్కించలేదు' : language === 'hi' ? 'जल बजट अभी नहीं निकाला' : 'No Water Budget Calculated Yet')}
               </h2>
               <p className="text-[16px] text-[#4A5750] max-w-xl">
-                {plainMeaning}
+                {hasPlan
+                  ? plainMeaning
+                  : (language === 'te' ? 'మీ నేల మరియు పంటకు నీటి బడ్జెట్ లెక్కించడానికి క్రింది బటన్ నొక్కండి.' : language === 'hi' ? 'खेत में पानी की मात्रा निकालने के लिए नीचे दिए गए बटन को दबाएं।' : 'Click Calculate Budget to evaluate FAO-56 daily water balance.')}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
-            <ReadAloudButton
-              text={plainMeaning}
-              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
-            />
+            {hasPlan && (
+              <ReadAloudButton
+                text={plainMeaning}
+                label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+              />
+            )}
             <button
               type="button"
               onClick={handleComputeBudget}
@@ -304,41 +312,41 @@ export const IrrigationPage: React.FC = () => {
               className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all disabled:opacity-60"
             >
               <RefreshCw className={`w-5 h-5 ${isRefetchingPlan ? 'animate-spin' : ''}`} />
-              <span>{isRefetchingPlan ? 'Calculating...' : 'Recalculate Budget'}</span>
+              <span>{isRefetchingPlan ? (language === 'te' ? 'లెక్కిస్తోంది...' : language === 'hi' ? 'गणना जारी...' : 'Calculating...') : hasPlan ? (language === 'te' ? 'మళ్లీ లెక్కించండి' : language === 'hi' ? 'फिर से गणना करें' : 'Recalculate Budget') : (language === 'te' ? 'బడ్జెట్ లెక్కించండి' : language === 'hi' ? 'बजट निकालें' : 'Calculate Budget')}</span>
             </button>
           </div>
         </div>
 
-        {/* 3 Large Pictorial Tiles with Real Values */}
+        {/* 3 Large Pictorial Tiles with REAL Values or Honest No-Data Fallback */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {/* Tile 1: Water Needed with Drops Gauge */}
           <PictorialTile
             title={language === 'te' ? 'నీటి మోతాదు' : language === 'hi' ? 'पानी की मात्रा' : 'Water Needed'}
-            phrase={`${grossDepth.toFixed(0)} mm • ${Math.round(waterLiters).toLocaleString('en-IN')} L`}
-            illustration={<WaterDropsGauge dropsCount={grossDepth > 25 ? 4 : grossDepth > 15 ? 3 : 2} />}
-            status={isWaterNeeded ? 'warning' : 'success'}
-            statusWord={isWaterNeeded ? 'Water Needed' : 'Adequate'}
-            spokenText={`Recommended gross irrigation depth is ${grossDepth.toFixed(0)} millimetres, equal to ${Math.round(waterLiters)} litres for your field area.`}
+            phrase={hasPlan ? `${grossDepth.toFixed(0)} mm • ${Math.round(waterLiters).toLocaleString('en-IN')} L` : (language === 'te' ? 'నీటి మోతాదు ఇంకా తెలియదు' : language === 'hi' ? 'पानी की मात्रा नहीं निकाली' : 'No calculation yet')}
+            illustration={hasPlan ? <WaterDropsGauge dropsCount={grossDepth > 25 ? 4 : grossDepth > 15 ? 3 : grossDepth > 0 ? 2 : 1} /> : <NoDataIllustration size={80} />}
+            status={hasPlan ? (isWaterNeeded ? 'warning' : 'success') : 'nodata'}
+            statusWord={hasPlan ? (isWaterNeeded ? (language === 'te' ? 'నీరు అవసరం' : language === 'hi' ? 'पानी चाहिए' : 'Water Needed') : (language === 'te' ? 'సరిపడా ఉంది' : language === 'hi' ? 'पर्याप्त' : 'Adequate')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasPlan ? `Recommended gross irrigation depth is ${grossDepth.toFixed(0)} millimetres, equal to ${Math.round(waterLiters)} litres for your field area.` : 'No irrigation calculation yet.'}
           />
 
           {/* Tile 2: Soil Root Zone Status */}
           <PictorialTile
             title={language === 'te' ? 'భూమిలో తేమ' : language === 'hi' ? 'मिट्टी में नमी' : 'Soil Moisture'}
-            phrase={isRainSkip ? 'Rain forecast active' : isWaterNeeded ? 'Root stress reached' : 'Normal water level'}
-            illustration={<WateringFieldIllustration size={80} />}
-            status={isRainSkip ? 'info' : isWaterNeeded ? 'warning' : 'success'}
-            statusWord={isRainSkip ? 'Rain Skip' : isWaterNeeded ? 'Depleted' : 'Optimal'}
-            spokenText={`Soil moisture condition: ${isRainSkip ? 'Rain forecast protects soil' : isWaterNeeded ? 'Root zone depletion requires watering' : 'Moisture is in optimal range'}.`}
+            phrase={hasPlan ? (isRainSkip ? (language === 'te' ? 'వర్ష సూచన ఉంది' : language === 'hi' ? 'बारिश का अनुमान' : 'Rain forecast active') : isWaterNeeded ? (language === 'te' ? 'వేర్లలో తేమ తగ్గింది' : language === 'hi' ? 'जड़ में नमी कम' : 'Root stress reached') : (language === 'te' ? 'నేలలో తేమ సరైనది' : language === 'hi' ? 'सामान्य जल स्तर' : 'Normal water level')) : (language === 'te' ? 'నేలలో తేమ ఇంకా కొలవలేదు' : language === 'hi' ? 'मिट्टी की नमी अभी नहीं मापी' : 'Awaiting soil moisture run')}
+            illustration={hasPlan ? <WateringFieldIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={hasPlan ? (isRainSkip ? 'info' : isWaterNeeded ? 'warning' : 'success') : 'nodata'}
+            statusWord={hasPlan ? (isRainSkip ? (language === 'te' ? 'వర్షం వల్ల వాయిదా' : language === 'hi' ? 'बारिश टालें' : 'Rain Skip') : isWaterNeeded ? (language === 'te' ? 'తేమ తగ్గింది' : language === 'hi' ? 'नमी कम' : 'Depleted') : (language === 'te' ? 'సరైన తేమ' : language === 'hi' ? 'उत्तम नमी' : 'Optimal')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasPlan ? `Soil moisture condition: ${isRainSkip ? 'Rain forecast protects soil' : isWaterNeeded ? 'Root zone depletion requires watering' : 'Moisture is in optimal range'}.` : 'Soil moisture has not been calculated yet.'}
           />
 
           {/* Tile 3: Next Watering Date */}
           <PictorialTile
             title={language === 'te' ? 'తదుపరి తడి' : language === 'hi' ? 'अगली सिंचाई' : 'Next Irrigation'}
-            phrase={plan?.next_irrigation_date ? `Date: ${plan.next_irrigation_date}` : 'Scheduled in 3 days'}
-            illustration={<WateringCanIllustration size={80} />}
-            status="info"
-            statusWord="Scheduled"
-            spokenText={`Next scheduled watering date is ${plan?.next_irrigation_date || 'in upcoming days'}.`}
+            phrase={hasPlan ? (plan?.next_irrigation_date ? `Date: ${plan.next_irrigation_date}` : (language === 'te' ? 'ఈ వారం అవసరం లేదు' : language === 'hi' ? 'इस सप्ताह जरूरत नहीं' : 'Not required this week')) : (language === 'te' ? 'తేదీ ఇంకా నిర్ణయించలేదు' : language === 'hi' ? 'तारीख अभी तय नहीं' : 'Not scheduled yet')}
+            illustration={hasPlan ? <WateringCanIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={hasPlan ? 'info' : 'nodata'}
+            statusWord={hasPlan ? (language === 'te' ? 'షెడ్యూల్ అయింది' : language === 'hi' ? 'निर्धारित' : 'Scheduled') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasPlan ? `Next scheduled watering date is ${plan?.next_irrigation_date || 'in upcoming days'}.` : 'Next irrigation date is not scheduled yet.'}
           />
         </div>
 

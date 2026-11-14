@@ -23,11 +23,14 @@ import { ExplainCard } from '../components/common/ExplainCard';
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { EmptyPlotIllustration } from '../components/common/FarmerIllustrations';
+import { NoDataIllustration, LeafScanIllustration } from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StatusBadge } from '../components/common/StatusBadge';
 
 export const CalendarPage: React.FC = () => {
   const { t, language } = useTranslation();
-  const { isPictorial } = usePictorial();
+  const { isPictorial, setMode } = usePictorial();
   const { activeFarm, activeFarmId, setActiveFarmId, farms } = useAuth();
 
   const [cropName, setCropName] = useState<string>('Cotton');
@@ -117,40 +120,106 @@ export const CalendarPage: React.FC = () => {
     ? `Your ${cropName} crop is currently at DAS ${calendarData.days_after_sowing} in the ${activeStage?.stage_name_en || 'active growth'} stage. Next priority task is: ${nextEvent?.title || 'routine field maintenance'}.`
     : 'Generating crop lifecycle calendar...';
 
-  // PICTORIAL MODE
+  // PICTORIAL MODE v2
   if (isPictorial) {
+    const hasCalendar = Boolean(calendarData);
+    const das = calendarData?.days_after_sowing;
+    const stageName = activeStage?.stage_name_en;
+    const stages = calendarData?.lifecycle_stages || [];
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
+        {/* Giant Mode & Language Switcher at Top */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={CalendarIcon}
           title={language === 'te' ? 'పంట కాలెండర్' : language === 'hi' ? 'फसल कैलेंडर' : 'Crop Calendar'}
           purpose={language === 'te' ? 'పంట దశ మరియు రాబోయే పనుల వివరాలు' : language === 'hi' ? 'फसल की अवस्था और आगामी कार्यों की जानकारी' : 'Visual schedule of field activities.'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <EmptyPlotIllustration className="w-48 h-36 drop-shadow-sm" />
+        {/* Lead "Do This Today" Crop Stage Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#E8F5E9] border-2 border-[#1B5E3B] flex items-center justify-center shrink-0 shadow-sm">
+              {hasCalendar ? <LeafScanIllustration size={64} /> : <NoDataIllustration size={64} />}
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {cropName}
+                </span>
+                <StatusBadge
+                  status={hasCalendar ? 'info' : 'nodata'}
+                  label={hasCalendar ? `DAS ${das}` : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No Data')}
+                  size="sm"
+                />
+              </div>
+              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
+                {hasCalendar
+                  ? (stageName || 'Mid-Season Development')
+                  : (language === 'te' ? 'కాలెండర్ ఇంకా సిద్ధం కాలేదు' : language === 'hi' ? 'कैलेंडर अभी तैयार नहीं' : 'Awaiting Crop Calendar')}
+              </h2>
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
+                {hasCalendar ? plainMeaning : (language === 'te' ? 'విత్తిన తేదీ ఆధారంగా దశలవారీ పనుల కాలెండర్ రూపొందించబడుతుంది.' : language === 'hi' ? 'बुवाई की तारीख के अनुसार कार्यों का कैलेंडर तैयार होगा।' : 'Sowing date models daily crop operations and phenological milestones.')}
+              </p>
+            </div>
           </div>
-
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            {cropName} &bull; DAS {calendarData?.days_after_sowing ?? 90}
-          </h2>
-
-          <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-2 text-left">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#183D2E] text-white">
-              Current Stage
-            </span>
-            <h3 className="text-xl font-bold text-[#183D2E]">
-              {activeStage?.stage_name_en || 'Mid-Season Development'}
-            </h3>
-            <p className="text-sm text-[#4E5F57]">
-              {nextEvent?.title ? `Next Task: ${nextEvent.title}` : 'Routine scouting and water checks.'}
-            </p>
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            {hasCalendar && (
+              <ReadAloudButton
+                text={`Crop Calendar: ${cropName} is at DAS ${das}. ${plainMeaning}`}
+                label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => setMode('words')}
+              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
+            >
+              <span>{language === 'te' ? 'పూర్తి వివరాలు' : language === 'hi' ? 'पूरा विवरण' : 'See Details'}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
+        </div>
 
-          <div className="pt-2">
-            <ReadAloudButton text={`Crop Calendar: ${cropName} is at DAS ${calendarData?.days_after_sowing}. ${plainMeaning}`} />
-          </div>
+        {/* 3 Pictorial Summary Tiles with Real Values */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Tile 1: Current Growth Stage */}
+          <PictorialTile
+            title={language === 'te' ? 'ప్రస్తుత పంట దశ' : language === 'hi' ? 'वर्तमान अवस्था' : 'Current Stage'}
+            phrase={hasCalendar ? `${stageName || 'Active Growth'} • DAS ${das}` : (language === 'te' ? 'దశ ఇంకా తెలియదు' : language === 'hi' ? 'अवस्था ज्ञात नहीं' : 'No stage calculated')}
+            illustration={hasCalendar ? <LeafScanIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={hasCalendar ? 'success' : 'nodata'}
+            statusWord={hasCalendar ? (stageName || 'Active') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasCalendar ? `${cropName} is in ${stageName || 'active'} stage at day ${das} after sowing.` : 'Crop calendar data not available.'}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 2: Next Scheduled Task */}
+          <PictorialTile
+            title={language === 'te' ? 'రాబోయే ముఖ్య పని' : language === 'hi' ? 'आगामी कार्य' : 'Next Priority Task'}
+            phrase={nextEvent ? `${nextEvent.title} (${nextEvent.start_date})` : (language === 'te' ? 'షెడ్యూల్ పనులు లేవు' : language === 'hi' ? 'कोई कार्य निर्धारित नहीं' : 'Routine field checks')}
+            illustration={<CalendarIcon className="w-16 h-16 text-[#1565A8]" />}
+            status={nextEvent ? 'warning' : 'nodata'}
+            statusWord={nextEvent ? (language === 'te' ? 'తదుపరి పని' : language === 'hi' ? 'आगामी कार्य' : 'Scheduled') : (language === 'te' ? 'పనులు లేవు' : language === 'hi' ? 'कार्य नहीं' : 'No Tasks')}
+            spokenText={nextEvent ? `Next priority field task is ${nextEvent.title} on ${nextEvent.start_date}.` : 'No upcoming tasks scheduled.'}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 3: Total Season Milestones */}
+          <PictorialTile
+            title={language === 'te' ? 'సీజన్ మైలురాళ్లు' : language === 'hi' ? 'सीजन के पड़ाव' : 'Season Milestones'}
+            phrase={stages.length > 0 ? `${stages.length} growth milestones scheduled` : (language === 'te' ? 'మైలురాళ్లు లేవు' : language === 'hi' ? 'पड़ाव नहीं' : 'No stages loaded')}
+            illustration={<Sprout className="w-16 h-16 text-[#1B5E3B]" />}
+            status={stages.length > 0 ? 'info' : 'nodata'}
+            statusWord={stages.length > 0 ? `${stages.length} Stages` : 'No Data'}
+            spokenText={`${stages.length} phenological growth stages are modeled for ${cropName}.`}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
         </div>
       </div>
     );

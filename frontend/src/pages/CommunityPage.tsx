@@ -21,11 +21,13 @@ import { OutbreakMapSection } from '../components/community/OutbreakMapSection';
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { EmptyPlotIllustration } from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StatusBadge } from '../components/common/StatusBadge';
 
 export const CommunityPage: React.FC = () => {
   const { t, language } = useTranslation();
-  const { isPictorial } = usePictorial();
+  const { isPictorial, setMode } = usePictorial();
   const { activeFarm, location: userLoc } = useAuth();
   const location = useLocation();
 
@@ -47,50 +49,106 @@ export const CommunityPage: React.FC = () => {
 
   const plainMeaning = `Community tools allow you to pool transport with neighbouring farmers in ${villageName} and rent idle farm machinery at fair daily rates.`;
 
-  // PICTORIAL MODE
+  // PICTORIAL MODE v2
   if (isPictorial) {
     return (
-      <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
+      <div className="space-y-6 animate-fadeIn pb-12">
+        {/* Giant Mode & Language Switcher at Top */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={Users}
           title={language === 'te' ? 'రైతు బృందం & యంత్రాలు' : language === 'hi' ? 'किसान समुदाय व मशीनें' : 'Community & Machinery'}
           purpose={language === 'te' ? 'యంత్రాల అద్దె మరియు కలిసి సరుకు రవాణా' : language === 'hi' ? 'मशीन किराया और समूह परिवहन' : 'Shared machinery and pooled transport.'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <EmptyPlotIllustration className="w-48 h-36 drop-shadow-sm" />
+        {/* Lead "Do This Today" Community Hub Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#E8F5E9] border-2 border-[#1B5E3B] flex items-center justify-center shrink-0 shadow-sm">
+              <Users className="w-10 h-10 text-[#1B5E3B]" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {villageName}, {districtName}
+                </span>
+                <StatusBadge
+                  status="success"
+                  label="Local Hub"
+                  size="sm"
+                />
+              </div>
+              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
+                {language === 'te' ? `${villageName} రైతు సమాజం` : language === 'hi' ? `${villageName} किसान समुदाय` : `${villageName} Farmer Community`}
+              </h2>
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
+                {plainMeaning}
+              </p>
+            </div>
           </div>
-
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            {villageName}, {districtName}
-          </h2>
-
-          <div className="grid grid-cols-2 gap-3 text-left">
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            <ReadAloudButton
+              text={`Community hub for ${villageName}. ${plainMeaning}`}
+              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+            />
             <button
               type="button"
-              onClick={() => setActiveTab('machinery')}
-              className="bg-white p-4 rounded-2xl border-2 border-[#183D2E]/20 hover:border-[#183D2E] transition-all space-y-1 shadow-sm"
+              onClick={() => setMode('words')}
+              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
             >
-              <Wrench className="w-6 h-6 text-[#183D2E]" />
-              <span className="font-bold text-[#183D2E] block text-sm">Machinery</span>
-              <span className="text-[11px] text-[#4E5F57]">Rent tractors & tools</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('requests')}
-              className="bg-white p-4 rounded-2xl border-2 border-[#183D2E]/20 hover:border-[#183D2E] transition-all space-y-1 shadow-sm"
-            >
-              <Truck className="w-6 h-6 text-[#DA9A4C]" />
-              <span className="font-bold text-[#183D2E] block text-sm">Transport</span>
-              <span className="text-[11px] text-[#4E5F57]">Pool mandi trips</span>
+              <span>{language === 'te' ? 'పూర్తి వివరాలు' : language === 'hi' ? 'पूरा विवरण' : 'See Details'}</span>
+              <ArrowRight className="w-5 h-5" />
             </button>
           </div>
+        </div>
 
-          <div className="pt-2">
-            <ReadAloudButton text={`Community hub for ${villageName}. ${plainMeaning}`} />
-          </div>
+        {/* 3 Pictorial Summary Tiles */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Tile 1: Farm Machinery Rental */}
+          <PictorialTile
+            title={language === 'te' ? 'యంత్రాల అద్దె' : language === 'hi' ? 'कृषि यंत्र किराया' : 'Machinery Rental'}
+            phrase={language === 'te' ? 'ట్రాక్టర్లు, దున్నే యంత్రాల అద్దె' : language === 'hi' ? 'ट्रैक्टर व कृषि उपकरण किराया' : 'Rent tractors & implements'}
+            illustration={<Wrench className="w-16 h-16 text-[#1B5E3B]" />}
+            status="info"
+            statusWord="Machinery"
+            spokenText="Rent idle tractors, rotavators, and sprayers at transparent hourly rates."
+            onOpenDetails={() => {
+              setMode('words');
+              setActiveTab('machinery');
+            }}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 2: Pooled Mandi Transport */}
+          <PictorialTile
+            title={language === 'te' ? 'సరుకు రవాణా' : language === 'hi' ? 'साझा परिवहन' : 'Transport Pooling'}
+            phrase={language === 'te' ? 'కలిసి మండికి రవాణా ఖర్చులు తగ్గించుకోండి' : language === 'hi' ? 'मंडी के लिए साझा वाहन' : 'Pool freight to APMC'}
+            illustration={<Truck className="w-16 h-16 text-[#DA9A4C]" />}
+            status="info"
+            statusWord="Freight Pool"
+            spokenText="Pool harvest freight with neighbouring farmers to reduce per-quintal transportation costs."
+            onOpenDetails={() => {
+              setMode('words');
+              setActiveTab('requests');
+            }}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 3: Outbreak Pest Map */}
+          <PictorialTile
+            title={language === 'te' ? 'తెగుళ్ల హెచ్చరిక మ్యాప్' : language === 'hi' ? 'कीट प्रकोप नक्शा' : 'Outbreak Radar'}
+            phrase={language === 'te' ? 'సమీప గ్రామాల తెగుళ్ల సమాచారం' : language === 'hi' ? 'आसपास के गांवों में कीट प्रकोप' : 'Pest outbreak reports'}
+            illustration={<AlertTriangle className="w-16 h-16 text-[#B3261E]" />}
+            status="warning"
+            statusWord="Community Watch"
+            spokenText="Community pest outbreak radar tracks reported foliar infections across neighbouring mandals."
+            onOpenDetails={() => {
+              setMode('words');
+              setActiveTab('outbreak');
+            }}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
         </div>
       </div>
     );

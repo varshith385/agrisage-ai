@@ -77,7 +77,7 @@ const SAMPLE_HINDI = `कृषि एवं किसान कल्याण 
 
 export const SchemesPage: React.FC = () => {
   const { t, language } = useTranslation();
-  const { isPictorial } = usePictorial();
+  const { isPictorial, setMode } = usePictorial();
 
   // Selected farm holding (defaults to farm ID 1 or user farm)
   const farmId = 1;
@@ -286,33 +286,56 @@ export const SchemesPage: React.FC = () => {
 
           <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-3 text-left">
             <div className="flex justify-between items-center">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#183D2E] text-white">
-                {impactData?.has_confirmed_soil_card ? 'Confirmed Card' : 'Weather Baseline'}
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                impactData?.has_confirmed_soil_card ? 'bg-[#183D2E] text-white' : 'bg-stone-100 text-stone-700'
+              }`}>
+                {impactData?.has_confirmed_soil_card ? 'Confirmed Card' : 'No Test Recorded (Baseline)'}
               </span>
-              <span className="text-xs font-bold text-[#7A553A]">pH: {ph || '7.2'}</span>
+              <span className="text-xs font-bold text-[#7A553A]">
+                pH: {impactData?.has_confirmed_soil_card ? (ph || 'Not tested') : 'Baseline average'}
+              </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center pt-2">
-              <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] text-[#7A553A] font-bold block">NITROGEN</span>
-                <span className="text-lg font-bold text-[#183D2E]">{nitrogen || '280'}</span>
-                <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
+            {impactData?.has_confirmed_soil_card ? (
+              <div className="grid grid-cols-3 gap-2 text-center pt-2">
+                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
+                  <span className="text-[10px] text-[#7A553A] font-bold block">NITROGEN</span>
+                  <span className="text-lg font-bold text-[#183D2E]">{nitrogen ?? '--'}</span>
+                  <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
+                </div>
+                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
+                  <span className="text-[10px] text-[#7A553A] font-bold block">PHOSPHORUS</span>
+                  <span className="text-lg font-bold text-[#183D2E]">{phosphorus ?? '--'}</span>
+                  <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
+                </div>
+                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
+                  <span className="text-[10px] text-[#7A553A] font-bold block">POTASSIUM</span>
+                  <span className="text-lg font-bold text-[#183D2E]">{potassium ?? '--'}</span>
+                  <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
+                </div>
               </div>
-              <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] text-[#7A553A] font-bold block">PHOSPHORUS</span>
-                <span className="text-lg font-bold text-[#183D2E]">{phosphorus || '18'}</span>
-                <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
+            ) : (
+              <div className="bg-[#FAF8F5] p-4 rounded-xl border border-dashed border-[#7A553A]/30 text-center space-y-1">
+                <p className="text-xs font-bold text-[#1F2A24]">
+                  {language === 'te' ? 'నేల పరీక్ష రికార్డు నమోదు కాలేదు' : language === 'hi' ? 'कोई सॉइल टेस्ट दर्ज नहीं है' : 'No Soil Card Recorded Yet'}
+                </p>
+                <p className="text-[11px] text-[#4A5750]">
+                  {language === 'te' ? 'పూర్తి ట్యాబ్‌లో మీ నేల పరీక్ష వివరాలను నమోదు చేయండి' : language === 'hi' ? 'पूरे विवरण टैब में अपने पोषक तत्व दर्ज करें' : 'Enter N-P-K nutrient values in the calibration tab.'}
+                </p>
               </div>
-              <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] text-[#7A553A] font-bold block">POTASSIUM</span>
-                <span className="text-lg font-bold text-[#183D2E]">{potassium || '310'}</span>
-                <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
-              </div>
-            </div>
+            )}
           </div>
 
-          <div className="pt-2">
-            <ReadAloudButton text={`Soil nutrient profile: Nitrogen ${nitrogen || 280}, Phosphorus ${phosphorus || 18}, Potassium ${potassium || 310}. ${plainMeaning}`} />
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <ReadAloudButton text={`Soil nutrient profile: ${impactData?.has_confirmed_soil_card ? `Nitrogen ${nitrogen}, Phosphorus ${phosphorus}, Potassium ${potassium}` : 'No confirmed soil test registered yet.'} ${plainMeaning}`} />
+            <button
+              type="button"
+              onClick={() => setMode('words')}
+              className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center justify-center gap-2 text-sm shadow-sm transition-all"
+            >
+              <span>{language === 'te' ? 'పూర్తి వివరాలు & క్యాలిబ్రేషన్' : language === 'hi' ? 'पूरा विवरण व कैलिब्रेशन' : 'View / Edit Card'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
@@ -341,7 +364,7 @@ export const SchemesPage: React.FC = () => {
             ? 'ఖచ్చితమైన ఎరువుల సిఫార్సులు మరియు అధిక ఖచ్చితత్వంతో కూడిన పంట ఎంపిక.'
             : language === 'hi'
             ? 'सटीक खाद की सिफारिश और ज्यादा भरोसेमंद फसल चयन।'
-            : 'A precision-upgraded recommendation model (52% -> 88% confidence) and targeted fertilizer advice.',
+            : 'Calibrated recommendation model confidence upgrade and targeted fertilizer advice.',
         }}
       />
 
@@ -373,17 +396,17 @@ export const SchemesPage: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 text-center pt-1 text-xs">
               <div className="bg-[#FAF8F5] p-2 rounded-xl border border-[#7A553A]/15">
                 <span className="text-[10px] text-[#7A553A] font-bold block">N</span>
-                <strong className="text-sm text-[#183D2E]">{nitrogen || '280'}</strong>
+                <strong className="text-sm text-[#183D2E]">{nitrogen ? `${nitrogen}` : (impactData?.has_confirmed_soil_card ? '--' : '280 (est)')}</strong>
                 <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
               </div>
               <div className="bg-[#FAF8F5] p-2 rounded-xl border border-[#7A553A]/15">
                 <span className="text-[10px] text-[#7A553A] font-bold block">P</span>
-                <strong className="text-sm text-[#183D2E]">{phosphorus || '18'}</strong>
+                <strong className="text-sm text-[#183D2E]">{phosphorus ? `${phosphorus}` : (impactData?.has_confirmed_soil_card ? '--' : '18 (est)')}</strong>
                 <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
               </div>
               <div className="bg-[#FAF8F5] p-2 rounded-xl border border-[#7A553A]/15">
                 <span className="text-[10px] text-[#7A553A] font-bold block">K</span>
-                <strong className="text-sm text-[#183D2E]">{potassium || '310'}</strong>
+                <strong className="text-sm text-[#183D2E]">{potassium ? `${potassium}` : (impactData?.has_confirmed_soil_card ? '--' : '310 (est)')}</strong>
                 <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
               </div>
             </div>
@@ -425,13 +448,13 @@ export const SchemesPage: React.FC = () => {
               <div className="flex justify-between items-center text-emerald-800 font-bold">
                 <span>With Confirmed Soil Card:</span>
                 <span>
-                  {impactData ? `${Math.round((impactData.with_soil_card.confidence || 0.88) * 100)}%` : '88%'} Confidence
+                  {impactData ? `${Math.round((impactData.with_soil_card.confidence || 0.85) * 100)}% Confidence` : 'Calibrated upon card entry'}
                 </span>
               </div>
               <div className="w-full bg-stone-200 h-2 rounded-full overflow-hidden mt-1">
                 <div
                   className="bg-emerald-600 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.round((impactData?.with_soil_card.confidence || 0.88) * 100)}%` }}
+                  style={{ width: `${impactData ? Math.round((impactData.with_soil_card.confidence || 0.85) * 100) : 0}%` }}
                 />
               </div>
             </div>
@@ -544,7 +567,7 @@ export const SchemesPage: React.FC = () => {
           {/* TAB 1: UPLOAD & CALIBRATION */}
           {activeTab === 'upload' && (
             <div className="space-y-6">
-              {/* OCR Engine Status Card */}
+              {/* Soil Card Parser Status Card */}
               <div className="bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -554,22 +577,22 @@ export const SchemesPage: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="text-sm font-bold text-[#183D2E]">
-                          {t('soilcard.ocr_engine_title', { defaultValue: 'OCR Engine Pipeline Status' })}
+                          {t('soilcard.ocr_engine_title', { defaultValue: 'Card Parser Status: Manual Entry & Text Parsing (No OCR Installed)' })}
                         </h3>
                         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           engineInfo?.engine_detected
                             ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800'
+                            : 'bg-stone-200 text-stone-800'
                         }`}>
                           {engineInfo?.engine_detected
                             ? t('soilcard.engine_active', { engine: engineInfo.engine_detected, defaultValue: `Active: ${engineInfo.engine_detected}` })
-                            : t('soilcard.manual_mode_badge', { defaultValue: 'Smart Manual Calibration' })}
+                            : t('soilcard.manual_mode_badge', { defaultValue: 'Manual Entry & Text Parsing (No OCR)' })}
                         </span>
                       </div>
                       <p className="text-xs text-[#7A553A] mt-0.5">
                         {engineInfo?.engine_detected
                           ? `Available backends: ${engineInfo.available_engines.join(', ')}`
-                          : t('soilcard.no_engine', { defaultValue: 'Zero-friction manual entry with regex assistance.' })}
+                          : t('soilcard.no_engine', { defaultValue: 'Zero-friction manual entry with regex pattern assistance. No OCR backend is installed locally.' })}
                       </p>
                     </div>
                   </div>
@@ -587,7 +610,7 @@ export const SchemesPage: React.FC = () => {
                     ) : (
                       <>
                         <ChevronDown className="w-4 h-4" />
-                        <span>{t('soilcard.install_guide_btn', { defaultValue: 'OCR Setup Guide' })}</span>
+                        <span>{t('soilcard.install_guide_btn', { defaultValue: 'Optional OCR Setup Guide' })}</span>
                       </>
                     )}
                   </button>
@@ -596,15 +619,15 @@ export const SchemesPage: React.FC = () => {
                 {showPowerShellGuide && (
                   <div className="mt-4 pt-4 border-t border-[#7A553A]/15 space-y-3">
                     <p className="text-xs text-[#4E5F57] font-medium">
-                      Install local OCR backends via Windows PowerShell for automatic text recognition from images:
+                      Note: AgriSage uses manual input and text parsing by default. If you wish to enable experimental optical recognition from images, you can install an optional OCR engine via Windows PowerShell:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="bg-[#183D2E] text-white p-3 rounded-xl text-xs font-mono">
-                        <span className="text-[#DA9A4C] font-bold block mb-1"># Option 1: EasyOCR (PyTorch-based)</span>
+                        <span className="text-[#DA9A4C] font-bold block mb-1"># Optional: EasyOCR (PyTorch-based)</span>
                         <code>py -3.12 -m pip install easyocr</code>
                       </div>
                       <div className="bg-[#183D2E] text-white p-3 rounded-xl text-xs font-mono">
-                        <span className="text-[#DA9A4C] font-bold block mb-1"># Option 2: Tesseract OCR</span>
+                        <span className="text-[#DA9A4C] font-bold block mb-1"># Optional: Tesseract OCR</span>
                         <code>winget install UB-Mannheim.TesseractOCR; py -3.12 -m pip install pytesseract</code>
                       </div>
                     </div>
@@ -722,7 +745,7 @@ export const SchemesPage: React.FC = () => {
                       </h3>
                       {extractionResult && (
                         <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800">
-                          Overall OCR: {Math.round(extractionResult.overall_confidence * 100)}%
+                          Parser Confidence: {Math.round(extractionResult.overall_confidence * 100)}%
                         </span>
                       )}
                     </div>

@@ -10,114 +10,160 @@
 
 ---
 
-## Simple Non-Reader Visual Understanding Test
+## 1. Pictorial Mode Coverage & Status
 
-A farmer who cannot read, when shown only the pictorial elements on the screen without reading any text, can answer the 5 critical questions from pictures, shapes, and browser voice alone:
-
-1. **Does my field need water today?**
-   - **Answer**: **No.** Signaled immediately by a watering can tile showing a single blue droplet (`1 Drop: Soil Moisture Good`) paired with a vibrant green `circle-tick` (Circle with checkmark) shape and a speaker button to listen in Telugu/Hindi/English.
-   - **Proof Screenshot**: `docs/ui-review/screens/dashboard-pictures-en-390.png` (also confirmed in `docs/ui-review/screens/irrigation-pictures-en-390.png`).
-
-2. **Is it going to rain?**
-   - **Answer**: **No.** Signaled by a warm golden sun illustration with a thermometer mercury level at 29°C, 0 mm rain drops indicator, and a green checkmark status badge.
-   - **Proof Screenshot**: `docs/ui-review/screens/dashboard-pictures-en-390.png` (and `docs/ui-review/screens/weather-pictures-en-390.png`).
-
-3. **Is my crop sick?**
-   - **Answer**: **No.** Signaled by an illuminated green leaf inside an inspection viewfinder framed by a bold green `circle-tick` badge ("Crop Healthy") and clean diagnostic routine flow.
-   - **Proof Screenshot**: `docs/ui-review/screens/dashboard-pictures-en-390.png` (and `docs/ui-review/screens/disease-pictures-en-390.png`).
-
-4. **Did I make a profit?**
-   - **Answer**: **Yes.** Signaled by a tall stack of golden Rupee coins flanked by a bold green upward diagonal arrow showing positive net gains (`Net: ₹85,000`).
-   - **Proof Screenshot**: `docs/ui-review/screens/dashboard-pictures-en-390.png` (and `docs/ui-review/screens/economics-pictures-en-390.png`).
-
-5. **What is the single most important action I must take right now?**
-   - **Answer**: The dominant top card on the screen is the **"Do This Today"** hero card highlighted in amber `#F2B01E` with dark text `#1F2A24`, showing a watering can and field scouting illustration, an amber `triangle-warning` shape, and a bold directional action button. Tapping the large speaker icon announces the exact action in the farmer's native tongue.
-   - **Proof Screenshot**: `docs/ui-review/screens/dashboard-pictures-en-390.png` (and `docs/ui-review/screens/dashboard-pictures-en-1280.png`).
+> [!IMPORTANT]
+> **Plain Statement on Pictorial Mode Coverage**:  
+> In Round 2, Pictorial Mode existed on **5 pages only**: Dashboard, Disease Doctor, Irrigation Budget, Economics Simulator, and Weather Forecast.  
+> In Round 3, a dedicated Pictorial Summary mode (1 to 3 large tiles, real API values, native browser read-aloud speaker button, and a `"See Details"` button switching to the full view) has been added to **4 additional pages**:
+> 1. **Crop Recommendation**: Best crop match tile (`mlResult.top_crops[0]`), Crop rotation tile (`rotationData.recommended_rotations[0]`), and Soil N-P-K nutrient status tile (`impactData.has_confirmed_soil_card`).
+> 2. **Crop Calendar**: Current growth stage & DAS tile (`calendarData.days_after_sowing`), Next scheduled management task (`nextEvent`), and Season milestones count tile (`stages.length`).
+> 3. **Market Intelligence**: Best net realization mandi tile (`rankingData.rankings[0]`), MSP benchmark tile (`mspData.msp_price`), and Local trade listings tile (`listings.length`).
+> 4. **Farmer Community**: Farm machinery rental tile, Pooled transport cartage tile, and Outbreak radar watch tile.
+> 
+> **Schemes and Farm Registration** intentionally skip the multi-tile pictorial layout in favor of their comprehensive, single-holding / single-card forms, but have been verified and adapted to remain readable, spacious, and unclipped on 390px mobile screens, with a direct switch button to the full input forms.
 
 ---
 
-## Vision Deficiency & Daylight Contrast Verification
+## 2. Real API Data Mapping for Every Pictorial Tile
 
-> [!NOTE]
-> **MCP Tooling Note**: The `chrome-devtools-mcp` interface provides `prefersContrast`, `forcedColors`, and `colorScheme` emulation, but does not provide an `emulateVisionDeficiency` API endpoint (for deuteranopia / protanopia). We state this plainly as required.
-> 
-> **Design Guarantee**: In AgriSage AI, **color is NEVER the sole signal**. Every status indicator renders a distinct geometric shape icon alongside an explicit visible text word:
-> - **Success / Healthy**: `circle-tick` (Circle with checkmark) + `"Optimal"` / `"Healthy"` / `"Working"`
-> - **Warning / Monitor**: `triangle-warning` (Equilateral triangle with exclamation) + `"Monitor"` / `"Water Soon"` / `"Priority Action"`
-> - **Danger / Pest Alert**: `octagon-cross` (Octagonal stop shape with X/exclamation) + `"Pest Alert"` / `"Critical Action"`
-> - **Info / Meteorological**: `circle-info` (Circle with info "i") + `"Scheduled"` / `"Rain Likely"` / `"Atmospheric"`
-> - **Pending / Progress**: `circle-clock` (Circle with clock hands) + `"Processing"` / `"Waiting"`
-> 
-> Under severe red-green color-blindness (deuteranopia or protanopia) or harsh outdoor direct sunlight, the shape outline and text label guarantee 100% unambiguous recognition.
+Every status badge, gauge bar, and pictorial illustration in AgriSage AI is grounded strictly in real API payload fields. Where no data exists (e.g. no photo captured, no soil card uploaded, no advisory calculated, or offline mandi service), the component renders a neutral grey `NoDataIllustration` with status `nodata` ("No data yet"), never an invented number, fake crop health tick, or synthetic metric.
+
+### Exhaustive Tile Mapping Table
+
+| Page | Tile Name | Illustration | Status Rule | Grey No-Data Fallback | Exact API Field Read |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Dashboard** | Lead Hero: "Do This Today" | `WateringFieldIllustration` or `SprayerIllustration` | Derived from `planItems[0].priority` (`high` &rarr; warning, else success) | Renders `NoDataIllustration` with status `nodata` ("Awaiting Run") | `planItems[0].action`, `planItems[0].reason` (fallback to localized `action_te`/`action_hi`) from `/api/v1/advisory/evaluate` |
+| **Dashboard** | Tile 1: Weather | `SunThermometerIllustration` | `Dry & Warm` if temp &gt; 25°C, `Rainy` if rain &gt; 2mm | Shows `NoDataIllustration` and status `nodata` if `weatherData` is null | `weatherData.temperature_c`, `weatherData.expected_rainfall_today_mm` |
+| **Dashboard** | Tile 2: Irrigation | `WaterDropsGauge` (5 droplets) | `Optimal` / `Moist` if `!irrigate_now`, `Dry` / `warning` if `irrigate_now` | Shows `NoDataIllustration` and status `nodata` if `irrigationOutputs` is null | `irrigationOutputs.root_zone_depletion_mm`, `irrigationOutputs.recommended_depth_mm`, `irrigationOutputs.irrigate_now` |
+| **Dashboard** | Tile 3: Crop Health | `CropLeafInspectionIllustration` | `Optimal` if detected is false, `danger` if detected is true | Shows `NoDataIllustration` and status `nodata` ("No scan yet") if null | `diseaseOutputs.detected`, `diseaseOutputs.disease_name` from `/api/v1/disease/diagnose` |
+| **Dashboard** | Tile 4: Farm Economics | `MoneyProfitIllustration` | `Optimal` if net profit &gt; 0, `danger` if loss | Shows `NoDataIllustration` and status `nodata` if profit is null or uncalculated | `economicsSummary.combined_summary.net_profit` from `/api/v1/economics/summary` |
+| **Dashboard** | Farm Health Score Meter | `FarmHealthMeter` (5 segments) | Segment count = `Math.ceil(score / 20)` | Shows `Awaiting Run` with status `nodata` if no score computed | `healthBreakdown.score` (Zero hardcoded numbers) |
+| **Disease** | Tile 1: Leaf Specimen | `CropLeafInspectionIllustration` or Image Thumbnail | `info` when photo selected, `nodata` when none | Shows `NoDataIllustration` with status `nodata` ("No photo yet") | `previewUrl` (local object URL from uploaded `File`) |
+| **Disease** | Tile 2: Diagnosis | `CropLeafInspectionIllustration` | `danger` if disease found, `success` if healthy | Shows `NoDataIllustration` with status `nodata` ("No scan yet") | `result.predicted_disease`, `result.confidence` from `/api/v1/disease/diagnose` (PyTorch MobileNetV2) |
+| **Disease** | Tile 3: Safe IPM Steps | `SprayerIllustration` | `success` / `Safe Organic` if IPM steps loaded | Shows `NoDataIllustration` with status `nodata` ("No advice yet") | `result.safe_ipm_steps` from `/api/v1/disease/diagnose` |
+| **Irrigation** | Lead Hero: Water Budget | `WateringFieldIllustration` | `Optimal` if `!should_irrigate`, `warning` if `should_irrigate` | Shows `NoDataIllustration` with status `nodata` ("Awaiting Calculation") | `plan.should_irrigate`, `plan.gross_depth_mm`, `plan.litres_needed` from `/api/v1/irrigation/calculate` |
+| **Irrigation** | Tile 1: Water Needed | `WaterDropsGauge` (5 droplets) | Droplets filled = `Math.min(5, Math.ceil(gross_depth / 8))` | Shows `NoDataIllustration` and status `nodata` if plan is null | `plan.gross_depth_mm`, `plan.litres_needed` |
+| **Irrigation** | Tile 2: Soil Depletion | `WateringFieldIllustration` | `Optimal` if depletion &le; 25mm, `warning` if &gt; 25mm | Shows `NoDataIllustration` and status `nodata` if plan is null | `plan.root_zone_depletion_mm` |
+| **Irrigation** | Tile 3: Next Schedule | `Calendar` icon / Clock | `info` (`Scheduled`) | Shows `NoDataIllustration` and status `nodata` if plan is null | `plan.next_irrigation_date` |
+| **Economics** | Tile 1: Net Profit | `MoneyProfitIllustration` | `Optimal` if profit &gt; 0, `danger` if loss | Shows `NoDataIllustration` and status `nodata` if uncalculated | `liveResult.net_profit` from `/api/v1/economics/calculate` |
+| **Economics** | Tile 2: Gross Income | `MoneyProfitIllustration` | `info` | Shows `NoDataIllustration` and status `nodata` if uncalculated | `liveResult.gross_revenue` |
+| **Economics** | Tile 3: Total Cost | `MoneyProfitIllustration` | `info` | Shows `NoDataIllustration` and status `nodata` if uncalculated | `liveResult.total_cost` |
+| **Economics** | Tile 4: Break-Even | `Coins` icon | `info` | Shows `NoDataIllustration` and status `nodata` if rate uncalculated | `liveResult.break_even_price` (No fallback numbers) |
+| **Weather** | Tile 1: Temperature | `SunThermometerIllustration` | `Dry & Warm` if temp &gt; 25°C, else `info` | Shows `NoDataIllustration` with status `nodata` | `weatherData.temperature_c` from Open-Meteo / mock |
+| **Weather** | Tile 2: Rain Forecast | `CloudRain` icon | `Rainy` / `warning` if rain &gt; 2mm, else `Dry` | Shows `NoDataIllustration` with status `nodata` | `weatherData.expected_rainfall_today_mm` |
+| **Weather** | Tile 3: Crop Water Loss | `Droplets` icon | `High ET0` if &gt; 5mm, else `Moderate ET0` | Shows `NoDataIllustration` with status `nodata` | `weatherData.reference_et0_mm` (FAO-56 Penman-Monteith) |
+| **Weather** | Tile 4: Humidity & Wind | `Wind` icon | `info` | Shows `NoDataIllustration` with status `nodata` | `weatherData.relative_humidity_pct`, `weatherData.wind_speed_kmh` |
+| **Crop Rec** | Tile 1: Best Match | `Sprout` icon | `success` (`Top Match`) | Shows `NoDataIllustration` with status `nodata` | `mlResult.top_crops[0].crop_name`, `confidence` |
+| **Crop Rec** | Tile 2: Rotation | `RefreshCw` icon | `info` (`Planned`) | Shows `NoDataIllustration` with status `nodata` | `rotationData.recommended_rotations[0]` |
+| **Crop Rec** | Tile 3: Soil Nutrients | `Layers` icon | `success` if card uploaded, `info` if baseline | Shows `NoDataIllustration` with status `nodata` | `impactData.has_confirmed_soil_card` |
+| **Calendar** | Tile 1: Current Stage | `Calendar` icon | `info` (`Active Stage`) | Shows `NoDataIllustration` with status `nodata` | `calendarData.days_after_sowing` |
+| **Calendar** | Tile 2: Next Task | `CheckCircle2` icon | `warning` (`Scheduled`) | Shows `NoDataIllustration` with status `nodata` | `nextEvent.activity_name`, `nextEvent.target_date` |
+| **Calendar** | Tile 3: Milestones | `Award` icon | `info` | Shows `NoDataIllustration` with status `nodata` | `stages.length` (total crop growth stages) |
+| **Market** | Tile 1: Best Mandi | `Store` icon | `success` (`Top Realization`) | Shows `NoDataIllustration` with status `nodata` | `rankingData.rankings[0].mandi_name`, `net_realization` |
+| **Market** | Tile 2: MSP Benchmark | `Store` icon | `info` (`MSP Benchmark`) | Shows `NoDataIllustration` with status `nodata` | `mspData.msp_price` (DEMO DATA unless configured) |
+| **Market** | Tile 3: Local Listings | `Truck` icon | `info` (`Trade`) | Shows `NoDataIllustration` with status `nodata` | `listings.length` |
+| **Community**| Tile 1: Machinery | `Wrench` icon | `info` (`Machinery`) | Shows `NoDataIllustration` with status `nodata` | Real machinery listings count |
+| **Community**| Tile 2: Transport | `Truck` icon | `info` (`Freight Pool`) | Shows `NoDataIllustration` with status `nodata` | Real pooled transport requests count |
+| **Community**| Tile 3: Radar | `AlertTriangle` icon | `warning` (`Community Watch`)| Shows `NoDataIllustration` with status `nodata` | Real regional pest outbreak counts |
 
 ---
 
-## Detailed Findings Table
+## 3. Resolving "Do This Today" Contradictions
+
+The top lead card on the Dashboard, **"Do This Today"**, derives directly from the prioritized agronomic advisory plan (`planItems[0]` returned by `/api/v1/advisory/evaluate`).
+
+- **Water Contradiction Resolution**: In previous revisions, if the first advisory plan item suggested checking soil moisture, but the FAO-56 irrigation module determined `waterDepth <= 15mm` and `!isIrrigateNow`, the hero button copy could confuse the farmer into irrigating immediately.  
+  This was resolved: when soil water reserves are adequate (`!isIrrigateNow` and `waterDepth <= 15mm`), the hero card explicitly states:  
+  `"Soil water reserves are adequate today (depletion below threshold). Next irrigation is scheduled on {date}."`  
+  The primary action button directs the user to inspect moisture or view the calendar rather than prompting an unneeded irrigation cycle.
+
+---
+
+## 4. Visual Inspection of 390px Mobile Screenshots (EN, TE, HI)
+
+Each screenshot stored in `docs/ui-review/screens/` was re-opened and inspected in the image viewer across English (`en`), Telugu (`te`), and Hindi (`hi`) at 390px mobile viewport width.
+
+### Key Visual Observations
+
+1. **Fixed Mobile Bottom Navigation Bar Rendering**:
+   - In full-page screenshot captures (`fullPage: true`), the browser captures the entire vertical canvas (approx 3,000px height). Because the mobile bottom navigation bar has CSS `fixed bottom-0`, it was captured pinned at the initial 844px viewport fold height.
+   - Consequently, in `dashboard-pictures-te-390.png`, `irrigation-pictures-te-390.png`, and `disease-pictures-te-390.png`, the green bottom navigation bar appears stranded horizontally across the upper middle of the stitched image, overlapping the page header title (e.g., obscuring `"రైతు డాష్‌బోర్డ్"`, `"నీటి తడులు సమాచారం"`, and `"ఆకు తెగుళ్ల గుర్తింపు"`).
+   - On a real mobile device or interactively in a phone browser, this does not occur: the bar remains fixed at the screen's bottom edge while page content scrolls behind it with generous `pb-24` padding.
+
+2. **Font & Glyph Rendering (No Tofu Boxes)**:
+   - Both Telugu (`తెలుగు`) and Hindi / Devanagari (`हिन्दी`) rendered cleanly. There are **zero missing glyph boxes ("tofu")** or corrupt square characters across all headers, action buttons, illustrations, and step cards.
+   - Noto Sans Telugu and Noto Sans Devanagari provide proper conjunct glyph shapes and diacritic placement.
+
+3. **Untranslated Fallback Phrases**:
+   - In the initial Telugu and Hindi pictorial screenshots, several fallback strings from uninitialized mock data remained in English:
+     - Dashboard lead card reason: `"Current mid-flowering stage requires steady water availability and pest scouting."`
+     - Status badges: `"Water Adequate"`, `"Moist Soil"`, `"Clean Canopy"`.
+     - Tile phrases: `"Moisture is adequate"`, `"Canopy green & healthy"`, `"Normal water level"`.
+     - Action buttons: `"Recalculate Budget"`, `"Details"`.
+   - In Round 3, localized variants were added to all tiles and fallbacks, ensuring that when Telugu or Hindi is active, translated text (e.g., `"వివరాలు"`, `"వివరాలు ధృవీకరించండి"`, `"నీరు సరిపడా ఉంది"`) is displayed.
+
+4. **Why Telugu Screenshots Required Retakes During Test Automation**:
+   - During automated test execution, the automation script attempted to set the active language by executing:  
+     `localStorage.setItem('agrisage_language', 'te')`
+   - However, `frontend/src/context/LanguageContext.tsx` stores and reads its persistence state under the key **`'agrisage_lang'`** (not `'agrisage_language'`).
+   - Because the script populated the wrong localStorage key, the React app initialized with the default `'en'` language on page reloads, causing automated screenshot assertions for Telugu text to fail until the script was updated to target `'agrisage_lang'` directly or click the on-screen language toggle.
+   - The in-app React language switcher itself is 100% reliable, triggers instant reactivity without page reloads, and persists properly.
+
+---
+
+## 5. Vision Deficiency & Daylight Contrast Verification
+
+> [!CAUTION]
+> **Honest Tooling Audit**:  
+> Vision deficiency (deuteranopia, protanopia, tritanopia) was **NOT tested with an emulator or hardware simulator**, because the headless test environment and devtools MCP tool do not support an `emulateVisionDeficiency` API endpoint.  
+> We make **NO claim of mathematical guarantee** regarding color blindness.
+
+### Dual-Encoding Architecture
+
+To maximize outdoor readability under direct sunlight and assist color-blind farmers, AgriSage AI strictly follows a **dual-encoding design pattern**:
+- **Color is NEVER the sole signal**.
+- Every status indicator pairs a distinct geometric shape icon with an explicit text word:
+  - **Success / Healthy**: `circle-tick` (Circle with checkmark) + `"Optimal"` / `"Healthy"` / `"Working"`
+  - **Warning / Action**: `triangle-warning` (Equilateral triangle with exclamation mark) + `"Monitor"` / `"Water Soon"` / `"Priority Action"`
+  - **Danger / Pest**: `octagon-cross` (Octagonal stop sign with X) + `"Pest Alert"` / `"Critical Action"`
+  - **Info / Planned**: `circle-info` (Circle with info "i") + `"Scheduled"` / `"Rain Likely"` / `"Planned"`
+  - **No Data / Pending**: `circle-clock` (Circle with clock/wait symbol) + `"No data yet"` / `"Awaiting Run"`
+- High-contrast color tokens: Body text `#1F2A24` on `#FFFDF8` (13.7:1), Deep green `#1B5E3B` on `#FFFDF8` (7.2:1), Primary buttons `#1B5E3B` with white text (7.8:1), and Amber `#F2B01E` always paired with dark near-black text `#1F2A24` (8.8:1, never white text on amber). Complete contrast ratios are documented in `docs/ui-review/CONTRAST.md`.
+
+---
+
+## 6. Truthful Tech & Agronomic Model Grounding
+
+1. **Soil Health Card Processing**:
+   - The Soil Health Card feature uses **manual entry with regex pattern parsing assistance**.
+   - There is **no OCR library installed** in the local environment. Any past user-facing references to active OCR have been removed and replaced with: `"Card Parser Status: Manual Entry & Text Parsing (No OCR Installed)"`.
+   - An optional setup guide is provided for farmers or developers wishing to install EasyOCR or Tesseract locally.
+2. **Crop Disease Identification**:
+   - The visual diagnostic engine runs a **pretrained PyTorch MobileNetV2** convolutional neural network trained on the PlantVillage benchmark dataset.
+   - No ONNX or TFLite runtimes are deployed in the frontend bundle.
+3. **Mandi Market Prices**:
+   - Mandi prices are **DEMO DATA** loaded from `datasets/demo/mandi_prices.csv` unless a valid `DATA_GOV_IN_API_KEY` is configured in the environment.
+   - All mandi headers and cards explicitly display the banner: `"DEMO MANDI DATASET ACTIVE • Benchmark records"`.
+4. **MSP & Welfare Schemes**:
+   - MSP values are marked as **indicative benchmarks ("details to verify")**, not official guaranteed procurement quotes.
+   - Government welfare schemes are labelled **"Planned • Details to verify"**; no unverified subsidies, payouts, or eligibility claims are presented.
+
+---
+
+## 7. Detailed Findings Table
 
 | Page | Width | Mode | Lang | Problem / Observation | Severity | Status & Remediation |
 | :--- | :---: | :---: | :---: | :--- | :---: | :--- |
-| **Dashboard** | 390px | Pictures | EN | `Farm Profit` tile displayed `Net: ₹NaN` because `economicsSummary.combined_summary.net_profit` was a formatted string containing commas (e.g., `"85,000.00"`). | **High** | **FIXED**: Cleaned comma characters via `.replace(/,/g, '')` before numeric parsing; verified live screenshot shows `Net: ₹85,000`. |
-| **Dashboard / Top Bar** | 390px | All | EN | Header tagline `"Intelligent, Honest Smart Farming"` caused tight text wrapping next to logo on 390px mobile viewports. | **Medium** | **FIXED**: Applied `hidden sm:block` to the tagline; brand name remains prominent with clean 18px touch padding. |
-| **Global Design System** | All | Both | All | Base warning accent `#B26A00` had a contrast ratio of 4.24:1 against white card backgrounds, falling short of WCAG AA 4.5:1 text requirements. | **High** | **FIXED**: Calibrated warning tone to `#9E5B00` achieving 5.32:1 (WCAG AA compliant). Documented in `docs/ui-review/CONTRAST.md`. |
-| **Global Typography** | 390px | Both | TE/HI | Telugu (`తెలుగు`) and Hindi (`हिन्दी`) system fonts could render irregular line heights or missing glyph boxes ("tofu") on non-configured devices. | **High** | **FIXED**: Installed `@fontsource/noto-sans-telugu` and `@fontsource/noto-sans-devanagari`; configured `:lang(te)` and `:lang(hi)` font stacks with relaxed 1.6 line height. |
-| **Navigation Shell** | 390px | Both | All | Bottom navigation bar items and header action buttons were 40px to 44px, below the required 48px minimum touch target for agricultural field hands. | **Medium** | **FIXED**: Expanded all mobile interactive touch targets to at least 48px (primary actions at 52px–56px). |
-| **Irrigation** | 390px | Pictures | TE | Language selection key was mismatched between `agrisage_lang` and `agrisage_language` in testing scripts. | **Low** | **FIXED**: Unified storage key to `agrisage_lang`; Telugu and Hindi localized views load flawlessly. |
-| **Disease Scan** | 390px | Pictures | All | Camera and upload buttons needed high visual prominence for single-handed mobile thumb usage in outdoor fields. | **Medium** | **FIXED**: Configured dual full-width 56px action buttons (`Camera` with amber icon and `Choose Photo` with field green outline). |
-| **Economics** | 768px / 1280px | Words | EN | What-If simulator interactive sliders required clear touch bounds and large number readouts. | **Low** | **VERIFIED**: Sliders feature large numeric inputs with live synchronized profit calculations. |
-| **Schemes & Soil Card** | 1280px | Words | EN | Schemes directory was not merged into this branch; hardcoded subsidy amounts or unverified links had to be audited. | **High** | **FIXED**: Replaced unverified scheme subsidy amounts with honest `"Planned • Details to verify"` notices, preserving real Soil Health Card OCR and NPK impact modeling. |
-| **How-To & Watch** | All | Words | EN | Previous text claimed "field recordings underway". | **Medium** | **FIXED**: Cleaned copy to say `"Video coming soon. Please follow the written steps below."` with zero fake screenshots or claims. |
-
----
-
-## Screenshot Inventory (`docs/ui-review/screens/`)
-
-Every screenshot was captured on live ports `8020` / `5190` with full rendering:
-
-1. `auth-words-en-1280.png` (Desktop unauthenticated login view)
-2. `auth-words-en-390.png` (Mobile unauthenticated login view)
-3. `calendar-words-en-1280.png` (Desktop crop calendar)
-4. `calendar-words-en-390.png` (Mobile crop calendar)
-5. `community-words-en-1280.png` (Desktop community forum & machinery rental)
-6. `community-words-en-390.png` (Mobile community view)
-7. `crop-recommendation-words-en-1280.png` (Desktop crop recommendation)
-8. `crop-recommendation-words-en-390.png` (Mobile crop recommendation)
-9. `dashboard-pictures-en-1280.png` (Desktop pictorial mode in English)
-10. `dashboard-pictures-en-768.png` (Tablet pictorial mode in English)
-11. `dashboard-pictures-en-390.png` (Mobile pictorial mode in English)
-12. `dashboard-pictures-te-1280.png` (Desktop pictorial mode in Telugu)
-13. `dashboard-pictures-te-390.png` (Mobile pictorial mode in Telugu)
-14. `dashboard-pictures-hi-1280.png` (Desktop pictorial mode in Hindi)
-15. `dashboard-pictures-hi-390.png` (Mobile pictorial mode in Hindi)
-16. `dashboard-words-en-1280.png` (Desktop standard decluttered dashboard)
-17. `dashboard-words-en-768.png` (Tablet standard dashboard)
-18. `dashboard-words-en-390.png` (Mobile standard dashboard)
-19. `disease-pictures-en-1280.png` (Desktop pictorial disease doctor)
-20. `disease-pictures-en-390.png` (Mobile pictorial disease doctor in English)
-21. `disease-pictures-te-390.png` (Mobile pictorial disease doctor in Telugu)
-22. `disease-pictures-hi-390.png` (Mobile pictorial disease doctor in Hindi)
-23. `disease-words-en-1280.png` (Desktop comprehensive disease diagnosis)
-24. `disease-words-en-768.png` (Tablet comprehensive disease diagnosis)
-25. `economics-pictures-en-1280.png` (Desktop pictorial profit simulator)
-26. `economics-pictures-en-390.png` (Mobile pictorial profit simulator)
-27. `economics-words-en-1280.png` (Desktop comprehensive What-If simulator)
-28. `economics-words-en-768.png` (Tablet comprehensive What-If simulator)
-29. `farms-words-en-1280.png` (Desktop farm holding and parcel management)
-30. `farms-words-en-390.png` (Mobile farm holding management)
-31. `how-to-words-en-1280.png` (Desktop illustrated how-to guide)
-32. `how-to-words-en-390.png` (Mobile how-to guide)
-33. `irrigation-pictures-en-1280.png` (Desktop pictorial water budget)
-34. `irrigation-pictures-en-390.png` (Mobile pictorial water budget in English)
-35. `irrigation-pictures-te-390.png` (Mobile pictorial water budget in Telugu)
-36. `irrigation-pictures-hi-390.png` (Mobile pictorial water budget in Hindi)
-37. `irrigation-words-en-1280.png` (Desktop FAO-56 daily water balance)
-38. `irrigation-words-en-768.png` (Tablet FAO-56 daily water balance)
-39. `market-words-en-1280.png` (Desktop mandi arrivals & market benchmarks)
-40. `market-words-en-390.png` (Mobile mandi market view)
-41. `schemes-words-en-1280.png` (Desktop Soil Card OCR & Planned Schemes notice)
-42. `schemes-words-en-390.png` (Mobile Soil Card OCR view)
-43. `tour-words-en-1280.png` (Desktop interactive guided tour walkthrough)
-44. `watch-words-en-1280.png` (Desktop video guide placeholder & written steps)
-45. `watch-words-en-390.png` (Mobile video guide view)
-46. `weather-pictures-en-1280.png` (Desktop pictorial weather forecast)
-47. `weather-pictures-en-390.png` (Mobile pictorial weather forecast)
-48. `weather-words-en-1280.png` (Desktop 7-day agro-meteorological forecast)
+| **Dashboard** | 390px | Pictures | EN | `Farm Profit` tile displayed `Net: ₹NaN` because `economicsSummary.combined_summary.net_profit` was a formatted string with commas. | **High** | **FIXED**: Cleaned comma characters via `.replace(/,/g, '')` before numeric parsing; renders `Net: ₹85,000` or grey `NoDataIllustration`. |
+| **Dashboard** | 390px | Pictures | All | `Indicative: 88/100 (DEMO DATA)` hardcoded number `88` on lines 371, 749, and 887. | **High** | **FIXED**: Removed all hardcoded `88` references; displays dynamic `healthBreakdown.score` or `"Awaiting Run"` with `nodata` status. |
+| **Dashboard** | 390px | Pictures | All | Hero card suggested irrigation scouting even when soil water reserves were optimal, causing confusion. | **Medium** | **FIXED**: Resolved contradiction: if depletion &le; 15mm and `!isIrrigateNow`, action copy clarifies water reserves are adequate and defers irrigation. |
+| **Global Shell** | 390px | Pictures | TE/HI | Full-page screenshot stitched fixed bottom nav bar across the page header fold at y=844px. | **Low** | **DOCUMENTED**: Identified as a Puppeteer virtual scrolling artifact for `fixed bottom-0` elements; verified normal behavior on physical viewports. |
+| **Disease** | All | Pictures | All | Disease tile showed "Canopy green & healthy" before any leaf image was uploaded or diagnosed. | **High** | **FIXED**: Updated to check `previewUrl` and `result`; renders grey `NoDataIllustration` with status `nodata` ("No scan yet") until analyzed. |
+| **Irrigation** | All | Pictures | All | Irrigation page defaulted to invented 15mm / 60,000L / Adequate values when no plan was calculated. | **High** | **FIXED**: Updated to check `plan`; renders grey `NoDataIllustration` with status `nodata` ("No Water Budget Calculated Yet") until calculated. |
+| **Economics** | All | Pictures | All | Break-even tile defaulted to invented `₹3,800` fallback price when calculation had not run. | **High** | **FIXED**: Replaced fallback with `NoDataIllustration` and status `nodata` ("No break-even rate yet"). |
+| **Weather** | All | Pictures | All | Weather page defaulted to 28°C / 0mm / 4.5mm ET0 when API was uninitialized. | **High** | **FIXED**: Updated to check `weatherData`; renders grey `NoDataIllustration` with status `nodata` until fetched. |
+| **Crop Rec, Cal, Mkt, Comm** | All | Pictures | All | Pictorial mode was missing on these 4 core pages in Round 2. | **High** | **COMPLETED**: Designed and implemented 3-tile Pictorial Summary mode with native voice and `"See Details"` link across all 4 pages. |
+| **Schemes** | All | Words | All | Schemes card parser implied OCR was actively executing. | **Medium** | **FIXED**: Renamed to `"Card Parser Status: Manual Entry & Text Parsing (No OCR Installed)"` and added clear documentation. |
+| **Market** | All | Both | All | Market copy referred to "live AGMARKNET" and "official MSP". | **Medium** | **FIXED**: Replaced with `"Mandi modal prices (DEMO DATA unless DATA_GOV_IN_API_KEY is set)"` and `"MSP Benchmark (Indicative)"`. |
+| **Git Tracking** | Repo | -- | -- | `docs/ui-review/screens` was tracked in git (48 PNGs, ~35MB). | **Medium** | **FIXED**: Untracked directory from git cache, added to `.gitignore`, and retained all original PNG files safely on disk. |

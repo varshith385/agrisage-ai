@@ -24,7 +24,7 @@ import { WateringFieldIllustration } from '../components/common/FarmerIllustrati
 
 export const FarmRegistrationPage: React.FC = () => {
   const { t, language } = useTranslation();
-  const { isPictorial } = usePictorial();
+  const { isPictorial, setMode } = usePictorial();
   const { setActiveFarmId, refreshFarms, activeFarmId, activeFarm } = useAuth();
 
   const [farms, setFarms] = useState<Farm[]>([]);
@@ -189,8 +189,16 @@ export const FarmRegistrationPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <ReadAloudButton text={`Your farm is ${activeFarm?.name || 'Registered Farm'}. ${plainMeaning}`} />
+            <button
+              type="button"
+              onClick={() => setMode('words')}
+              className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center justify-center gap-2 text-sm shadow-sm transition-all"
+            >
+              <span>{language === 'te' ? 'పూర్తి వివరాలు & రిజిస్ట్రేషన్' : language === 'hi' ? 'पूरा विवरण व पंजीकरण' : 'View / Edit Parcels'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>

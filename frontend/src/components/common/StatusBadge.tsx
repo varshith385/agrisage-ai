@@ -16,7 +16,10 @@ export type StatusType =
   | 'warning'
   | 'danger'
   | 'info'
-  | 'planned';
+  | 'planned'
+  | 'nodata'
+  | 'no_data'
+  | 'empty';
 
 export interface StatusBadgeProps {
   status: StatusType | string;
@@ -58,6 +61,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     IconComponent = Info;
     defaultWord = normStatus === 'DEMO' ? 'Demo Data' : 'Info';
     styleClasses = 'bg-[#E3F2FD] text-[#1565A8] border-[#1565A8]/40';
+  } else if (normStatus === 'NODATA' || normStatus === 'NO_DATA' || normStatus === 'EMPTY' || normStatus === 'NONE') {
+    shapeName = 'circle-clock';
+    IconComponent = Clock;
+    defaultWord = 'No data yet';
+    styleClasses = 'bg-[#F5F5F4] text-[#78716C] border-[#D6D3D1]';
   } else {
     shapeName = 'circle-clock';
     IconComponent = Clock;

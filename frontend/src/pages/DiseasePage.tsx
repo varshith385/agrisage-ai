@@ -242,8 +242,8 @@ export const DiseasePage: React.FC = () => {
                     {language === 'te' ? 'ఆకు స్కాన్' : language === 'hi' ? 'पत्ती स्कैन' : 'Leaf Camera Scan'}
                   </span>
                   <StatusBadge
-                    status={isDiagnosed ? (isHealthy ? 'success' : 'danger') : 'info'}
-                    label={isDiagnosed ? (isHealthy ? 'Healthy Leaf' : 'Pest Detected') : 'Ready for Photo'}
+                    status={isDiagnosed ? (isHealthy ? 'success' : 'danger') : 'nodata'}
+                    label={isDiagnosed ? (isHealthy ? (language === 'te' ? 'ఆరోగ్యకరం' : language === 'hi' ? 'स्वस्थ पत्ती' : 'Healthy Leaf') : (language === 'te' ? 'తెగులు గుర్తించబడింది' : language === 'hi' ? 'रोग मिला' : 'Pest Detected')) : (language === 'te' ? 'స్కాన్ లేదు' : language === 'hi' ? 'स्कैन नहीं' : 'No Scan Yet')}
                     size="sm"
                   />
                 </div>
@@ -296,7 +296,7 @@ export const DiseasePage: React.FC = () => {
                     {selectedFile?.name || 'Leaf specimen image'}
                   </span>
                   <span className="text-[13px] text-[#4A5750]">
-                    Compressed & ready for neural model scan
+                    Compressed & ready for pretrained PyTorch MobileNetV2 leaf scan
                   </span>
                 </div>
               </div>
@@ -323,12 +323,12 @@ export const DiseasePage: React.FC = () => {
           )}
         </div>
 
-        {/* 3 Large Pictorial Tiles */}
+        {/* 3 Large Pictorial Tiles with REAL Values or Honest No-Data Fallback */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {/* Tile 1: Leaf Specimen */}
           <PictorialTile
             title={language === 'te' ? 'ఆకు నమూనా' : language === 'hi' ? 'पत्ती का नमूना' : 'Leaf Specimen'}
-            phrase={previewUrl ? 'Leaf photo loaded' : 'Take sharp photo of leaf'}
+            phrase={previewUrl ? (language === 'te' ? 'ఆకు ఫోటో లోడ్ అయింది' : language === 'hi' ? 'पत्ती का फोटो तैयार' : 'Leaf photo loaded') : (language === 'te' ? 'ఆకు ఫోటో తీయండి' : language === 'hi' ? 'पत्ती का फोटो लें' : 'Take sharp photo of leaf')}
             illustration={
               previewUrl ? (
                 <img
@@ -337,32 +337,32 @@ export const DiseasePage: React.FC = () => {
                   className="w-20 h-20 object-cover rounded-2xl border-2 border-[#1B5E3B]"
                 />
               ) : (
-                <LeafScanIllustration size={80} />
+                <NoDataIllustration size={80} />
               )
             }
-            status={previewUrl ? 'info' : 'demo'}
-            statusWord={previewUrl ? 'Photo Ready' : 'No Photo Yet'}
+            status={previewUrl ? 'info' : 'nodata'}
+            statusWord={previewUrl ? (language === 'te' ? 'ఫోటో సిద్ధం' : language === 'hi' ? 'फोटो तैयार' : 'Photo Ready') : (language === 'te' ? 'ఫోటో లేదు' : language === 'hi' ? 'फोटो नहीं' : 'No photo yet')}
             spokenText={previewUrl ? 'Leaf photo is loaded and ready for analysis.' : 'Take or upload a photo of the affected plant leaf.'}
           />
 
-          {/* Tile 2: AI Diagnosis Status */}
+          {/* Tile 2: PyTorch MobileNetV2 Diagnosis Status */}
           <PictorialTile
             title={language === 'te' ? 'తెగులు నిర్ధారణ' : language === 'hi' ? 'रोग पहचान' : 'Disease Diagnosis'}
-            phrase={isDiagnosed ? (result?.predicted_disease || 'Diagnosed') : 'Awaiting leaf photo scan'}
-            illustration={<LeafScanIllustration size={80} />}
-            status={isDiagnosed ? (isHealthy ? 'success' : 'danger') : 'demo'}
-            statusWord={isDiagnosed ? (isHealthy ? 'Healthy Leaf' : 'Pest Detected') : 'Waiting'}
-            spokenText={isDiagnosed ? `Diagnosis result: ${result?.predicted_disease} on ${result?.predicted_crop}.` : 'Awaiting leaf photo for automated diagnosis.'}
+            phrase={isDiagnosed ? `${result?.predicted_crop}: ${result?.predicted_disease}` : (language === 'te' ? 'ఆకు ఫోటో స్కాన్ కోసం వేచి ఉంది' : language === 'hi' ? 'पत्ती स्कैन की प्रतीक्षा' : 'Awaiting leaf photo scan')}
+            illustration={isDiagnosed ? <LeafScanIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={isDiagnosed ? (isHealthy ? 'success' : 'danger') : 'nodata'}
+            statusWord={isDiagnosed ? (isHealthy ? (language === 'te' ? 'ఆరోగ్యకరం' : language === 'hi' ? 'स्वस्थ पत्ती' : 'Healthy Leaf') : (language === 'te' ? 'తెగులు గుర్తింపు' : language === 'hi' ? 'रोग मिला' : 'Pest Detected')) : (language === 'te' ? 'స్కాన్ లేదు' : language === 'hi' ? 'स्कैन नहीं' : 'No scan yet')}
+            spokenText={isDiagnosed ? `Diagnosis result: ${result?.predicted_disease} on ${result?.predicted_crop}.` : 'Awaiting leaf photo for automated MobileNetV2 diagnosis.'}
           />
 
           {/* Tile 3: Safe IPM Advisory */}
           <PictorialTile
             title={language === 'te' ? 'సేంద్రీయ నివారణ' : language === 'hi' ? 'जैविक उपाय' : 'Organic IPM Advice'}
-            phrase={result?.safe_ipm_steps?.[0] ? `${result.safe_ipm_steps[0].slice(0, 45)}...` : 'Zero chemical dosages • Safe neem spray'}
-            illustration={<NoDataIllustration size={80} />}
-            status="success"
-            statusWord="Safe Organic"
-            spokenText={result?.safe_ipm_steps?.[0] || 'Safe cultural and biological IPM practices: Spray neem seed kernel extract or bio-fungicides.'}
+            phrase={result?.safe_ipm_steps?.[0] ? `${result.safe_ipm_steps[0].slice(0, 45)}...` : (language === 'te' ? 'తెగులు నిర్ధారణ తర్వాత సలహా కనిపిస్తుంది' : language === 'hi' ? 'जांच के बाद सलाह दिखेगी' : 'IPM steps appear after leaf diagnosis')}
+            illustration={result?.safe_ipm_steps?.[0] ? <LeafScanIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={result?.safe_ipm_steps?.[0] ? 'success' : 'nodata'}
+            statusWord={result?.safe_ipm_steps?.[0] ? (language === 'te' ? 'సేంద్రీయ పద్ధతి' : language === 'hi' ? 'जैविक उपाय' : 'Organic IPM') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={result?.safe_ipm_steps?.[0] || 'Safe cultural and biological IPM practices will appear once a leaf photo is diagnosed.'}
           />
         </div>
 
@@ -405,7 +405,7 @@ export const DiseasePage: React.FC = () => {
         title={t('disease.title')}
         purpose={t('disease.subtitle')}
         whatIsThis={{
-          summary: 'Scans plant leaf photos using deep learning computer vision to recognize foliar diseases, calculate visual confidence, and recommend zero-chemical cultural IPM management.',
+          summary: 'Scans plant leaf photos using a pretrained PyTorch MobileNetV2 computer vision model to recognize foliar diseases, calculate visual confidence, and recommend zero-chemical cultural IPM management.',
           whatToEnter: 'A sharp, well-lit photo of an affected leaf, your crop name, and (optionally) your registered farm holding.',
           whatYouGet: 'Identified condition name, certainty percentage, safe non-chemical management steps, and weather fungal risk indicators.',
         }}

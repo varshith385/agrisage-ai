@@ -28,6 +28,7 @@ import {
   WeatherIllustration,
   ThermometerGauge,
   WaterDropsGauge,
+  NoDataIllustration,
 } from '../components/common/FarmerIllustrations';
 import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
@@ -186,11 +187,12 @@ export const LocationWeatherPage: React.FC = () => {
 
   // PICTORIAL MODE v2
   if (isPictorial) {
-    const tempC = weatherData?.temperature_c ?? 28;
+    const hasWeather = Boolean(weatherData && weatherData.temperature_c != null);
+    const tempC = weatherData?.temperature_c ?? 0;
     const rainMm = weatherData?.expected_rainfall_today_mm ?? 0;
-    const humidity = weatherData?.relative_humidity_pct ?? 55;
-    const windSpeed = weatherData?.wind_speed_kmh ?? 12;
-    const et0Val = weatherData?.reference_et0_mm ?? 4.5;
+    const humidity = weatherData?.relative_humidity_pct ?? 0;
+    const windSpeed = weatherData?.wind_speed_kmh ?? 0;
+    const et0Val = weatherData?.reference_et0_mm ?? 0;
     const isRainy = rainMm > 3;
     const isHot = tempC > 36;
 
@@ -209,7 +211,7 @@ export const LocationWeatherPage: React.FC = () => {
         <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div className="w-20 h-20 rounded-2xl bg-[#E1F5FE] border-2 border-[#1565A8] flex items-center justify-center shrink-0 shadow-sm">
-              <ThermometerGauge tempC={tempC} className="w-10 h-16" />
+              {hasWeather ? <ThermometerGauge tempC={tempC} className="w-10 h-16" /> : <NoDataIllustration size={64} />}
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -217,70 +219,78 @@ export const LocationWeatherPage: React.FC = () => {
                   {selectedVillage || 'Local Village'}, {selectedDistrict || 'District'}
                 </span>
                 <StatusBadge
-                  status={isRainy ? 'info' : isHot ? 'warning' : 'success'}
-                  label={isRainy ? 'Rain Alert' : isHot ? 'High Heat' : 'Comfortable'}
+                  status={hasWeather ? (isRainy ? 'info' : isHot ? 'warning' : 'success') : 'nodata'}
+                  label={hasWeather ? (isRainy ? (language === 'te' ? 'వర్ష సూచన' : language === 'hi' ? 'बारिश चेतावनी' : 'Rain Alert') : isHot ? (language === 'te' ? 'తీవ్ర ఎండ' : language === 'hi' ? 'तीज धूप' : 'High Heat') : (language === 'te' ? 'అనుకూలం' : language === 'hi' ? 'अनुकूल' : 'Comfortable')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No Data')}
                   size="sm"
                 />
               </div>
               <h2 className="font-display text-[24px] sm:text-[30px] font-black text-[#1F2A24] leading-snug">
-                {tempC.toFixed(0)}°C
-                <span className="text-[18px] font-bold text-[#4A5750] ml-3">
-                  {isRainy ? `• ${rainMm} mm Rain Expected` : '• Clear Skies'}
-                </span>
+                {hasWeather ? (
+                  <>
+                    {tempC.toFixed(0)}°C
+                    <span className="text-[18px] font-bold text-[#4A5750] ml-3">
+                      {isRainy ? `• ${rainMm} mm Rain Expected` : (language === 'te' ? '• ఆకాశం నిర్మలంగా ఉంది' : language === 'hi' ? '• आसमान साफ' : '• Clear Skies')}
+                    </span>
+                  </>
+                ) : (
+                  language === 'te' ? 'వాతావరణ డేటా ఇంకా రాలేదు' : language === 'hi' ? 'मौसम डेटा अभी उपलब्ध नहीं' : 'Weather Telemetry Loading'
+                )}
               </h2>
               <p className="text-[16px] text-[#4A5750] max-w-xl">
-                {plainMeaning}
+                {hasWeather ? plainMeaning : (language === 'te' ? 'వాతావరణ సమాచారం లోడ్ అయిన తర్వాత తగిన సలహాలు కనిపిస్తాయి.' : language === 'hi' ? 'मौसम की जानकारी प्राप्त होने के बाद सलाह उपलब्ध होगी।' : 'Open-Meteo weather telemetry will calculate field action recommendations once loaded.')}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
-            <ReadAloudButton
-              text={`Weather for ${selectedVillage}: ${tempC.toFixed(0)} degrees Celsius. ${plainMeaning}`}
-              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
-            />
+            {hasWeather && (
+              <ReadAloudButton
+                text={`Weather for ${selectedVillage}: ${tempC.toFixed(0)} degrees Celsius. ${plainMeaning}`}
+                label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+              />
+            )}
           </div>
         </div>
 
-        {/* 4 Large Pictorial Tiles with Real Values */}
+        {/* 4 Large Pictorial Tiles with REAL Values or Honest No-Data Fallback */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Tile 1: Temperature Gauge */}
           <PictorialTile
             title={language === 'te' ? 'ఉష్ణోగ్రత' : language === 'hi' ? 'तापमान' : 'Temperature'}
-            phrase={`${tempC.toFixed(0)}°C • ${isHot ? 'High heat alert' : 'Comfortable for crops'}`}
-            illustration={<ThermometerGauge tempC={tempC} className="w-12 h-24" />}
-            status={isHot ? 'warning' : 'success'}
-            statusWord={isHot ? 'High Heat' : 'Optimal'}
-            spokenText={`Current temperature is ${tempC.toFixed(0)} degrees Celsius.`}
+            phrase={hasWeather ? `${tempC.toFixed(0)}°C • ${isHot ? (language === 'te' ? 'తీవ్రమైన ఎండ' : language === 'hi' ? 'अधिक तापमान' : 'High heat alert') : (language === 'te' ? 'పంటలకు అనుకూలం' : language === 'hi' ? 'फसलों के लिए उत्तम' : 'Comfortable for crops')}` : (language === 'te' ? 'ఉష్ణోగ్రత డేటా లేదు' : language === 'hi' ? 'तापमान डेटा नहीं है' : 'No temperature data')}
+            illustration={hasWeather ? <ThermometerGauge tempC={tempC} className="w-12 h-24" /> : <NoDataIllustration size={80} />}
+            status={hasWeather ? (isHot ? 'warning' : 'success') : 'nodata'}
+            statusWord={hasWeather ? (isHot ? (language === 'te' ? 'ఎండ హెచ్చరిక' : language === 'hi' ? 'अधिक गर्मी' : 'High Heat') : (language === 'te' ? 'సరైనది' : language === 'hi' ? 'सामान्य' : 'Optimal')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasWeather ? `Current temperature is ${tempC.toFixed(0)} degrees Celsius.` : 'No temperature data loaded yet.'}
           />
 
           {/* Tile 2: Rain & Cloud */}
           <PictorialTile
             title={language === 'te' ? 'వర్ష సూచన' : language === 'hi' ? 'बारिश' : 'Rainfall'}
-            phrase={`${rainMm} mm • ${isRainy ? 'Rain showers likely' : 'No heavy rain'}`}
-            illustration={<WeatherIllustration size={80} />}
-            status={isRainy ? 'info' : 'success'}
-            statusWord={isRainy ? 'Rain Likely' : 'Dry & Clear'}
-            spokenText={`Rain forecast is ${rainMm} millimetres.`}
+            phrase={hasWeather ? `${rainMm} mm • ${isRainy ? (language === 'te' ? 'వర్షపు జల్లులు' : language === 'hi' ? 'बारिश के आसार' : 'Rain showers likely') : (language === 'te' ? 'భారీ వర్షం లేదు' : language === 'hi' ? 'बारिश नहीं' : 'No heavy rain')}` : (language === 'te' ? 'వర్ష సూచన లేదు' : language === 'hi' ? 'वर्षा डेटा नहीं है' : 'No rainfall data')}
+            illustration={hasWeather ? <WeatherIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={hasWeather ? (isRainy ? 'info' : 'success') : 'nodata'}
+            statusWord={hasWeather ? (isRainy ? (language === 'te' ? 'వర్ష సూచన' : language === 'hi' ? 'बारिश संभव' : 'Rain Likely') : (language === 'te' ? 'ఎండ & పొడి' : language === 'hi' ? 'धूप और साफ' : 'Dry & Clear')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasWeather ? `Rain forecast is ${rainMm} millimetres.` : 'No rain forecast data loaded yet.'}
           />
 
           {/* Tile 3: Atmospheric Water Demand (ET0) */}
           <PictorialTile
             title={language === 'te' ? 'ఆవిరయ్యే నీరు' : language === 'hi' ? 'जल वाष्पीकरण' : 'Water Loss (ET0)'}
-            phrase={`${et0Val.toFixed(1)} mm/day demand`}
-            illustration={<WaterDropsGauge dropsCount={et0Val > 5 ? 4 : et0Val > 3 ? 3 : 2} />}
-            status="info"
-            statusWord="Atmospheric"
-            spokenText={`Atmospheric water demand rate is ${et0Val.toFixed(1)} millimetres per day.`}
+            phrase={hasWeather ? `${et0Val.toFixed(1)} mm/day` : (language === 'te' ? 'ఆవిరి లెక్క లేదు' : language === 'hi' ? 'वाष्पीकरण डेटा नहीं' : 'No ET0 calculated')}
+            illustration={hasWeather ? <WaterDropsGauge dropsCount={et0Val > 5 ? 4 : et0Val > 3 ? 3 : 2} /> : <NoDataIllustration size={80} />}
+            status={hasWeather ? 'info' : 'nodata'}
+            statusWord={hasWeather ? (language === 'te' ? 'ఆవిరి రేటు' : language === 'hi' ? 'वाष्पीकरण' : 'Atmospheric') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasWeather ? `Atmospheric water demand rate is ${et0Val.toFixed(1)} millimetres per day.` : 'Atmospheric water demand rate is not available.'}
           />
 
           {/* Tile 4: Humidity & Wind */}
           <PictorialTile
             title={language === 'te' ? 'తేమ & గాలి' : language === 'hi' ? 'हवा और नमी' : 'Wind & Humidity'}
-            phrase={`${humidity}% RH • ${windSpeed} km/h wind`}
-            illustration={<Wind className="w-16 h-16 text-[#1565A8]" />}
-            status="success"
-            statusWord="Normal"
-            spokenText={`Relative humidity is ${humidity} percent, wind speed is ${windSpeed} kilometres per hour.`}
+            phrase={hasWeather ? `${humidity}% RH • ${windSpeed} km/h` : (language === 'te' ? 'గాలి/తేమ డేటా లేదు' : language === 'hi' ? 'हवा/नमी डेटा नहीं' : 'No wind data')}
+            illustration={hasWeather ? <Wind className="w-16 h-16 text-[#1565A8]" /> : <NoDataIllustration size={80} />}
+            status={hasWeather ? 'success' : 'nodata'}
+            statusWord={hasWeather ? (language === 'te' ? 'సాధారణం' : language === 'hi' ? 'सामान्य' : 'Normal') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasWeather ? `Relative humidity is ${humidity} percent, wind speed is ${windSpeed} kilometres per hour.` : 'Humidity and wind data not available.'}
           />
         </div>
 

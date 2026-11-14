@@ -47,7 +47,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { StatusBadge } from '../components/common/StatusBadge';
-import { MoneyProfitIllustration, CoinStackGauge } from '../components/common/FarmerIllustrations';
+import { MoneyProfitIllustration, CoinStackGauge, NoDataIllustration } from '../components/common/FarmerIllustrations';
 import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
@@ -382,7 +382,8 @@ export const EconomicsPage: React.FC = () => {
     const profitVal = liveResult.net_profit;
     const revenueVal = liveResult.gross_revenue;
     const costVal = liveResult.total_cost;
-    const breakEven = liveResult.break_even_price ?? 3800;
+    const hasBreakEven = liveResult.break_even_price != null && liveResult.break_even_price > 0;
+    const breakEven = hasBreakEven ? liveResult.break_even_price! : 0;
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
@@ -408,7 +409,7 @@ export const EconomicsPage: React.FC = () => {
                 </span>
                 <StatusBadge
                   status={isProfit ? 'success' : 'danger'}
-                  label={isProfit ? 'Surplus Projected' : 'Deficit Risk'}
+                  label={isProfit ? (language === 'te' ? 'లాభం సాధ్యం' : language === 'hi' ? 'मुनाफा संभव' : 'Surplus Projected') : (language === 'te' ? 'నష్ట భయం' : language === 'hi' ? 'घाटे का जोखिम' : 'Deficit Risk')}
                   size="sm"
                 />
               </div>
@@ -439,7 +440,7 @@ export const EconomicsPage: React.FC = () => {
             phrase={`₹${Math.round(profitVal).toLocaleString('en-IN')}`}
             illustration={<CoinStackGauge netProfit={profitVal} className="w-20 h-20" />}
             status={isProfit ? 'success' : 'danger'}
-            statusWord={isProfit ? 'Profit Surplus' : 'Deficit Risk'}
+            statusWord={isProfit ? (language === 'te' ? 'లాభం' : language === 'hi' ? 'मुनाफा' : 'Profit Surplus') : (language === 'te' ? 'నష్టం' : language === 'hi' ? 'घाटा' : 'Deficit Risk')}
             spokenText={`Estimated net profit is rupees ${Math.round(profitVal)}.`}
           />
 
@@ -449,7 +450,7 @@ export const EconomicsPage: React.FC = () => {
             phrase={`₹${Math.round(revenueVal).toLocaleString('en-IN')}`}
             illustration={<MoneyProfitIllustration size={80} />}
             status="info"
-            statusWord="Harvest Value"
+            statusWord={language === 'te' ? 'పంట విలువ' : language === 'hi' ? 'फसल मूल्य' : 'Harvest Value'}
             spokenText={`Gross harvest value is rupees ${Math.round(revenueVal)} based on ${sliderYield} quintals per acre.`}
           />
 
@@ -459,18 +460,18 @@ export const EconomicsPage: React.FC = () => {
             phrase={`₹${Math.round(costVal).toLocaleString('en-IN')}`}
             illustration={<Coins className="w-16 h-16 text-[#7A553A]" />}
             status="warning"
-            statusWord="Expenses"
+            statusWord={language === 'te' ? 'ఖర్చులు' : language === 'hi' ? 'लागत' : 'Expenses'}
             spokenText={`Total cultivation cost is rupees ${Math.round(costVal)} across seeds, fertilizer, labour, and irrigation.`}
           />
 
           {/* Tile 4: Break-Even Mandi Price */}
           <PictorialTile
             title={language === 'te' ? 'కనీస విక్రయ ధర' : language === 'hi' ? 'न्यूनतम भाव' : 'Break-even Rate'}
-            phrase={`₹${breakEven.toFixed(0)} / quintal`}
-            illustration={<Scale className="w-16 h-16 text-[#1565A8]" />}
-            status="info"
-            statusWord="Target Price"
-            spokenText={`Break-even selling price is rupees ${breakEven.toFixed(0)} per quintal. Sell above this price to earn profit.`}
+            phrase={hasBreakEven ? `₹${breakEven.toFixed(0)} / quintal` : (language === 'te' ? 'కనీస ధర లేదు' : language === 'hi' ? 'न्यूनतम भाव नहीं' : 'No break-even rate')}
+            illustration={hasBreakEven ? <Scale className="w-16 h-16 text-[#1565A8]" /> : <NoDataIllustration size={80} />}
+            status={hasBreakEven ? 'info' : 'nodata'}
+            statusWord={hasBreakEven ? (language === 'te' ? 'లక్ష్య ధర' : language === 'hi' ? 'लक्ष्य भाव' : 'Target Price') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasBreakEven ? `Break-even selling price is rupees ${breakEven.toFixed(0)} per quintal. Sell above this price to earn profit.` : 'Break-even price cannot be calculated with zero yield.'}
           />
         </div>
 
@@ -601,7 +602,7 @@ export const EconomicsPage: React.FC = () => {
           </p>
           <p className="text-[11px] text-amber-800/90 leading-relaxed">
             {selectedCrop === 'Cotton'
-              ? 'Cotton is excluded from metric yield regressor per MODEL_CARD.md (official DES production recorded in 170 kg bales, not metric tonnes). Expected yield is user-entered.'
+              ? 'Cotton is excluded from metric yield regressor per MODEL_CARD.md (DES historical dataset records production in 170 kg bales, not metric tonnes). Expected yield is user-entered.'
               : 'Expected yield defaults to historical district mean baseline per MODEL_CARD.md until local soil test is confirmed.'}
             {' '}Prices and costs are editable indicative estimates; edit each line item below to match your actual local expenditure.
           </p>
@@ -1409,7 +1410,7 @@ export const EconomicsPage: React.FC = () => {
                   ],
                   limitations: [
                     "Mandi market price service is not yet integrated; price is user's estimate and MSP is unverified.",
-                    "Cotton yield regressor is not supported due to official non-metric bale units (170 kg bales vs tonnes).",
+                    "Cotton yield regressor is not supported due to DES non-metric bale units (170 kg bales vs tonnes).",
                     "Cost templates represent regional indicative benchmarks; actual local costs may differ based on soil and weed pressure.",
                   ],
                 }}

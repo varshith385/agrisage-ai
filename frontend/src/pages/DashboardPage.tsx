@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Leaf,
   Sun,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -46,6 +47,7 @@ import {
   ThermometerGauge,
   CoinStackGauge,
   FarmHealthMeter,
+  NoDataIllustration,
 } from '../components/common/FarmerIllustrations';
 import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
@@ -239,26 +241,71 @@ export const DashboardPage: React.FC = () => {
   const irrigationOutputs = irrigationEnvelope?.outputs as Record<string, any> | undefined;
   const diseaseOutputs = diseaseEnvelope?.outputs as Record<string, any> | undefined;
 
-  // Derive "What should I do today?" from actual outputs
+  // Derive "What should I do today?" strictly from actual outputs
   const todayActionItem = planItems.length > 0 ? planItems[0] : null;
-  const todayActionTitle = todayActionItem
-    ? (language === 'te' && todayActionItem.action_te ? todayActionItem.action_te : language === 'hi' && todayActionItem.action_hi ? todayActionItem.action_hi : todayActionItem.action)
-    : 'Monitor soil moisture and observe lower canopy for bollworm symptoms.';
-  const todayActionReason = todayActionItem
-    ? (language === 'te' && todayActionItem.reason_te ? todayActionItem.reason_te : language === 'hi' && todayActionItem.reason_hi ? todayActionItem.reason_hi : todayActionItem.reason)
-    : 'Current mid-flowering stage requires steady water availability and pest scouting.';
+
+  // Real advisory fields or honest awaiting run state
+  const isIrrigateNow = Boolean(irrigationOutputs?.irrigate_now);
+  const waterDepth = irrigationOutputs?.root_zone_depletion_mm ?? irrigationOutputs?.recommended_depth_mm;
+
+  let todayActionTitle = language === 'te'
+    ? 'ఈరోజు సలహా ఇంకా సిద్ధం కాలేదు'
+    : language === 'hi'
+    ? 'आज की सलाह अभी उपलब्ध नहीं है'
+    : 'No Advisory Generated Yet';
+
+  let todayActionReason = language === 'te'
+    ? 'ఈరోజు పనుల ప్రణాళిక పొందడానికి మల్టీ-ఏజెంట్ అడ్వైజరీని రన్ చేయండి.'
+    : language === 'hi'
+    ? 'आज की व्यक्तिगत कार्य योजना के लिए Multi-Agent सलाह चलाएं।'
+    : 'Click Run Advisory below to analyze live field conditions and generate today\'s action.';
+
+  if (todayActionItem) {
+    todayActionTitle = language === 'te' && todayActionItem.action_te
+      ? todayActionItem.action_te
+      : language === 'hi' && todayActionItem.action_hi
+      ? todayActionItem.action_hi
+      : todayActionItem.action;
+
+    todayActionReason = language === 'te' && todayActionItem.reason_te
+      ? todayActionItem.reason_te
+      : language === 'hi' && todayActionItem.reason_hi
+      ? todayActionItem.reason_hi
+      : todayActionItem.reason;
+
+    // Resolve any contradiction between action text and irrigation water balance
+    if (!isIrrigateNow && (waterDepth !== undefined && waterDepth <= 15) && todayActionTitle.toLowerCase().startsWith('irrigate')) {
+      todayActionTitle = language === 'te'
+        ? 'నేలలో తేమను పరిశీలించండి'
+        : language === 'hi'
+        ? 'मिट्टी की नमी का निरीक्षण करें'
+        : 'Inspect soil moisture (adequate reserves)';
+      todayActionReason = language === 'te'
+        ? 'నేలలో తగినంత తేమ ఉంది. ఈరోజు నీరు పెట్టవలసిన అవసరం లేదు.'
+        : language === 'hi'
+        ? 'मिट्टी में पर्याप्त नमी है, आज सिंचाई की आवश्यकता नहीं है।'
+        : 'Current root-zone moisture reserves are adequate; defer irrigation.';
+    }
+  }
 
   // =========================================================================
   // PICTORIAL MODE VIEW: Big Icons, 1 Short Phrase, Audio Read-Aloud
   // =========================================================================
   if (isPictorial) {
-    const weatherTemp = weatherData?.temperature_c ?? 28;
+    const hasWeather = Boolean(weatherData && weatherData.temperature_c != null);
+    const weatherTemp = weatherData?.temperature_c;
     const weatherRain = weatherData?.expected_rainfall_today_mm ?? 0;
-    const waterDepth = irrigationOutputs?.root_zone_depletion_mm ?? (irrigationOutputs?.recommended_depth_mm ?? 15);
+
+    const hasIrrigation = Boolean(irrigationOutputs && (irrigationOutputs.root_zone_depletion_mm != null || irrigationOutputs.recommended_depth_mm != null));
+    const effectiveWaterDepth = irrigationOutputs?.root_zone_depletion_mm ?? (irrigationOutputs?.recommended_depth_mm ?? 0);
+
+    const hasDiseaseData = Boolean(diseaseOutputs && diseaseOutputs.detected !== undefined);
     const hasDisease = Boolean(diseaseOutputs?.detected);
+
     const rawProfitStr = String(economicsSummary?.combined_summary?.net_profit || '').replace(/,/g, '');
     const parsedProfit = Number(rawProfitStr);
-    const estProfit = !isNaN(parsedProfit) && rawProfitStr.trim() !== '' ? parsedProfit : 45000;
+    const hasEconomics = !isNaN(parsedProfit) && rawProfitStr.trim() !== '' && economicsSummary != null;
+    const estProfit = hasEconomics ? parsedProfit : 0;
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
@@ -275,14 +322,22 @@ export const DashboardPage: React.FC = () => {
         <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div className="w-20 h-20 rounded-2xl bg-[#FFF8E1] border-2 border-[#F2B01E] flex items-center justify-center shrink-0 shadow-sm">
-              <WateringCanIllustration size={64} />
+              {todayActionItem ? (
+                isIrrigateNow ? <WateringCanIllustration size={64} /> : <LeafScanIllustration size={64} />
+              ) : (
+                <NoDataIllustration size={64} />
+              )}
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-center sm:justify-start gap-2">
                 <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
                   {language === 'te' ? 'ఈరోజు చేయాల్సిన పని' : language === 'hi' ? 'आज का मुख्य कार्य' : 'Do This Today'}
                 </span>
-                <StatusBadge status="warning" label="Priority Action" size="sm" />
+                <StatusBadge
+                  status={todayActionItem ? 'warning' : 'nodata'}
+                  label={todayActionItem ? (language === 'te' ? 'ముఖ్యమైన పని' : language === 'hi' ? 'प्राथमिकता' : 'Priority Action') : (language === 'te' ? 'సలహా పెండింగ్' : language === 'hi' ? 'लंबित' : 'Awaiting Run')}
+                  size="sm"
+                />
               </div>
               <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
                 {todayActionTitle}
@@ -297,26 +352,38 @@ export const DashboardPage: React.FC = () => {
               text={`${todayActionTitle}. ${todayActionReason}`}
               label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
             />
-            <Link
-              to="/irrigation"
-              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
-            >
-              <span>{language === 'te' ? 'నీటి తడి చూడండి' : language === 'hi' ? 'पानी देखें' : 'Check Water'}</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            {todayActionItem ? (
+              <Link
+                to={isIrrigateNow ? '/irrigation' : '/disease'}
+                className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
+              >
+                <span>{isIrrigateNow ? (language === 'te' ? 'నీటి తడి చూడండి' : language === 'hi' ? 'पानी देखें' : 'Check Water') : (language === 'te' ? 'వివరాలు చూడండి' : language === 'hi' ? 'विवरण देखें' : 'View Action')}</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={handleTriggerAgentRun}
+                disabled={isTriggering}
+                className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all disabled:opacity-60"
+              >
+                <Sparkles className={`w-5 h-5 ${isTriggering ? 'animate-spin' : 'text-[#F2B01E]'}`} />
+                <span>{isTriggering ? (language === 'te' ? 'విశ్లేషిస్తోంది...' : language === 'hi' ? 'विश्लेषण जारी...' : 'Analyzing...') : (language === 'te' ? 'సలహా ప్రారంభించండి' : language === 'hi' ? 'सलाह शुरू करें' : 'Run Advisory')}</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* 4 Large Pictorial Tiles with Real-Value Gauges */}
+        {/* 4 Large Pictorial Tiles with REAL-Value Gauges or Grey No-Data Fallback */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Tile 1: Weather & Temperature */}
           <PictorialTile
             title={language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम' : 'Weather'}
-            phrase={`${weatherTemp}°C • ${weatherRain > 0 ? `${weatherRain}mm Rain` : 'Clear Sky'}`}
-            illustration={<ThermometerGauge tempC={weatherTemp} />}
-            status={weatherRain > 0 ? 'info' : 'success'}
-            statusWord={weatherRain > 0 ? 'Rain Likely' : 'Dry & Warm'}
-            spokenText={`Weather is ${weatherTemp} degrees celsius. Rain forecast is ${weatherRain} millimetres.`}
+            phrase={hasWeather ? `${weatherTemp}°C • ${weatherRain > 0 ? `${weatherRain}mm Rain` : (language === 'te' ? 'ఎండగా ఉంది' : language === 'hi' ? 'मौसम साफ' : 'Clear Sky')}` : (language === 'te' ? 'వాతావరణ వివరాలు లేవు' : language === 'hi' ? 'मौसम डेटा उपलब्ध नहीं' : 'No weather data yet')}
+            illustration={hasWeather ? <ThermometerGauge tempC={weatherTemp!} /> : <NoDataIllustration size={80} />}
+            status={hasWeather ? (weatherRain > 0 ? 'info' : 'success') : 'nodata'}
+            statusWord={hasWeather ? (weatherRain > 0 ? (language === 'te' ? 'వర్ష సూచన' : language === 'hi' ? 'बारिश संभव' : 'Rain Likely') : (language === 'te' ? 'ఎండ & పొడి' : language === 'hi' ? 'धूप और साफ' : 'Dry & Warm')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasWeather ? `Weather is ${weatherTemp} degrees celsius. Rain forecast is ${weatherRain} millimetres.` : 'No weather forecast data loaded yet.'}
             detailsLink="/setup"
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -324,11 +391,11 @@ export const DashboardPage: React.FC = () => {
           {/* Tile 2: Water Demand */}
           <PictorialTile
             title={language === 'te' ? 'నీటి తడులు' : language === 'hi' ? 'सिंचाई' : 'Irrigation'}
-            phrase={waterDepth > 15 ? 'Irrigate in 2 days' : 'Moisture is adequate'}
-            illustration={<WaterDropsGauge dropsCount={waterDepth > 25 ? 4 : waterDepth > 15 ? 3 : 2} />}
-            status={waterDepth > 15 ? 'warning' : 'success'}
-            statusWord={waterDepth > 15 ? 'Water Soon' : 'Moist Soil'}
-            spokenText={`Irrigation water depletion is ${waterDepth} millimetres. ${waterDepth > 15 ? 'Prepare to irrigate in two days.' : 'Soil moisture is currently adequate.'}`}
+            phrase={hasIrrigation ? (isIrrigateNow ? (language === 'te' ? 'పొలానికి నీరు పెట్టాలి' : language === 'hi' ? 'सिंचाई की आवश्यकता है' : 'Irrigate today') : (language === 'te' ? 'నేలలో తగినంత తేమ ఉంది' : language === 'hi' ? 'मिट्टी में पर्याप्त नमी है' : 'Moisture is adequate')) : (language === 'te' ? 'నీటి లెక్కలు ఇంకా చేయలేదు' : language === 'hi' ? 'सिंचाई गणना उपलब्ध नहीं' : 'No irrigation run yet')}
+            illustration={hasIrrigation ? <WaterDropsGauge dropsCount={effectiveWaterDepth > 25 ? 4 : effectiveWaterDepth > 15 ? 3 : 2} /> : <NoDataIllustration size={80} />}
+            status={hasIrrigation ? (isIrrigateNow ? 'warning' : 'success') : 'nodata'}
+            statusWord={hasIrrigation ? (isIrrigateNow ? (language === 'te' ? 'నీరు అవసరం' : language === 'hi' ? 'पानी चाहिए' : 'Water Soon') : (language === 'te' ? 'తేమ సరిపోయింది' : language === 'hi' ? 'नमी पर्याप्त' : 'Moist Soil')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasIrrigation ? `Irrigation water depletion is ${effectiveWaterDepth} millimetres. ${isIrrigateNow ? 'Watering is required.' : 'Soil moisture is currently adequate.'}` : 'No irrigation calculation yet. Run multi-agent advisory to compute water balance.'}
             detailsLink="/irrigation"
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -336,11 +403,11 @@ export const DashboardPage: React.FC = () => {
           {/* Tile 3: Leaf & Crop Health */}
           <PictorialTile
             title={language === 'te' ? 'పంట ఆరోగ్యం' : language === 'hi' ? 'फसल स्वास्थ्य' : 'Crop Health'}
-            phrase={hasDisease ? 'Pest spots observed' : 'Canopy green & healthy'}
-            illustration={<LeafScanIllustration size={80} />}
-            status={hasDisease ? 'danger' : 'success'}
-            statusWord={hasDisease ? 'Pest Alert' : 'Clean Canopy'}
-            spokenText={hasDisease ? 'Pest detected. Open disease scanner for organic IPM treatment.' : 'Canopy is healthy with no disease symptoms detected.'}
+            phrase={hasDiseaseData ? (hasDisease ? (language === 'te' ? 'తెగులు గుర్తించబడింది' : language === 'hi' ? 'कीट या रोग पाया गया' : 'Pest spots observed') : (language === 'te' ? 'ఆకు ఆరోగ్యంగా ఉంది' : language === 'hi' ? 'पत्ती स्वस्थ है' : 'Canopy green & healthy')) : (language === 'te' ? 'ఆకు ఫోటో ఇంకా తీయలేదు' : language === 'hi' ? 'पत्ती का फोटो अभी नहीं लिया' : 'No leaf scanned yet')}
+            illustration={hasDiseaseData ? <LeafScanIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={hasDiseaseData ? (hasDisease ? 'danger' : 'success') : 'nodata'}
+            statusWord={hasDiseaseData ? (hasDisease ? (language === 'te' ? 'తెగులు హెచ్చరిక' : language === 'hi' ? 'रोग चेतावनी' : 'Pest Alert') : (language === 'te' ? 'ఆరోగ్యకరం' : language === 'hi' ? 'स्वस्थ' : 'Clean Canopy')) : (language === 'te' ? 'స్కాన్ లేదు' : language === 'hi' ? 'स्कैन नहीं' : 'No scan yet')}
+            spokenText={hasDiseaseData ? (hasDisease ? 'Pest detected. Open disease scanner for organic IPM treatment.' : 'Canopy is healthy with no disease symptoms detected.') : 'No crop leaf has been scanned yet. Tap to take or upload a leaf photo.'}
             detailsLink="/disease"
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -348,34 +415,46 @@ export const DashboardPage: React.FC = () => {
           {/* Tile 4: Farm Economics / Profit */}
           <PictorialTile
             title={language === 'te' ? 'ఖర్చులు & లాభం' : language === 'hi' ? 'खर्च और मुनाफा' : 'Farm Profit'}
-            phrase={`Net: ₹${Math.round(estProfit).toLocaleString('en-IN')}`}
-            illustration={<CoinStackGauge netProfit={estProfit} />}
-            status={estProfit >= 0 ? 'success' : 'danger'}
-            statusWord={economicsSummary ? 'Modelled' : 'DEMO DATA'}
-            spokenText={`Estimated net profit is rupees ${Math.round(estProfit)}. Modelled calculation based on yield and market price.`}
+            phrase={hasEconomics ? `Net: ₹${Math.round(estProfit).toLocaleString('en-IN')}` : (language === 'te' ? 'ఆదాయం వివరాలు లేవు' : language === 'hi' ? 'मुनाफा डेटा नहीं है' : 'No profit loaded')}
+            illustration={hasEconomics ? <CoinStackGauge netProfit={estProfit} /> : <NoDataIllustration size={80} />}
+            status={hasEconomics ? (estProfit >= 0 ? 'success' : 'danger') : 'nodata'}
+            statusWord={hasEconomics ? (language === 'te' ? 'నమూనా లెక్క' : language === 'hi' ? 'मॉडल किया गया' : 'Modelled') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasEconomics ? `Estimated net profit is rupees ${Math.round(estProfit)}. Modelled calculation based on yield and market price.` : 'No profit estimate loaded yet.'}
             detailsLink="/economics"
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
         </div>
 
-        {/* Indicative Farm Health Meter */}
+        {/* Real Farm Health Meter or Honest Awaiting Run Placeholder */}
         <div className="bg-white rounded-3xl border-2 border-[#D9D4C7] p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <h3 className="font-display text-[20px] font-bold text-[#1B5E3B]">
                 {language === 'te' ? 'మొత్తం పొలం రేటింగ్' : language === 'hi' ? 'खेत समग्र स्कोर' : 'Overall Farm Health'}
               </h3>
-              <StatusBadge status="demo" label="DEMO DATA" size="sm" />
+              <StatusBadge
+                status={healthBreakdown?.score != null ? 'info' : 'nodata'}
+                label={healthBreakdown?.score != null ? 'Multi-Agent Evaluated' : 'Awaiting Run'}
+                size="sm"
+              />
             </div>
             <p className="text-[16px] text-[#4A5750]">
-              Indicative: 88/100 (DEMO DATA • details to verify)
+              {healthBreakdown?.score != null
+                ? `Health Score: ${healthBreakdown.score}/100 (Advisory model)`
+                : (language === 'te' ? 'సమగ్ర స్కోరు ఇంకా సిద్ధం కాలేదు (సలహాను రన్ చేయండి)' : language === 'hi' ? 'समग्र स्कोर अभी उपलब्ध नहीं (सलाह चलाएं)' : 'No score yet (Run advisory to calculate)')}
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <FarmHealthMeter score={88} />
+            {healthBreakdown?.score != null ? (
+              <FarmHealthMeter score={healthBreakdown.score} />
+            ) : (
+              <NoDataIllustration size={64} />
+            )}
             <ReadAloudButton
-              text="Indicative farm health score is 88 out of 100. This is demo data based on weather, water, and pest telemetry."
-              label="Listen"
+              text={healthBreakdown?.score != null
+                ? `Farm health score is ${healthBreakdown.score} out of 100.`
+                : 'Farm health score has not been evaluated yet. Run the multi-agent advisory to compute score.'}
+              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
             />
           </div>
         </div>
@@ -669,7 +748,7 @@ export const DashboardPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            Farm Health Score ({healthBreakdown?.score ? `${healthBreakdown.score}/100` : 'Indicative: 88/100 (DEMO DATA)'})
+            Farm Health Score ({healthBreakdown?.score ? `${healthBreakdown.score}/100` : 'Awaiting Run (No score yet)'})
           </button>
           <button
             type="button"
@@ -807,7 +886,7 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-[#E4EDE8] rounded-2xl border border-[#183D2E]/20">
                 <div>
                   <h4 className="font-display text-lg font-bold text-[#183D2E]">
-                    Farm Health Score: {healthBreakdown?.score ? `${healthBreakdown.score} / 100` : '88 / 100 (DEMO DATA • details to verify)'}
+                    Farm Health Score: {healthBreakdown?.score ? `${healthBreakdown.score} / 100` : 'Awaiting Run (No score yet)'}
                   </h4>
                   <p className="text-xs text-[#183D2E]/80">
                     {healthBreakdown?.formula_description || 'Modelled multi-factor indicator: soil moisture, weather stress, and pest incidence (details to verify).'}

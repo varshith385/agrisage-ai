@@ -171,3 +171,32 @@ The following translations were added in Round 2 Phase C for the mode toggle her
 | **Gauges** | Leaf Disease | ఆకు తెగుళ్లు | पत्ती रोग | **Unverified**: Needs native review. |
 | **Gauges** | Farm Profit | వ్యవసాయ లాభం | खेत का मुनाफा | **Unverified**: Needs native review. |
 | **Gauges** | Farm Health | పొలం ఆరోగ్యం | खेत का स्वास्थ्य | **Unverified**: Needs native review. |
+
+
+---
+
+## 8. Round 3 Pictorial Summary & Honesty Additions (Unverified — Awaiting Native Review)
+
+The following translations were added in Round 3 for grey no-data states, honest parser notifications, and 3-tile pictorial summaries across Crop Recommendation, Calendar, Market, and Community:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **No-Data State** | No data yet | డేటా అందుబాటులో లేదు | अभी कोई डेटा नहीं | **Unverified**: Needs native review. |
+| **No-Data State** | Awaiting Run | రన్ కోసం వేచి ఉంది | परिणाम प्रतीक्षित | **Unverified**: Needs native review. |
+| **No-Data State** | No scan yet | ఇంకా ఫోటో తీయలేదు | अभी कोई स्कैन नहीं | **Unverified**: Needs native review. |
+| **No-Data State** | No advice yet | సలహా అందుబాటులో లేదు | कोई सलाह नहीं | **Unverified**: Needs native review. |
+| **No-Data State** | No Soil Card Recorded Yet | నేల పరీక్ష రికార్డు నమోదు కాలేదు | कोई सॉइल टेस्ट दर्ज नहीं है | **Unverified**: Needs native review. |
+| **Crop Rec Pictorial** | Best Match | ఉత్తమ పంట ఎంపిక | सबसे उपयुक्त फसल | **Unverified**: Needs native review. |
+| **Crop Rec Pictorial** | Crop Rotation | పంట మార్పిడి | फसल चक्र | **Unverified**: Needs native review. |
+| **Crop Rec Pictorial** | Soil Nutrients | నేల పోషకాలు (N-P-K) | मिट्टी के पोषक तत्व | **Unverified**: Needs native review. |
+| **Calendar Pictorial** | Crop Days (DAS) | నాటిన రోజుల సంఖ్య | बुवाई के दिन | **Unverified**: Needs native review. |
+| **Calendar Pictorial** | Next Field Task | తదుపరి పని | अगला कृषि कार्य | **Unverified**: Needs native review. |
+| **Calendar Pictorial** | Growth Stages | పంట దశలు | फसल चरण | **Unverified**: Needs native review. |
+| **Market Pictorial** | Top Mandi | ఉత్తమ మండి | सबसे अच्छी मंडी | **Unverified**: Needs native review. |
+| **Market Pictorial** | MSP Benchmark | కనీస మద్దతు ధర (MSP) | न्यूनतम समर्थन मूल्य (MSP) | **Unverified**: Needs native review. |
+| **Market Pictorial** | Direct Trade | రైతు విక్రయాలు | किसान खरीद-बिक्री | **Unverified**: Needs native review. |
+| **Community Pictorial**| Machinery Rental | యంత్రాల అద్దె | कृषि यंत्र किराया | **Unverified**: Needs native review. |
+| **Community Pictorial**| Transport Pooling | సరుకు రవాణా | साझा परिवहन | **Unverified**: Needs native review. |
+| **Community Pictorial**| Outbreak Radar | తెగుళ్ల హెచ్చరిక మ్యాప్ | कीट प्रकोप नक्शा | **Unverified**: Needs native review. |
+| **Parser Status** | Manual Entry & Text Parsing | మాన్యువల్ ఎంట్రీ & టెక్స్ట్ పార్సింగ్ (OCR లేదు) | मैन्युअल प्रविष्टि व टेक्स्ट विश्लेषण (कोई OCR नहीं) | **Unverified**: Needs native review. |
+| **Parser Status** | Verify against physical card | భద్రపరిచే ముందు మీ అసలు పత్రంతో సరిచూసుకోండి | सहेजने से पहले अपने कार्ड से मिलान अवश्य करें | **Unverified**: Needs native review. |

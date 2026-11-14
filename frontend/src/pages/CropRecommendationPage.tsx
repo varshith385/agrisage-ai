@@ -24,11 +24,14 @@ import { ExplainCard } from '../components/common/ExplainCard';
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { EmptyPlotIllustration } from '../components/common/FarmerIllustrations';
+import { EmptyPlotIllustration, NoDataIllustration, LeafScanIllustration } from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StatusBadge } from '../components/common/StatusBadge';
 
 export const CropRecommendationPage: React.FC = () => {
   const { t, language } = useTranslation();
-  const { isPictorial } = usePictorial();
+  const { isPictorial, setMode } = usePictorial();
   const { activeCrop } = useAuth();
 
   // ML Recommendation Inputs
@@ -105,61 +108,104 @@ export const CropRecommendationPage: React.FC = () => {
     ? `The most suitable crop for your soil and weather is ${topCrop.crop_name} with ${(topCrop.probability * 100).toFixed(0)}% agro-climatic alignment. Following previous ${prevCrop}, rotating with ${topRotation?.crop_name || 'legumes'} will restore soil nutrients.`
     : 'Evaluating crop suitability and restorative rotation sequence...';
 
-  // PICTORIAL MODE
+  // PICTORIAL MODE v2
   if (isPictorial) {
+    const hasTopCrop = Boolean(topCrop);
+    const hasRotation = Boolean(topRotation);
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
+        {/* Giant Mode & Language Switcher at Top */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={Sprout}
-          title={language === 'te' ? 'పంట సిఫార్సు' : language === 'hi' ? 'फसल चयन' : 'Crop Advisory'}
+          title={language === 'te' ? 'పంట సిఫార్సు' : language === 'hi' ? 'फसल चयन' : 'Crop Recommendation'}
           purpose={language === 'te' ? 'మీ నేల మరియు వాతావరణానికి తగిన పంటను ఎంచుకోండి' : language === 'hi' ? 'अपनी मिट्टी और मौसम के लिए सबसे सही फसल चुनें' : 'Visual crop recommendation based on soil and weather.'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <EmptyPlotIllustration className="w-48 h-36 drop-shadow-sm" />
-          </div>
-
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            {topCrop ? `Best Crop: ${topCrop.crop_name}` : 'Evaluating Crops...'}
-          </h2>
-
-          {topCrop && (
-            <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-2 text-left">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#183D2E] text-white">
-                  Rank #1 Match
+        {/* Lead "Do This Today" Best Crop Match Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#E8F5E9] border-2 border-[#1B5E3B] flex items-center justify-center shrink-0 shadow-sm">
+              {hasTopCrop ? <LeafScanIllustration size={64} /> : <NoDataIllustration size={64} />}
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {language === 'te' ? 'ఉత్తమ పంట' : language === 'hi' ? 'सर्वोत्तम फसल' : 'Recommended Crop'}
                 </span>
-                <span className="text-sm font-mono font-bold text-[#183D2E]">
-                  {(topCrop.probability * 100).toFixed(0)}%
-                </span>
+                <StatusBadge
+                  status={hasTopCrop ? 'success' : 'nodata'}
+                  label={hasTopCrop ? `${(topCrop!.probability * 100).toFixed(0)}% Match` : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No Data')}
+                  size="sm"
+                />
               </div>
-              <h3 className="text-xl font-bold text-[#183D2E] capitalize">
-                {topCrop.crop_name}
-              </h3>
-              <p className="text-xs text-[#4E5F57]">
-                {topCrop.reasons[0] || 'High agro-climatic match for current season.'}
+              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
+                {hasTopCrop
+                  ? `${topCrop!.crop_name} (${(topCrop!.probability * 100).toFixed(0)}% Match)`
+                  : (language === 'te' ? 'పంట సిఫార్సు ఇంకా లెక్కింపబడలేదు' : language === 'hi' ? 'फसल चयन अभी नहीं हुआ' : 'Awaiting Crop Evaluation')}
+              </h2>
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
+                {hasTopCrop ? plainMeaning : (language === 'te' ? 'మీ నేల పోషకాలు మరియు వాతావరణం ఆధారంగా ఉత్తమ పంటను సిఫార్సు చేయడానికి వివరాలు నమోదు చేయండి.' : language === 'hi' ? 'मिट्टी और मौसम के अनुसार सर्वोत्तम फसल जानने के लिए जानकारी भरें।' : 'Fill soil NPK and climate values in details view to evaluate suitable crops.')}
               </p>
             </div>
-          )}
-
-          {topRotation && (
-            <div className="bg-white rounded-2xl p-4 border border-[#7A553A]/20 shadow-sm text-left space-y-1">
-              <span className="text-[10px] font-bold text-[#7A553A] uppercase block">
-                Restorative Rotation
-              </span>
-              <p className="text-sm font-bold text-[#183D2E]">
-                After {prevCrop} → Plant {topRotation.crop_name}
-              </p>
-              <p className="text-xs text-[#4E5F57]">
-                {topRotation.rationale}
-              </p>
-            </div>
-          )}
-
-          <div className="pt-2">
-            <ReadAloudButton text={`Recommended crop is ${topCrop?.crop_name || 'pulses'}. ${plainMeaning}`} />
           </div>
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            {hasTopCrop && (
+              <ReadAloudButton
+                text={`Best crop is ${topCrop!.crop_name}. ${plainMeaning}`}
+                label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => setMode('words')}
+              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
+            >
+              <span>{language === 'te' ? 'పూర్తి వివరాలు' : language === 'hi' ? 'पूरा विवरण' : 'See Details'}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* 3 Pictorial Summary Tiles with Real Values */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Tile 1: Top Suitable Crop */}
+          <PictorialTile
+            title={language === 'te' ? 'అత్యంత అనుకూల పంట' : language === 'hi' ? 'उपयुक्त फसल' : 'Best Match'}
+            phrase={hasTopCrop ? `${topCrop!.crop_name} • ${(topCrop!.probability * 100).toFixed(0)}% match` : (language === 'te' ? 'పంట ఇంకా నిర్ణయించలేదు' : language === 'hi' ? 'फसल तय नहीं' : 'No crop matched yet')}
+            illustration={hasTopCrop ? <LeafScanIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={hasTopCrop ? 'success' : 'nodata'}
+            statusWord={hasTopCrop ? (language === 'te' ? 'అగ్ర ఎంపిక' : language === 'hi' ? 'शीर्ष पसंद' : 'Rank #1') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasTopCrop ? `Recommended crop is ${topCrop!.crop_name} with ${(topCrop!.probability * 100).toFixed(0)} percent suitability.` : 'No crop recommendation calculated yet.'}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 2: Restorative Crop Rotation */}
+          <PictorialTile
+            title={language === 'te' ? 'పంట మార్పిడి' : language === 'hi' ? 'फसल चक्र' : 'Crop Rotation'}
+            phrase={hasRotation ? `After ${prevCrop} → ${topRotation!.crop_name}` : (language === 'te' ? 'మార్పిడి ప్రణాళిక లేదు' : language === 'hi' ? 'चक्र योजना नहीं' : 'No rotation plan yet')}
+            illustration={hasRotation ? <EmptyPlotIllustration size={80} /> : <NoDataIllustration size={80} />}
+            status={hasRotation ? 'info' : 'nodata'}
+            statusWord={hasRotation ? (language === 'te' ? 'నేల రక్షణ' : language === 'hi' ? 'भूमि सुधार' : 'Restorative') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            spokenText={hasRotation ? `Recommended rotation after ${prevCrop} is ${topRotation!.crop_name}. ${topRotation!.rationale}` : 'No rotation sequence calculated yet.'}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 3: Soil Nutrients Evaluated */}
+          <PictorialTile
+            title={language === 'te' ? 'నేల పోషకాలు' : language === 'hi' ? 'मिट्टी के पोषक तत्व' : 'Soil Nutrients'}
+            phrase={omitSoil ? 'Weather-only evaluation' : `N: ${n} • P: ${p} • K: ${k}`}
+            illustration={<Sprout className="w-16 h-16 text-[#1B5E3B]" />}
+            status="info"
+            statusWord={omitSoil ? 'Weather Only' : 'Soil NPK'}
+            spokenText={omitSoil ? 'Evaluating recommendations using climate parameters only.' : `Soil nutrients evaluated: Nitrogen ${n}, Phosphorus ${p}, Potassium ${k}.`}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
         </div>
       </div>
     );
