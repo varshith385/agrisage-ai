@@ -44,8 +44,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="AgriSage AI API",
-    description="Multi-agent smart agriculture intelligence system for the Yuktik 2026 hackathon.",
+    title="Grow2Gain API",
+    description="Multi-agent smart agriculture intelligence system.",
     version="1.0.0",
     lifespan=lifespan,
 )

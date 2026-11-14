@@ -1,5 +1,5 @@
 /**
- * AgriSage AI — Voice Assistant API Client
+ * Grow2Gain — Voice Assistant API Client
  * Module 21: /api/v1/voice
  */
 

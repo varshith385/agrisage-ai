@@ -1,4 +1,4 @@
-# AgriSage AI — Antigravity Prompt Pack (Yuktik 2026)
+# Grow2Gain — Antigravity Prompt Pack
 
 ## 0. What is going on (read this first)
 

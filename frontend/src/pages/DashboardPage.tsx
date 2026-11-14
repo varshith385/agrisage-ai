@@ -212,7 +212,7 @@ export const DashboardPage: React.FC = () => {
       return `Day ${item.day_number}: ${act}. ${rsn}`;
     });
 
-    const fullScript = `AgriSage Farm Advisory Plan for ${cropName}. ` + spokenLines.join('. ');
+    const fullScript = `Grow2Gain Farm Advisory Plan for ${cropName}. ` + spokenLines.join('. ');
 
     const utterance = new SpeechSynthesisUtterance(fullScript);
     utterance.lang = langCode;

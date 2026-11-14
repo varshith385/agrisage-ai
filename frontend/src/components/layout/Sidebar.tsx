@@ -99,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
       }`}>
         <Link
           to="/dashboard"
-          title="AgriSage AI Dashboard"
+          title="Grow2Gain Dashboard"
           className="flex items-center gap-3 group min-w-0"
         >
           <div className="w-10 h-10 rounded-2xl bg-[#F2B01E] text-[#1F2A24] flex items-center justify-center font-black shadow-xs group-hover:scale-105 transition-transform shrink-0">
@@ -304,7 +304,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
 
         {!isCollapsed && (
           <div className="text-[10px] text-white/50 text-center tracking-tight">
-            Yuktik 2026 &bull; FAO-56 Calibrated
+            Grow2Gain &bull; FAO-56 Calibrated
           </div>
         )}
       </div>

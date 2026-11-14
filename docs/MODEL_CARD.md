@@ -1,4 +1,4 @@
-# AgriSage AI — Model Cards (`docs/MODEL_CARD.md`)
+# Grow2Gain — Model Cards (`docs/MODEL_CARD.md`)
 
 **Yuktik 2026 Hackathon | Synchronized Model Documentation**
 

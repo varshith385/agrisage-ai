@@ -1,5 +1,5 @@
 """
-AgriSage AI — English Keywords & Small Talk
+Grow2Gain — English Keywords & Small Talk
 """
 
 GREETINGS = [
@@ -89,12 +89,12 @@ SUGGESTION_CHIPS = [
 
 RESPONSES = {
     "greeting": (
-        "Hello! I am AgriSage AI, your agronomic assistant. I can help you with: "
+        "Hello! I am Grow2Gain, your agronomic assistant. I can help you with: "
         "1. Live Weather forecasts, 2. Live Irrigation crop water budgets, 3. Live Plant Disease diagnosis, "
         "4. Live Farm Economics & profit simulation, and 5. Mandi Market prices (Demo). How can I help your farm today?"
     ),
     "about": (
-        "I am AgriSage AI, an agronomic decision support assistant for Indian farmers. "
+        "I am Grow2Gain, an agronomic decision support assistant for Indian farmers. "
         "Working features include Live Weather, Irrigation Budgeting, Disease Scanner, and Farm Economics, "
         "plus Mandi Prices (Demo). Government schemes are not available on this version. What would you like to check?"
     ),

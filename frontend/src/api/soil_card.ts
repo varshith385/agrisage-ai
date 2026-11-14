@@ -1,5 +1,5 @@
 /**
- * AgriSage AI — Soil Health Card API Client
+ * Grow2Gain — Soil Health Card API Client
  * Module 20: /api/v1/soil-card
  */
 

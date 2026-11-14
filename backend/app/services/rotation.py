@@ -25,7 +25,7 @@ CROP_FAMILY_MAP: Dict[str, str] = {
     "greengram": "Fabaceae (Leguminosae)",
 }
 
-# Agronomic citation notes strictly marked per Yuktik Honesty Rules
+# Agronomic citation notes strictly marked per Honesty Rules
 LEGUME_FIXATION_CITATION = "Biological nitrogen fixation principles (to verify - source not checked)"
 PEST_BREAK_CITATION = "Crop family pathogen and pest cycle break principles (to verify - source not checked)"
 SOIL_STRUCTURE_CITATION = "Soil aeration and moisture conservation rotation principles (to verify - source not checked)"

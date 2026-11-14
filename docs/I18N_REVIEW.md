@@ -1,4 +1,4 @@
-# AgriSage AI — Internationalization & Translation Review Registry (`docs/I18N_REVIEW.md`)
+# Grow2Gain — Internationalization & Translation Review Registry (`docs/I18N_REVIEW.md`)
 
 **Date:** 2026-11-13  
 **Languages:** English (`en`), Telugu (`te`), Hindi (`hi`)  

@@ -554,7 +554,7 @@ def get_price_trends_and_forecast(crop: str, mandi_name: Optional[str] = None) -
 
     disclaimer = (
         "Indicative seasonal pattern and trend estimate based on historical APMC arrivals. "
-        "In accordance with AgriSage AI Honesty Rules, this is an indicative statistical signal, "
+        "In accordance with Grow2Gain Honesty Rules, this is an indicative statistical signal, "
         "never an absolute price guarantee. Actual prices depend on export policy, international futures, and daily arrivals."
     )
 
@@ -570,7 +570,7 @@ def get_price_trends_and_forecast(crop: str, mandi_name: Optional[str] = None) -
         disclaimer=disclaimer,
         is_indicative=True,
         status="DEMO",
-        source="AgriSage Demo Historical Mandi Prices (datasets/demo/historical_prices.csv)",
+        source="Grow2Gain Demo Historical Mandi Prices (datasets/demo/historical_prices.csv)",
         demo=True,
     )
 

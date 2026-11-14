@@ -1,5 +1,5 @@
 /**
- * AgriSage AI — Speech Recognition (STT) & Speech Synthesis (TTS) Service
+ * Grow2Gain — Speech Recognition (STT) & Speech Synthesis (TTS) Service
  * Web Speech API with multilingual support for en-IN, te-IN, hi-IN
  */
 

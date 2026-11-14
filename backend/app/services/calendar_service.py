@@ -1,6 +1,6 @@
 """
 Crop Lifecycle Timeline, Calendar Generator, RFC 5545 (.ics) Exporter,
-and Seasonal Awareness Engine for AgriSage AI.
+and Seasonal Awareness Engine for Grow2Gain.
 """
 
 from datetime import date, datetime, timedelta, timezone
@@ -364,10 +364,10 @@ def generate_rfc5545_ics(
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//AgriSage AI//Crop Lifecycle Calendar RFC5545//EN",
+        "PRODID:-//Grow2Gain//Crop Lifecycle Calendar RFC5545//EN",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
-        f"X-WR-CALNAME:AgriSage - {cal.crop_name} Schedule",
+        f"X-WR-CALNAME:Grow2Gain - {cal.crop_name} Schedule",
         "X-WR-TIMEZONE:Asia/Kolkata",
     ]
 
@@ -378,7 +378,7 @@ def generate_rfc5545_ics(
 
         dtstart_str = d_start.strftime("%Y%m%d")
         dtend_str = d_end.strftime("%Y%m%d")
-        uid = f"{evt.event_id}-{dtstart_str}@agrisage.ai"
+        uid = f"{evt.event_id}-{dtstart_str}@grow2gain.ai"
 
         lines.extend([
             "BEGIN:VEVENT",

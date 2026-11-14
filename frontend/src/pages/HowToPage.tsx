@@ -127,7 +127,7 @@ export const HowToPage: React.FC = () => {
       <div className="space-y-6 animate-fadeIn pb-12">
         <PageHeader
           icon={HelpCircle}
-          title={language === 'te' ? 'అగ్రిసేజ్ ఎలా వాడాలి? (చిత్రాల గైడ్)' : language === 'hi' ? 'एग्रीसेज कैसे उपयोग करें? (चित्र गाइड)' : 'How to Use AgriSage (Visual Guide)'}
+          title={language === 'te' ? 'Grow2Gain ఎలా వాడాలి? (చిత్రాల గైడ్)' : language === 'hi' ? 'Grow2Gain कैसे उपयोग करें? (चित्र गाइड)' : 'How to Use Grow2Gain (Visual Guide)'}
           purpose={
             language === 'te'
               ? 'రైతుల కోసం సులభమైన 4-దశల ముఖ్యమైన పనుల మార్గదర్శి'
@@ -193,7 +193,7 @@ export const HowToPage: React.FC = () => {
     <div className="space-y-6 animate-fadeIn pb-12">
       <PageHeader
         icon={HelpCircle}
-        title={language === 'te' ? 'అగ్రిసేజ్ ఎలా వాడాలి?' : language === 'hi' ? 'एग्रीसेज का उपयोग कैसे करें?' : 'How to Use AgriSage AI'}
+        title={language === 'te' ? 'Grow2Gain ఎలా వాడాలి?' : language === 'hi' ? 'Grow2Gain का उपयोग कैसे करें?' : 'How to Use Grow2Gain'}
         purpose={
           language === 'te'
             ? 'రైతుల కోసం సులభమైన 7-దశల సమగ్ర మార్గదర్శిని'

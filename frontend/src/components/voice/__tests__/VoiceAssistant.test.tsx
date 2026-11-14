@@ -13,9 +13,9 @@ const mockGreetingResponse: voiceApi.VoiceQueryResponse = {
   intent: 'greeting',
   confidence: 0.98,
   confidence_type: 'rule',
-  spoken_text: 'Hello! I am AgriSage AI, your agronomic assistant. I can help you with: 1. Live Weather, 2. Live Irrigation, 3. Live Disease diagnosis, 4. Live Farm Economics, and 5. Mandi Market prices (Demo).',
+  spoken_text: 'Hello! I am Grow2Gain, your agronomic assistant. I can help you with: 1. Live Weather, 2. Live Irrigation, 3. Live Disease diagnosis, 4. Live Farm Economics, and 5. Mandi Market prices (Demo).',
   status: 'WORKING',
-  sources: ['AgriSage Assistant Capabilities Registry'],
+  sources: ['Grow2Gain Assistant Capabilities Registry'],
   action_link: '/dashboard',
   action_label: 'Open Dashboard',
   suggestion_chips: [
@@ -76,7 +76,7 @@ describe('VoiceAssistant Component', () => {
 
     // Verify greeting response text is displayed
     await waitFor(() => {
-      expect(screen.getByText(/I am AgriSage AI/i)).toBeInTheDocument();
+      expect(screen.getByText(/I am Grow2Gain/i)).toBeInTheDocument();
       expect(screen.getByText(/Live Weather/i)).toBeInTheDocument();
     });
 

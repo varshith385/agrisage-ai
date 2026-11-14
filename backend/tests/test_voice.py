@@ -311,7 +311,7 @@ def test_greetings_english_5_utterances(client, setup_voice_db, greeting):
     data = res.json()
     assert data["intent"] == "greeting"
     assert data["status"] == "WORKING"
-    assert "AgriSage AI" in data["spoken_text"]
+    assert "Grow2Gain" in data["spoken_text"]
     assert "Live Weather" in data["spoken_text"]
     assert "Live Irrigation" in data["spoken_text"]
     # Schemes must NOT be listed as a working feature
@@ -327,7 +327,7 @@ def test_greetings_telugu_5_utterances(client, setup_voice_db, greeting):
     data = res.json()
     assert data["intent"] == "greeting"
     assert data["status"] == "WORKING"
-    assert "అగ్రిసేజ్" in data["spoken_text"]
+    assert "Grow2Gain" in data["spoken_text"]
     assert len(data["suggestion_chips"]) > 0
     # Response must be in Telugu
     assert any(ord(c) >= 0x0C00 and ord(c) <= 0x0C7F for c in data["spoken_text"])
@@ -341,7 +341,7 @@ def test_greetings_hindi_5_utterances(client, setup_voice_db, greeting):
     data = res.json()
     assert data["intent"] == "greeting"
     assert data["status"] == "WORKING"
-    assert "एग्रीसेज" in data["spoken_text"]
+    assert "Grow2Gain" in data["spoken_text"]
     assert len(data["suggestion_chips"]) > 0
     # Response must be in Hindi (Devanagari)
     assert any(ord(c) >= 0x0900 and ord(c) <= 0x097F for c in data["spoken_text"])
@@ -377,7 +377,7 @@ def test_reply_language_matches_setting(client, setup_voice_db):
     # English
     r_en = client.post("/api/v1/voice/query", json={"query": "hello", "language": "en"}, headers=headers)
     assert r_en.status_code == 200
-    assert "AgriSage" in r_en.json()["spoken_text"]
+    assert "Grow2Gain" in r_en.json()["spoken_text"]
 
     # Telugu
     r_te = client.post("/api/v1/voice/query", json={"query": "హలో", "language": "te"}, headers=headers)
@@ -397,7 +397,7 @@ def test_who_are_you_smalltalk(client, setup_voice_db):
     assert res.status_code == 200
     data = res.json()
     assert data["intent"] == "about"
-    assert "AgriSage AI" in data["spoken_text"]
+    assert "Grow2Gain" in data["spoken_text"]
     assert "Live Weather" in data["spoken_text"]
     assert "schemes are not" in data["spoken_text"].lower()
     assert data["structured_data"]["features"]["schemes"] == "NOT_BUILT"

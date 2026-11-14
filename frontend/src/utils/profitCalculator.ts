@@ -1,5 +1,5 @@
 /**
- * Pure function computeProfit(inputs) for AgriSage AI
+ * Pure function computeProfit(inputs) for Grow2Gain
  * Verified against Python Decimal backend simulate_what_if.
  */
 

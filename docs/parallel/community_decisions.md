@@ -1,4 +1,4 @@
-# AgriSage AI — Community Module Architectural Decisions
+# Grow2Gain — Community Module Architectural Decisions
 
 **Yuktik 2026 Hackathon | Community, Logistics & Disease Outbreak Architecture**
 

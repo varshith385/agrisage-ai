@@ -148,7 +148,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="AgriSage Guided Tour"
+      aria-label="Grow2Gain Guided Tour"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       onClick={handleComplete}
     >
@@ -163,7 +163,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
               <Sparkles className="w-4 h-4" />
             </div>
             <span className="font-display font-bold text-base text-[#183D2E]">
-              AgriSage Quick Tour ({currentStepIndex + 1} of {steps.length})
+              Grow2Gain Quick Tour ({currentStepIndex + 1} of {steps.length})
             </span>
           </div>
           <button

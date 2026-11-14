@@ -75,7 +75,7 @@ vi.mock('../../context/AuthContext', () => ({
 
 // Allowlist of allowed English acronyms, proper nouns, and units
 const ALLOWLIST = new Set([
-  'agrisage', 'bollgard', 'ii', 'bpt', '5204', 'l', 'mm', 'q/ac', 'et0', 'das',
+  'grow2gain', 'bollgard', 'ii', 'bpt', '5204', 'l', 'mm', 'q/ac', 'et0', 'das',
   'fao-56', 'fao', '56', 'raw', 'taw', 'awc', 'npk', 'ph', 'ha', 'kg', 'ac', 'n', 'p', 'k', 'oc',
   'demo', 'data', 'open-meteo', 'imd', 'kvk', 'des', 'msp', 'pm-kisan', 'rythu', 'bandhu',
   'sms', 'whatsapp', 'url', 'pdf', 'csv', 'json', 'rfc', '5545', 'iso', '8601', 'cpu', 'id', 'api', 'gps',

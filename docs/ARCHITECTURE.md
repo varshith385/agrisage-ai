@@ -1,4 +1,4 @@
-# AgriSage AI — System Architecture (`docs/ARCHITECTURE.md`)
+# Grow2Gain — System Architecture (`docs/ARCHITECTURE.md`)
 
 **Yuktik 2026 Hackathon | Architecture & System Design**
 

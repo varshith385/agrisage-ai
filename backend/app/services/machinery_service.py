@@ -1,6 +1,6 @@
 """
 Machinery Mechanization Guide, Haversine Distance Search & Rental Service
-Yuktik 2026 Hackathon | AgriSage AI Machinery Module
+Grow2Gain Machinery Module
 """
 
 import math

@@ -1,4 +1,4 @@
-# AgriSage AI — Demonstration Video Screen Recording Script
+# Grow2Gain — Demonstration Video Screen Recording Script
 
 **Target Duration:** ~3 minutes (180 seconds)  
 **Target Audience:** Indian smallholder farmers, agronomists, and hackathon evaluators  

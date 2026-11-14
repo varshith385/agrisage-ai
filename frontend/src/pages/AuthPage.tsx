@@ -293,7 +293,7 @@ export const AuthPage: React.FC = () => {
               disabled={isLoading}
               className="w-full min-h-[48px] py-3 px-4 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold rounded-2xl shadow-md transition-all active:scale-98 disabled:opacity-50 text-sm mt-2"
             >
-              {isLoading ? t('common.loading', { defaultValue: 'Please wait...' }) : activeTab === 'login' ? t('auth.login_action', { defaultValue: 'Sign In to AgriSage' }) : t('auth.register_action', { defaultValue: 'Create My Account' })}
+              {isLoading ? t('common.loading', { defaultValue: 'Please wait...' }) : activeTab === 'login' ? t('auth.login_action', { defaultValue: 'Sign In to Grow2Gain' }) : t('auth.register_action', { defaultValue: 'Create My Account' })}
             </button>
           </form>
         </div>

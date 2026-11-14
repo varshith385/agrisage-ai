@@ -87,7 +87,7 @@ export const CalendarPage: React.FC = () => {
       setNotificationPermission(perm);
       if (perm === 'granted') {
         setNotificationMsg('Notifications enabled! You will receive timely field task reminders.');
-        new Notification('AgriSage AI Calendar', {
+        new Notification('Grow2Gain Calendar', {
           body: 'Field reminders and stage alerts are active for your farm.',
           icon: '/favicon.ico',
         });

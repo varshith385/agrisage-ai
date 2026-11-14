@@ -61,8 +61,8 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
         lang: isTe ? 'Telugu' : 'Hindi',
         isMissingVoice: true,
         message: isTe
-          ? 'Telugu (తెలుగు) speech voice is not installed in this browser. To enable audio: 1) In Windows Settings > Time & Language > Speech, install the Telugu speech voice pack, or 2) Open AgriSage AI in Microsoft Edge (which includes built-in Natural voices for Telugu). The text remains visible on screen.'
-          : 'Hindi (हिन्दी) speech voice is not installed in this browser. To enable audio: 1) In Windows Settings > Time & Language > Speech, install the Hindi speech voice pack, or 2) Open AgriSage AI in Microsoft Edge. The text remains visible on screen.',
+          ? 'Telugu (తెలుగు) speech voice is not installed in this browser. To enable audio: 1) In Windows Settings > Time & Language > Speech, install the Telugu speech voice pack, or 2) Open Grow2Gain in Microsoft Edge (which includes built-in Natural voices for Telugu). The text remains visible on screen.'
+          : 'Hindi (हिन्दी) speech voice is not installed in this browser. To enable audio: 1) In Windows Settings > Time & Language > Speech, install the Hindi speech voice pack, or 2) Open Grow2Gain in Microsoft Edge. The text remains visible on screen.',
       });
       return;
     }
@@ -138,7 +138,7 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
           <p className="text-[#4A5750] dark:text-[#9EB0A5] mb-2">{voiceNotice.message}</p>
           <div className="pt-2 border-t border-stone-200 dark:border-stone-700 text-[11px] text-stone-500 dark:text-stone-400 flex items-center justify-between">
             <span>Honesty: Text never read in wrong accent.</span>
-            <span className="font-semibold text-[#1B5E3B] dark:text-[#F2B01E]">AgriSage Speech</span>
+            <span className="font-semibold text-[#1B5E3B] dark:text-[#F2B01E]">Grow2Gain Speech</span>
           </div>
         </div>
       )}

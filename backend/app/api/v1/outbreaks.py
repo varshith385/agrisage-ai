@@ -1,6 +1,6 @@
 """
 Disease Outbreak Map API Endpoints: Village Clusters & District Officer Summary
-Yuktik 2026 Hackathon | AgriSage AI Outbreak Module
+Grow2Gain Outbreak Module
 """
 
 from typing import Optional

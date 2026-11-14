@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "AgriSage AI",
+    "name": "Grow2Gain",
     "tagline": "Intelligent, Honest Smart Farming"
   },
   "nav": {
@@ -16,7 +16,7 @@
     "recommend": "Crop Advisory",
     "schemes": "Schemes & Soil Card",
     "community": "Community & Map",
-    "how_to": "How to use AgriSage",
+    "how_to": "How to use Grow2Gain",
     "watch": "Watch Video Guide",
     "logout": "Logout"
   },
@@ -40,7 +40,7 @@
     "role_expert": "Agronomist / Expert",
     "role_buyer": "Produce Buyer / Trader",
     "role_admin": "Platform Administrator",
-    "hackathon_badge": "Yuktik 2026 Hackathon Ready",
+    "hackathon_badge": "Production Ready",
     "honesty_badge": "Honesty Principles Active",
     "honesty_desc": "Zero synthetic or fabricated telemetry",
     "fao_badge": "FAO-56 Calibrated",
@@ -55,7 +55,7 @@
     "state_placeholder": "-- Choose State --",
     "district_placeholder": "-- Choose District --",
     "village_placeholder": "-- Choose Village --",
-    "partial_dataset_notice": "Village Directory Note: Showing representative village centroids for Yuktik 2026. Micro-locations can be geocoded.",
+    "partial_dataset_notice": "Village Directory Note: Showing representative village centroids. Micro-locations can be geocoded.",
     "current_weather_heading": "Live Agro-Meteorological Conditions",
     "forecast_heading": "7-Day Weather & Evapotranspiration Forecast",
     "suitability_heading": "Cotton Agro-Climatic Suitability Assessment",
@@ -123,7 +123,7 @@
   "dashboard": {
     "title": "Executive Farmer Dashboard",
     "welcome_farmer": "Welcome back, {name}",
-    "demo_badge": "Yuktik 2026 Demo Mode",
+    "demo_badge": "Demo Mode",
     "active_farm": "Primary Farm",
     "crop_cycle_heading": "Current Active Crop Cycle",
     "crop_label": "Crop",
@@ -132,7 +132,7 @@
     "stage_label": "Growth Stage (Phenology)",
     "stage_not_computed": "Growth stage not computed yet",
     "weather_snapshot": "Meteorological Snapshot",
-    "agent_panel_title": "AgriSage Multi-Agent Activity Timeline",
+    "agent_panel_title": "Grow2Gain Multi-Agent Activity Timeline",
     "agent_panel_desc": "Sequential orchestration between Weather, Irrigation (FAO-56), Disease CV, Yield, and Advisory agents.",
     "agent_status_notice": "Tier 1 Multi-Agent Orchestrator is scheduled for Phase 3. Live agent executions are not simulated here to respect Honesty Rules.",
     "health_score_title": "Farm Health Composite Score",
@@ -243,7 +243,7 @@
     "remove": "Remove",
     "acres": "Acres",
     "inr": "₹",
-    "demo_mode": "Yuktik 2026 Demo Mode",
+    "demo_mode": "Demo Mode",
     "select_language": "Language",
     "what_this_means": "What this means for you",
     "what_is_this": "What is this?",
@@ -289,7 +289,7 @@
     "issue_label": "Issue:",
     "hide_json": "Hide Telemetry JSON",
     "inspect_json": "Inspect Raw Envelopes JSON",
-    "stub_disclaimer": "Numeric predictions (water volume, harvest yield, health score) are intentionally null in current preview stubs per Yuktik Honesty Rules. Conflict detection and weather telemetry are fully live."
+    "stub_disclaimer": "Numeric predictions (water volume, harvest yield, health score) are intentionally null in current preview stubs per honesty rules. Conflict detection and weather telemetry are fully live."
   },
   "disease": {
     "title": "Plant Disease Diagnosis & Crop Protection",
@@ -523,8 +523,8 @@
     "humidity_label": "Relative Humidity (%)"
   },
   "voice": {
-    "fab_label": "AgriSage Voice Assistant",
-    "panel_title": "AgriSage Voice Assistant",
+    "fab_label": "Grow2Gain Voice Assistant",
+    "panel_title": "Grow2Gain Voice Assistant",
     "badge_working": "WORKING",
     "listening_status": "Listening... Speak now",
     "listening_hint": "Ask in English, Telugu, or Hindi",
@@ -808,7 +808,7 @@
     "marketplace_title": "Farmer-to-Buyer Harvest Exchange",
     "marketplace_subtitle": "Direct trade between verified smallholders and licensed procurement buyers. Strict contact privacy until inquiry is accepted.",
     "privacy_banner_title": "Strict Contact Privacy Policy",
-    "privacy_banner_desc": "Per AgriSage Honesty Rule 8, farmer phone numbers and exact farm coordinates are never exposed to buyers until the farmer explicitly accepts the buyer's procurement inquiry.",
+    "privacy_banner_desc": "Per Grow2Gain Honesty Rule 8, farmer phone numbers and exact farm coordinates are never exposed to buyers until the farmer explicitly accepts the buyer's procurement inquiry.",
     "listing_crop": "Crop",
     "listing_variety": "Variety / Hybrid",
     "listing_qty": "Available Quantity",

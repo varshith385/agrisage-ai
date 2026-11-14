@@ -545,7 +545,7 @@ export const SchemesPage: React.FC = () => {
             </div>
 
             <p className="text-[11px] text-[#7A553A]">
-              AgriSage AI does not disburse government subsidies. Verify rules with your local Mandal Agriculture Officer (MAO).
+              Grow2Gain does not disburse government subsidies. Verify rules with your local Mandal Agriculture Officer (MAO).
             </p>
           </div>
 
@@ -672,7 +672,7 @@ export const SchemesPage: React.FC = () => {
                 {showPowerShellGuide && (
                   <div className="mt-4 pt-4 border-t border-[#7A553A]/15 space-y-3">
                     <p className="text-xs text-[#4E5F57] font-medium">
-                      Note: AgriSage uses manual input and text parsing by default. If you wish to enable experimental optical recognition from images, you can install an optional OCR engine via Windows PowerShell:
+                      Note: Grow2Gain uses manual input and text parsing by default. If you wish to enable experimental optical recognition from images, you can install an optional OCR engine via Windows PowerShell:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="bg-[#183D2E] text-white p-3 rounded-xl text-xs font-mono">
@@ -1193,7 +1193,7 @@ export const SchemesPage: React.FC = () => {
                     </span>
                   </div>
                   <p className="text-[#4E5F57] leading-relaxed">
-                    Agricultural schemes and subsidy registries were not merged into this branch and are not listed as an active feature. AgriSage AI is an independent decision-support tool. It does not provide financial grants, disburse government funds, or certify scheme eligibility.
+                    Agricultural schemes and subsidy registries were not merged into this branch and are not listed as an active feature. Grow2Gain is an independent decision-support tool. It does not provide financial grants, disburse government funds, or certify scheme eligibility.
                   </p>
                 </div>
               </div>

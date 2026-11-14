@@ -50,7 +50,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
     { to: '/farms', label: t('nav.farms', { defaultValue: 'My Farms' }), icon: Layers, desc: 'Parcel registration & mixed land tenure' },
     { to: '/reminders', label: 'Reminders & Alerts', icon: Bell, desc: 'Task scheduling, irrigation alarms & field alerts' },
     { to: '/community', label: t('nav.community', { defaultValue: 'Community & Map' }), icon: Users, desc: 'Farmer forum, machinery rental & pest outbreaks' },
-    { to: '/how-to', label: 'How to Use AgriSage', icon: HelpCircle, desc: 'Illustrated step-by-step guidance' },
+    { to: '/how-to', label: t('nav.how_to', { defaultValue: 'How to Use Grow2Gain' }), icon: HelpCircle, desc: 'Illustrated step-by-step guidance' },
     { to: '/watch', label: 'Watch Video Guide', icon: Video, desc: 'Short video walkthrough for farmers' },
   ];
 
@@ -186,7 +186,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
                 className="w-full min-h-[52px] p-3 rounded-2xl border border-red-300 bg-red-50 text-red-800 font-bold text-[16px] flex items-center justify-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Sign Out of AgriSage</span>
+                <span>Sign Out of Grow2Gain</span>
               </button>
             </div>
           </div>

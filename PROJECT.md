@@ -1,4 +1,4 @@
-# AgriSage AI: Autonomous Multi-Agent Smart Agriculture Intelligence System
+# Grow2Gain: Autonomous Multi-Agent Smart Agriculture Intelligence System
 
 **Yuktik 2026 Hackathon**
 

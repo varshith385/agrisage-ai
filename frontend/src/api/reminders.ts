@@ -1,5 +1,5 @@
 /**
- * AgriSage AI — Reminders & Field Task Alerts API Client
+ * Grow2Gain — Reminders & Field Task Alerts API Client
  * Module: /api/v1/reminders
  */
 
@@ -103,16 +103,16 @@ export function downloadIcsCalendarFile(reminder: Reminder): void {
   const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//AgriSage AI//Farmer Field Reminders//EN',
+    'PRODID:-//Grow2Gain//Farmer Field Reminders//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:agrisage-rem-${reminder.id}-${Date.now()}@agrisage.local`,
+    `UID:grow2gain-rem-${reminder.id}-${Date.now()}@grow2gain.local`,
     `DTSTAMP:${formatIcsDate(new Date())}`,
     `DTSTART:${formatIcsDate(startDt)}`,
     `DTEND:${formatIcsDate(endDt)}`,
-    `SUMMARY:AgriSage: ${reminder.title.replace(/[\r\n]+/g, ' ')}`,
-    `DESCRIPTION:${(reminder.notes || 'Field reminder from AgriSage AI').replace(/[\r\n]+/g, ' ')}`,
+    `SUMMARY:Grow2Gain: ${reminder.title.replace(/[\r\n]+/g, ' ')}`,
+    `DESCRIPTION:${(reminder.notes || 'Field reminder from Grow2Gain').replace(/[\r\n]+/g, ' ')}`,
     'STATUS:CONFIRMED',
     'BEGIN:VALARM',
     'TRIGGER:-PT15M',
@@ -127,7 +127,7 @@ export function downloadIcsCalendarFile(reminder: Reminder): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', `agrisage-reminder-${reminder.id}.ics`);
+  link.setAttribute('download', `grow2gain-reminder-${reminder.id}.ics`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

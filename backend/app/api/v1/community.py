@@ -1,6 +1,6 @@
 """
 Community API Endpoints: Groups, Opt-In Consent Flow, Pooled Requests & Cost Calculator
-Yuktik 2026 Hackathon | AgriSage AI Community Module
+Grow2Gain Community Module
 """
 
 from typing import List, Optional

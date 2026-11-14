@@ -54,10 +54,10 @@ export const VisualModeChooserModal: React.FC = () => {
             className="text-lg sm:text-xl font-black text-stone-900 dark:text-stone-100 tracking-tight"
           >
             {language === 'te'
-              ? 'అగ్రిసేజ్ ని ఎలా చూడాలనుకుంటున్నారు?'
+              ? 'Grow2Gain ని ఎలా చూడాలనుకుంటున్నారు?'
               : language === 'hi'
-              ? 'आप एग्रीसेज को कैसे देखना चाहते हैं?'
-              : 'How would you like to see AgriSage?'}
+              ? 'आप Grow2Gain को कैसे देखना चाहते हैं?'
+              : 'How would you like to see Grow2Gain?'}
           </h2>
           <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 max-w-xs mx-auto">
             {language === 'te'

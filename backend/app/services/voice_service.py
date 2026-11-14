@@ -1,5 +1,5 @@
 """
-AgriSage AI — Voice Assistant Query Service
+Grow2Gain — Voice Assistant Query Service
 Module 21: /api/v1/voice
 
 Features:
@@ -178,7 +178,7 @@ class VoiceAssistantService:
             confidence_type="rule",
             spoken_text=sanitize_agronomic_speech(kw.RESPONSES["greeting"]),
             status="WORKING",
-            sources=["AgriSage Assistant Capabilities Registry"],
+            sources=["Grow2Gain Assistant Capabilities Registry"],
             action_link="/dashboard",
             action_label="Open Dashboard",
             suggestion_chips=kw.SUGGESTION_CHIPS,
@@ -204,7 +204,7 @@ class VoiceAssistantService:
             confidence_type="rule",
             spoken_text=sanitize_agronomic_speech(kw.RESPONSES["about"]),
             status="WORKING",
-            sources=["AgriSage System Specification"],
+            sources=["Grow2Gain System Specification"],
             action_link="/dashboard",
             action_label="Explore Features",
             suggestion_chips=kw.SUGGESTION_CHIPS,
@@ -230,7 +230,7 @@ class VoiceAssistantService:
             confidence_type="rule",
             spoken_text=sanitize_agronomic_speech(kw.RESPONSES["thanks"]),
             status="WORKING",
-            sources=["AgriSage Assistant"],
+            sources=["Grow2Gain Assistant"],
             action_link="/dashboard",
             action_label="Back to Dashboard",
             suggestion_chips=kw.SUGGESTION_CHIPS,
@@ -245,7 +245,7 @@ class VoiceAssistantService:
             confidence_type="rule",
             spoken_text=sanitize_agronomic_speech(kw.RESPONSES["bye"]),
             status="WORKING",
-            sources=["AgriSage Assistant"],
+            sources=["Grow2Gain Assistant"],
             action_link="/dashboard",
             action_label="Session Closed",
             suggestion_chips=kw.SUGGESTION_CHIPS,
@@ -616,7 +616,7 @@ class VoiceAssistantService:
             return None
 
         system_instruction = (
-            "You are AgriSage AI, an honest, helpful agronomic assistant for smallholder Indian farmers. "
+            "You are Grow2Gain, an honest, helpful agronomic assistant for smallholder Indian farmers. "
             "STRICT RULES:\n"
             "1. Answer using general agronomy knowledge plus the farm's own data in the Ground Truth Context Packet.\n"
             "2. Never claim your advice comes from official government literature or certified government bodies.\n"
@@ -718,7 +718,7 @@ class VoiceAssistantService:
             )
 
         system_instruction = (
-            "You are AgriSage AI, an agronomic assistant for smallholder Indian farmers. "
+            "You are Grow2Gain, an agronomic assistant for smallholder Indian farmers. "
             "Answer using general agronomy knowledge and sustainable farming practices based on: "
             "weather, irrigation budgeting, plant pathology, and farm economics. "
             "Do not claim to be official or governmental. "
@@ -870,7 +870,7 @@ class VoiceAssistantService:
                         confidence_type="rule",
                         spoken_text=saved_text,
                         status="WORKING",
-                        sources=["AgriSage Field Reminder Engine"],
+                        sources=["Grow2Gain Field Reminder Engine"],
                         action_link="/reminders",
                         action_label="Open Reminders",
                         action_type="navigate",
@@ -892,7 +892,7 @@ class VoiceAssistantService:
                         confidence_type="rule",
                         spoken_text=cancel_text,
                         status="WORKING",
-                        sources=["AgriSage Field Reminder Engine"],
+                        sources=["Grow2Gain Field Reminder Engine"],
                         action_link="/reminders",
                         action_label="Open Reminders",
                         confirmation_chip="Cancelled",
@@ -916,7 +916,7 @@ class VoiceAssistantService:
                     confidence_type="rule",
                     spoken_text=rem_prompt,
                     status="WORKING",
-                    sources=["AgriSage Field Reminder Engine"],
+                    sources=["Grow2Gain Field Reminder Engine"],
                     action_link="/reminders",
                     action_label="Confirm in Reminders",
                     action_type="confirm_reminder",

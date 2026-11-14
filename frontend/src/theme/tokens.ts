@@ -1,5 +1,5 @@
 /**
- * AgriSage AI — Unified Design Tokens (Round 5 Professional Visual System & Dark Mode)
+ * Grow2Gain — Unified Design Tokens (Round 5 Professional Visual System & Dark Mode)
  * 
  * Strict WCAG AAA/AA Compliant Agricultural Palette:
  * - Primary (Deep Field Green): #1B5E3B (Headers, main action buttons, active navigation)

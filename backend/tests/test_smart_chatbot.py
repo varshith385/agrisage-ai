@@ -137,7 +137,7 @@ def test_smalltalk_router():
     res_who = route_smalltalk("who are you", "en")
     assert res_who is not None
     assert res_who.intent == "about"
-    assert "AgriSage AI" in res_who.spoken_text
+    assert "Grow2Gain" in res_who.spoken_text
 
     # "help"
     res_help = route_smalltalk("help", "en")

@@ -1,4 +1,4 @@
-# AgriSage AI — Feature Status Ledger (`docs/FEATURE_STATUS.md`)
+# Grow2Gain — Feature Status Ledger (`docs/FEATURE_STATUS.md`)
 
 **Yuktik 2026 Hackathon | Synchronized Code Reality Ledger**
 

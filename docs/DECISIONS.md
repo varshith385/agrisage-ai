@@ -1,4 +1,4 @@
-# AgriSage AI — Architectural Decision Record (`docs/DECISIONS.md`)
+# Grow2Gain — Architectural Decision Record (`docs/DECISIONS.md`)
 
 **Yuktik 2026 Hackathon | Technical Decisions & Rationale**
 

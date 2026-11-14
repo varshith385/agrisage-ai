@@ -1,5 +1,5 @@
 """
-AgriSage AI — Advisory Coordinator Agent
+Grow2Gain — Advisory Coordinator Agent
 Synthesizes telemetry from all 4 domain agents (Weather, Irrigation, Disease, Yield) and GrowthStageService:
 1. Calculates Farm Health Score (0-100) with transparent component breakdown.
    - Weights and thresholds labeled "indicative design choice, not validated" and "indicative, not validated".
@@ -700,7 +700,7 @@ class AdvisoryAgent(BaseAgent):
             confidence_type="rule",
             reasons=explain_reasons,
             sources=[
-                "AgriSage Multi-Agent Orchestrator Framework",
+                "Grow2Gain Multi-Agent Orchestrator Framework",
                 "FAO-56 Table 11 Growth Stage Durations (to verify)",
                 "DES Indian Agricultural Statistics Division",
             ],

@@ -1,4 +1,4 @@
-# AgriSage AI — Data Sources Catalog (`docs/DATA_SOURCES.md`)
+# Grow2Gain — Data Sources Catalog (`docs/DATA_SOURCES.md`)
 
 **Yuktik 2026 Hackathon | Data Provenance & Verification Ledger**
 

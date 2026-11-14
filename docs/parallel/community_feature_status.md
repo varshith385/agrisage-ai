@@ -1,4 +1,4 @@
-# AgriSage AI — Community Feature Status Ledger
+# Grow2Gain — Community Feature Status Ledger
 
 **Yuktik 2026 Hackathon | Synchronized Feature Reality Ledger**
 

@@ -1,4 +1,4 @@
-# AgriSage AI — Technical & Functional Specification (`docs/SPEC.md`)
+# Grow2Gain — Technical & Functional Specification (`docs/SPEC.md`)
 
 **Yuktik 2026 Hackathon | Version 1.0.0**
 

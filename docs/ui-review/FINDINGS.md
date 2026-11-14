@@ -1,4 +1,4 @@
-# AgriSage AI — UI Review & Accessibility Audit Findings
+# Grow2Gain — UI Review & Accessibility Audit Findings
 
 **Date**: 2026-11-14  
 **Auditor**: Antigravity UI & Accessibility Engineering  

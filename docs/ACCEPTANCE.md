@@ -1,4 +1,4 @@
-# AgriSage AI — Tier 1 Acceptance Criteria & Verification Matrix
+# Grow2Gain — Tier 1 Acceptance Criteria & Verification Matrix
 
 This document defines the strict, testable acceptance checks for all **Tier 1** features of AgriSage AI (Yuktik 2026 hackathon).
 According to the **Scope Guard Rule**, Tier 2 work must NOT begin until all Tier 1 acceptance checks below have passed with documented evidence.

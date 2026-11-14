@@ -430,7 +430,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         {/* Footer info bar */}
         <div className="px-5 py-2.5 border-t border-[#D9D4C7] dark:border-[#273B30] bg-[#FFFDF8] dark:bg-[#121B16] flex items-center justify-between text-[11px] text-[#4A5750] dark:text-[#9EB0A5]">
           <span>Use &uarr; &darr; arrows to navigate, Enter to select</span>
-          <span className="font-semibold text-[#1B5E3B] dark:text-[#F2B01E]">AgriSage Command Palette</span>
+          <span className="font-semibold text-[#1B5E3B] dark:text-[#F2B01E]">Grow2Gain Command Palette</span>
         </div>
       </div>
     </div>

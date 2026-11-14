@@ -88,14 +88,14 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
     if (path.startsWith('/reminders')) return 'Reminders';
     if (path.startsWith('/how-to')) return t('nav.how_to', { defaultValue: 'How to Use' });
     if (path.startsWith('/watch')) return t('nav.watch', { defaultValue: 'Watch Video' });
-    return 'AgriSage AI';
+    return 'Grow2Gain';
   };
 
   const handleTestVoice = (langCode: SupportedLanguage) => {
     const phrases: Record<SupportedLanguage, string> = {
-      en: 'AgriSage voice test: system is ready to read agronomic advisories.',
-      te: 'వ్యవసాయ సలహా ఆడియో పరీక్ష: అగ్రిసేజ్ వాయిస్ సిద్ధంగా ఉంది.',
-      hi: 'कृषि सलाहकार ऑडियो परीक्षण: एग्रीसेज आवाज तैयार है।',
+      en: 'Grow2Gain voice test: system is ready to read agronomic advisories.',
+      te: 'వ్యవసాయ సలహా ఆడియో పరీక్ష: Grow2Gain వాయిస్ సిద్ధంగా ఉంది.',
+      hi: 'कृषि सलाहकार ऑडियो परीक्षण: Grow2Gain आवाज तैयार है।',
     };
     setVoiceTestStatus(`Testing ${langCode.toUpperCase()}...`);
     speakText(phrases[langCode], langCode, {

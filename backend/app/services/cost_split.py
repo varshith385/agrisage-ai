@@ -1,6 +1,6 @@
 """
 Transparent Cost-Splitting Calculator Service for Pooled Agricultural Logistics
-Yuktik 2026 Hackathon | AgriSage AI Community Module
+Grow2Gain Community Module
 """
 
 from decimal import Decimal, ROUND_HALF_UP

@@ -13,7 +13,7 @@ export const WatchHowToPage: React.FC = () => {
     <div className="space-y-6 animate-fadeIn pb-12">
       <PageHeader
         icon={Video}
-        title={language === 'te' ? 'అగ్రిసేజ్ వీడియో గైడ్' : language === 'hi' ? 'एग्रीसेज वीडियो गाइड' : 'Watch How to Use AgriSage AI'}
+        title={language === 'te' ? 'Grow2Gain వీడియో గైడ్' : language === 'hi' ? 'Grow2Gain वीडियो गाइड' : 'Watch How to Use Grow2Gain'}
         purpose={
           language === 'te'
             ? 'రైతుల కోసం సులభమైన వీడియో మరియు అంచెలవారీ సూచనలు'
@@ -70,7 +70,7 @@ export const WatchHowToPage: React.FC = () => {
             Quick Summary of Steps
           </h2>
           <ReadAloudButton
-            text="AgriSage AI walkthrough steps: Step 1. Select your preferred language from top bar. Step 2. Select your registered farm holding. Step 3. Check live weather and rainfall forecast. Step 4. Run the FAO-56 crop water budget to check if you need to irrigate. Step 5. Take a leaf photo to diagnose plant diseases. Step 6. Use the What-If slider in Economics to calculate profit. Step 7. Speak with the voice assistant in Telugu, Hindi or English."
+            text="Grow2Gain walkthrough steps: Step 1. Select your preferred language from top bar. Step 2. Select your registered farm holding. Step 3. Check live weather and rainfall forecast. Step 4. Run the FAO-56 crop water budget to check if you need to irrigate. Step 5. Take a leaf photo to diagnose plant diseases. Step 6. Use the What-If slider in Economics to calculate profit. Step 7. Speak with the voice assistant in Telugu, Hindi or English."
             label="Listen to summary"
           />
         </div>

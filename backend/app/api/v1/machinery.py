@@ -1,6 +1,6 @@
 """
 Machinery API Endpoints: Mechanization Guide, Distance-Ranked Search & Booking Flow
-Yuktik 2026 Hackathon | AgriSage AI Machinery Module
+Grow2Gain Machinery Module
 """
 
 from datetime import date

@@ -33,7 +33,7 @@ class YieldAgent(BaseAgent):
         district = context.get("district", "Warangal")
         season = context.get("season", "Kharif")
 
-        # If crop_name is absent in context, preserve clean stub behavior per Yuktik rules
+        # If crop_name is absent in context, preserve clean stub behavior per honesty rules
         if not crop_name:
             estimate = YieldEstimate(
                 status="stub",

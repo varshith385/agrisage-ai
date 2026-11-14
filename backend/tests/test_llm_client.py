@@ -52,7 +52,7 @@ async def test_groq_success():
         mock_post.return_value = mock_resp
 
         res = await call_groq_chat(
-            system_instruction="You are AgriSage AI",
+            system_instruction="You are Grow2Gain",
             user_prompt="How is my soil?",
         )
 

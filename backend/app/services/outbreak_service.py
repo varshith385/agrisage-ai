@@ -1,6 +1,6 @@
 """
 Disease Outbreak Telemetry, Village-Level Privacy Aggregation & Officer View Service
-Yuktik 2026 Hackathon | AgriSage AI Outbreak Map Module
+Grow2Gain Outbreak Map Module
 """
 
 from datetime import datetime, timedelta, timezone
