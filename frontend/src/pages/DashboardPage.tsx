@@ -256,9 +256,9 @@ export const DashboardPage: React.FC = () => {
     const weatherRain = weatherData?.expected_rainfall_today_mm ?? 0;
     const waterDepth = irrigationOutputs?.root_zone_depletion_mm ?? (irrigationOutputs?.recommended_depth_mm ?? 15);
     const hasDisease = Boolean(diseaseOutputs?.detected);
-    const estProfit = economicsSummary?.combined_summary?.net_profit
-      ? Number(economicsSummary.combined_summary.net_profit)
-      : 45000;
+    const rawProfitStr = String(economicsSummary?.combined_summary?.net_profit || '').replace(/,/g, '');
+    const parsedProfit = Number(rawProfitStr);
+    const estProfit = !isNaN(parsedProfit) && rawProfitStr.trim() !== '' ? parsedProfit : 45000;
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">

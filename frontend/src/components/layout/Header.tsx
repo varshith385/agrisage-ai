@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                 <span className="font-display text-lg sm:text-xl font-black tracking-tight text-white block leading-none">
                   {t('app.name')}
                 </span>
-                <span className="text-[12px] text-[#F2B01E] font-bold tracking-wide block mt-0.5">
+                <span className="text-[12px] text-[#F2B01E] font-bold tracking-wide hidden sm:block mt-0.5">
                   {t('app.tagline')}
                 </span>
               </div>
@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
           </div>
 
           {/* Right Controls: Language Switcher, Pictorial Toggle, Tour, Voice, User */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Language Switcher Buttons (min 48px touch targets) */}
             <div
               role="group"
