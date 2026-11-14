@@ -89,6 +89,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
   const items: CommandItem[] = [
     // Core Pages
     {
+      id: 'page-recommend',
+      category: 'pages',
+      title: t('nav.recommend', { defaultValue: 'Crop Advisory' }),
+      subtitle: 'Crop suitability matching soil nutrients and Open-Meteo agro-climate',
+      icon: Sprout,
+      keywords: 'crop advisory recommendation suitability matching soil climate పంట సలహా फसल सलाह',
+      onSelect: () => { navigate('/recommend'); onClose(); },
+    },
+    {
       id: 'page-dashboard',
       category: 'pages',
       title: t('nav.dashboard', { defaultValue: 'Dashboard' }),
@@ -150,15 +159,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
       icon: Calendar,
       keywords: 'calendar stage gdd milestone tasks schedule పంట క్యాలెండర్',
       onSelect: () => { navigate('/calendar'); onClose(); },
-    },
-    {
-      id: 'page-recommend',
-      category: 'pages',
-      title: t('nav.recommend', { defaultValue: 'Crop Advisory' }),
-      subtitle: 'RandomForest crop suitability matching soil and climate',
-      icon: Sprout,
-      keywords: 'crop advisory recommendation suitability matching పంట సలహా',
-      onSelect: () => { navigate('/recommend'); onClose(); },
     },
     {
       id: 'page-market',

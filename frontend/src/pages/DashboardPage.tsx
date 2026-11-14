@@ -15,6 +15,7 @@ import {
   Leaf,
   Sun,
   Sparkles,
+  Sprout,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -379,8 +380,19 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 4 Large Pictorial Tiles with REAL-Value Gauges or Grey No-Data Fallback */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-start">
+        {/* 5 Large Pictorial Tiles with REAL-Value Gauges or Grey No-Data Fallback */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4 items-start">
+          {/* Tile 1: Crop Advisory (Main Feature) */}
+          <PictorialTile
+            title={language === 'te' ? 'పంట సలహా' : language === 'hi' ? 'फसल सलाह' : 'Crop Advisory'}
+            phrase={cropName ? `${cropName} • ${language === 'te' ? 'ప్రధాన ఫీచర్' : language === 'hi' ? 'मुख्य सुविधा' : 'Main Feature'}` : (language === 'te' ? 'పంట సలహా చూడండి' : language === 'hi' ? 'फसल सलाह देखें' : 'View Advisory')}
+            illustration={<LeafScanIllustration size={80} />}
+            status="success"
+            statusWord={language === 'te' ? 'ప్రధాన ఫీచర్' : language === 'hi' ? 'मुख्य सुविधा' : 'Main Feature'}
+            spokenText={language === 'te' ? 'పంట సలహా మరియు పంట మార్పిడి ప్రణాళిక చూడండి.' : language === 'hi' ? 'फसल सलाह और चक्र योजना देखें।' : 'View machine learning crop recommendations and rotation plan.'}
+            detailsLink="/recommend"
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
           {/* Tile 1: Weather & Temperature */}
           <PictorialTile
             title={language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम' : 'Weather'}
@@ -550,9 +562,51 @@ export const DashboardPage: React.FC = () => {
         }
       />
 
-      {/* 1. LEAD SUMMARY SECTION (1 to 3 Important Results as Large Cards + ONE clear CTA) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
-        {/* Card 1: What Should I Do Today? (Primary Action) */}
+      {/* 1. LEAD SUMMARY SECTION (Crop Advisory as Main Feature + Primary Daily Decisions) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-start">
+        {/* Card 1: Crop Advisory (Main Feature) */}
+        <div className="bg-gradient-to-br from-[#E8F5E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#1B5E3B] p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#1B5E3B] tracking-wider flex items-center gap-1.5">
+                <Sprout className="w-4 h-4 text-[#1B5E3B]" />
+                {t('nav.recommend', { defaultValue: 'Crop Advisory' })}
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#F2B01E] text-[#1F2A24] tracking-wide shadow-2xs">
+                {language === 'te' ? 'ప్రధాన ఫీచర్' : language === 'hi' ? 'मुख्य सुविधा' : 'Main Feature'}
+              </span>
+            </div>
+            <h2 className="font-display text-[20px] sm:text-[22px] font-bold text-[#183D2E]">
+              {cropName ? `${cropName} Advisory` : (language === 'te' ? 'పంట ఎంపిక & మార్పిడి సలహా' : language === 'hi' ? 'फसल चयन और चक्र सलाह' : 'Crop Advisory & Rotation')}
+            </h2>
+            <p className="text-[14px] sm:text-[15px] text-[#4E5F57] leading-relaxed">
+              {language === 'te'
+                ? 'నేల పోషకాలు మరియు ప్రత్యక్ష వాతావరణం ఆధారంగా ఉత్తమ పంట అనుకూలతను అంచనా వేయండి.'
+                : language === 'hi'
+                ? 'मृदा पोषक तत्वों और लाइव मौसम के आधार पर अनुकूलतम फसल और चक्र योजना प्राप्त करें।'
+                : 'Evaluate machine-learning crop suitability and restorative rotations tailored to your local soil & Open-Meteo climate.'}
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-[#1B5E3B]/15 flex items-center justify-between gap-3">
+            <ReadAloudButton
+              text={language === 'te'
+                ? 'పంట సలహా: మీ పొలానికి అనుకూలమైన పంటలు మరియు పంట మార్పిడి వివరాలు చూడండి.'
+                : language === 'hi'
+                ? 'फसल सलाह: अपने खेत के लिए अनुशंसित फसलें और चक्र योजना देखें।'
+                : 'Crop Advisory: View recommended crops and restorative rotations for your farm holding.'}
+            />
+            <Link
+              to="/recommend"
+              className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs sm:text-sm shadow-sm"
+            >
+              <span>{language === 'te' ? 'సలహా చూడండి' : language === 'hi' ? 'सलाह देखें' : 'View Advisory'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Card 2: What Should I Do Today? (Primary Action) */}
         <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -690,7 +744,17 @@ export const DashboardPage: React.FC = () => {
         <h3 className="font-display text-lg font-bold text-[#183D2E] mb-3">
           {t('dashboard.quick_access_tools', { defaultValue: 'Quick Access Tools' })}
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+          <Link
+            to="/recommend"
+            className="p-4 rounded-2xl bg-white border-2 border-[#1B5E3B]/40 hover:border-[#1B5E3B] shadow-sm flex flex-col items-center text-center transition-all group ring-1 ring-[#1B5E3B]/20"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-[#E8F5E9] text-[#1B5E3B] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+              <Sprout className="w-6 h-6 text-[#1B5E3B]" />
+            </div>
+            <span className="text-sm font-bold text-[#183D2E] block">{t('nav.recommend', { defaultValue: 'Crop Advisory' })}</span>
+            <span className="text-[11px] text-[#4E5F57] mt-0.5">{language === 'te' ? 'ప్రధాన ఫీచర్' : language === 'hi' ? 'मुख्य सुविधा' : 'Main Feature'}</span>
+          </Link>
           <Link
             to="/irrigation"
             className="p-4 rounded-2xl bg-white border border-[#7A553A]/20 hover:border-[#183D2E] shadow-sm flex flex-col items-center text-center transition-all group"

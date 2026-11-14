@@ -64,6 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
   if (!isAuthenticated) return null;
 
   const coreNav = [
+    { to: '/recommend', label: t('nav.recommend', { defaultValue: 'Crop Advisory' }), icon: Sprout, isMain: true },
     { to: '/dashboard', label: t('nav.dashboard', { defaultValue: 'Dashboard' }), icon: LayoutDashboard },
     { to: '/setup', label: t('nav.weather', { defaultValue: 'Weather & Setup' }), icon: CloudSun },
     { to: '/irrigation', label: t('nav.irrigation', { defaultValue: 'Irrigation & Water' }), icon: Droplets },
@@ -75,7 +76,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
     { to: '/farms', label: t('nav.farms', { defaultValue: 'My Farms' }), icon: Layers },
     { to: '/reminders', label: 'Reminders', icon: Bell },
     { to: '/calendar', label: t('nav.calendar', { defaultValue: 'Crop Calendar' }), icon: Calendar },
-    { to: '/recommend', label: t('nav.recommend', { defaultValue: 'Crop Advisory' }), icon: Sprout },
     { to: '/market', label: t('nav.market', { defaultValue: 'Mandi Market' }), icon: Store },
     { to: '/schemes', label: t('nav.schemes', { defaultValue: 'Soil Card & Schemes' }), icon: FileText },
     { to: '/community', label: t('nav.community', { defaultValue: 'Community & Map' }), icon: Users },
@@ -162,12 +162,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  title={isCollapsed ? item.label : undefined}
+                  title={isCollapsed ? (item.isMain ? `${item.label} (Main Feature)` : item.label) : undefined}
                   className={({ isActive }) =>
                     `min-h-[44px] rounded-xl text-xs font-bold flex items-center transition-all ${
                       isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2 gap-3'
                     } ${
-                      isActive
+                      item.isMain
+                        ? isActive
+                          ? 'bg-[#24784C] dark:bg-[#1B5E3B] text-white shadow-md border-2 border-[#F2B01E] ring-2 ring-[#F2B01E]/40'
+                          : 'bg-[#24784C]/40 text-white border border-[#F2B01E]/60 hover:bg-[#24784C]/80 shadow-xs'
+                        : isActive
                         ? 'bg-[#24784C] dark:bg-[#1B5E3B] text-white shadow-xs border border-[#F2B01E]/60 ring-1 ring-[#F2B01E]/20'
                         : 'text-white/80 hover:bg-[#24784C]/50 dark:hover:bg-[#18241E] hover:text-white'
                     }`
@@ -175,6 +179,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
                 >
                   <Icon className="w-4 h-4 text-[#F2B01E] shrink-0" />
                   {!isCollapsed && <span className="truncate">{item.label}</span>}
+                  {item.isMain && !isCollapsed && (
+                    <span className="ml-auto text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-[#F2B01E] text-[#1F2A24] tracking-wider shrink-0 shadow-xs">
+                      Main
+                    </span>
+                  )}
                 </NavLink>
               );
             })}

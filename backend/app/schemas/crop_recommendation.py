@@ -33,5 +33,7 @@ class CropRecommendationResponse(BaseModel):
     supported_crops: List[str]
     unsupported_common_crops: List[str]
     climate_warnings: List[str]
+    is_out_of_distribution: bool = False
+    ood_warning: Optional[str] = None
     explanation: Dict[str, Any]
     status: Literal["WORKING", "PARTIAL", "DEMO"] = "WORKING"

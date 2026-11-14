@@ -159,3 +159,41 @@ def test_crop_recommendation_api_success(client: TestClient, farmer_headers: dic
     assert "crop_name" in data["top_crops"][0]
     assert "probability" in data["top_crops"][0]
     assert "unsupported_common_crops" in data
+    assert "is_out_of_distribution" in data
+
+
+def test_crop_recommender_ood_detection():
+    """Validates that extreme, abnormal soil/climate vectors are flagged by the IsolationForest OOD detector."""
+    # Extreme input: pH 2.1 (very acidic), temperature 55°C, rainfall 450mm
+    res = crop_recommender_engine.recommend(
+        n=280.0,
+        p=280.0,
+        k=380.0,
+        ph=2.2,
+        temperature=55.0,
+        humidity=10.0,
+        rainfall=480.0,
+        state="Rajasthan",
+        season="Kharif",
+    )
+    assert res["status"] == "WORKING"
+    assert res["is_out_of_distribution"] is True
+    assert res["ood_warning"] is not None
+    assert "out-of-distribution" in res["ood_warning"]
+    assert res["confidence"] <= 0.70
+
+
+def test_crop_recommender_uncalibrated_probability_label():
+    """Ensures model outputs explicitly state 'uncalibrated model score' in reasons."""
+    res = crop_recommender_engine.recommend(
+        n=80.0,
+        p=40.0,
+        k=40.0,
+        ph=6.5,
+        temperature=25.0,
+        humidity=70.0,
+        rainfall=150.0,
+    )
+    top1 = res["top_crops"][0]
+    has_uncalibrated_label = any("uncalibrated model score" in r for r in top1["reasons"])
+    assert has_uncalibrated_label is True

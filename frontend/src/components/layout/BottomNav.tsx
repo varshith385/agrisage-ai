@@ -35,6 +35,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
   if (!isAuthenticated) return null;
 
   const primaryItems = [
+    { to: '/recommend', label: t('nav.recommend', { defaultValue: 'Advisory' }), icon: Sprout },
     { to: '/dashboard', label: t('nav.dashboard', { defaultValue: 'Home' }), icon: LayoutDashboard },
     { to: '/irrigation', label: t('nav.irrigation', { defaultValue: 'Water' }), icon: Droplets },
     { to: '/disease', label: t('nav.disease', { defaultValue: 'Disease' }), icon: Leaf },
@@ -45,7 +46,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
     { to: '/setup', label: t('nav.weather', { defaultValue: 'Weather & Forecast' }), icon: CloudSun, desc: 'Agro-meteorology & 7-day rain forecast' },
     { to: '/market', label: t('nav.market', { defaultValue: 'Mandi Market' }), icon: Store, desc: 'Mandi arrivals, prices & buyer inquiries' },
     { to: '/calendar', label: t('nav.calendar', { defaultValue: 'Crop Calendar' }), icon: Calendar, desc: 'Crop schedule & field activity tracking' },
-    { to: '/recommend', label: t('nav.recommend', { defaultValue: 'Crop Advisory' }), icon: Sprout, desc: 'AI soil & agro-climatic crop matching' },
     { to: '/schemes', label: t('nav.schemes', { defaultValue: 'Soil Card & Schemes' }), icon: FileText, desc: 'Soil nutrient calibration & advisory notices' },
     { to: '/farms', label: t('nav.farms', { defaultValue: 'My Farms' }), icon: Layers, desc: 'Parcel registration & mixed land tenure' },
     { to: '/reminders', label: 'Reminders & Alerts', icon: Bell, desc: 'Task scheduling, irrigation alarms & field alerts' },

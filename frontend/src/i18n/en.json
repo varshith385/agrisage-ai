@@ -562,7 +562,7 @@
     "primary_seasonal_risks_colon": "Primary Seasonal Risks:"
   },
   "recommend": {
-    "title": "Crop Recommendation",
+    "title": "Crop Advisory",
     "rotation_title": "Crop Rotation Planner",
     "subtitle": "Data-driven crop selection and restorative rotation schedules backed by biological soil rules.",
     "ml_section_title": "Machine Learning Crop Recommendation",

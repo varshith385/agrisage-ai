@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import joblib
 import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 ARTIFACTS_DIR = PROJECT_ROOT / "model_artifacts"
@@ -176,23 +177,38 @@ class CropRecommenderEngine:
         r_val = float(rainfall) if rainfall is not None else 100.0
 
         soil_provided = (n is not None) and (p is not None) and (k is not None) and (ph is not None)
+        is_ood = False
+        ood_warning = None
 
         if soil_provided:
             # Full model inference
             model = self.full_bundle["model"]
             classes = self.full_bundle["classes"]
-            features = np.array([[float(n), float(p), float(k), t_val, h_val, float(ph), r_val]])
-            probs = model.predict_proba(features)[0]
+            feat_names = self.full_bundle.get("features", ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"])
+            feat_df = pd.DataFrame([[float(n), float(p), float(k), t_val, h_val, float(ph), r_val]], columns=feat_names)
+            probs = model.predict_proba(feat_df)[0]
             soil_missing = False
             fallback_used = "none_full_features"
             base_confidence = 0.88
             conf_type = "model_metric"
+
+            # OOD Check
+            ood_det = self.full_bundle.get("ood_detector")
+            if ood_det is not None:
+                try:
+                    if ood_det.predict(feat_df)[0] == -1:
+                        is_ood = True
+                        ood_warning = "Inputs appear out-of-distribution compared to training soil/climate benchmarks. Predictions should be interpreted with caution."
+                        base_confidence = max(0.60, base_confidence - 0.20)
+                except Exception:
+                    pass
         else:
             # Weather-only model inference
             model = self.weather_bundle["model"]
             classes = self.weather_bundle["classes"]
-            features = np.array([[t_val, h_val, r_val]])
-            probs = model.predict_proba(features)[0]
+            feat_names = self.weather_bundle.get("features", ["temperature", "humidity", "rainfall"])
+            feat_df = pd.DataFrame([[t_val, h_val, r_val]], columns=feat_names)
+            probs = model.predict_proba(feat_df)[0]
             soil_missing = True
             fallback_used = "weather_only_model (soil N, P, K, pH not provided)"
             # Lower confidence when soil data is missing
@@ -210,9 +226,11 @@ class CropRecommenderEngine:
             suitable, note = self.evaluate_climate_suitability(crop_name, state, season, t_val, r_val)
 
             reasons = [
-                f"Model probability (uncalibrated): {raw_prob * 100:.1f}%.",
+                f"Model probability (uncalibrated model score): {raw_prob * 100:.1f}%.",
                 f"Ambient temperature ({t_val:.1f}°C) and seasonal rainfall ({r_val:.1f} mm) match vegetative requirements.",
             ]
+            if is_ood and ood_warning:
+                reasons.append(f"OOD Notice: {ood_warning}")
             if not suitable:
                 reasons.append(f"WARNING: {note}")
                 climate_warnings.append(f"{crop_name.capitalize()}: {note}")
@@ -229,8 +247,10 @@ class CropRecommenderEngine:
         expl_reasons = [
             f"Evaluated candidate crops using {'full soil + weather parameters' if soil_provided else 'weather-only model (soil parameters omitted)'}.",
             f"Local agro-climate context: {state} ({district}), {season} season, {t_val:.1f}°C, {r_val:.1f} mm precipitation.",
-            f"Top match: {top_crops[0]['crop_name']} ({top_crops[0]['probability'] * 100:.1f}% uncalibrated model probability).",
+            f"Top match: {top_crops[0]['crop_name']} ({top_crops[0]['probability'] * 100:.1f}% uncalibrated model score).",
         ]
+        if is_ood and ood_warning:
+            expl_reasons.append(ood_warning)
         if soil_missing:
             expl_reasons.append(
                 "Soil nutrients (N, P, K, pH) were not provided; confidence is reduced. Soil testing is strongly recommended."
@@ -250,6 +270,8 @@ class CropRecommenderEngine:
             "supported_crops": SUPPORTED_CROPS,
             "unsupported_common_crops": UNSUPPORTED_COMMON_CROPS,
             "climate_warnings": climate_warnings,
+            "is_out_of_distribution": is_ood,
+            "ood_warning": ood_warning,
             "explanation": {
                 "value": f"Recommended: {', '.join([c['crop_name'] for c in top_crops])}",
                 "confidence": round(base_confidence, 2),

@@ -8,11 +8,14 @@ import {
   ArrowRight,
   BookOpen,
   Sliders,
+  MapPin,
+  CloudSun,
 } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePictorial } from '../context/PictorialContext';
 import { getRotationRecommendations } from '../api/economics';
+import { weatherApi } from '../api/weather';
 import { apiRequest } from '../api/client';
 import {
   CropRotationResponse,
@@ -20,6 +23,7 @@ import {
   CropCandidate,
 } from '../types/api';
 import { translateBackendString } from '../utils/safeTranslation';
+import { getIndianStates, getDistrictsForState, getDistrictCoordinates } from '../utils/indiaGeo';
 import { ConfidenceMeter } from '../components/common/ConfidenceMeter';
 import { ExplainCard } from '../components/common/ExplainCard';
 import { PageHeader } from '../components/common/PageHeader';
@@ -33,18 +37,34 @@ import { ErrorState } from '../components/common/ErrorState';
 export const CropRecommendationPage: React.FC = () => {
   const { t, language } = useTranslation();
   const { isPictorial, setMode } = usePictorial();
-  const { activeCrop } = useAuth();
+  const { activeCrop, activeFarm } = useAuth();
 
-  // ML Recommendation Inputs
+  // Location selector (cascading state -> district with coordinates)
+  const statesList = getIndianStates();
+  const [selectedState, setSelectedState] = useState<string>(activeFarm?.state || 'Telangana');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(activeFarm?.district || 'Warangal');
+  const [coordinates, setCoordinates] = useState<{ lat: number; lon: number }>(() => {
+    if (activeFarm?.latitude && activeFarm?.longitude) {
+      return { lat: activeFarm.latitude, lon: activeFarm.longitude };
+    }
+    const c = getDistrictCoordinates(activeFarm?.state || 'Telangana', activeFarm?.district || 'Warangal');
+    return { lat: c.latitude, lon: c.longitude };
+  });
+
+  const districtsList = getDistrictsForState(selectedState);
+
+  // Environmental inputs populated from Open-Meteo for the farm/district coordinates
+  const [temp, setTemp] = useState<number>(25.0);
+  const [humidity, setHumidity] = useState<number>(65.0);
+  const [rainfall, setRainfall] = useState<number>(100.0);
+  const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
+
+  // Soil inputs: strictly distinguishing measured from defaults
+  const [hasUserEnteredSoil, setHasUserEnteredSoil] = useState<boolean>(false);
   const [n, setN] = useState<number>(50.0);
   const [p, setP] = useState<number>(50.0);
   const [k, setK] = useState<number>(50.0);
   const [ph, setPh] = useState<number>(6.5);
-  const [temp, setTemp] = useState<number>(28.0);
-  const [humidity, setHumidity] = useState<number>(70.0);
-  const [rainfall, setRainfall] = useState<number>(180.0);
-  const [omitSoil, setOmitSoil] = useState<boolean>(false);
-  const [hasConfirmedInputs, setHasConfirmedInputs] = useState<boolean>(false);
 
   const [mlResult, setMlResult] = useState<CropRecommendationResponse | null>(null);
   const [loadingMl, setLoadingMl] = useState<boolean>(false);
@@ -56,12 +76,67 @@ export const CropRecommendationPage: React.FC = () => {
   const [loadingRotation, setLoadingRotation] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'candidates' | 'inputs' | 'rotation' | 'methodology'>('candidates');
 
+  // Update location when activeFarm changes
+  useEffect(() => {
+    if (activeFarm) {
+      if (activeFarm.state) setSelectedState(activeFarm.state);
+      if (activeFarm.district) setSelectedDistrict(activeFarm.district);
+      if (activeFarm.latitude && activeFarm.longitude) {
+        setCoordinates({ lat: activeFarm.latitude, lon: activeFarm.longitude });
+      }
+    }
+  }, [activeFarm]);
+
+  // Synchronize activeCrop
   useEffect(() => {
     if (activeCrop) {
       setPrevCrop(activeCrop);
     }
   }, [activeCrop]);
 
+  // Handle location dropdown changes
+  const handleStateChange = (newState: string) => {
+    setSelectedState(newState);
+    const districts = getDistrictsForState(newState);
+    const firstDist = districts[0]?.name || '';
+    setSelectedDistrict(firstDist);
+    const coords = getDistrictCoordinates(newState, firstDist);
+    setCoordinates({ lat: coords.latitude, lon: coords.longitude });
+  };
+
+  const handleDistrictChange = (newDistrict: string) => {
+    setSelectedDistrict(newDistrict);
+    const coords = getDistrictCoordinates(selectedState, newDistrict);
+    setCoordinates({ lat: coords.latitude, lon: coords.longitude });
+  };
+
+  // Fetch live Open-Meteo weather when coordinates change
+  useEffect(() => {
+    let cancelled = false;
+    const loadWeather = async () => {
+      setWeatherLoading(true);
+      try {
+        const forecast = await weatherApi.getForecast(coordinates.lat, coordinates.lon);
+        if (cancelled) return;
+        if (forecast?.current) {
+          setTemp(forecast.current.temperature_c);
+          setHumidity(forecast.current.relative_humidity_pct);
+          const rain7d = forecast.daily ? forecast.daily.reduce((acc, d) => acc + (d.precipitation_sum_mm || 0), 0) : 0;
+          setRainfall(Math.max(Math.round(rain7d * 10), 40.0));
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.warn('Weather fetch fallback to default climate', err);
+        }
+      } finally {
+        if (!cancelled) setWeatherLoading(false);
+      }
+    };
+    loadWeather();
+    return () => { cancelled = true; };
+  }, [coordinates.lat, coordinates.lon]);
+
+  // Fetch Crop Advisory recommendations from backend
   const fetchRecommendation = async () => {
     setLoadingMl(true);
     setErrorMl(null);
@@ -70,8 +145,15 @@ export const CropRecommendationPage: React.FC = () => {
         temperature: temp,
         humidity: humidity,
         rainfall: rainfall,
+        state: selectedState,
+        district: selectedDistrict,
+        season: 'Kharif',
       };
-      if (!omitSoil) {
+      if (activeFarm?.id) {
+        payload.farm_id = activeFarm.id;
+      }
+      // ONLY send soil parameters if user explicitly entered them
+      if (hasUserEnteredSoil) {
         payload.n = n;
         payload.p = p;
         payload.k = k;
@@ -100,7 +182,7 @@ export const CropRecommendationPage: React.FC = () => {
 
   useEffect(() => {
     fetchRecommendation();
-  }, [omitSoil]);
+  }, [hasUserEnteredSoil, coordinates.lat, coordinates.lon, temp, humidity, rainfall]);
 
   useEffect(() => {
     fetchRotation();
@@ -133,8 +215,8 @@ export const CropRecommendationPage: React.FC = () => {
       <div className="space-y-6 animate-fadeIn pb-12">
         <PageHeader
           icon={Sprout}
-          title={language === 'te' ? 'పంట సిఫార్సు' : language === 'hi' ? 'फसल चयन' : 'Crop Recommendation'}
-          purpose={language === 'te' ? 'మీ నేల మరియు వాతావరణానికి తగిన పంటను ఎంచుకోండి' : language === 'hi' ? 'अपनी मिट्टी और मौसम के लिए सबसे सही फसल चुनें' : 'Visual crop recommendation based on soil and weather.'}
+          title={t('recommend.title', { defaultValue: 'Crop Advisory' })}
+          purpose={language === 'te' ? 'మీ నేల మరియు వాతావరణానికి తగిన పంటను ఎంచుకోండి' : language === 'hi' ? 'अपनी मिट्टी और मौसम के लिए सबसे सही फसल चुनें' : 'Visual crop advisory based on soil and weather.'}
         />
 
         {errorMl && (
@@ -225,11 +307,11 @@ export const CropRecommendationPage: React.FC = () => {
           {/* Tile 3: Soil Nutrients Evaluated */}
           <PictorialTile
             title={language === 'te' ? 'మూల్యాంకన ఆధారం' : language === 'hi' ? 'मूल्यांकन आधार' : 'Evaluation Basis'}
-            phrase={!hasConfirmedInputs ? (language === 'te' ? 'డిఫాల్ట్ వివరాలు (ధృవీకరించబడలేదు)' : language === 'hi' ? 'डिफ़ॉल्ट इनपुट (असत्यापित)' : 'Default inputs (unconfirmed)') : omitSoil ? 'Weather-only evaluation' : `N: ${n} • P: ${p} • K: ${k}`}
+            phrase={!hasUserEnteredSoil ? (language === 'te' ? 'నేల వివరాలు ఇవ్వలేదు (వాతావరణ ఆధారితం)' : language === 'hi' ? 'मृदा मान उपलब्ध नहीं (मौसम आधारित)' : 'Soil not provided (Weather-only)') : `N: ${n} • P: ${p} • K: ${k}`}
             illustration={<Sprout className="w-16 h-16 text-[#1B5E3B]" />}
-            status={!hasConfirmedInputs ? 'warning' : 'info'}
-            statusWord={!hasConfirmedInputs ? (language === 'te' ? 'డిఫాల్ట్ వివరాలు' : language === 'hi' ? 'डिफ़ॉल्ट इनपुट' : 'Default inputs') : omitSoil ? 'Weather Only' : 'Soil NPK'}
-            spokenText={!hasConfirmedInputs ? 'Evaluation using default demo inputs. Confirm your soil NPK and climate values to calibrate.' : omitSoil ? 'Evaluating recommendations using climate parameters only.' : `Soil nutrients evaluated: Nitrogen ${n}, Phosphorus ${p}, Potassium ${k}.`}
+            status={!hasUserEnteredSoil ? 'warning' : 'success'}
+            statusWord={!hasUserEnteredSoil ? (language === 'te' ? 'నేల వివరాలు లేవు' : language === 'hi' ? 'मृदा डेटा नहीं' : 'Soil not provided') : 'Measured Soil'}
+            spokenText={!hasUserEnteredSoil ? 'Soil test values not provided. Evaluation using Open-Meteo climate parameters with reduced confidence.' : `Measured soil nutrients evaluated: Nitrogen ${n}, Phosphorus ${p}, Potassium ${k}.`}
             onOpenDetails={() => setMode('words')}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -243,21 +325,18 @@ export const CropRecommendationPage: React.FC = () => {
       {/* PAGE HEADER */}
       <PageHeader
         icon={Sprout}
-        title={`${t('recommend.title')} & ${t('recommend.rotation_title')}`}
+        title={t('recommend.title', { defaultValue: 'Crop Advisory' })}
         purpose={t('recommend.subtitle')}
         whatIsThis={{
-          summary: 'Evaluates machine learning multi-crop suitability (Random Forest) and agronomic crop rotation sequences to protect long-term soil health and pest breaks.',
-          whatToEnter: 'Soil Nitrogen, Phosphorus, Potassium, and pH (or check Weather-Only fallback), plus expected temperature, humidity, and rainfall.',
-          whatYouGet: 'Ranked candidate crops with suitability percentages, climate risk flags, and biological nitrogen-fixing rotation recommendations.',
+          summary: 'Evaluates machine learning multi-crop suitability (scikit-learn benchmark) and agronomic crop rotation sequences to protect long-term soil health and pest breaks.',
+          whatToEnter: 'Soil Nitrogen, Phosphorus, Potassium, and pH (optional — leave unchecked for Weather-Only advisory), with temperature and rainfall auto-filled from live Open-Meteo weather.',
+          whatYouGet: 'Ranked candidate crops with suitability percentages, climate risk flags, Out-of-Distribution validation, and biological nitrogen-fixing rotation recommendations.',
         }}
         actions={
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                setHasConfirmedInputs(true);
-                fetchRecommendation();
-              }}
+              onClick={fetchRecommendation}
               disabled={loadingMl}
               className="min-h-[48px] px-5 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all disabled:opacity-50 flex items-center gap-2"
             >
@@ -268,12 +347,69 @@ export const CropRecommendationPage: React.FC = () => {
         }
       />
 
+      {/* LOCATION & AGRO-METEOROLOGY SELECTOR BAR */}
+      <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#183D2E]">
+              <MapPin className="w-4 h-4 text-[#DA9A4C]" />
+              <span>{language === 'te' ? 'ప్రాంతం:' : language === 'hi' ? 'स्थान:' : 'Holding Location:'}</span>
+            </div>
+            <select
+              value={selectedState}
+              onChange={(e) => handleStateChange(e.target.value)}
+              className="min-h-[40px] px-3 py-1.5 rounded-xl border border-[#7A553A]/30 text-xs font-bold text-[#183D2E] bg-[#FAF8F5]"
+            >
+              {statesList.map((s) => (
+                <option key={s.state} value={s.state}>{s.state}</option>
+              ))}
+            </select>
+            <select
+              value={selectedDistrict}
+              onChange={(e) => handleDistrictChange(e.target.value)}
+              className="min-h-[40px] px-3 py-1.5 rounded-xl border border-[#7A553A]/30 text-xs font-bold text-[#183D2E] bg-[#FAF8F5]"
+            >
+              {districtsList.map((d) => (
+                <option key={d.name} value={d.name}>{d.name}</option>
+              ))}
+            </select>
+            <span className="text-[11px] text-[#7A553A] font-semibold">
+              ({coordinates.lat.toFixed(2)}°N, {coordinates.lon.toFixed(2)}°E &bull; approximate district centre)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 self-start md:self-auto text-xs font-bold text-[#183D2E] bg-[#FAF8F5] px-3 py-2 rounded-xl border border-[#7A553A]/15">
+            <CloudSun className="w-4 h-4 text-[#DA9A4C]" />
+            <span>
+              {weatherLoading
+                ? 'Loading Open-Meteo weather...'
+                : `${temp}°C • ${humidity}% RH • ${rainfall} mm rain (Open-Meteo live)`}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {errorMl && (
         <ErrorState
           title={language === 'te' ? 'సిఫార్సులను లోడ్ చేయడం సాధ్యం కాలేదు' : language === 'hi' ? 'सिफारिश लोड नहीं हो सकी' : 'Could not load recommendation'}
           message={errorMl}
           onRetry={fetchRecommendation}
         />
+      )}
+
+      {/* OUT-OF-DISTRIBUTION WARNING BANNER */}
+      {mlResult?.is_out_of_distribution && (
+        <div className="bg-amber-50 border-2 border-amber-300 p-4 rounded-2xl flex items-start gap-3 shadow-xs">
+          <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div className="text-xs text-amber-900 space-y-0.5">
+            <span className="font-bold text-sm block">
+              {language === 'te' ? 'అవుట్-ఆఫ్-డిస్ట్రిబ్యూషన్ హెచ్చరిక' : language === 'hi' ? 'आउट-ऑफ-डिस्ट्रिब्यूशन चेतावनी' : 'Out-of-Distribution Input Notice'}
+            </span>
+            <p>
+              {mlResult.ood_warning || 'The entered soil or climate values fall outside standard benchmark distributions. Predictions carry reduced confidence.'}
+            </p>
+          </div>
+        </div>
       )}
 
       {/* LEAD SUMMARY SECTION (1 to 3 Large Cards + Primary CTA) */}
@@ -368,17 +504,13 @@ export const CropRecommendationPage: React.FC = () => {
                 {t('recommend.evaluation_basis_title', { defaultValue: 'Evaluation Basis' })}
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                !hasConfirmedInputs
+                !hasUserEnteredSoil
                   ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                  : omitSoil
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'bg-emerald-100 text-emerald-900'
+                  : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
               }`}>
-                {!hasConfirmedInputs
-                  ? (language === 'te' ? 'డిఫాల్ట్ వివరాలు' : language === 'hi' ? 'डिफ़ॉल्ट इनपुट' : 'Default inputs')
-                  : omitSoil
-                  ? (language === 'te' ? 'వాతావరణ ఆధారితం (ధృవీకరించబడింది)' : language === 'hi' ? 'केवल मौसम (पुष्ट)' : 'Weather-Only (Confirmed)')
-                  : (language === 'te' ? 'పూర్తి నేల + వాతావరణం (ధృవీకరించబడింది)' : language === 'hi' ? 'पूर्ण मिट्टी + मौसम (पुष्ट)' : 'Full Soil + Weather (Confirmed)')}
+                {!hasUserEnteredSoil
+                  ? (language === 'te' ? 'నేల వివరాలు ఇవ్వలేదు (వాతావరణ ఆధారితం)' : language === 'hi' ? 'मृदा मान उपलब्ध नहीं (मौसम आधारित)' : 'Soil not provided (Weather-only)')
+                  : (language === 'te' ? 'కొలిచిన నేల + వాతావరణం' : language === 'hi' ? 'प्रमाणित मिट्टी + मौसम' : 'Measured Soil + Weather')}
               </span>
             </div>
 
@@ -391,17 +523,30 @@ export const CropRecommendationPage: React.FC = () => {
                 <span className="text-[10px] text-[#7A553A] block">{t('recommend.rainfall_label', { defaultValue: 'Rainfall' })}</span>
                 <strong className="text-sm font-bold text-[#183D2E]">{rainfall} mm</strong>
               </div>
-              {!omitSoil && (
+              {hasUserEnteredSoil ? (
                 <>
                   <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
                     <span className="text-[10px] text-[#7A553A] block">{t('recommend.npk_label', { defaultValue: 'NPK (kg/ha)' })}</span>
-                    <strong className="text-xs font-bold text-[#183D2E]">{n}-{p}-{k}</strong>
+                    <strong className="text-xs font-bold text-[#183D2E]">{n}-{p}-{k} kg/ha</strong>
                   </div>
                   <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
                     <span className="text-[10px] text-[#7A553A] block">{t('recommend.soil_ph_label', { defaultValue: 'Soil pH' })}</span>
                     <strong className="text-xs font-bold text-[#183D2E]">{ph}</strong>
                   </div>
                 </>
+              ) : (
+                <div className="col-span-2 p-2 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900">
+                  <span className="font-bold block">
+                    {language === 'te' ? 'నేల పరీక్ష వివరాలు నమోదు చేయలేదు' : language === 'hi' ? 'मृदा परीक्षण डेटा दर्ज नहीं' : 'Soil test values not entered'}
+                  </span>
+                  <span>
+                    {language === 'te'
+                      ? 'ఖచ్చితమైన NPK/pH ఆధారిత సిఫార్సుల కొరకు క్రింద నేల వివరాలను నమోదు చేయండి.'
+                      : language === 'hi'
+                      ? 'सटीक NPK/pH आधारित सिफारिश के लिए नीचे मृदा मान दर्ज करें।'
+                      : 'Enter measured NPK and pH under Nutrient Parameters tab for calibrated full-soil evaluation.'}
+                  </span>
+                </div>
               )}
             </div>
 
@@ -413,7 +558,7 @@ export const CropRecommendationPage: React.FC = () => {
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between text-xs text-[#7A553A]">
-            <span>Model: RandomForest Multi-Crop</span>
+            <span>Model: scikit-learn Multi-Crop</span>
             <button
               type="button"
               onClick={() => setActiveTab('inputs')}
@@ -425,7 +570,7 @@ export const CropRecommendationPage: React.FC = () => {
         </div>
       </div>
 
-      {/* DETAIL TABS (Decluttering without deleting any feature or control) */}
+      {/* DETAIL TABS */}
       <div className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
         {/* Tabs Bar */}
         <div className="flex border-b border-[#7A553A]/15 overflow-x-auto bg-[#FAF8F5]/80">
@@ -537,40 +682,59 @@ export const CropRecommendationPage: React.FC = () => {
                 <label className="flex items-center gap-2 text-xs font-bold text-[#183D2E] cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={omitSoil}
-                    onChange={(e) => setOmitSoil(e.target.checked)}
+                    checked={hasUserEnteredSoil}
+                    onChange={(e) => setHasUserEnteredSoil(e.target.checked)}
                     className="accent-[#183D2E] rounded w-4 h-4 cursor-pointer"
                   />
-                  <span>{t('recommend.omit_soil_checkbox')} (Weather-Only Fallback)</span>
+                  <span>
+                    {language === 'te'
+                      ? 'నేల పరీక్ష వివరాలను నమోదు చేయండి (NPK & pH)'
+                      : language === 'hi'
+                      ? 'मृदा परीक्षण डेटा दर्ज करें (NPK और pH)'
+                      : 'Enter measured soil test data (NPK & pH)'}
+                  </span>
                 </label>
               </div>
 
+              {!hasUserEnteredSoil && (
+                <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-900 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>
+                    {language === 'te'
+                      ? 'నేల విలువలు లేవు (వాతావరణ ఆధారిత సలహా). కొలిచిన నేల డేటా కోసం పై చెక్‌బాక్స్‌ను ఎంచుకోండి.'
+                      : language === 'hi'
+                      ? 'मृदा मान उपलब्ध नहीं (केवल मौसम आधारित)। प्रमाणित मृदा डेटा के लिए उपरोक्त चेकबॉक्स चुनें।'
+                      : 'Soil values omitted — running weather-only model variant (confidence 50%). Check box above to enter measured Soil Health Card values.'}
+                  </span>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
                 <div>
-                  <label className="text-[11px] font-bold text-[#183D2E] block mb-1">Nitrogen (N)</label>
+                  <label className="text-[11px] font-bold text-[#183D2E] block mb-1">Nitrogen (kg/ha)</label>
                   <input
                     type="number"
-                    disabled={omitSoil}
+                    disabled={!hasUserEnteredSoil}
                     value={n}
                     onChange={(e) => setN(parseFloat(e.target.value) || 0)}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-[#183D2E] block mb-1">Phosphorus (P)</label>
+                  <label className="text-[11px] font-bold text-[#183D2E] block mb-1">Phosphorus (kg/ha)</label>
                   <input
                     type="number"
-                    disabled={omitSoil}
+                    disabled={!hasUserEnteredSoil}
                     value={p}
                     onChange={(e) => setP(parseFloat(e.target.value) || 0)}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-[#183D2E] block mb-1">Potassium (K)</label>
+                  <label className="text-[11px] font-bold text-[#183D2E] block mb-1">Potassium (kg/ha)</label>
                   <input
                     type="number"
-                    disabled={omitSoil}
+                    disabled={!hasUserEnteredSoil}
                     value={k}
                     onChange={(e) => setK(parseFloat(e.target.value) || 0)}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
@@ -581,7 +745,7 @@ export const CropRecommendationPage: React.FC = () => {
                   <input
                     type="number"
                     step="0.1"
-                    disabled={omitSoil}
+                    disabled={!hasUserEnteredSoil}
                     value={ph}
                     onChange={(e) => setPh(parseFloat(e.target.value) || 7.0)}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
@@ -618,18 +782,20 @@ export const CropRecommendationPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setHasConfirmedInputs(true);
-                    fetchRecommendation();
-                  }}
+                  onClick={fetchRecommendation}
                   disabled={loadingMl}
                   className="min-h-[48px] px-6 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all disabled:opacity-50"
                 >
                   {loadingMl ? 'Evaluating ML Model...' : t('recommend.evaluate_btn')}
                 </button>
+                <span className="text-[11px] text-[#7A553A]">
+                  {hasUserEnteredSoil
+                    ? 'Mode: Full Soil + Weather'
+                    : 'Mode: Weather-Only (Soil parameters omitted)'}
+                </span>
               </div>
             </div>
           )}
@@ -750,7 +916,8 @@ export const CropRecommendationPage: React.FC = () => {
                   reasons: [
                     "Crop rotation rules prioritize leguminous biological nitrogen fixation (indicative 30-40 kg N/ha, to verify) after heavy-feeding cotton.",
                     "Monoculture cotton and Solanaceous crops (Chilli/Tomato) are strictly flagged due to soil-borne nematode and wilt accumulation.",
-                    "Weather-only fallback protects model credibility by lowering confidence when soil parameters are unavailable.",
+                    "Weather-only fallback protects model credibility by lowering confidence to 50% when soil parameters are unavailable.",
+                    "Out-of-Distribution (OOD) detector evaluates whether environmental inputs conform to real Indian agro-climatic ranges.",
                   ],
                   sources: [
                     "General agronomic rotation and biological nitrogen fixation principles (to verify - source not checked)",

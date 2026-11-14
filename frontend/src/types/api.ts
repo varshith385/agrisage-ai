@@ -598,6 +598,8 @@ export interface CropRecommendationResponse {
   supported_crops: string[];
   unsupported_common_crops: string[];
   climate_warnings: string[];
+  is_out_of_distribution?: boolean;
+  ood_warning?: string | null;
   explanation: ExplainabilitySchema;
   status: FeatureStatus;
 }
