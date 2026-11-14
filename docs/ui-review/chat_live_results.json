@@ -1,0 +1,384 @@
+[
+  {
+    "query": {
+      "query": "okay",
+      "language": "en"
+    },
+    "response": {
+      "intent": "smalltalk",
+      "confidence": 0.98,
+      "confidence_type": "rule",
+      "spoken_text": "Glad to help! What would you like to check next on your farm?",
+      "status": "WORKING",
+      "sources": [
+        "AgriSage Conversational Engine"
+      ],
+      "action_link": null,
+      "action_label": null,
+      "action_type": null,
+      "confirmation_chip": null,
+      "mode": "basic",
+      "privacy_notice": null,
+      "structured_data": {},
+      "limitations": [],
+      "upstream_status": null,
+      "suggestion_chips": [
+        "Will it rain today?",
+        "Should I irrigate?",
+        "What is my profit?"
+      ],
+      "timestamp": "2026-11-14T13:58:59.173233Z"
+    }
+  },
+  {
+    "query": {
+      "query": "should I water today?",
+      "language": "en"
+    },
+    "response": {
+      "intent": "irrigation",
+      "confidence": 0.9,
+      "confidence_type": "model",
+      "spoken_text": "Your Cotton holding does not require irrigation today. Target application depth is 25.0 mm (150,000 litres for 5.0 acres). Forecast rain savings: 0 litres.",
+      "status": "WORKING",
+      "sources": [
+        "FAO-56 Irrigation and Drainage Paper",
+        "Daily Soil Water Balance Bucket Model"
+      ],
+      "action_link": "/irrigation",
+      "action_label": "Open Water Budget Planner",
+      "action_type": null,
+      "confirmation_chip": null,
+      "mode": "basic",
+      "privacy_notice": null,
+      "structured_data": {
+        "irrigate_now": false,
+        "net_depth_mm": 25.0,
+        "volume_litres": 150000,
+        "crop": "Cotton",
+        "context_packet": {
+          "farm_profile": {
+            "status": "LIVE",
+            "name": "Rameshwaram Farm (Warangal)",
+            "area_acres": 5.0,
+            "crop": "Cotton",
+            "soil_type": "Red Loam",
+            "irrigation_method": "drip",
+            "village": "Geikonda",
+            "district": "Warangal",
+            "state": "Telangana"
+          },
+          "weather": {
+            "status": "LIVE",
+            "temperature_c": 28.5,
+            "rainfall_today_mm": 0.0,
+            "reference_et0_mm": 4.5,
+            "weather_code_meaning": "Clear / Mild"
+          },
+          "irrigation": {
+            "status": "LIVE",
+            "irrigate_now": false,
+            "recommended_depth_mm": 0.0,
+            "root_zone_depletion_mm": 12.0,
+            "method": "drip"
+          },
+          "calendar": {
+            "status": "LIVE",
+            "active_crop": "Cotton",
+            "days_after_sowing": 45,
+            "stage_name": "Flowering / Square Formation"
+          },
+          "disease": {
+            "status": "LIVE",
+            "has_recent_scan": true,
+            "predicted_disease": "Tomato___Early_blight",
+            "treatment_note": "Regular foliar scouting recommended"
+          },
+          "economics": {
+            "status": "LIVE",
+            "estimated_net_profit_rs": 85000,
+            "gross_revenue_rs": 185000,
+            "total_cost_rs": 100000
+          },
+          "outbreaks": {
+            "status": "LIVE",
+            "nearby_outbreaks_count": 4,
+            "active_outbreaks": [
+              "Pest in Dharmasagar",
+              "Pest in Geikonda",
+              "Pest in Hasanparthy"
+            ]
+          },
+          "market": {
+            "status": "DEMO DATA",
+            "crop": "Cotton",
+            "top_mandi": "Warangal APMC",
+            "modal_price_rs_per_q": 7120,
+            "note": "Modal prices are DEMO DATA unless real DATA_GOV_IN_API_KEY is active. No unverified MSP numbers."
+          },
+          "soil_health_card": {
+            "status": "UNVERIFIED",
+            "has_confirmed_card": false,
+            "npk": "Standard baseline values"
+          }
+        }
+      },
+      "limitations": [
+        "Verify soil water deficit visually with a 2-3 inch field finger test before pumping."
+      ],
+      "upstream_status": "Basic mode (no AI key)",
+      "suggestion_chips": [
+        "Will it rain today?",
+        "Should I irrigate today?",
+        "Diagnose leaf disease",
+        "Cotton cultivation cost",
+        "Mandi market price"
+      ],
+      "timestamp": "2026-11-14T13:59:00.788224Z"
+    }
+  },
+  {
+    "query": {
+      "query": "open market",
+      "language": "en"
+    },
+    "response": {
+      "intent": "navigation",
+      "confidence": 1.0,
+      "confidence_type": "rule",
+      "spoken_text": "Navigating to Mandi Market & Prices.",
+      "status": "WORKING",
+      "sources": [
+        "AgriSage Navigation Registry"
+      ],
+      "action_link": "/market",
+      "action_label": "Open Mandi Market",
+      "action_type": "navigate",
+      "confirmation_chip": "Opening Mandi Market...",
+      "mode": "basic",
+      "privacy_notice": null,
+      "structured_data": {},
+      "limitations": [],
+      "upstream_status": null,
+      "suggestion_chips": [
+        "Best mandi price",
+        "Check mandi distance"
+      ],
+      "timestamp": "2026-11-14T13:59:00.793245Z"
+    }
+  },
+  {
+    "query": {
+      "query": "ఈరోజు నా పత్తి చేనుకు నీరు పెట్టాలా?",
+      "language": "te"
+    },
+    "response": {
+      "intent": "irrigation",
+      "confidence": 0.9,
+      "confidence_type": "model",
+      "spoken_text": "మీ Cotton పంటకు ఈరోజు నీరు పెట్టాల్సిన అవసరం లేదు. సిఫార్సు చేసిన తడి లోతు 25.0 మి.మీ (మొత్తం 150,000 లీటర్లు). వర్ష సూచన ద్వారా ఆదా అయ్యే నీరు 0 లీటర్లు.",
+      "status": "WORKING",
+      "sources": [
+        "FAO-56 Irrigation and Drainage Paper",
+        "Daily Soil Water Balance Bucket Model"
+      ],
+      "action_link": "/irrigation",
+      "action_label": "Open Water Budget Planner",
+      "action_type": null,
+      "confirmation_chip": null,
+      "mode": "basic",
+      "privacy_notice": null,
+      "structured_data": {
+        "irrigate_now": false,
+        "net_depth_mm": 25.0,
+        "volume_litres": 150000,
+        "crop": "Cotton",
+        "context_packet": {
+          "farm_profile": {
+            "status": "LIVE",
+            "name": "Rameshwaram Farm (Warangal)",
+            "area_acres": 5.0,
+            "crop": "Cotton",
+            "soil_type": "Red Loam",
+            "irrigation_method": "drip",
+            "village": "Geikonda",
+            "district": "Warangal",
+            "state": "Telangana"
+          },
+          "weather": {
+            "status": "LIVE",
+            "temperature_c": 28.5,
+            "rainfall_today_mm": 0.0,
+            "reference_et0_mm": 4.5,
+            "weather_code_meaning": "Clear / Mild"
+          },
+          "irrigation": {
+            "status": "LIVE",
+            "irrigate_now": false,
+            "recommended_depth_mm": 0.0,
+            "root_zone_depletion_mm": 12.0,
+            "method": "drip"
+          },
+          "calendar": {
+            "status": "LIVE",
+            "active_crop": "Cotton",
+            "days_after_sowing": 45,
+            "stage_name": "Flowering / Square Formation"
+          },
+          "disease": {
+            "status": "LIVE",
+            "has_recent_scan": true,
+            "predicted_disease": "Tomato___Early_blight",
+            "treatment_note": "Regular foliar scouting recommended"
+          },
+          "economics": {
+            "status": "LIVE",
+            "estimated_net_profit_rs": 85000,
+            "gross_revenue_rs": 185000,
+            "total_cost_rs": 100000
+          },
+          "outbreaks": {
+            "status": "LIVE",
+            "nearby_outbreaks_count": 4,
+            "active_outbreaks": [
+              "Pest in Dharmasagar",
+              "Pest in Geikonda",
+              "Pest in Hasanparthy"
+            ]
+          },
+          "market": {
+            "status": "DEMO DATA",
+            "crop": "Cotton",
+            "top_mandi": "Warangal APMC",
+            "modal_price_rs_per_q": 7120,
+            "note": "Modal prices are DEMO DATA unless real DATA_GOV_IN_API_KEY is active. No unverified MSP numbers."
+          },
+          "soil_health_card": {
+            "status": "UNVERIFIED",
+            "has_confirmed_card": false,
+            "npk": "Standard baseline values"
+          }
+        }
+      },
+      "limitations": [
+        "Verify soil water deficit visually with a 2-3 inch field finger test before pumping."
+      ],
+      "upstream_status": "Basic mode (no AI key)",
+      "suggestion_chips": [
+        "ఈరోజు వర్షం పడుతుందా?",
+        "ఈరోజు నా పంటకు నీరు పెట్టాలా?",
+        "ఆకు తెగులు ఎలా గుర్తించాలి?",
+        "ఎకరాకు పత్తి సాగు ఖర్చు ఎంత?",
+        "పత్తి మార్కెట్ ధర ఎంత?"
+      ],
+      "timestamp": "2026-11-14T13:59:01.875876Z"
+    }
+  },
+  {
+    "query": {
+      "query": "क्या मुझे आज अपनी फसल में पानी देना चाहिए?",
+      "language": "hi"
+    },
+    "response": {
+      "intent": "irrigation",
+      "confidence": 0.9,
+      "confidence_type": "model",
+      "spoken_text": "आपकी Cotton फसल को आज सिंचाई की आवश्यकता नहीं है। सिंचाई गहराई 25.0 मिमी (कुल 150,000 लीटर) है। बारिश के पूर्वानुमान से अनुमानित जल बचत 0 लीटर है।",
+      "status": "WORKING",
+      "sources": [
+        "FAO-56 Irrigation and Drainage Paper",
+        "Daily Soil Water Balance Bucket Model"
+      ],
+      "action_link": "/irrigation",
+      "action_label": "Open Water Budget Planner",
+      "action_type": null,
+      "confirmation_chip": null,
+      "mode": "basic",
+      "privacy_notice": null,
+      "structured_data": {
+        "irrigate_now": false,
+        "net_depth_mm": 25.0,
+        "volume_litres": 150000,
+        "crop": "Cotton",
+        "context_packet": {
+          "farm_profile": {
+            "status": "LIVE",
+            "name": "Rameshwaram Farm (Warangal)",
+            "area_acres": 5.0,
+            "crop": "Cotton",
+            "soil_type": "Red Loam",
+            "irrigation_method": "drip",
+            "village": "Geikonda",
+            "district": "Warangal",
+            "state": "Telangana"
+          },
+          "weather": {
+            "status": "LIVE",
+            "temperature_c": 28.5,
+            "rainfall_today_mm": 0.0,
+            "reference_et0_mm": 4.5,
+            "weather_code_meaning": "Clear / Mild"
+          },
+          "irrigation": {
+            "status": "LIVE",
+            "irrigate_now": false,
+            "recommended_depth_mm": 0.0,
+            "root_zone_depletion_mm": 12.0,
+            "method": "drip"
+          },
+          "calendar": {
+            "status": "LIVE",
+            "active_crop": "Cotton",
+            "days_after_sowing": 45,
+            "stage_name": "Flowering / Square Formation"
+          },
+          "disease": {
+            "status": "LIVE",
+            "has_recent_scan": true,
+            "predicted_disease": "Tomato___Early_blight",
+            "treatment_note": "Regular foliar scouting recommended"
+          },
+          "economics": {
+            "status": "LIVE",
+            "estimated_net_profit_rs": 85000,
+            "gross_revenue_rs": 185000,
+            "total_cost_rs": 100000
+          },
+          "outbreaks": {
+            "status": "LIVE",
+            "nearby_outbreaks_count": 4,
+            "active_outbreaks": [
+              "Pest in Dharmasagar",
+              "Pest in Geikonda",
+              "Pest in Hasanparthy"
+            ]
+          },
+          "market": {
+            "status": "DEMO DATA",
+            "crop": "Cotton",
+            "top_mandi": "Warangal APMC",
+            "modal_price_rs_per_q": 7120,
+            "note": "Modal prices are DEMO DATA unless real DATA_GOV_IN_API_KEY is active. No unverified MSP numbers."
+          },
+          "soil_health_card": {
+            "status": "UNVERIFIED",
+            "has_confirmed_card": false,
+            "npk": "Standard baseline values"
+          }
+        }
+      },
+      "limitations": [
+        "Verify soil water deficit visually with a 2-3 inch field finger test before pumping."
+      ],
+      "upstream_status": "Basic mode (no AI key)",
+      "suggestion_chips": [
+        "क्या आज बारिश होगी?",
+        "क्या आज फसल को पानी देना चाहिए?",
+        "पत्ती रोग की पहचान कैसे करें?",
+        "प्रति एकड़ कपास खेती लागत कितनी है?",
+        "कपास का मंडी भाव क्या है?"
+      ],
+      "timestamp": "2026-11-14T13:59:03.217646Z"
+    }
+  }
+]

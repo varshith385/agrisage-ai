@@ -369,6 +369,21 @@ The following agronomic, workflow, and interface strings were added in Round 5 P
 | **Reminders Wizard** | When is it due? | ఎప్పుడు చేయాలి? | कब करना है? | **Unverified**: Not native-reviewed. |
 | **Reminders Wizard** | Does it repeat? | పునరావృతం కావాలా? | क्या यह दोहराना है? | **Unverified**: Not native-reviewed. |
 
+---
+
+## 15. Phase 6 Chat Query & Spoken Telemetry Additions (Not Native-Reviewed)
+
+The following queries and backend-generated conversational spoken responses were tested against the live API on port 8020 and catalogued as **not native-reviewed**:
+
+| Category | Text / Phrase | Language | Translation / Meaning | Review Status |
+|---|---|---|---|---|
+| **Chat Query** | ఈరోజు నా పత్తి చేనుకు నీరు పెట్టాలా? | `te` | Should I water my cotton farm today? | **Unverified**: Not native-reviewed. |
+| **Chat Response** | మీ Cotton పంటకు ఈరోజు నీరు పెట్టాల్సిన అవసరం లేదు. సిఫార్సు చేసిన తడి లోతు 25.0 మి.మీ (మొత్తం 150,000 లీటర్లు). వర్ష సూచన ద్వారా ఆదా అయ్యే నీరు 0 లీటర్లు. | `te` | Your Cotton crop does not need water today. Recommended depth is 25.0 mm (total 150,000 litres). Rain savings forecast is 0 litres. | **Unverified**: Not native-reviewed. |
+| **Chat Query** | क्या मुझे आज अपनी फसल में पानी देना चाहिए? | `hi` | Should I give water to my crop today? | **Unverified**: Not native-reviewed. |
+| **Chat Response** | आपकी Cotton फसल को आज सिंचाई की आवश्यकता नहीं है। सिंचाई गहराई 25.0 मिमी (कुल 150,000 लीटर) है। बारिश के पूर्वानुमान से अनुमानित जल बचत 0 लीटर है। | `hi` | Your Cotton crop does not need irrigation today. Irrigation depth is 25.0 mm (total 150,000 litres). Estimated water savings from rain forecast is 0 litres. | **Unverified**: Not native-reviewed. |
+| **Chat Smalltalk** | Glad to help! What would you like to check next on your farm? | `en` | Conversational acknowledgment response for "okay" | **English**: Standard extension tone. |
+
+
 
 
 
