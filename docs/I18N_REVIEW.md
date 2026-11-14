@@ -252,3 +252,34 @@ The following translations were added in Round 5 Phase D for the Reminders page,
 | **Reminders Modal** | Create Field Reminder | నూతన జ్ఞాపికను సృష్టించండి | नया स्मरणपत्र बनाएं | **Unverified**: Needs native review. |
 | **Reminders Action** | Mark Done | పూర్తయింది | पूर्ण हुआ | **Unverified**: Needs native review. |
 | **Reminders Action** | Add to Reminders | జోడించు | जोड़ें | **Unverified**: Needs native review. |
+
+---
+
+## 11. Round 5 Phase E Universal Pictorial Mode, Step-Flows, Legend & Chooser (Unverified — Awaiting Native Review)
+
+The following translations were added in Round 5 Phase E for the First-Run Visual Mode Chooser, Picture Legend Modal ("How to read this screen"), physical StepFlow components across all 14 pages, and Schemes/Soil pictorial tiles:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Visual Chooser** | How would you like to view AgriSage? | మీరు అగ్రిసేజ్ యాప్‌ను ఎలా చూడాలనుకుంటున్నారు? | आप एग्रीसेज ऐप को कैसे देखना चाहते हैं? | **Unverified**: Needs native review. |
+| **Visual Chooser** | Pictures Mode (Visual cards, voice speak, simple colors) | చిత్రాల మోడ్ (కార్డులు, వాయిస్, రంగులు) | चित्र मोड (चित्र, आवाज, रंग) | **Unverified**: Needs native review. |
+| **Visual Chooser** | Words Mode (Standard tables, detailed numbers and data) | పాఠ్య మోడ్ (వివరమైన పట్టికలు, సంఖ్యలు) | टेक्स्ट मोड (विस्तृत तालिकाएं, डेटा) | **Unverified**: Needs native review. |
+| **Legend Modal** | How to Read This Screen | ఈ స్క్రీన్‌ను ఎలా చదవాలి (చిత్రాల సంకేతాలు) | इस स्क्रीन को कैसे समझें (चित्र संकेत) | **Unverified**: Needs native review. |
+| **Legend Modal** | Green Circle: Safe / Good to go / Proceed | ఆకుపచ్చ వృత్తం: సురక్షితం / అంతా బాగుంది / కొనసాగించండి | हरा वृत्त: सुरक्षित / सब ठीक / आगे बढ़ें | **Unverified**: Needs native review. |
+| **Legend Modal** | Amber Square: Attention / Check Details | పసుపు చతురస్రం: శ్రద్ధ వహించండి / వివరాలు తనిఖీ చేయండి | पीला वर्ग: ध्यान दें / विवरण की जांच करें | **Unverified**: Needs native review. |
+| **Legend Modal** | Red Triangle: Urgent Action / Stop / Consult Officer | ఎరుపు త్రికోణం: తక్షణ చర్య అవసరం / ఆగండి / అధికారిని సంప్రదించండి | लाल त्रिभुज: तुरंत कार्रवाई / रुकें / अधिकारी से सलाह लें | **Unverified**: Needs native review. |
+| **Legend Modal** | Grey Dashed Circle: Awaiting Data / Unmeasured | బూడిద చుక్కల వృత్తం: డేటా ఇంకా అందలేదు / వేచి ఉంది | धूसर वृत्त: डेटा प्रतीक्षित / अभी उपलब्ध नहीं | **Unverified**: Needs native review. |
+| **Legend Modal** | Test Audio (Play Sample) | నమూనా ఆడియో వినండి | नमूना ऑडियो सुनें | **Unverified**: Needs native review. |
+| **Schemes Pictorial** | Soil Nutrients (N-P-K) | నత్రజని-భాస్వరం-పొటాష్ | एन-पी-के पोषक तत्व | **Unverified**: Needs native review. |
+| **Schemes Pictorial** | pH & Soil Texture | పీహెచ్ & నేల రకం | पीएच व मिट्टी का प्रकार | **Unverified**: Needs native review. |
+| **Schemes Pictorial** | Welfare Schemes (Planned) | ప్రభుత్వ పథకాలు (ప్రణాళిక) | सरकारी योजनाएं (प्रस्तावित) | **Unverified**: Needs native review. |
+| **Schemes StepFlow** | Soil Sampling | నేల నమూనా సేకరణ | मिट्टी का नमूना संग्रह | **Unverified**: Needs native review. |
+| **Schemes StepFlow** | Nutrient Calibration | యాప్‌లో నమోదు & క్యాలిబ్రేషన్ | ऐप में दर्ज व कैलिब्रेशन | **Unverified**: Needs native review. |
+| **Schemes StepFlow** | Extension Verification | అధికారులతో సంప్రదింపు | कृषि अधिकारी से संपर्क | **Unverified**: Needs native review. |
+| **Market StepFlow** | Check Mandi Prices | మండి ధరల పరిశీలన | मंडी भाव की जांच | **Unverified**: Needs native review. |
+| **Market StepFlow** | Deduct Transport Cost | రవాణా ఖర్చు తీసివేత | परिवहन खर्च घटाना | **Unverified**: Needs native review. |
+| **Market StepFlow** | Direct Trade or Best Mandi | నేరుగా అమ్మకం లేదా ఉత్తమ మండి | सीधा व्यापार या सर्वश्रेष्ठ मंडी | **Unverified**: Needs native review. |
+| **Farm StepFlow** | Village & Location | గ్రామం & ప్రాంత వివరాలు | गांव व स्थान का विवरण | **Unverified**: Needs native review. |
+| **Farm StepFlow** | Crop & Soil Selection | పంట & నేల రకం ఎంపిక | फसल और मिट्टी का चयन | **Unverified**: Needs native review. |
+| **Farm StepFlow** | Land Acreage & Tenure | ఎకరాలు & యాజమాన్య హక్కు | रकबा व स्वामित्व पट्टा | **Unverified**: Needs native review. |
+

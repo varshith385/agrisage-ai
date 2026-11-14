@@ -27,6 +27,7 @@ import { NoDataIllustration, LeafScanIllustration } from '../components/common/F
 import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { StepFlow } from '../components/common/StepFlow';
 
 export const CalendarPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -221,6 +222,31 @@ export const CalendarPage: React.FC = () => {
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
         </div>
+
+        {/* 3-Step Phenological Crop Operations Routine */}
+        <StepFlow
+          heading={language === 'te' ? 'పంట దశల కాలెండర్‌లో 3 ముఖ్యమైన అడుగులు' : language === 'hi' ? 'फसल कैलेंडर के 3 सरल चरण' : '3 Crop Stage Milestones'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'ప్రస్తుత పంట దశ' : language === 'hi' ? 'वर्तमान अवस्था' : 'Current Stage Tracking',
+              desc: language === 'te' ? 'విత్తిన రోజుల సంఖ్య (DAS) మరియు ఎదుగుదల చూడండి' : language === 'hi' ? 'बुवाई के दिन और वानस्पतिक वृद्धि देखें' : 'Track exact days after sowing and canopy development',
+              icon: Sprout,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'తదుపరి పొలం పని' : language === 'hi' ? 'अगला कृषि कार्य' : 'Next Field Task',
+              desc: language === 'te' ? 'ఎరువులు, కలుపు తీత లేదా పురుగుల నిఘా చేపట్టండి' : language === 'hi' ? 'खाद, निराई या कीट निगरानी करें' : 'Perform scheduled weeding, scouting, and nutrient top-dressing',
+              icon: CheckCircle,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'కోత సమయం మరియు విక్రయం' : language === 'hi' ? 'कटाई एवं मंडी' : 'Harvest Window',
+              desc: language === 'te' ? 'సరైన పక్వత సమయంలో కోత కోసి మార్కెట్ కు తరలించండి' : language === 'hi' ? 'सही परिपक्वता पर कटाई कर मंडी ले जाएं' : 'Plan harvest timing and line up transport to avoid moisture loss',
+              icon: Sun,
+            },
+          ]}
+        />
       </div>
     );
   }

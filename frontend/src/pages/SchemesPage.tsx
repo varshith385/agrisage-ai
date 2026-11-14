@@ -16,6 +16,8 @@ import {
   RefreshCw,
   ArrowRight,
   BookOpen,
+  FlaskConical,
+  Landmark,
 } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
 import { usePictorial } from '../context/PictorialContext';
@@ -33,6 +35,10 @@ import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { WateringFieldIllustration } from '../components/common/FarmerIllustrations';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StepFlow } from '../components/common/StepFlow';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { StatusBadge } from '../components/common/StatusBadge';
 
 // Quick test sample transcripts
 const SAMPLE_ENGLISH = `GOVERNMENT OF INDIA - MINISTRY OF AGRICULTURE & FARMERS WELFARE
@@ -267,83 +273,136 @@ export const SchemesPage: React.FC = () => {
 
   // PICTORIAL MODE
   if (isPictorial) {
+    const hasCard = Boolean(impactData?.has_confirmed_soil_card);
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
+        <ModeToggleHero />
+
         <PageHeader
           icon={FileText}
-          title={language === 'te' ? 'నేల ఆరోగ్య పత్రం' : language === 'hi' ? 'मृदा स्वास्थ्य कार्ड' : 'Soil Health Card'}
-          purpose={language === 'te' ? 'నేల పరీక్ష ఫలితాలు మరియు ఎరువుల మోతాదు' : language === 'hi' ? 'मिट्टी की जांच और उर्वरक की मात्रा' : 'Visual soil nutrients and welfare schemes (planned, details to verify).'}
+          title={language === 'te' ? 'నేల ఆరోగ్య పత్రం & పథకాలు' : language === 'hi' ? 'मृदा स्वास्थ्य व योजनाएं' : 'Soil Health & Schemes'}
+          purpose={language === 'te' ? 'నేల పరీక్ష ఫలితాలు, ఎరువుల మోతాదు మరియు సంక్షేమ పథకాలు' : language === 'hi' ? 'मिट्टी की जांच, पोषण और सरकारी योजनाएं' : 'Visual soil nutrients and welfare schemes (planned, details to verify).'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <WateringFieldIllustration className="w-48 h-36 drop-shadow-sm" />
-          </div>
-
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            Soil Nutrients (N-P-K)
-          </h2>
-
-          <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-3 text-left">
-            <div className="flex justify-between items-center">
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                impactData?.has_confirmed_soil_card ? 'bg-[#183D2E] text-white' : 'bg-stone-100 text-stone-700'
-              }`}>
-                {impactData?.has_confirmed_soil_card ? 'Confirmed Card' : 'No Test Recorded (Baseline)'}
-              </span>
-              <span className="text-xs font-bold text-[#7A553A]">
-                pH: {impactData?.has_confirmed_soil_card ? (ph || 'Not tested') : 'Baseline average'}
-              </span>
+        {/* Lead Status Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#E8F5E9] border-2 border-[#1B5E3B] flex items-center justify-center shrink-0 shadow-sm">
+              <WateringFieldIllustration className="w-16 h-16 drop-shadow-sm" />
             </div>
-
-            {impactData?.has_confirmed_soil_card ? (
-              <div className="grid grid-cols-3 gap-2 text-center pt-2">
-                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] text-[#7A553A] font-bold block">NITROGEN</span>
-                  <span className="text-lg font-bold text-[#183D2E]">{nitrogen ?? '--'}</span>
-                  <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
-                </div>
-                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] text-[#7A553A] font-bold block">PHOSPHORUS</span>
-                  <span className="text-lg font-bold text-[#183D2E]">{phosphorus ?? '--'}</span>
-                  <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
-                </div>
-                <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] text-[#7A553A] font-bold block">POTASSIUM</span>
-                  <span className="text-lg font-bold text-[#183D2E]">{potassium ?? '--'}</span>
-                  <span className="text-[9px] text-[#4E5F57] block">kg/ha</span>
-                </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {soilTexture || 'Field Soil'}
+                </span>
+                <StatusBadge
+                  status={hasCard ? 'success' : 'nodata'}
+                  label={hasCard ? (language === 'te' ? 'ధృవీకరించబడింది' : language === 'hi' ? 'पुष्टि की गई' : 'Card Confirmed') : (language === 'te' ? 'బేస్‌లైన్ డేటా' : language === 'hi' ? 'बेसलाइन डेटा' : 'Baseline Mode')}
+                  size="sm"
+                />
               </div>
-            ) : (
-              <div className="bg-[#FAF8F5] p-4 rounded-xl border border-dashed border-[#7A553A]/30 text-center space-y-1">
-                <p className="text-xs font-bold text-[#1F2A24]">
-                  {language === 'te' ? 'నేల పరీక్ష రికార్డు నమోదు కాలేదు' : language === 'hi' ? 'कोई सॉइल टेस्ट दर्ज नहीं है' : 'No Soil Card Recorded Yet'}
-                </p>
-                <p className="text-[11px] text-[#4A5750]">
-                  {language === 'te' ? 'పూర్తి ట్యాబ్‌లో మీ నేల పరీక్ష వివరాలను నమోదు చేయండి' : language === 'hi' ? 'पूरे विवरण टैब में अपने पोषक तत्व दर्ज करें' : 'Enter N-P-K nutrient values in the calibration tab.'}
-                </p>
-              </div>
-            )}
+              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
+                {hasCard
+                  ? (language === 'te' ? 'నేల పోషకాలు నమోదు చేయబడ్డాయి' : language === 'hi' ? 'मृदा पोषक तत्व सक्रिय हैं' : 'Calibrated Soil Profile')
+                  : (language === 'te' ? 'నేల పరీక్ష రికార్డు నమోదు కాలేదు' : language === 'hi' ? 'कोई सॉइल टेस्ट दर्ज नहीं है' : 'No Soil Card Recorded Yet')}
+              </h2>
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
+                {hasCard
+                  ? `N: ${nitrogen || '280'} kg/ha • P: ${phosphorus || '18'} kg/ha • K: ${potassium || '310'} kg/ha • pH ${ph || '7.2'}`
+                  : (language === 'te' ? 'ప్రాంతీయ సగటు నేల విలువల ఆధారంగా సిఫార్సులు చేయబడుతున్నాయి. ఖచ్చితత్వం కోసం మీ నేల పరీక్ష పత్రాన్ని నమోదు చేయండి.' : language === 'hi' ? 'क्षेत्रीय औसत के आधार पर सिफारिशें हो रही हैं। सटीक जानकारी के लिए सॉइल टेस्ट कार्ड दर्ज करें।' : 'Recommendations currently use regional baseline averages. Enter lab test values to upgrade confidence.')}
+              </p>
+            </div>
           </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <ReadAloudButton text={`Soil nutrient profile: ${impactData?.has_confirmed_soil_card ? `Nitrogen ${nitrogen}, Phosphorus ${phosphorus}, Potassium ${potassium}` : 'No confirmed soil test registered yet.'} ${plainMeaning}`} />
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            <ReadAloudButton
+              text={`Soil status: ${hasCard ? `Confirmed soil card. Nitrogen ${nitrogen || 280}, Phosphorus ${phosphorus || 18}, Potassium ${potassium || 310}` : 'No confirmed soil card registered. Using regional baseline values.'} ${plainMeaning}`}
+              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+            />
             <button
               type="button"
-              onClick={() => setMode('words')}
-              className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center justify-center gap-2 text-sm shadow-sm transition-all"
+              onClick={() => { setActiveTab('upload'); setMode('words'); }}
+              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
             >
               <span>{language === 'te' ? 'పూర్తి వివరాలు & క్యాలిబ్రేషన్' : language === 'hi' ? 'पूरा विवरण व कैलिब्रेशन' : 'View / Edit Card'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-5 h-5" />
             </button>
           </div>
         </div>
+
+        {/* 3 Pictorial Summary Tiles */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Tile 1: Soil Nutrients N-P-K */}
+          <PictorialTile
+            title={language === 'te' ? 'నత్రజని-భాస్వరం-పొటాష్' : language === 'hi' ? 'एन-पी-के पोषक तत्व' : 'Nutrients (N-P-K)'}
+            phrase={hasCard ? `N: ${nitrogen || '--'} • P: ${phosphorus || '--'} • K: ${potassium || '--'} kg/ha` : (language === 'te' ? 'బేస్‌లైన్ సగటు (N:280 P:18 K:310)' : language === 'hi' ? 'बेसलाइन औसत (N:280 P:18 K:310)' : 'Regional baseline average')}
+            illustration={<WateringFieldIllustration className="w-20 h-20" />}
+            status={hasCard ? 'success' : 'nodata'}
+            statusWord={hasCard ? (language === 'te' ? 'ధృవీకరించబడింది' : language === 'hi' ? 'सत्यापित' : 'Confirmed') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'Baseline / No Data')}
+            spokenText={hasCard ? `Nitrogen is ${nitrogen} kg/ha, Phosphorus is ${phosphorus} kg/ha, Potassium is ${potassium} kg/ha.` : 'No lab soil test on file. Regional baseline estimates are being used.'}
+            onOpenDetails={() => { setActiveTab('upload'); setMode('words'); }}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 2: Soil pH & Texture */}
+          <PictorialTile
+            title={language === 'te' ? 'పీహెచ్ & నేల రకం' : language === 'hi' ? 'पीएच व मिट्टी का प्रकार' : 'pH & Soil Texture'}
+            phrase={`${soilTexture || 'Sandy Clay Loam'} • pH ${ph || (hasCard ? 'Not tested' : '7.2 (est)')}`}
+            illustration={<FlaskConical className="w-16 h-16 text-[#1565A8]" />}
+            status={hasCard ? 'info' : 'nodata'}
+            statusWord={hasCard ? `pH ${ph || '7.2'}` : (language === 'te' ? 'అంచనా' : language === 'hi' ? 'अनुमानित' : 'Estimated')}
+            spokenText={`Soil reaction is pH ${ph || '7.2'} and soil texture is ${soilTexture || 'sandy clay loam'}.`}
+            onOpenDetails={() => { setActiveTab('impact'); setMode('words'); }}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+
+          {/* Tile 3: Government Schemes (Planned) */}
+          <PictorialTile
+            title={language === 'te' ? 'ప్రభుత్వ పథకాలు (ప్రణాళిక)' : language === 'hi' ? 'सरकारी योजनाएं (प्रस्तावित)' : 'Welfare Schemes (Planned)'}
+            phrase={language === 'te' ? 'వివరాలు ధృవీకరించబడాలి (Planned, details to verify)' : language === 'hi' ? 'सत्यापन आवश्यक (Planned, details to verify)' : 'Directory planned (details to verify)'}
+            illustration={<Landmark className="w-16 h-16 text-[#7A553A]" />}
+            status="warning"
+            statusWord={language === 'te' ? 'పరిశీలించండి' : language === 'hi' ? 'सत्यापित करें' : 'Planned'}
+            spokenText="Government welfare schemes directory is planned. Details require verification from official local agriculture extension offices."
+            onOpenDetails={() => { setActiveTab('schemes'); setMode('words'); }}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
+        </div>
+
+        {/* Step-by-Step Physical Field Flow */}
+        <StepFlow
+          heading={language === 'te' ? 'నేల పరీక్ష & పథకాల మార్గదర్శకత్వం' : language === 'hi' ? 'मृदा स्वास्थ्य व योजना प्रक्रिया' : 'Soil Testing & Schemes Workflow'}
+          spokenText="Step 1: Collect soil core samples from 10 to 15 field locations. Step 2: Calibrate app with Soil Health Card N-P-K readings. Step 3: Consult local Agriculture Extension Officer for verified government welfare schemes."
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'నేల నమూనా సేకరణ' : language === 'hi' ? 'मिट्टी का नमूना संग्रह' : 'Soil Sampling',
+              desc: language === 'te' ? 'పొలంలో 10-15 ప్రదేశాల్లో 15 సెం.మీ లోతులో మట్టి సేకరించి ల్యాబ్‌లో పరీక్షించండి' : language === 'hi' ? 'खेत में 10-15 स्थानों से 15 सेमी गहराई से नमूना लेकर लैब में जांच करवाएं' : 'Collect 10-15 core samples at 15cm depth across field for testing at KVK/lab.',
+              icon: FlaskConical,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'యాప్‌లో నమోదు & క్యాలిబ్రేషన్' : language === 'hi' ? 'ऐप में दर्ज व कैलिब्रेशन' : 'Nutrient Calibration',
+              desc: language === 'te' ? 'ల్యాబ్ ఫలితాల ప్రకారం N-P-K మరియు pH విలువలను నమోదు చేసి సిఫార్సులను మెరుగుపరచండి' : language === 'hi' ? 'सॉइल कार्ड से N-P-K और पीएच मान दर्ज करके सटीक सिफारिशें प्राप्त करें' : 'Input lab test values to replace baseline averages with verified field nutrients.',
+              icon: FileText,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'అధికారులతో సంప్రదింపు' : language === 'hi' ? 'कृषि अधिकारी से संपर्क' : 'Extension Verification',
+              desc: language === 'te' ? 'అర్హత కలిగిన ప్రభుత్వ పథకాల ధృవీకరణ కోసం మీ స్థానిక వ్యవసాయ అధికారి (AEO)ని సంప్రదించండి' : language === 'hi' ? 'पात्र सरकारी योजनाओं के सत्यापन हेतु अपने स्थानीय कृषि विस्तार अधिकारी से संपर्क करें' : 'Visit local Agriculture Extension Officer (AEO) / Rythu Bharosa Kendra for verified scheme enrolment.',
+              icon: Landmark,
+            },
+          ]}
+        />
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-16 animate-fadeIn">
+      {/* Mode Switcher */}
+      <ModeToggleHero />
+
       {/* PAGE HEADER */}
       <PageHeader
         icon={FileText}

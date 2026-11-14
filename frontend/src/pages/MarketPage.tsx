@@ -57,6 +57,7 @@ import { MoneyProfitIllustration, CoinStackGauge, NoDataIllustration } from '../
 import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { StepFlow } from '../components/common/StepFlow';
 
 export const MarketPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -358,6 +359,31 @@ export const MarketPage: React.FC = () => {
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
         </div>
+
+        {/* 3-Step Mandi Selection StepFlow */}
+        <StepFlow
+          heading={language === 'te' ? 'మార్కెట్ ఎంపికలో 3 దశలు' : language === 'hi' ? 'मंडी चयन के 3 सरल कदम' : '3 Mandi Decision Steps'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'ధరలు పరిశీలించండి' : language === 'hi' ? 'भाव देखें' : 'Check Mandi Prices',
+              desc: language === 'te' ? 'దగ్గర్లోని మార్కెట్లలో క్వింటాల్ మోడల్ ధర తెలుసుకోండి' : language === 'hi' ? 'आस-पास की मंडियों में मॉडल भाव देखें' : 'Compare modal prices across nearby APMC yards',
+              icon: Store,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'రవాణా ఖర్చు తీసివేయండి' : language === 'hi' ? 'किराया घटाएं' : 'Deduct Transport Cost',
+              desc: language === 'te' ? 'దూరం మరియు డీజిల్ ఖర్చు తీసివేసి నికర ధర లెక్కించండి' : language === 'hi' ? 'दूरी और मालभाड़ा घटाकर शुद्ध प्राप्ति निकालें' : 'Calculate net realization after transport and market fees',
+              icon: Truck,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'ఉత్తమ మండిని ఎంచుకోండి' : language === 'hi' ? 'सही मंडी चुनें' : 'Choose Best Mandi',
+              desc: language === 'te' ? 'చేతికి ఎక్కువ డబ్బు వచ్చే మార్కెట్ కు సరుకు తీసుకెళ్లండి' : language === 'hi' ? 'जहाँ शुद्ध कमाई सबसे ज्यादा हो, वही मंडी चुनें' : 'Direct produce to the highest net-yield market',
+              icon: TrendingUp,
+            },
+          ]}
+        />
       </div>
     );
   }

@@ -21,9 +21,13 @@ import {
   MoneyProfitIllustration,
 } from '../components/common/FarmerIllustrations';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { StepFlow } from '../components/common/StepFlow';
+import { usePictorial } from '../context/PictorialContext';
 
 export const HowToPage: React.FC = () => {
   const { language } = useTranslation();
+  const { isPictorial, setMode } = usePictorial();
 
   const steps = [
     {
@@ -119,8 +123,78 @@ export const HowToPage: React.FC = () => {
     },
   ];
 
+  if (isPictorial) {
+    return (
+      <div className="space-y-6 animate-fadeIn pb-12">
+        <ModeToggleHero />
+
+        <PageHeader
+          icon={HelpCircle}
+          title={language === 'te' ? 'అగ్రిసేజ్ ఎలా వాడాలి? (చిత్రాల గైడ్)' : language === 'hi' ? 'एग्रीसेज कैसे उपयोग करें? (चित्र गाइड)' : 'How to Use AgriSage (Visual Guide)'}
+          purpose={
+            language === 'te'
+              ? 'రైతుల కోసం సులభమైన 4-దశల ముఖ్యమైన పనుల మార్గదర్శి'
+              : language === 'hi'
+              ? 'किसानों के लिए 4-चरणीय मुख्य कार्यों की सरल चित्र मार्गदर्शिका'
+              : 'Simple 4-step visual journey for smallholder farmers.'
+          }
+          actions={
+            <div className="flex items-center gap-2">
+              <Link
+                to="/watch"
+                className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#DA9A4C] text-[#0E241B] hover:bg-[#F5C989] shadow-xs flex items-center gap-2 transition-all text-xs"
+              >
+                <Video className="w-4 h-4" />
+                <span>{language === 'te' ? 'వీడియో చూడండి' : 'Watch Video'}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMode('words')}
+                className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-stone-700 flex items-center gap-1.5 text-xs shadow-xs"
+              >
+                <span>{language === 'te' ? 'పూర్తి టెక్స్ట్ గైడ్' : 'Full Text Guide'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          }
+        />
+
+        <StepFlow
+          heading={language === 'te' ? 'యాప్ ఉపయోగంలో 4 సులభమైన దశలు' : language === 'hi' ? 'ऐप उपयोग के 4 सरल चरण' : '4 Easy Steps to Farm Intelligence'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'భాష & పొలం ఎంచుకోండి' : language === 'hi' ? 'भाषा व खेत चुनें' : 'Language & Farm Setup',
+              desc: language === 'te' ? 'మీ భాష (తెలుగు/హిందీ) మరియు పొలం విస్తీర్ణం ఎంచుకోండి' : language === 'hi' ? 'अपनी भाषा और खेत का रकबा चुनें' : 'Choose local language and enter owned vs leased acreage',
+              icon: Globe,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'వాతావరణం & నీటి తడులు' : language === 'hi' ? 'मौसम व जल बजट' : 'Weather & Water Budget',
+              desc: language === 'te' ? '7 రోజుల వర్ష సూచన మరియు ఎప్పుడు నీరు పెట్టాలో చూడండి' : language === 'hi' ? '7 दिनों की बारिश और सिंचाई का समय देखें' : 'Check live rain forecast and root-zone water schedule',
+              icon: Droplets,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'ఆకు స్కాన్ & తెగులు గుర్తింపు' : language === 'hi' ? 'पत्ती स्कैन व रोग' : 'Leaf Scan Diagnosis',
+              desc: language === 'te' ? 'ఆకు ఫోటో తీసి తక్షణమే సేంద్రీయ నివారణ చర్యలు పొందండి' : language === 'hi' ? 'पत्ती की फोटो लेकर जैविक उपाय जानें' : 'Photograph affected leaf for verified IPM remedies',
+              icon: Leaf,
+            },
+            {
+              stepNumber: 4,
+              title: language === 'te' ? 'లాభాలు & మార్కెట్ ధరలు' : language === 'hi' ? 'मुनाफा व मंडी भाव' : 'Profit & Mandi Choice',
+              desc: language === 'te' ? 'రవాణా ఖర్చు తీసివేసి అత్యధిక నికర ధర ఇచ్చే మండిని ఎంచుకోండి' : language === 'hi' ? 'किराया घटाकर सबसे अच्छी मंडी चुनें' : 'Compare transport-adjusted net payouts across mandis',
+              icon: Coins,
+            },
+          ]}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
+      <ModeToggleHero />
       <PageHeader
         icon={HelpCircle}
         title={language === 'te' ? 'అగ్రిసేజ్ ఎలా వాడాలి?' : language === 'hi' ? 'एग्रीसेज का उपयोग कैसे करें?' : 'How to Use AgriSage AI'}

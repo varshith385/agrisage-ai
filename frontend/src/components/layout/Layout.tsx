@@ -7,6 +7,7 @@ import { Footer } from '../common/Footer';
 import { VoiceAssistant } from '../voice/VoiceAssistant';
 import { ActiveFarmBanner } from '../common/ActiveFarmBanner';
 import { GuidedTour } from '../guidance/GuidedTour';
+import { VisualModeChooserModal } from '../common/VisualModeChooserModal';
 import { useAuth } from '../../context/AuthContext';
 
 export const Layout: React.FC = () => {
@@ -57,6 +58,9 @@ export const Layout: React.FC = () => {
 
       {/* Interactive Guided Tour Overlay */}
       <GuidedTour isOpen={tourOpen} onClose={() => setTourOpen(false)} />
+
+      {/* First-Run Experience Visual Mode Chooser Modal */}
+      <VisualModeChooserModal />
 
       {/* Global Floating Voice Assistant Container on EVERY page */}
       <div

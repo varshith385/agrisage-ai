@@ -1,13 +1,15 @@
-import React from 'react';
-import { Image as ImageIcon, BookOpen, Volume2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Image as ImageIcon, BookOpen, Volume2, HelpCircle } from 'lucide-react';
 import { usePictorial } from '../../context/PictorialContext';
 import { useTranslation } from '../../context/LanguageContext';
 import { Language } from '../../types/api';
 import { speakText, SupportedLanguage } from '../../services/speech';
+import { PictorialLegendModal } from './PictorialLegendModal';
 
 export const ModeToggleHero: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { isPictorial, setPictorial } = usePictorial();
   const { language, setLanguage } = useTranslation();
+  const [legendOpen, setLegendOpen] = useState(false);
 
   const handleLanguageClick = (lang: Language) => {
     setLanguage(lang);
@@ -41,7 +43,7 @@ export const ModeToggleHero: React.FC<{ className?: string }> = ({ className = '
               className={`min-h-[64px] px-5 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all border-2 text-[18px] ${
                 isPictorial
                   ? 'bg-[#1B5E3B] text-white border-[#1B5E3B] shadow-md ring-2 ring-[#1B5E3B]/20 scale-[1.02]'
-                  : 'bg-[#FFFDF8] text-[#1F2A24] border-[#D9D4C7] hover:border-[#1B5E3B]'
+                  : 'bg-[#FFFDF8] dark:bg-[#18241E] text-[#1F2A24] dark:text-[#F2F5F3] border-[#D9D4C7] dark:border-[#273B30] hover:border-[#1B5E3B]'
               }`}
             >
               <ImageIcon className="w-6 h-6 shrink-0 text-[#F2B01E]" />
@@ -64,7 +66,7 @@ export const ModeToggleHero: React.FC<{ className?: string }> = ({ className = '
               className={`min-h-[64px] px-5 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all border-2 text-[18px] ${
                 !isPictorial
                   ? 'bg-[#1B5E3B] text-white border-[#1B5E3B] shadow-md ring-2 ring-[#1B5E3B]/20 scale-[1.02]'
-                  : 'bg-[#FFFDF8] text-[#1F2A24] border-[#D9D4C7] hover:border-[#1B5E3B]'
+                  : 'bg-[#FFFDF8] dark:bg-[#18241E] text-[#1F2A24] dark:text-[#F2F5F3] border-[#D9D4C7] dark:border-[#273B30] hover:border-[#1B5E3B]'
               }`}
             >
               <BookOpen className="w-6 h-6 shrink-0 text-[#F2B01E]" />
@@ -78,6 +80,18 @@ export const ModeToggleHero: React.FC<{ className?: string }> = ({ className = '
               </div>
             </button>
           </div>
+
+          {/* Picture Legend Modal Button */}
+          <button
+            type="button"
+            onClick={() => setLegendOpen(true)}
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-[#18241E] text-[#1B5E3B] dark:text-[#F2B01E] hover:bg-stone-50 dark:hover:bg-stone-800 text-xs font-semibold transition-colors w-fit"
+            title="How to read status shapes and colors (?)"
+            aria-label="How to read this screen"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-[#1B5E3B] dark:text-[#F2B01E]" />
+            <span>{language === 'te' ? 'రంగులు & చిహ్నాల వివరణ (?)' : language === 'hi' ? 'संकेत गाइड (?)' : 'How to read this screen (?)'}</span>
+          </button>
         </div>
 
         {/* Right: Large Language Selection Buttons */}
@@ -110,6 +124,9 @@ export const ModeToggleHero: React.FC<{ className?: string }> = ({ className = '
           </div>
         </div>
       </div>
+
+      {/* Picture Legend Modal */}
+      <PictorialLegendModal isOpen={legendOpen} onClose={() => setLegendOpen(false)} />
     </div>
   );
 };

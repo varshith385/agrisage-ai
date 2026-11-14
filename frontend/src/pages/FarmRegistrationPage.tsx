@@ -8,6 +8,7 @@ import {
   Layers,
   ArrowRight,
   Sparkles,
+  Droplets,
 } from 'lucide-react';
 import { farmsApi } from '../api/farms';
 import { Farm, OwnershipType, IrrigationMethod } from '../types/api';
@@ -21,6 +22,9 @@ import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { WateringFieldIllustration } from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StepFlow } from '../components/common/StepFlow';
 
 export const FarmRegistrationPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -156,57 +160,91 @@ export const FarmRegistrationPage: React.FC = () => {
   if (isPictorial) {
     return (
       <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
+        <ModeToggleHero />
+
         <PageHeader
           icon={Tractor}
           title={language === 'te' ? 'నా పొలం వివరాలు' : language === 'hi' ? 'खेत का विवरण' : 'My Farm Holdings'}
           purpose={language === 'te' ? 'భూమి వివరాలు మరియు హక్కుల రకం నమోదు చేసుకోండి' : language === 'hi' ? 'जमीन का रकबा और मालिकाना हक़ दर्ज करें' : 'Visual farm parcel registration and holding summary.'}
-        />
-
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <WateringFieldIllustration className="w-48 h-36 drop-shadow-sm" />
-          </div>
-
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            {activeFarm?.name || 'My Farmland'}
-          </h2>
-
-          <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-3 text-left">
-            <div className="flex justify-between items-center">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#183D2E] text-white">
-                Active Holding
-              </span>
-              <span className="text-sm font-bold text-[#7A553A]">
-                {activeFarm?.village}, {activeFarm?.district}
-              </span>
-            </div>
-            <div className="text-3xl font-display font-black text-[#183D2E]">
-              {activeFarm?.area || area} <span className="text-sm text-[#7A553A]">Acres Total</span>
-            </div>
-            <div className="text-xs text-[#4E5F57] space-y-1">
-              <p>Tenure: <strong>{activeFarm?.ownership_type || ownershipType}</strong></p>
-              <p>Irrigation: <strong>{activeFarm?.irrigation_method || irrigationMethod}</strong></p>
-            </div>
-          </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <ReadAloudButton text={`Your farm is ${activeFarm?.name || 'Registered Farm'}. ${plainMeaning}`} />
+          actions={
             <button
               type="button"
               onClick={() => setMode('words')}
-              className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center justify-center gap-2 text-sm shadow-sm transition-all"
+              className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-stone-700 flex items-center gap-1.5 text-xs shadow-xs"
             >
-              <span>{language === 'te' ? 'పూర్తి వివరాలు & రిజిస్ట్రేషన్' : language === 'hi' ? 'पूरा विवरण व पंजीकरण' : 'View / Edit Parcels'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>{language === 'te' ? 'పూర్తి వివరాలు & రిజిస్ట్రేషన్' : 'View / Edit Parcels'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
-          </div>
+          }
+        />
+
+        {/* 3 Pictorial Tiles */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <PictorialTile
+            title={language === 'te' ? 'యాక్టివ్ పొలం' : language === 'hi' ? 'सक्रिय खेत' : 'Active Parcel'}
+            phrase={`${activeFarm?.area || area} Acres (${activeFarm?.village || village})`}
+            illustration={<WateringFieldIllustration size={80} />}
+            status={activeFarm ? 'success' : 'nodata'}
+            statusWord={activeFarm ? `${activeFarm.area} ac` : 'No farm'}
+            spokenText={`Active farm is ${activeFarm?.name || 'My Farmland'}, total area ${activeFarm?.area || area} acres located in ${activeFarm?.village || village}.`}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : 'Details'}
+          />
+
+          <PictorialTile
+            title={language === 'te' ? 'భూమి హక్కులు' : language === 'hi' ? 'मालिकाना हक' : 'Land Tenure'}
+            phrase={`${activeFarm?.ownership_type || ownershipType} tenure (${activeFarm?.owned_area || ownedArea} ac owned)`}
+            illustration={<Layers className="w-16 h-16 text-[#1B5E3B]" />}
+            status="info"
+            statusWord={String(activeFarm?.ownership_type || ownershipType)}
+            spokenText={`Land tenure is ${activeFarm?.ownership_type || ownershipType}. ${activeFarm?.owned_area || ownedArea} acres owned and ${activeFarm?.leased_area || leasedArea} acres leased.`}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : 'Details'}
+          />
+
+          <PictorialTile
+            title={language === 'te' ? 'నీటిపారుదల రకం' : language === 'hi' ? 'सिंचाई प्रणाली' : 'Irrigation Profile'}
+            phrase={`${activeFarm?.irrigation_method || irrigationMethod} (${activeFarm?.water_source || waterSource})`}
+            illustration={<Droplets className="w-16 h-16 text-sky-600" />}
+            status="good"
+            statusWord={String(activeFarm?.irrigation_method || irrigationMethod)}
+            spokenText={`Irrigation method is ${activeFarm?.irrigation_method || irrigationMethod} utilizing ${activeFarm?.water_source || waterSource} water.`}
+            onOpenDetails={() => setMode('words')}
+            detailsLabel={language === 'te' ? 'వివరాలు' : 'Details'}
+          />
         </div>
+
+        {/* 3-Step Parcel Registration StepFlow */}
+        <StepFlow
+          heading={language === 'te' ? 'పొలం నమోదులో 3 దశలు' : language === 'hi' ? 'खेत पंजीकरण के 3 सरल कदम' : '3 Land Registration Steps'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'విస్తీర్ణం మరియు హక్కులు' : language === 'hi' ? 'रकबा और मालिकाना हक' : 'Area & Land Tenure',
+              desc: language === 'te' ? 'సొంత మరియు కౌలు ఎకరాల వివరాలు ఇవ్వండి' : language === 'hi' ? 'खुद की और बटाई की जमीन दर्ज करें' : 'Enter owned and leased acreage to calibrate lease expenses',
+              icon: Layers,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'గ్రామం & జీపీఎస్ లొకేషన్' : language === 'hi' ? 'गांव व स्थान' : 'Village & Weather Location',
+              desc: language === 'te' ? 'ఖచ్చితమైన వర్షపాత సూచన కోసం గ్రామం ఎంచుకోండి' : language === 'hi' ? 'सटीक बारिश के लिए गांव का चयन करें' : 'Pinpoint village coordinates for hyper-local rain telemetry',
+              icon: MapPin,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'నీటి వనరు & పద్ధతి' : language === 'hi' ? 'जल स्रोत व विधि' : 'Water & Irrigation Type',
+              desc: language === 'te' ? 'బోరుబావి, కాల్వ లేదా డ్రిప్ పద్ధతి ఎంచుకోండి' : language === 'hi' ? 'बोरवेल, नहर या ड्रिप चुनें' : 'Configure drip, sprinkler, or canal for root-zone moisture models',
+              icon: Droplets,
+            },
+          ]}
+        />
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-16 animate-fadeIn">
+      <ModeToggleHero />
       {/* PAGE HEADER */}
       <PageHeader
         icon={Tractor}
