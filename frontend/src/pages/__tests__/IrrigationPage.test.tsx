@@ -75,6 +75,7 @@ describe('IrrigationPage Component', () => {
     });
     vi.clearAllMocks();
     localStorage.clear();
+    localStorage.setItem('agrisage_pictorial_mode', 'words');
 
     vi.spyOn(farmsApiModule.farmsApi, 'getFarms').mockResolvedValue([
       {

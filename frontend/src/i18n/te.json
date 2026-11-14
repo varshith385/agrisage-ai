@@ -745,5 +745,20 @@
     "admin_unverify_action": "ధృవీకరణ రద్దు చేయి",
     "use_mandi_price": "మండి ధరను వాడండి",
     "use_mandi_price_success": "అంచనా ధర ప్రస్తుత మండి మోడల్ ధరకు మార్చబడింది: ₹"
+  },
+  "pictorial": {
+    "choose_view": "చూపు విధానం ఎంచుకోండి",
+    "pictures": "చిత్రాలు",
+    "pictures_desc": "సులభ రూపం",
+    "words": "అక్షరాలు",
+    "words_desc": "పూర్తి వివరాలు",
+    "do_this_today": "ఈరోజు చేయాల్సిన ముఖ్య పని",
+    "see_details": "పూర్తి వివరాలు చూడండి",
+    "weather_title": "వాతావరణం & వర్షం",
+    "water_title": "పంట నీటి అవసరం",
+    "disease_title": "ఆకు తెగుళ్లు",
+    "profit_title": "వ్యవసాయ లాభం",
+    "health_title": "పొలం ఆరోగ్యం",
+    "how_it_helps": "మీ పొలానికి 4 ముఖ్యమైన అంచెలు"
   }
 }

@@ -1,33 +1,62 @@
+@import '@fontsource/noto-sans-telugu/400.css';
+@import '@fontsource/noto-sans-telugu/700.css';
+@import '@fontsource/noto-sans-devanagari/400.css';
+@import '@fontsource/noto-sans-devanagari/700.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   color-scheme: light;
+  font-size: 18px;
+  /* High accessibility base font size for farmer readability */
 }
 
 body {
   margin: 0;
-  background-color: #faf8f5;
-  color: #1c1917;
+  background-color: #FFFDF8;
+  color: #1F2A24;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.6;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Custom scrollbars for mobile feel */
+/* Indic script specific font styling with safe generous line-height */
+:lang(te) {
+  font-family: 'Noto Sans Telugu', system-ui, sans-serif;
+  line-height: 1.75;
+}
+
+:lang(hi) {
+  font-family: 'Noto Sans Devanagari', system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f4f0ea;
+  background: #FFFDF8;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #d4a373;
+  background: #D9D4C7;
   border-radius: 9999px;
 }
 
-/* Large tap targets guarantee */
-button, input, select, textarea {
-  touch-action: manipulation;
+::-webkit-scrollbar-thumb:hover {
+  background: #7A553A;
 }
 
+/* Accessible tap targets */
+button,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}

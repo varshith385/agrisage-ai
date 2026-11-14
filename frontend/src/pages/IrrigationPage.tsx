@@ -9,6 +9,7 @@ import {
   Upload,
   RefreshCw,
   ArrowRight,
+  Sprout,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -37,7 +38,15 @@ import {
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { WateringFieldIllustration } from '../components/common/FarmerIllustrations';
+import { StatusBadge } from '../components/common/StatusBadge';
+import {
+  WateringFieldIllustration,
+  WateringCanIllustration,
+  WaterDropsGauge,
+} from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StepFlow } from '../components/common/StepFlow';
 
 const SUPPORTED_CROPS = [
   'Cotton',
@@ -236,49 +245,136 @@ export const IrrigationPage: React.FC = () => {
     ? `Root zone moisture has reached the stress threshold. Recommended depth is ${plan.gross_depth_mm.toFixed(0)} mm to maintain optimal crop transpiration.`
     : `Soil water reserves are adequate for today. Next scheduled irrigation is on ${plan?.next_irrigation_date || 'upcoming dates'}.`;
 
-  // PICTORIAL MODE
+  // PICTORIAL MODE v2
   if (isPictorial) {
+    const grossDepth = plan ? plan.gross_depth_mm : 15;
+    const waterLiters = plan ? plan.litres_needed : 60000;
+    const isWaterNeeded = Boolean(plan?.should_irrigate);
+    const isRainSkip = Boolean(plan?.rain_skip_triggered);
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
+        {/* Giant Mode & Language Switcher at Top */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={Droplets}
           title={language === 'te' ? 'నీటి తడుల సమాచారం' : language === 'hi' ? 'सिंचाई और पानी' : 'Water & Irrigation'}
           purpose={language === 'te' ? 'పొలానికి నీరు ఎప్పుడు పెట్టాలో చిత్రాల రూపంలో చూడండి' : language === 'hi' ? 'खेत में पानी कब देना है, सरल रूप में देखें' : 'Pictorial view of crop water budget and irrigation decision.'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <WateringFieldIllustration size={110} />
+        {/* Lead "Do This Today" Irrigation Decision Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#E1F5FE] border-2 border-[#1565A8] flex items-center justify-center shrink-0 shadow-sm">
+              <WateringFieldIllustration size={64} />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {language === 'te' ? 'నేటి నిర్ణయం' : language === 'hi' ? 'आज का फैसला' : 'Today\'s Decision'}
+                </span>
+                <StatusBadge
+                  status={isRainSkip ? 'info' : isWaterNeeded ? 'warning' : 'success'}
+                  label={isRainSkip ? 'Rain Skip' : isWaterNeeded ? 'Irrigate Today' : 'Water Adequate'}
+                  size="sm"
+                />
+              </div>
+              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
+                {isRainSkip
+                  ? (language === 'te' ? 'వర్షం వల్ల నీరు పెట్టవద్దు' : language === 'hi' ? 'बारिश के कारण पानी न दें' : 'Skip Irrigation: Rain Expected')
+                  : isWaterNeeded
+                  ? (language === 'te' ? 'ఈరోజు నీరు పెట్టాలి' : language === 'hi' ? 'आज खेत में पानी दें' : 'Irrigate Today: Root Moisture Low')
+                  : (language === 'te' ? 'భూమిలో తేమ సరిపడా ఉంది' : language === 'hi' ? 'मिट्टी में पर्याप्त नमी है' : 'Moisture Adequate: No Water Needed')}
+              </h2>
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
+                {plainMeaning}
+              </p>
+            </div>
           </div>
-          <h2 className="font-display text-2xl font-bold text-[#183D2E]">
-            {plan?.rain_skip_triggered
-              ? 'వర్షం వల్ల నీరు పెట్టవద్దు (Rain Skip Active)'
-              : plan?.should_irrigate
-              ? 'ఈరోజు నీరు పెట్టాలి (Irrigate Today)'
-              : 'తేమ సరిపడా ఉంది (Adequate Water)'}
-          </h2>
-          <p className="text-base text-[#4E5F57] leading-relaxed">
-            {plainMeaning}
-          </p>
-          <div className="flex justify-center gap-3">
-            <ReadAloudButton text={plainMeaning} label="Listen in audio" />
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            <ReadAloudButton
+              text={plainMeaning}
+              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+            />
             <button
               type="button"
               onClick={handleComputeBudget}
               disabled={isLoadingPlan || isRefetchingPlan}
-              className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-2"
+              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all disabled:opacity-60"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefetchingPlan ? 'animate-spin' : ''}`} />
-              <span>Compute Crop Water Budget</span>
+              <RefreshCw className={`w-5 h-5 ${isRefetchingPlan ? 'animate-spin' : ''}`} />
+              <span>{isRefetchingPlan ? 'Calculating...' : 'Recalculate Budget'}</span>
             </button>
           </div>
         </div>
+
+        {/* 3 Large Pictorial Tiles with Real Values */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Tile 1: Water Needed with Drops Gauge */}
+          <PictorialTile
+            title={language === 'te' ? 'నీటి మోతాదు' : language === 'hi' ? 'पानी की मात्रा' : 'Water Needed'}
+            phrase={`${grossDepth.toFixed(0)} mm • ${Math.round(waterLiters).toLocaleString('en-IN')} L`}
+            illustration={<WaterDropsGauge dropsCount={grossDepth > 25 ? 4 : grossDepth > 15 ? 3 : 2} />}
+            status={isWaterNeeded ? 'warning' : 'success'}
+            statusWord={isWaterNeeded ? 'Water Needed' : 'Adequate'}
+            spokenText={`Recommended gross irrigation depth is ${grossDepth.toFixed(0)} millimetres, equal to ${Math.round(waterLiters)} litres for your field area.`}
+          />
+
+          {/* Tile 2: Soil Root Zone Status */}
+          <PictorialTile
+            title={language === 'te' ? 'భూమిలో తేమ' : language === 'hi' ? 'मिट्टी में नमी' : 'Soil Moisture'}
+            phrase={isRainSkip ? 'Rain forecast active' : isWaterNeeded ? 'Root stress reached' : 'Normal water level'}
+            illustration={<WateringFieldIllustration size={80} />}
+            status={isRainSkip ? 'info' : isWaterNeeded ? 'warning' : 'success'}
+            statusWord={isRainSkip ? 'Rain Skip' : isWaterNeeded ? 'Depleted' : 'Optimal'}
+            spokenText={`Soil moisture condition: ${isRainSkip ? 'Rain forecast protects soil' : isWaterNeeded ? 'Root zone depletion requires watering' : 'Moisture is in optimal range'}.`}
+          />
+
+          {/* Tile 3: Next Watering Date */}
+          <PictorialTile
+            title={language === 'te' ? 'తదుపరి తడి' : language === 'hi' ? 'अगली सिंचाई' : 'Next Irrigation'}
+            phrase={plan?.next_irrigation_date ? `Date: ${plan.next_irrigation_date}` : 'Scheduled in 3 days'}
+            illustration={<WateringCanIllustration size={80} />}
+            status="info"
+            statusWord="Scheduled"
+            spokenText={`Next scheduled watering date is ${plan?.next_irrigation_date || 'in upcoming days'}.`}
+          />
+        </div>
+
+        {/* 3-Step Daily Water Management Flow */}
+        <StepFlow
+          heading={language === 'te' ? 'నీటి యాజమాన్యంలో 3 దశలు' : language === 'hi' ? 'सिंचाई के 3 सरल कदम' : '3 Water Management Steps'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'భూమి తేమ చూడండి' : language === 'hi' ? 'जड़ की नमी देखें' : 'Check Soil Depth',
+              desc: language === 'te' ? 'వేర్ల ప్రాంతంలో 10 సెం.మీ లోతులో తేమ చూడండి' : language === 'hi' ? '10 सेमी गहराई पर मिट्टी की नमी जांचें' : 'Feel moisture at 10cm depth in root zone',
+              icon: Sprout,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'వర్షం గమనించండి' : language === 'hi' ? 'बारिश का अनुमान' : 'Check Rain Forecast',
+              desc: language === 'te' ? 'వర్షం ఉంటే తడిని వాయిదా వేయండి' : language === 'hi' ? 'बारिश हो तो सिंचाई टालें' : 'Skip irrigation if heavy rainfall is predicted',
+              icon: CloudRain,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'డ్రిప్ / స్ప్రింక్లర్ ప్రారంభించండి' : language === 'hi' ? 'ड्रिप चालू करें' : 'Irrigate Field',
+              desc: language === 'te' ? 'సిఫార్సు చేసిన లీటర్ల నీరు మాత్రమే ఇవ్వండి' : language === 'hi' ? 'सिफारिश अनुसार आवश्यक लीटर पानी दें' : 'Apply recommended depth to avoid waterlogging',
+              icon: Droplets,
+            },
+          ]}
+        />
       </div>
     );
   }
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
+      {/* Mode & Language Switcher in Words Mode */}
+      <ModeToggleHero />
+
       <PageHeader
         icon={Droplets}
         title={t('irrigation.title')}

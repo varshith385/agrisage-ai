@@ -57,19 +57,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
   return (
     <aside
       aria-label="Sidebar navigation"
-      className="hidden md:flex flex-col w-64 lg:w-72 bg-[#183D2E] text-[#FAF8F5] border-r border-[#183D2E]/80 shrink-0 select-none min-h-screen sticky top-0 h-screen overflow-y-auto"
+      className="hidden md:flex flex-col w-64 lg:w-72 bg-[#1B5E3B] text-white border-r border-[#164E30] shrink-0 select-none min-h-screen sticky top-0 h-screen overflow-y-auto"
     >
       {/* Brand Header */}
-      <div className="p-5 border-b border-[#FAF8F5]/10">
+      <div className="p-5 border-b border-white/10">
         <Link to="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-11 h-11 rounded-2xl bg-[#DA9A4C] text-[#0E241B] flex items-center justify-center font-bold shadow-subtle group-hover:scale-105 transition-transform shrink-0">
-            <Sprout className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-2xl bg-[#F2B01E] text-[#1F2A24] flex items-center justify-center font-black shadow-sm group-hover:scale-105 transition-transform shrink-0">
+            <Sprout className="w-7 h-7" />
           </div>
           <div>
-            <span className="font-display text-xl font-bold tracking-tight text-white block leading-none">
+            <span className="font-display text-xl font-black tracking-tight text-white block leading-none">
               {t('app.name')}
             </span>
-            <span className="text-[11px] text-[#DA9A4C] font-semibold tracking-wide block mt-1">
+            <span className="text-[12px] text-[#F2B01E] font-bold tracking-wide block mt-1">
               {t('app.tagline')}
             </span>
           </div>
@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
       <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
         {/* Core Advisory */}
         <div>
-          <span className="px-3 text-[11px] font-black uppercase text-[#DA9A4C] tracking-wider block mb-2">
+          <span className="px-3 text-[12px] font-black uppercase text-[#F2B01E] tracking-wider block mb-2">
             Core Advisory
           </span>
           <div className="space-y-1">
@@ -91,14 +91,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `min-h-[48px] px-3.5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all ${
+                    `min-h-[48px] px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 transition-all ${
                       isActive
-                        ? 'bg-[#265C46] text-white shadow-sm border border-[#DA9A4C]/40'
-                        : 'text-[#FAF8F5]/80 hover:bg-[#265C46]/50 hover:text-white'
+                        ? 'bg-[#24784C] text-white shadow-sm border border-[#F2B01E]/60 ring-1 ring-[#F2B01E]/20'
+                        : 'text-white/80 hover:bg-[#24784C]/50 hover:text-white'
                     }`
                   }
                 >
-                  <Icon className="w-5 h-5 text-[#DA9A4C] shrink-0" />
+                  <Icon className="w-5 h-5 text-[#F2B01E] shrink-0" />
                   <span className="truncate">{item.label}</span>
                 </NavLink>
               );
@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
 
         {/* Farm & Market Tools */}
         <div>
-          <span className="px-3 text-[11px] font-black uppercase text-[#FAF8F5]/60 tracking-wider block mb-2">
+          <span className="px-3 text-[12px] font-black uppercase text-white/70 tracking-wider block mb-2">
             Farm Management
           </span>
           <div className="space-y-1">
@@ -119,14 +119,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `min-h-[48px] px-3.5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all ${
+                    `min-h-[48px] px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 transition-all ${
                       isActive
-                        ? 'bg-[#265C46] text-white shadow-sm border border-[#DA9A4C]/40'
-                        : 'text-[#FAF8F5]/80 hover:bg-[#265C46]/50 hover:text-white'
+                        ? 'bg-[#24784C] text-white shadow-sm border border-[#F2B01E]/60 ring-1 ring-[#F2B01E]/20'
+                        : 'text-white/80 hover:bg-[#24784C]/50 hover:text-white'
                     }`
                   }
                 >
-                  <Icon className="w-5 h-5 text-[#FAF8F5]/70 shrink-0" />
+                  <Icon className="w-5 h-5 text-white/80 shrink-0" />
                   <span className="truncate">{item.label}</span>
                 </NavLink>
               );
@@ -136,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
 
         {/* Guidance */}
         <div>
-          <span className="px-3 text-[11px] font-black uppercase text-[#FAF8F5]/60 tracking-wider block mb-2">
+          <span className="px-3 text-[12px] font-black uppercase text-white/70 tracking-wider block mb-2">
             Help & Guidance
           </span>
           <div className="space-y-1">
@@ -147,14 +147,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `min-h-[48px] px-3.5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all ${
+                    `min-h-[48px] px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 transition-all ${
                       isActive
-                        ? 'bg-[#265C46] text-white shadow-sm border border-[#DA9A4C]/40'
-                        : 'text-[#FAF8F5]/80 hover:bg-[#265C46]/50 hover:text-white'
+                        ? 'bg-[#24784C] text-white shadow-sm border border-[#F2B01E]/60'
+                        : 'text-white/80 hover:bg-[#24784C]/50 hover:text-white'
                     }`
                   }
                 >
-                  <Icon className="w-5 h-5 text-[#FAF8F5]/70 shrink-0" />
+                  <Icon className="w-5 h-5 text-white/80 shrink-0" />
                   <span className="truncate">{item.label}</span>
                 </NavLink>
               );
@@ -164,9 +164,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
               <button
                 type="button"
                 onClick={onStartTour}
-                className="min-h-[48px] w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-3 text-[#FAF8F5]/80 hover:bg-[#265C46]/50 hover:text-white transition-all text-left"
+                className="min-h-[48px] w-full px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 text-white/80 hover:bg-[#24784C]/50 hover:text-white transition-all text-left"
               >
-                <Sparkles className="w-5 h-5 text-[#DA9A4C] shrink-0" />
+                <Sparkles className="w-5 h-5 text-[#F2B01E] shrink-0" />
                 <span>Start Guided Tour</span>
               </button>
             )}
@@ -175,14 +175,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
       </nav>
 
       {/* Pictorial Mode Toggle & Bottom Footer Info */}
-      <div className="p-4 border-t border-[#FAF8F5]/10 space-y-3 bg-[#0E241B]/40">
+      <div className="p-4 border-t border-white/10 space-y-3 bg-[#14462C]">
         <button
           type="button"
           onClick={togglePictorial}
           className={`min-h-[48px] w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all border ${
             isPictorial
-              ? 'bg-[#DA9A4C] text-[#0E241B] border-[#DA9A4C]'
-              : 'bg-[#183D2E] text-[#FAF8F5] border-[#FAF8F5]/20 hover:bg-[#265C46]'
+              ? 'bg-[#F2B01E] text-[#1F2A24] border-[#F2B01E] font-black'
+              : 'bg-[#1B5E3B] text-white border-white/20 hover:bg-[#24784C]'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -190,13 +190,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onStartTour }) => {
             <span>Pictorial Mode</span>
           </div>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            isPictorial ? 'bg-[#0E241B] text-[#DA9A4C]' : 'bg-[#FAF8F5]/10 text-white'
+            isPictorial ? 'bg-[#1F2A24] text-[#F2B01E]' : 'bg-black/20 text-white'
           }`}>
             {isPictorial ? 'ON' : 'OFF'}
           </span>
         </button>
 
-        <div className="text-[10px] text-[#FAF8F5]/60 text-center">
+        <div className="text-[11px] text-white/60 text-center">
           Yuktik 2026 &bull; FAO-56 Calibrated
         </div>
       </div>

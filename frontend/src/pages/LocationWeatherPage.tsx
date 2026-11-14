@@ -8,6 +8,9 @@ import {
   Droplets,
   Calendar,
   Sparkles,
+  Sun,
+  Wind,
+  CloudRain,
 } from 'lucide-react';
 import { locationApi } from '../api/location';
 import { weatherApi } from '../api/weather';
@@ -20,7 +23,15 @@ import { ErrorState } from '../components/common/ErrorState';
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { WeatherIllustration } from '../components/common/FarmerIllustrations';
+import { StatusBadge } from '../components/common/StatusBadge';
+import {
+  WeatherIllustration,
+  ThermometerGauge,
+  WaterDropsGauge,
+} from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StepFlow } from '../components/common/StepFlow';
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePictorial } from '../context/PictorialContext';
@@ -173,55 +184,139 @@ export const LocationWeatherPage: React.FC = () => {
       : `Weather conditions are moderate (${weatherData.temperature_c.toFixed(0)}°C, ${weatherData.relative_humidity_pct}% humidity). Favourable for routine field maintenance.`
     : 'Live weather telemetry will calculate field action recommendations once loaded.';
 
-  // PICTORIAL MODE
+  // PICTORIAL MODE v2
   if (isPictorial) {
+    const tempC = weatherData?.temperature_c ?? 28;
+    const rainMm = weatherData?.expected_rainfall_today_mm ?? 0;
+    const humidity = weatherData?.relative_humidity_pct ?? 55;
+    const windSpeed = weatherData?.wind_speed_kmh ?? 12;
+    const et0Val = weatherData?.reference_et0_mm ?? 4.5;
+    const isRainy = rainMm > 3;
+    const isHot = tempC > 36;
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
+        {/* Giant Mode & Language Switcher at Top */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={CloudSun}
           title={language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम की जानकारी' : 'Weather'}
           purpose={language === 'te' ? 'ఈ రోజు ఎండ, వర్షం మరియు గాలి సమాచారం' : language === 'hi' ? 'आज की धूप, बारिश और हवा की स्थिति' : 'Visual weather forecast for your village.'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <WeatherIllustration className="w-48 h-36 drop-shadow-sm" />
-          </div>
-
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            {selectedVillage}, {selectedDistrict}
-          </h2>
-
-          {weatherData ? (
-            <div className="space-y-3">
-              <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-2">
-                <span className="text-4xl font-display font-black text-[#183D2E]">
-                  {weatherData.temperature_c.toFixed(0)}°C
-                </span>
-                <p className="text-sm font-bold text-[#7A553A]">
-                  {weatherData.expected_rainfall_today_mm > 0 ? `Rain: ${weatherData.expected_rainfall_today_mm} mm` : 'No heavy rain expected today'}
-                </p>
-                <div className="flex justify-center gap-4 text-xs text-[#4E5F57] pt-1">
-                  <span>Humidity: {weatherData.relative_humidity_pct}%</span>
-                  <span>&bull;</span>
-                  <span>Wind: {weatherData.wind_speed_kmh} km/h</span>
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <ReadAloudButton text={`Weather for ${selectedVillage}: ${weatherData.temperature_c.toFixed(0)} degrees Celsius. ${plainMeaning}`} />
-              </div>
+        {/* Lead "Do This Today" Weather Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#E1F5FE] border-2 border-[#1565A8] flex items-center justify-center shrink-0 shadow-sm">
+              <ThermometerGauge tempC={tempC} className="w-10 h-16" />
             </div>
-          ) : (
-            <p className="text-sm text-[#4E5F57]">Loading weather...</p>
-          )}
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {selectedVillage || 'Local Village'}, {selectedDistrict || 'District'}
+                </span>
+                <StatusBadge
+                  status={isRainy ? 'info' : isHot ? 'warning' : 'success'}
+                  label={isRainy ? 'Rain Alert' : isHot ? 'High Heat' : 'Comfortable'}
+                  size="sm"
+                />
+              </div>
+              <h2 className="font-display text-[24px] sm:text-[30px] font-black text-[#1F2A24] leading-snug">
+                {tempC.toFixed(0)}°C
+                <span className="text-[18px] font-bold text-[#4A5750] ml-3">
+                  {isRainy ? `• ${rainMm} mm Rain Expected` : '• Clear Skies'}
+                </span>
+              </h2>
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
+                {plainMeaning}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            <ReadAloudButton
+              text={`Weather for ${selectedVillage}: ${tempC.toFixed(0)} degrees Celsius. ${plainMeaning}`}
+              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+            />
+          </div>
         </div>
+
+        {/* 4 Large Pictorial Tiles with Real Values */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Tile 1: Temperature Gauge */}
+          <PictorialTile
+            title={language === 'te' ? 'ఉష్ణోగ్రత' : language === 'hi' ? 'तापमान' : 'Temperature'}
+            phrase={`${tempC.toFixed(0)}°C • ${isHot ? 'High heat alert' : 'Comfortable for crops'}`}
+            illustration={<ThermometerGauge tempC={tempC} className="w-12 h-24" />}
+            status={isHot ? 'warning' : 'success'}
+            statusWord={isHot ? 'High Heat' : 'Optimal'}
+            spokenText={`Current temperature is ${tempC.toFixed(0)} degrees Celsius.`}
+          />
+
+          {/* Tile 2: Rain & Cloud */}
+          <PictorialTile
+            title={language === 'te' ? 'వర్ష సూచన' : language === 'hi' ? 'बारिश' : 'Rainfall'}
+            phrase={`${rainMm} mm • ${isRainy ? 'Rain showers likely' : 'No heavy rain'}`}
+            illustration={<WeatherIllustration size={80} />}
+            status={isRainy ? 'info' : 'success'}
+            statusWord={isRainy ? 'Rain Likely' : 'Dry & Clear'}
+            spokenText={`Rain forecast is ${rainMm} millimetres.`}
+          />
+
+          {/* Tile 3: Atmospheric Water Demand (ET0) */}
+          <PictorialTile
+            title={language === 'te' ? 'ఆవిరయ్యే నీరు' : language === 'hi' ? 'जल वाष्पीकरण' : 'Water Loss (ET0)'}
+            phrase={`${et0Val.toFixed(1)} mm/day demand`}
+            illustration={<WaterDropsGauge dropsCount={et0Val > 5 ? 4 : et0Val > 3 ? 3 : 2} />}
+            status="info"
+            statusWord="Atmospheric"
+            spokenText={`Atmospheric water demand rate is ${et0Val.toFixed(1)} millimetres per day.`}
+          />
+
+          {/* Tile 4: Humidity & Wind */}
+          <PictorialTile
+            title={language === 'te' ? 'తేమ & గాలి' : language === 'hi' ? 'हवा और नमी' : 'Wind & Humidity'}
+            phrase={`${humidity}% RH • ${windSpeed} km/h wind`}
+            illustration={<Wind className="w-16 h-16 text-[#1565A8]" />}
+            status="success"
+            statusWord="Normal"
+            spokenText={`Relative humidity is ${humidity} percent, wind speed is ${windSpeed} kilometres per hour.`}
+          />
+        </div>
+
+        {/* 3-Step Weather Routine */}
+        <StepFlow
+          heading={language === 'te' ? 'వాతావరణ రక్షణలో 3 దశలు' : language === 'hi' ? 'मौसम सुरक्षा के 3 सरल कदम' : '3 Weather Action Steps'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'ఉదయం ఎండ చూడండి' : language === 'hi' ? 'सुबह की धूप देखें' : 'Check Morning Sun',
+              desc: language === 'te' ? 'ఆకులపై మంచు త్వరగా ఆరిపోయేలా చూడండి' : language === 'hi' ? 'पत्तियों पर ओस सूखने का ध्यान रखें' : 'Dew dry-off prevents fungal proliferation',
+              icon: Sun,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'వర్షం ఉంటే మందులు కొట్టవద్దు' : language === 'hi' ? 'बारिश में छिड़काव न करें' : 'Hold Sprays if Rainy',
+              desc: language === 'te' ? 'వర్షానికి మందు కొట్టుకుపోతుంది' : language === 'hi' ? 'बारिश से दवा बह जाएगी' : 'Avoid liquid foliar spraying before rain showers',
+              icon: CloudRain,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'మధ్యాహ్నపు వేడి గమనించండి' : language === 'hi' ? 'दोपहर की गर्मी से बचाव' : 'Mitigate Afternoon Heat',
+              desc: language === 'te' ? 'వేడి ఎక్కువగా ఉంటే సాయంత్రం తడి ఇవ్వండి' : language === 'hi' ? 'तेज धूप में शाम को पानी दें' : 'Irrigate during evening hours to minimize evaporation',
+              icon: Wind,
+            },
+          ]}
+        />
       </div>
     );
   }
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
+      {/* Mode & Language Switcher in Words Mode */}
+      <ModeToggleHero />
+
       {/* PAGE HEADER */}
       <PageHeader
         icon={CloudSun}

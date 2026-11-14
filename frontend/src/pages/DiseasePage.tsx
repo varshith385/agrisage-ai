@@ -34,7 +34,11 @@ import { ConfidenceMeter } from '../components/common/ConfidenceMeter';
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { LeafScanIllustration } from '../components/common/FarmerIllustrations';
+import { StatusBadge } from '../components/common/StatusBadge';
+import { LeafScanIllustration, NoDataIllustration } from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StepFlow } from '../components/common/StepFlow';
 
 export const DiseasePage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -187,124 +191,214 @@ export const DiseasePage: React.FC = () => {
 
   const result = diagnoseMutation.data;
 
-  // PICTORIAL MODE
+  // Derived plain meaning
+  const plainMeaning = result?.success
+    ? `Identified condition is ${result.predicted_disease} on ${result.predicted_crop} with ${Math.round((result.prediction_confidence || 0) * 100)}% visual similarity. Zero chemical pesticides recommended; implement the organic cultural practices below.`
+    : 'Upload or capture a sharp photo of an affected leaf to identify symptoms and safe cultural treatments.';
+
+  // PICTORIAL MODE v2
   if (isPictorial) {
+    const isDiagnosed = Boolean(result?.success);
+    const isHealthy = Boolean(result?.predicted_disease?.toLowerCase().includes('healthy'));
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
+        {/* View Mode & Language Selector */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={Leaf}
           title={language === 'te' ? 'ఆకు తెగుళ్ల గుర్తింపు' : language === 'hi' ? 'पत्ती रोग की जांच' : 'Plant Disease Doctor'}
           purpose={language === 'te' ? 'ఆకు ఫోటో తీసి తెగులును సులభంగా తెలుసుకోండి' : language === 'hi' ? 'पत्ती की फोटो खींचकर रोग की पहचान करें' : 'Visual leaf photo diagnosis with zero-chemical organic advice.'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <LeafScanIllustration className="w-48 h-36 drop-shadow-sm" />
-          </div>
+        {/* Hidden File / Camera Inputs */}
+        <input
+          type="file"
+          ref={cameraInputRef}
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
 
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            {language === 'te' ? 'ఆకు ఫోటో తీయండి' : language === 'hi' ? 'रोगग्रस्त पत्ती का फोटो लें' : 'Take a Leaf Photo'}
-          </h2>
+        {/* Lead "Do This Today" Leaf Capture Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md space-y-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+              <div className="w-20 h-20 rounded-2xl bg-[#E8F5E9] border-2 border-[#1B5E3B] flex items-center justify-center shrink-0 shadow-sm">
+                <LeafScanIllustration size={64} />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                  <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                    {language === 'te' ? 'ఆకు స్కాన్' : language === 'hi' ? 'पत्ती स्कैन' : 'Leaf Camera Scan'}
+                  </span>
+                  <StatusBadge
+                    status={isDiagnosed ? (isHealthy ? 'success' : 'danger') : 'info'}
+                    label={isDiagnosed ? (isHealthy ? 'Healthy Leaf' : 'Pest Detected') : 'Ready for Photo'}
+                    size="sm"
+                  />
+                </div>
+                <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
+                  {isDiagnosed
+                    ? `${result?.predicted_crop}: ${result?.predicted_disease}`
+                    : (language === 'te' ? 'ఆకు ఫోటో తీయండి' : language === 'hi' ? 'रोगग्रस्त पत्ती का फोटो लें' : 'Take or Upload Leaf Photo')}
+                </h2>
+                <p className="text-[16px] text-[#4A5750] max-w-xl">
+                  {plainMeaning}
+                </p>
+              </div>
+            </div>
 
-          <p className="text-base text-[#4E5F57]">
-            {language === 'te'
-              ? 'మచ్చలు లేదా తెగులు ఉన్న ఆకును స్పష్టంగా ఫోటో తీయండి'
-              : language === 'hi'
-              ? 'जिस पत्ती पर धब्बे या रोग हों, उसका साफ फोटो खींचें'
-              : 'Hold camera steady on the leaf showing spots or disease symptoms.'}
-          </p>
-
-          <input
-            type="file"
-            ref={cameraInputRef}
-            accept="image/*"
-            capture="environment"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => cameraInputRef.current?.click()}
-              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center justify-center gap-3 text-lg shadow-md active:scale-95 transition-all"
-            >
-              <Camera className="w-6 h-6 text-[#DA9A4C]" />
-              <span>{language === 'te' ? 'కెమెరా తెరవండి' : language === 'hi' ? 'कैमरा खोलें' : 'Open Camera'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#FAF8F5] text-[#183D2E] border-2 border-[#183D2E]/30 hover:bg-[#EFE7DE] flex items-center justify-center gap-3 text-lg shadow-sm active:scale-95 transition-all"
-            >
-              <Upload className="w-6 h-6 text-[#183D2E]" />
-              <span>{language === 'te' ? 'ఫోటో ఎంచుకోండి' : language === 'hi' ? 'फोटो चुनें' : 'Choose Photo'}</span>
-            </button>
-          </div>
-
-          {previewUrl && (
-            <div className="pt-4 border-t border-[#7A553A]/20 space-y-3">
-              <img
-                src={previewUrl}
-                alt="Leaf Preview"
-                className="w-40 h-40 object-cover rounded-2xl mx-auto border-2 border-[#183D2E]"
+            <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
+              <ReadAloudButton
+                text={plainMeaning}
+                label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
               />
+              <button
+                type="button"
+                onClick={() => cameraInputRef.current?.click()}
+                className="w-full sm:w-auto min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center justify-center gap-3 text-[18px] shadow-sm transition-all"
+              >
+                <Camera className="w-6 h-6 text-[#F2B01E]" />
+                <span>{language === 'te' ? 'కెమెరా తెరవండి' : language === 'hi' ? 'कैमरा खोलें' : 'Open Camera'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full sm:w-auto min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#FFFDF8] text-[#1F2A24] border-2 border-[#D9D4C7] hover:border-[#1B5E3B] flex items-center justify-center gap-3 text-[18px] shadow-sm transition-all"
+              >
+                <Upload className="w-6 h-6 text-[#1B5E3B]" />
+                <span>{language === 'te' ? 'ఫోటో ఎంచుకోండి' : language === 'hi' ? 'फोटो चुनें' : 'Choose Photo'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Photo Preview & Run Diagnosis */}
+          {previewUrl && (
+            <div className="pt-4 border-t border-[#D9D4C7] flex flex-col sm:flex-row items-center gap-5 justify-between">
+              <div className="flex items-center gap-4">
+                <img
+                  src={previewUrl}
+                  alt="Leaf Specimen"
+                  className="w-24 h-24 object-cover rounded-2xl border-2 border-[#1B5E3B] shadow-sm"
+                />
+                <div>
+                  <span className="text-[14px] font-bold text-[#4A5750] block">
+                    {selectedFile?.name || 'Leaf specimen image'}
+                  </span>
+                  <span className="text-[13px] text-[#4A5750]">
+                    Compressed & ready for neural model scan
+                  </span>
+                </div>
+              </div>
+
               <button
                 type="button"
                 disabled={diagnoseMutation.isPending}
                 onClick={() => diagnoseMutation.mutate()}
-                className="w-full min-h-[52px] px-6 py-3 rounded-2xl font-bold bg-[#DA9A4C] text-[#183D2E] hover:bg-[#C28538] flex items-center justify-center gap-2 text-lg shadow-md transition-all active:scale-95 disabled:opacity-50"
+                className="w-full sm:w-auto min-h-[56px] px-8 py-3 rounded-2xl font-bold bg-[#F2B01E] text-[#1F2A24] hover:bg-[#e09f14] flex items-center justify-center gap-2 text-[18px] shadow-sm transition-all disabled:opacity-50"
               >
                 {diagnoseMutation.isPending ? (
                   <>
                     <RefreshCw className="w-5 h-5 animate-spin" />
-                    <span>{t('disease.diagnosing_btn')}</span>
+                    <span>Analyzing Leaf...</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    <span>{language === 'te' ? 'తెగులును గుర్తించండి' : language === 'hi' ? 'रोग की जांच करें' : 'Diagnose Disease Now'}</span>
+                    <span>{language === 'te' ? 'తెగులును గుర్తించండి' : language === 'hi' ? 'रोग पहचानें' : 'Diagnose Disease Now'}</span>
                   </>
                 )}
               </button>
             </div>
           )}
-
-          {result && result.success && (
-            <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] text-left space-y-3 mt-4">
-              <div className="flex items-center justify-between">
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#183D2E] text-white">
-                  {result.predicted_crop}
-                </span>
-                <ReadAloudButton text={`${result.predicted_disease}. ${result.safe_ipm_steps[0] || ''}`} />
-              </div>
-              <h3 className="text-xl font-bold text-[#183D2E]">
-                {result.predicted_disease}
-              </h3>
-              <p className="text-sm text-[#4E5F57]">
-                {result.safe_ipm_steps[0]}
-              </p>
-            </div>
-          )}
         </div>
+
+        {/* 3 Large Pictorial Tiles */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Tile 1: Leaf Specimen */}
+          <PictorialTile
+            title={language === 'te' ? 'ఆకు నమూనా' : language === 'hi' ? 'पत्ती का नमूना' : 'Leaf Specimen'}
+            phrase={previewUrl ? 'Leaf photo loaded' : 'Take sharp photo of leaf'}
+            illustration={
+              previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Uploaded leaf"
+                  className="w-20 h-20 object-cover rounded-2xl border-2 border-[#1B5E3B]"
+                />
+              ) : (
+                <LeafScanIllustration size={80} />
+              )
+            }
+            status={previewUrl ? 'info' : 'demo'}
+            statusWord={previewUrl ? 'Photo Ready' : 'No Photo Yet'}
+            spokenText={previewUrl ? 'Leaf photo is loaded and ready for analysis.' : 'Take or upload a photo of the affected plant leaf.'}
+          />
+
+          {/* Tile 2: AI Diagnosis Status */}
+          <PictorialTile
+            title={language === 'te' ? 'తెగులు నిర్ధారణ' : language === 'hi' ? 'रोग पहचान' : 'Disease Diagnosis'}
+            phrase={isDiagnosed ? (result?.predicted_disease || 'Diagnosed') : 'Awaiting leaf photo scan'}
+            illustration={<LeafScanIllustration size={80} />}
+            status={isDiagnosed ? (isHealthy ? 'success' : 'danger') : 'demo'}
+            statusWord={isDiagnosed ? (isHealthy ? 'Healthy Leaf' : 'Pest Detected') : 'Waiting'}
+            spokenText={isDiagnosed ? `Diagnosis result: ${result?.predicted_disease} on ${result?.predicted_crop}.` : 'Awaiting leaf photo for automated diagnosis.'}
+          />
+
+          {/* Tile 3: Safe IPM Advisory */}
+          <PictorialTile
+            title={language === 'te' ? 'సేంద్రీయ నివారణ' : language === 'hi' ? 'जैविक उपाय' : 'Organic IPM Advice'}
+            phrase={result?.safe_ipm_steps?.[0] ? `${result.safe_ipm_steps[0].slice(0, 45)}...` : 'Zero chemical dosages • Safe neem spray'}
+            illustration={<NoDataIllustration size={80} />}
+            status="success"
+            statusWord="Safe Organic"
+            spokenText={result?.safe_ipm_steps?.[0] || 'Safe cultural and biological IPM practices: Spray neem seed kernel extract or bio-fungicides.'}
+          />
+        </div>
+
+        {/* 3-Step Leaf Inspection Routine */}
+        <StepFlow
+          heading={language === 'te' ? 'ఆకు తనిఖీలో 3 దశలు' : language === 'hi' ? 'पत्ती जांच के 3 सरल कदम' : '3 Leaf Diagnostic Steps'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'ఆకు ఫోటో తీయండి' : language === 'hi' ? 'फोटो खींचें' : 'Hold Camera Steady',
+              desc: language === 'te' ? 'ఆకు నుండి 15 సెం.మీ దూరంలో కెమెరా ఉంచండి' : language === 'hi' ? 'पत्ती से 15 सेमी की दूरी पर कैमरा रखें' : 'Keep camera 15cm from leaf in good sunlight',
+              icon: Camera,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'మచ్చలను గమనించండి' : language === 'hi' ? 'धब्बों की जांच' : 'Check Leaf Spots',
+              desc: language === 'te' ? 'ఎండిన లేదా పసుపు రంగు మచ్చలను గుర్తించండి' : language === 'hi' ? 'पीले या भूरे धब्बों की पहचान करें' : 'Look for fungal spots, yellowing, or curl',
+              icon: Leaf,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'సేంద్రీయ కషాయం పిచికారీ' : language === 'hi' ? 'जैविक छिड़काव' : 'Apply Bio Solution',
+              desc: language === 'te' ? 'వేపనూనె లేదా సూచించిన సేంద్రీయ పద్ధతి వాడండి' : language === 'hi' ? 'नीम तेल या जैविक अर्क का प्रयोग करें' : 'Spray neem oil or bio-agent without synthetic chemicals',
+              icon: ShieldCheck,
+            },
+          ]}
+        />
       </div>
     );
   }
 
-  // Derived plain meaning
-  const plainMeaning = result?.success
-    ? `Identified condition is ${result.predicted_disease} on ${result.predicted_crop} with ${Math.round((result.prediction_confidence || 0) * 100)}% visual similarity. Zero chemical pesticides recommended; implement the organic cultural practices below.`
-    : 'Upload or capture a sharp photo of an affected leaf to identify symptoms and safe cultural treatments.';
-
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
+      {/* View Mode & Language Selector in Words Mode */}
+      <ModeToggleHero />
+
       {/* PAGE HEADER */}
       <PageHeader
         icon={Leaf}

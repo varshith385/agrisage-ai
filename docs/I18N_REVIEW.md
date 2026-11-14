@@ -147,3 +147,27 @@ The following translations were added across the Phase 1-5 UI overhaul for "What
 | **Calendar** | Field Operations & Crop Stage Timeline | వ్యవసాయ పనుల క్యాలెండర్ మరియు పంట దశలు | कृषि कार्य कैलेंडर और फसल अवस्थाएं | **Unverified**: Needs native review. |
 | **How-To** | How to Use AgriSage AI | అగ్రిసేజ్ యాప్ ఎలా ఉపయోగించాలి? | एग्रीसेज का उपयोग कैसे करें? | **Unverified**: Needs native review. |
 | **Video Guide** | Watch How to Use AgriSage AI | అగ్రిసేజ్ వీడియో గైడ్ | एग्रीसेज वीडियो गाइड | **Unverified**: Needs native review. |
+
+
+---
+
+## 7. Round 2 Phase C Pictorial Mode v2 Additions (Unverified — Awaiting Native Review)
+
+The following translations were added in Round 2 Phase C for the mode toggle hero ("Pictures" vs "Words"), picture gauges, step flows, and spoken greetings across Telugu and Hindi:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Mode Hero** | Choose How to View | చూపు విధానం ఎంచుకోండి | दृश्य मोड चुनें | **Unverified**: Needs native review. |
+| **Mode Hero** | Pictures | చిత్రాలు | चित्र | **Unverified**: Needs native review. |
+| **Mode Hero** | Simple Visual | సులభ రూపం | सरल दृश्य | **Unverified**: Needs native review. |
+| **Mode Hero** | Words | అక్షరాలు | शब्द | **Unverified**: Needs native review. |
+| **Mode Hero** | Full Detail | పూర్తి వివరాలు | पूर्ण विवरण | **Unverified**: Needs native review. |
+| **Mode Hero** | Do This Today | ఈరోజు చేయాల్సిన ముఖ్య పని | आज का मुख्य कार्य | **Unverified**: Needs native review. |
+| **Mode Hero** | See Details | పూర్తి వివరాలు చూడండి | पूरा विवरण देखें | **Unverified**: Needs native review. |
+| **Mode Hero** | 4 Steps for Your Farm Today | మీ పొలానికి 4 ముఖ్యమైన అంచెలు | आज आपके खेत के 4 सरल कदम | **Unverified**: Needs native review. |
+| **Spoken Greeting** | Welcome to AgriSage AI | నమస్కారం! అగ్రిసేజ్ కి స్వాగతం | नमस्ते! एग्रीसेज में आपका स्वागत है | **Unverified**: Needs native review. |
+| **Gauges** | Water Needed | పంట నీటి అవసరం | फसल का पानी | **Unverified**: Needs native review. |
+| **Gauges** | Weather & Rain | వాతావరణం & వర్షం | मौसम और बारिश | **Unverified**: Needs native review. |
+| **Gauges** | Leaf Disease | ఆకు తెగుళ్లు | पत्ती रोग | **Unverified**: Needs native review. |
+| **Gauges** | Farm Profit | వ్యవసాయ లాభం | खेत का मुनाफा | **Unverified**: Needs native review. |
+| **Gauges** | Farm Health | పొలం ఆరోగ్యం | खेत का स्वास्थ्य | **Unverified**: Needs native review. |

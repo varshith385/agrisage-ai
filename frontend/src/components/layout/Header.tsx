@@ -31,20 +31,20 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#183D2E] text-[#FAF8F5] shadow-md border-b border-[#0E241B]">
+    <header className="sticky top-0 z-40 bg-[#1B5E3B] text-white shadow-md border-b border-[#164E30]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18">
-          {/* Left: Brand Logo (especially prominent on mobile since sidebar is hidden) */}
+        <div className="flex items-center justify-between h-18 sm:h-20">
+          {/* Left: Brand Logo */}
           <div className="flex items-center gap-3">
-            <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-2xl bg-[#DA9A4C] text-[#0E241B] flex items-center justify-center font-bold shadow-subtle group-hover:scale-105 transition-transform shrink-0">
-                <Sprout className="w-6 h-6" />
+            <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-3 group">
+              <div className="w-11 h-11 rounded-2xl bg-[#F2B01E] text-[#1F2A24] flex items-center justify-center font-black shadow-sm group-hover:scale-105 transition-transform shrink-0">
+                <Sprout className="w-7 h-7" />
               </div>
               <div>
-                <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-white block leading-none">
+                <span className="font-display text-lg sm:text-xl font-black tracking-tight text-white block leading-none">
                   {t('app.name')}
                 </span>
-                <span className="text-[10px] text-[#DA9A4C] font-semibold tracking-wide block mt-0.5">
+                <span className="text-[12px] text-[#F2B01E] font-bold tracking-wide block mt-0.5">
                   {t('app.tagline')}
                 </span>
               </div>
@@ -57,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
             <div
               role="group"
               aria-label="Language selection"
-              className="flex items-center bg-[#0E241B]/80 rounded-xl p-1 border border-[#265C46]"
+              className="flex items-center bg-[#14462C] rounded-2xl p-1 border border-[#24784C]"
             >
               {(['en', 'te', 'hi'] as Language[]).map((lang) => (
                 <button
@@ -66,10 +66,10 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                   onClick={() => setLanguage(lang)}
                   aria-pressed={language === lang}
                   aria-label={`Switch to ${lang === 'te' ? 'Telugu' : lang === 'hi' ? 'Hindi' : 'English'}`}
-                  className={`min-h-[40px] px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`min-h-[48px] px-3 sm:px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
                     language === lang
-                      ? 'bg-[#DA9A4C] text-[#0E241B] shadow-sm'
-                      : 'text-[#FAF8F5]/80 hover:text-white hover:bg-[#265C46]/50'
+                      ? 'bg-[#F2B01E] text-[#1F2A24] shadow-sm font-black'
+                      : 'text-white/80 hover:text-white hover:bg-[#24784C]/60'
                   }`}
                 >
                   {lang === 'en' ? 'EN' : lang === 'te' ? 'తెలుగు' : 'हिन्दी'}
@@ -84,18 +84,18 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
               aria-pressed={isPictorial}
               aria-label="Toggle pictorial visual mode"
               title="Pictorial visual mode with large icons and simple text"
-              className={`min-h-[44px] px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border ${
+              className={`min-h-[48px] px-3.5 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 transition-all border-2 ${
                 isPictorial
-                  ? 'bg-[#DA9A4C] text-[#0E241B] border-[#DA9A4C] shadow-sm'
-                  : 'bg-[#265C46]/50 text-[#FAF8F5] border-[#265C46] hover:bg-[#265C46]'
+                  ? 'bg-[#F2B01E] text-[#1F2A24] border-[#F2B01E] shadow-sm font-black'
+                  : 'bg-[#14462C] text-white border-[#24784C] hover:bg-[#24784C]'
               }`}
             >
-              <ImageIcon className="w-4 h-4 shrink-0" />
+              <ImageIcon className="w-5 h-5 shrink-0" />
               <span className="hidden sm:inline">
-                {language === 'te' ? 'చిత్రాలు' : language === 'hi' ? 'चित्र' : 'Pictorial'}
+                {language === 'te' ? 'చిత్రాలు' : language === 'hi' ? 'चित्र' : 'Pictures'}
               </span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-                isPictorial ? 'bg-[#0E241B] text-[#DA9A4C]' : 'bg-black/20 text-[#FAF8F5]'
+              <span className={`text-[11px] px-2 py-0.5 rounded-full font-black ${
+                isPictorial ? 'bg-[#1F2A24] text-[#F2B01E]' : 'bg-black/30 text-white'
               }`}>
                 {isPictorial ? 'ON' : 'OFF'}
               </span>
@@ -108,9 +108,9 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                 onClick={onStartTour}
                 aria-label="Start guided tour"
                 title="Start guided walkthrough of AgriSage AI"
-                className="min-h-[44px] px-3 py-2 rounded-xl text-xs font-bold bg-[#265C46]/50 text-[#FAF8F5] border border-[#265C46] hover:bg-[#265C46] flex items-center gap-1.5 transition-all hidden sm:flex"
+                className="min-h-[48px] px-3.5 py-2 rounded-2xl text-sm font-bold bg-[#14462C] text-white border border-[#24784C] hover:bg-[#24784C] flex items-center gap-1.5 transition-all hidden sm:flex"
               >
-                <Sparkles className="w-4 h-4 text-[#DA9A4C]" />
+                <Sparkles className="w-5 h-5 text-[#F2B01E]" />
                 <span>Tour</span>
               </button>
             )}
@@ -121,20 +121,20 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
               onClick={handleVoiceAssistantClick}
               aria-label="Ask Voice Assistant"
               title="Ask Voice Assistant in Telugu, Hindi or English"
-              className="min-h-[44px] px-3 py-2 rounded-xl text-xs font-bold bg-[#DA9A4C] text-[#0E241B] hover:bg-[#F5C989] shadow-sm flex items-center gap-1.5 transition-all active:scale-[0.98]"
+              className="min-h-[48px] px-4 py-2.5 rounded-2xl text-sm font-bold bg-[#F2B01E] text-[#1F2A24] hover:bg-[#e09f14] shadow-sm flex items-center gap-2 transition-all active:scale-[0.98]"
             >
-              <Mic className="w-4 h-4" />
-              <span className="hidden md:inline">Voice</span>
+              <Mic className="w-5 h-5" />
+              <span className="hidden md:inline font-black">Voice</span>
             </button>
 
             {/* User Profile / Logout */}
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <div className="hidden lg:flex flex-col text-right">
-                  <span className="text-xs font-bold text-white leading-tight">
+                  <span className="text-sm font-bold text-white leading-tight">
                     {user?.full_name || 'Farmer'}
                   </span>
-                  <span className="text-[10px] text-[#DA9A4C] font-semibold">
+                  <span className="text-[11px] text-[#F2B01E] font-semibold">
                     {user?.role || 'Farmer'}
                   </span>
                 </div>
@@ -143,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                   onClick={logout}
                   aria-label="Logout"
                   title="Sign out of AgriSage AI"
-                  className="min-h-[44px] min-w-[44px] p-2 rounded-xl text-[#FAF8F5]/80 hover:text-white hover:bg-[#265C46] transition-all flex items-center justify-center border border-transparent hover:border-[#265C46]"
+                  className="min-h-[48px] min-w-[48px] p-2.5 rounded-2xl text-white/80 hover:text-white hover:bg-[#24784C] transition-all flex items-center justify-center border border-transparent hover:border-[#24784C]"
                 >
                   <LogOut className="w-5 h-5" />
                 </button>
@@ -151,9 +151,9 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
             ) : (
               <Link
                 to="/login"
-                className="min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold bg-[#DA9A4C] text-[#0E241B] hover:bg-[#F5C989] transition-all flex items-center gap-1.5"
+                className="min-h-[48px] px-5 py-2.5 rounded-2xl text-sm font-bold bg-[#F2B01E] text-[#1F2A24] hover:bg-[#e09f14] transition-all flex items-center gap-2 font-black"
               >
-                <UserIcon className="w-4 h-4" />
+                <UserIcon className="w-5 h-5" />
                 <span>Sign In</span>
               </Link>
             )}

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Sprout,
   Calendar,
   Droplets,
   Coins,
@@ -14,6 +13,7 @@ import {
   RefreshCw,
   ArrowRight,
   Leaf,
+  Sun,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -41,10 +41,15 @@ import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import {
   LeafScanIllustration,
-  WateringFieldIllustration,
-  WeatherIllustration,
-  MoneyProfitIllustration,
+  WateringCanIllustration,
+  WaterDropsGauge,
+  ThermometerGauge,
+  CoinStackGauge,
+  FarmHealthMeter,
 } from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StepFlow } from '../components/common/StepFlow';
 
 export const DashboardPage: React.FC = () => {
   const { user, activeFarm, activeFarmId, activeCrop } = useAuth();
@@ -247,114 +252,158 @@ export const DashboardPage: React.FC = () => {
   // PICTORIAL MODE VIEW: Big Icons, 1 Short Phrase, Audio Read-Aloud
   // =========================================================================
   if (isPictorial) {
+    const weatherTemp = weatherData?.temperature_c ?? 28;
+    const weatherRain = weatherData?.expected_rainfall_today_mm ?? 0;
+    const waterDepth = irrigationOutputs?.root_zone_depletion_mm ?? (irrigationOutputs?.recommended_depth_mm ?? 15);
+    const hasDisease = Boolean(diseaseOutputs?.detected);
+    const estProfit = economicsSummary?.combined_summary?.net_profit
+      ? Number(economicsSummary.combined_summary.net_profit)
+      : 45000;
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
+        {/* Giant Mode & Language Switcher at Top */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={LayoutDashboard}
           title={language === 'te' ? 'రైతు డ్యాష్‌బోర్డ్' : language === 'hi' ? 'किसान डैशबोर्ड' : 'Farmer Dashboard'}
           purpose={language === 'te' ? 'చిత్రాల రూపంలో ముఖ్యమైన సమాచారం' : language === 'hi' ? 'चित्रों के माध्यम से आज का मुख्य कार्य' : 'Pictorial view with large icon cards and one-tap voice guidance.'}
         />
 
-        {/* Pictorial Lead Action Card */}
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="w-20 h-20 rounded-3xl bg-[#183D2E] text-[#DA9A4C] flex items-center justify-center font-bold shadow-md shrink-0">
-              <Sprout className="w-10 h-10" />
+        {/* Lead "Do This Today" Picture Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#FFF8E1] border-2 border-[#F2B01E] flex items-center justify-center shrink-0 shadow-sm">
+              <WateringCanIllustration size={64} />
             </div>
-            <div>
-              <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider block">
-                {language === 'te' ? 'ఈరోజు చేయాల్సిన ముఖ్య పని' : language === 'hi' ? 'आज का मुख्य कार्य' : 'What to do today'}
-              </span>
-              <h2 className="font-display text-xl sm:text-2xl font-bold text-[#183D2E] mt-1">
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {language === 'te' ? 'ఈరోజు చేయాల్సిన పని' : language === 'hi' ? 'आज का मुख्य कार्य' : 'Do This Today'}
+                </span>
+                <StatusBadge status="warning" label="Priority Action" size="sm" />
+              </div>
+              <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
                 {todayActionTitle}
               </h2>
-              <p className="text-base text-[#4E5F57] mt-1">
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
                 {todayActionReason}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <ReadAloudButton text={`Today's farm advice: ${todayActionTitle}. ${todayActionReason}`} label="Listen" />
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            <ReadAloudButton
+              text={`${todayActionTitle}. ${todayActionReason}`}
+              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+            />
             <Link
               to="/irrigation"
-              className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-2"
+              className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
             >
               <span>{language === 'te' ? 'నీటి తడి చూడండి' : language === 'hi' ? 'पानी देखें' : 'Check Water'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </div>
 
-        {/* Large Pictorial Navigation Grid */}
+        {/* 4 Large Pictorial Tiles with Real-Value Gauges */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Weather Tile */}
-          <Link
-            to="/setup"
-            className="bg-white rounded-3xl border border-[#7A553A]/20 hover:border-[#183D2E] p-6 text-center shadow-sm flex flex-col items-center justify-between group transition-all"
-          >
-            <WeatherIllustration size={80} />
-            <div className="my-3">
-              <span className="font-display text-xl font-bold text-[#183D2E] block">
-                {language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम' : 'Weather'}
-              </span>
-              <span className="text-sm text-[#4E5F57] block mt-1">
-                {weatherData ? `${weatherData.temperature_c}°C • Rain: ${weatherData.expected_rainfall_today_mm}mm` : 'Live forecast'}
-              </span>
-            </div>
-            <ReadAloudButton text={`Weather today is ${weatherData?.temperature_c || 28} degrees. Rain chance is ${weatherData?.expected_rainfall_today_mm || 0} millimetres.`} />
-          </Link>
+          {/* Tile 1: Weather & Temperature */}
+          <PictorialTile
+            title={language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम' : 'Weather'}
+            phrase={`${weatherTemp}°C • ${weatherRain > 0 ? `${weatherRain}mm Rain` : 'Clear Sky'}`}
+            illustration={<ThermometerGauge tempC={weatherTemp} />}
+            status={weatherRain > 0 ? 'info' : 'success'}
+            statusWord={weatherRain > 0 ? 'Rain Likely' : 'Dry & Warm'}
+            spokenText={`Weather is ${weatherTemp} degrees celsius. Rain forecast is ${weatherRain} millimetres.`}
+            detailsLink="/setup"
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
 
-          {/* Water Tile */}
-          <Link
-            to="/irrigation"
-            className="bg-white rounded-3xl border border-[#7A553A]/20 hover:border-[#183D2E] p-6 text-center shadow-sm flex flex-col items-center justify-between group transition-all"
-          >
-            <WateringFieldIllustration size={80} />
-            <div className="my-3">
-              <span className="font-display text-xl font-bold text-[#183D2E] block">
-                {language === 'te' ? 'నీటి తడులు' : language === 'hi' ? 'सिंचाई' : 'Irrigation'}
-              </span>
-              <span className="text-sm text-[#4E5F57] block mt-1">
-                FAO-56 Water Budget
-              </span>
-            </div>
-            <ReadAloudButton text="Check irrigation water budget and root zone moisture." />
-          </Link>
+          {/* Tile 2: Water Demand */}
+          <PictorialTile
+            title={language === 'te' ? 'నీటి తడులు' : language === 'hi' ? 'सिंचाई' : 'Irrigation'}
+            phrase={waterDepth > 15 ? 'Irrigate in 2 days' : 'Moisture is adequate'}
+            illustration={<WaterDropsGauge dropsCount={waterDepth > 25 ? 4 : waterDepth > 15 ? 3 : 2} />}
+            status={waterDepth > 15 ? 'warning' : 'success'}
+            statusWord={waterDepth > 15 ? 'Water Soon' : 'Moist Soil'}
+            spokenText={`Irrigation water depletion is ${waterDepth} millimetres. ${waterDepth > 15 ? 'Prepare to irrigate in two days.' : 'Soil moisture is currently adequate.'}`}
+            detailsLink="/irrigation"
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
 
-          {/* Disease Tile */}
-          <Link
-            to="/disease"
-            className="bg-white rounded-3xl border border-[#7A553A]/20 hover:border-[#183D2E] p-6 text-center shadow-sm flex flex-col items-center justify-between group transition-all"
-          >
-            <LeafScanIllustration size={80} />
-            <div className="my-3">
-              <span className="font-display text-xl font-bold text-[#183D2E] block">
-                {language === 'te' ? 'తెగుళ్ల గుర్తింపు' : language === 'hi' ? 'रोग पहचान' : 'Disease Scan'}
-              </span>
-              <span className="text-sm text-[#4E5F57] block mt-1">
-                Scan leaf photo
-              </span>
-            </div>
-            <ReadAloudButton text="Scan or upload a crop leaf photo to identify diseases." />
-          </Link>
+          {/* Tile 3: Leaf & Crop Health */}
+          <PictorialTile
+            title={language === 'te' ? 'పంట ఆరోగ్యం' : language === 'hi' ? 'फसल स्वास्थ्य' : 'Crop Health'}
+            phrase={hasDisease ? 'Pest spots observed' : 'Canopy green & healthy'}
+            illustration={<LeafScanIllustration size={80} />}
+            status={hasDisease ? 'danger' : 'success'}
+            statusWord={hasDisease ? 'Pest Alert' : 'Clean Canopy'}
+            spokenText={hasDisease ? 'Pest detected. Open disease scanner for organic IPM treatment.' : 'Canopy is healthy with no disease symptoms detected.'}
+            detailsLink="/disease"
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
 
-          {/* Money / Profit Tile */}
-          <Link
-            to="/economics"
-            className="bg-white rounded-3xl border border-[#7A553A]/20 hover:border-[#183D2E] p-6 text-center shadow-sm flex flex-col items-center justify-between group transition-all"
-          >
-            <MoneyProfitIllustration size={80} />
-            <div className="my-3">
-              <span className="font-display text-xl font-bold text-[#183D2E] block">
-                {language === 'te' ? 'ఖర్చులు & లాభం' : language === 'hi' ? 'खर्च और मुनाफा' : 'Farm Profit'}
-              </span>
-              <span className="text-sm text-[#4E5F57] block mt-1">
-                What-If Simulator
-              </span>
-            </div>
-            <ReadAloudButton text="Simulate your net profit and crop expenses." />
-          </Link>
+          {/* Tile 4: Farm Economics / Profit */}
+          <PictorialTile
+            title={language === 'te' ? 'ఖర్చులు & లాభం' : language === 'hi' ? 'खर्च और मुनाफा' : 'Farm Profit'}
+            phrase={`Net: ₹${Math.round(estProfit).toLocaleString('en-IN')}`}
+            illustration={<CoinStackGauge netProfit={estProfit} />}
+            status={estProfit >= 0 ? 'success' : 'danger'}
+            statusWord={economicsSummary ? 'Modelled' : 'DEMO DATA'}
+            spokenText={`Estimated net profit is rupees ${Math.round(estProfit)}. Modelled calculation based on yield and market price.`}
+            detailsLink="/economics"
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
+          />
         </div>
+
+        {/* Indicative Farm Health Meter */}
+        <div className="bg-white rounded-3xl border-2 border-[#D9D4C7] p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
+              <h3 className="font-display text-[20px] font-bold text-[#1B5E3B]">
+                {language === 'te' ? 'మొత్తం పొలం రేటింగ్' : language === 'hi' ? 'खेत समग्र स्कोर' : 'Overall Farm Health'}
+              </h3>
+              <StatusBadge status="demo" label="DEMO DATA" size="sm" />
+            </div>
+            <p className="text-[16px] text-[#4A5750]">
+              Indicative: 88/100 (DEMO DATA • details to verify)
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <FarmHealthMeter score={88} />
+            <ReadAloudButton
+              text="Indicative farm health score is 88 out of 100. This is demo data based on weather, water, and pest telemetry."
+              label="Listen"
+            />
+          </div>
+        </div>
+
+        {/* 3-Step Daily Routine Flow */}
+        <StepFlow
+          heading={language === 'te' ? 'ఈరోజు అనుసరించాల్సిన 3 దశలు' : language === 'hi' ? 'आज के 3 सरल कदम' : '3 Simple Steps for Your Farm Today'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'వాతావరణం చూడండి' : language === 'hi' ? 'मौसम जांचें' : 'Check Weather',
+              desc: language === 'te' ? 'ఉష్ణోగ్రత మరియు వర్షం సూచన గమనించండి' : language === 'hi' ? 'तापमान और बारिश का पूर्वानुमान देखें' : 'Review rain and temperature forecast',
+              icon: Sun,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'ఆకులను గమనించండి' : language === 'hi' ? 'पत्तियों की जांच' : 'Inspect Leaves',
+              desc: language === 'te' ? 'తెగుళ్లు లేదా మచ్చలు కనిపిస్తే ఫోటో తీయండి' : language === 'hi' ? 'कीट या धब्बे दिखने पर फोटो लें' : 'Look for pest spots or dry canopy',
+              icon: Leaf,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'సరిపడా నీరు ఇవ్వండి' : language === 'hi' ? 'जरूरत अनुसार पानी' : 'Irrigate if Dry',
+              desc: language === 'te' ? 'సిఫార్సు ప్రకారం తడులు ఇవ్వండి' : language === 'hi' ? 'सिफारिश के अनुसार पानी दें' : 'Apply water if depletion exceeds 15mm',
+              icon: Droplets,
+            },
+          ]}
+        />
       </div>
     );
   }
@@ -364,6 +413,9 @@ export const DashboardPage: React.FC = () => {
   // =========================================================================
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
+      {/* View Mode & Language Selector */}
+      <ModeToggleHero />
+
       <PageHeader
         icon={LayoutDashboard}
         title={t('dashboard.welcome_farmer', { name: user?.full_name || 'Farmer Ramesh' })}

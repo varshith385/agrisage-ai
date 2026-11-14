@@ -128,6 +128,8 @@ describe('EconomicsPage What-If Simulator', () => {
       defaultOptions: { queries: { retry: false } },
     });
     vi.clearAllMocks();
+    localStorage.clear();
+    localStorage.setItem('agrisage_pictorial_mode', 'words');
 
     vi.spyOn(farmsApi, 'getFarms').mockResolvedValue([mockFarm as any]);
     vi.spyOn(economicsApi, 'getCostTemplates').mockResolvedValue({});

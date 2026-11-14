@@ -12,6 +12,8 @@ import {
   RotateCcw,
   ArrowRight,
   BookOpen,
+  Coins,
+  Receipt,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -44,7 +46,11 @@ import { computeProfit } from '../utils/profitCalculator';
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { MoneyProfitIllustration } from '../components/common/FarmerIllustrations';
+import { StatusBadge } from '../components/common/StatusBadge';
+import { MoneyProfitIllustration, CoinStackGauge } from '../components/common/FarmerIllustrations';
+import { ModeToggleHero } from '../components/common/ModeToggleHero';
+import { PictorialTile } from '../components/common/PictorialTile';
+import { StepFlow } from '../components/common/StepFlow';
 
 export const EconomicsPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -370,64 +376,137 @@ export const EconomicsPage: React.FC = () => {
     ? `At current price of ₹${sliderPrice}/q and harvest yield of ${sliderYield} q/acre, your estimated net profit is ₹${Math.round(liveResult.net_profit).toLocaleString('en-IN')} with a ${liveResult.margin_pct.toFixed(1)}% margin.`
     : `Warning: Projected net deficit of ₹${Math.abs(Math.round(liveResult.net_profit)).toLocaleString('en-IN')}. Break-even requires at least ₹${liveResult.break_even_price?.toFixed(0) || 'N/A'}/q or reduced operating expenditure.`;
 
-  // PICTORIAL MODE
+  // PICTORIAL MODE v2
   if (isPictorial) {
+    const isProfit = liveResult.net_profit >= 0;
+    const profitVal = liveResult.net_profit;
+    const revenueVal = liveResult.gross_revenue;
+    const costVal = liveResult.total_cost;
+    const breakEven = liveResult.break_even_price ?? 3800;
+
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
+        {/* Giant Mode & Language Switcher at Top */}
+        <ModeToggleHero />
+
         <PageHeader
           icon={DollarSign}
           title={language === 'te' ? 'ఆదాయం మరియు ఖర్చులు' : language === 'hi' ? 'खर्च और मुनाफा' : 'Money & Profit'}
           purpose={language === 'te' ? 'మీ పంట ఖర్చులు, ఆదాయం మరియు నికర లాభం చూడండి' : language === 'hi' ? 'अपनी फसल का खर्च, कमाई और शुद्ध मुनाफा देखें' : 'Visual profit estimation and crop cost planning.'}
         />
 
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
-          <div className="flex justify-center">
-            <MoneyProfitIllustration className="w-48 h-36 drop-shadow-sm" />
-          </div>
-
-          <h2 className="text-2xl font-bold font-display text-[#183D2E]">
-            {language === 'te' ? 'నికర లాభం అంచనా' : language === 'hi' ? 'शुद्ध मुनाफा अनुमान' : 'Estimated Net Profit'}
-          </h2>
-
-          <div className="bg-white rounded-2xl p-5 border-2 border-[#183D2E] shadow-sm space-y-2">
-            <span className="text-xs font-black uppercase tracking-wider text-[#7A553A]">
-              Live Net Profit
-            </span>
-            <div className={`text-3xl font-display font-black ${
-              liveResult.net_profit >= 0 ? 'text-[#183D2E]' : 'text-red-600'
-            }`}>
-              ₹{liveResult.net_profit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+        {/* Lead "Do This Today" Profit Card */}
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-2xl bg-[#FFF8E1] border-2 border-[#F2B01E] flex items-center justify-center shrink-0 shadow-sm">
+              <CoinStackGauge netProfit={profitVal} className="w-16 h-16" />
             </div>
-            <p className="text-xs text-[#4E5F57]">
-              {selectedCrop} &bull; {sliderArea} acres &bull; Margin {liveResult.margin_pct.toFixed(1)}%
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 text-left">
-            <div className="bg-white rounded-xl p-3 border border-[#7A553A]/20">
-              <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Revenue</span>
-              <span className="text-lg font-bold text-[#183D2E]">
-                ₹{liveResult.gross_revenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-              </span>
-            </div>
-            <div className="bg-white rounded-xl p-3 border border-[#7A553A]/20">
-              <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Total Cost</span>
-              <span className="text-lg font-bold text-[#7A553A]">
-                ₹{liveResult.total_cost.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-              </span>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[13px] font-black uppercase tracking-wider text-[#1B5E3B] bg-[#1B5E3B]/10 px-2.5 py-1 rounded-md">
+                  {language === 'te' ? 'నికర లాభం' : language === 'hi' ? 'शुद्ध मुनाफा' : 'Net Season Profit'}
+                </span>
+                <StatusBadge
+                  status={isProfit ? 'success' : 'danger'}
+                  label={isProfit ? 'Surplus Projected' : 'Deficit Risk'}
+                  size="sm"
+                />
+              </div>
+              <h2 className="font-display text-[24px] sm:text-[30px] font-black text-[#1F2A24] leading-snug">
+                ₹{Math.round(profitVal).toLocaleString('en-IN')}
+                <span className="text-[16px] font-medium text-[#4A5750] ml-2">
+                  ({selectedCrop} &bull; {sliderArea} acres &bull; Margin {liveResult.margin_pct.toFixed(1)}%)
+                </span>
+              </h2>
+              <p className="text-[16px] text-[#4A5750] max-w-xl">
+                {plainMeaning}
+              </p>
             </div>
           </div>
-
-          <div className="pt-2">
-            <ReadAloudButton text={`Live Net Profit is ₹${Math.round(liveResult.net_profit).toLocaleString('en-IN')}. ${plainMeaning}`} />
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            <ReadAloudButton
+              text={`Estimated net profit is ₹${Math.round(profitVal).toLocaleString('en-IN')}. ${plainMeaning}`}
+              label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
+            />
           </div>
         </div>
+
+        {/* 4 Large Pictorial Tiles with Real Values */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Tile 1: Net Profit */}
+          <PictorialTile
+            title={language === 'te' ? 'నికర లాభం' : language === 'hi' ? 'शुद्ध लाभ' : 'Net Profit'}
+            phrase={`₹${Math.round(profitVal).toLocaleString('en-IN')}`}
+            illustration={<CoinStackGauge netProfit={profitVal} className="w-20 h-20" />}
+            status={isProfit ? 'success' : 'danger'}
+            statusWord={isProfit ? 'Profit Surplus' : 'Deficit Risk'}
+            spokenText={`Estimated net profit is rupees ${Math.round(profitVal)}.`}
+          />
+
+          {/* Tile 2: Gross Crop Revenue */}
+          <PictorialTile
+            title={language === 'te' ? 'మొత్తం రాబడి' : language === 'hi' ? 'कुल आय' : 'Gross Income'}
+            phrase={`₹${Math.round(revenueVal).toLocaleString('en-IN')}`}
+            illustration={<MoneyProfitIllustration size={80} />}
+            status="info"
+            statusWord="Harvest Value"
+            spokenText={`Gross harvest value is rupees ${Math.round(revenueVal)} based on ${sliderYield} quintals per acre.`}
+          />
+
+          {/* Tile 3: Total Cultivation Cost */}
+          <PictorialTile
+            title={language === 'te' ? 'మొత్తం ఖర్చులు' : language === 'hi' ? 'कुल खर्च' : 'Cultivation Cost'}
+            phrase={`₹${Math.round(costVal).toLocaleString('en-IN')}`}
+            illustration={<Coins className="w-16 h-16 text-[#7A553A]" />}
+            status="warning"
+            statusWord="Expenses"
+            spokenText={`Total cultivation cost is rupees ${Math.round(costVal)} across seeds, fertilizer, labour, and irrigation.`}
+          />
+
+          {/* Tile 4: Break-Even Mandi Price */}
+          <PictorialTile
+            title={language === 'te' ? 'కనీస విక్రయ ధర' : language === 'hi' ? 'न्यूनतम भाव' : 'Break-even Rate'}
+            phrase={`₹${breakEven.toFixed(0)} / quintal`}
+            illustration={<Scale className="w-16 h-16 text-[#1565A8]" />}
+            status="info"
+            statusWord="Target Price"
+            spokenText={`Break-even selling price is rupees ${breakEven.toFixed(0)} per quintal. Sell above this price to earn profit.`}
+          />
+        </div>
+
+        {/* 3-Step Financial Routine */}
+        <StepFlow
+          heading={language === 'te' ? 'ఆర్థిక భద్రతలో 3 దశలు' : language === 'hi' ? 'मुनाफा बढ़ाने के 3 सरल कदम' : '3 Farm Profit Maximizing Steps'}
+          steps={[
+            {
+              stepNumber: 1,
+              title: language === 'te' ? 'ఖర్చుల రసీదులు ఉంచండి' : language === 'hi' ? 'खर्च की रसीद रखें' : 'Track Input Costs',
+              desc: language === 'te' ? 'విత్తనాలు మరియు ఎరువుల ఖర్చులను రాయండి' : language === 'hi' ? 'బీజ్ మరియు ఖాద్ కా బిల్ సంభాల్ కర్ రఖేం' : 'Record seed, fertilizer, and tractor hire bills',
+              icon: Receipt,
+            },
+            {
+              stepNumber: 2,
+              title: language === 'te' ? 'మార్కెట్ ధరలు చూడండి' : language === 'hi' ? 'మండీ భావ్ దేఖేం' : 'Watch Mandi Rates',
+              desc: language === 'te' ? 'కనీస విక్రయ ధర కంటే ఎక్కువకు అమ్మండి' : language === 'hi' ? 'న్యూనతం దర్ సే అధిక్ భావ్ పర్ బేచేం' : 'Compare nearby APMC market modal prices',
+              icon: Store,
+            },
+            {
+              stepNumber: 3,
+              title: language === 'te' ? 'లాభాన్ని లెక్కించండి' : language === 'hi' ? 'మునాఫే కీ గణనా' : 'Secure Season Profit',
+              desc: language === 'te' ? 'ఆదాయం ఖర్చుల కంటే ఎక్కువగా ఉండాలి' : language === 'hi' ? 'ఖర్చ్ ఘటాకర్ అప్నా శుద్ధ మునాఫా సురక్షిత కరేం' : 'Ensure harvest income exceeds total seasonal outlay',
+              icon: TrendingUp,
+            },
+          ]}
+        />
       </div>
     );
   }
 
   return (
     <div className="space-y-6 animate-fadeIn max-w-6xl mx-auto pb-16">
+      {/* Mode & Language Switcher in Words Mode */}
+      <ModeToggleHero />
+
       {/* PAGE HEADER */}
       <PageHeader
         icon={DollarSign}

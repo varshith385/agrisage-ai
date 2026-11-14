@@ -745,5 +745,20 @@
     "admin_unverify_action": "Revoke Verification",
     "use_mandi_price": "Use Mandi Price",
     "use_mandi_price_success": "Expected price updated to current mandi modal price: ₹"
+  },
+  "pictorial": {
+    "choose_view": "Choose How to View",
+    "pictures": "Pictures",
+    "pictures_desc": "Simple Visual",
+    "words": "Words",
+    "words_desc": "Full Detail",
+    "do_this_today": "Do This Today",
+    "see_details": "See Details",
+    "weather_title": "Weather & Rain",
+    "water_title": "Water Needed",
+    "disease_title": "Leaf Disease",
+    "profit_title": "Farm Profit",
+    "health_title": "Farm Health",
+    "how_it_helps": "4 Steps for Your Farm Today"
   }
 }

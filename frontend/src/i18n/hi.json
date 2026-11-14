@@ -745,5 +745,20 @@
     "admin_unverify_action": "सत्यापन रद्द करें",
     "use_mandi_price": "मंडी भाव का उपयोग करें",
     "use_mandi_price_success": "अपेक्षित मूल्य को नवीनतम मंडी मॉडल भाव पर अपडेट किया गया: ₹"
+  },
+  "pictorial": {
+    "choose_view": "दृश्य मोड चुनें",
+    "pictures": "चित्र",
+    "pictures_desc": "सरल दृश्य",
+    "words": "शब्द",
+    "words_desc": "पूर्ण विवरण",
+    "do_this_today": "आज का मुख्य कार्य",
+    "see_details": "पूरा विवरण देखें",
+    "weather_title": "मौसम और बारिश",
+    "water_title": "फसल का पानी",
+    "disease_title": "पत्ती रोग",
+    "profit_title": "खेत का मुनाफा",
+    "health_title": "खेत का स्वास्थ्य",
+    "how_it_helps": "आज आपके खेत के 4 सरल कदम"
   }
 }

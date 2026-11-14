@@ -57,7 +57,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
       {/* Mobile Bottom Navigation Bar */}
       <nav
         aria-label="Mobile navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#183D2E]/95 backdrop-blur-md text-[#FAF8F5] border-t border-[#0E241B] px-1 py-1 shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1B5E3B]/95 backdrop-blur-md text-white border-t border-[#164E30] px-1 py-1.5 shadow-lg"
       >
         <div className="flex items-center justify-around">
           {primaryItems.map((item) => {
@@ -67,15 +67,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `min-h-[48px] min-w-[56px] flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
+                  `min-h-[52px] min-w-[60px] flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all ${
                     isActive
-                      ? 'text-[#DA9A4C] font-bold bg-[#265C46]/60 shadow-inner'
-                      : 'text-[#FAF8F5]/80 hover:text-white font-medium'
+                      ? 'text-[#F2B01E] font-black bg-[#24784C] shadow-inner'
+                      : 'text-white/80 hover:text-white font-semibold'
                   }`
                 }
               >
                 <Icon className="w-5 h-5 mb-0.5" />
-                <span className="text-[11px] tracking-tight">{item.label}</span>
+                <span className="text-[12px] tracking-tight">{item.label}</span>
               </NavLink>
             );
           })}
@@ -86,14 +86,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
             onClick={() => setMoreOpen(true)}
             aria-expanded={moreOpen}
             aria-label="More navigation pages"
-            className={`min-h-[48px] min-w-[56px] flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
+            className={`min-h-[52px] min-w-[60px] flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all ${
               moreOpen
-                ? 'text-[#DA9A4C] font-bold bg-[#265C46]/60'
-                : 'text-[#FAF8F5]/80 hover:text-white font-medium'
+                ? 'text-[#F2B01E] font-black bg-[#24784C]'
+                : 'text-white/80 hover:text-white font-semibold'
             }`}
           >
             <MoreHorizontal className="w-5 h-5 mb-0.5" />
-            <span className="text-[11px] tracking-tight">More</span>
+            <span className="text-[12px] tracking-tight">More</span>
           </button>
         </div>
       </nav>
@@ -108,16 +108,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
           onClick={() => setMoreOpen(false)}
         >
           <div
-            className="bg-[#FAF8F5] rounded-t-3xl border-t-2 border-[#183D2E] p-5 max-h-[85vh] overflow-y-auto text-[#1A2421] shadow-elevated"
+            className="bg-[#FFFDF8] rounded-t-3xl border-t-2 border-[#1B5E3B] p-5 max-h-[85vh] overflow-y-auto text-[#1F2A24] shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Sheet Header */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#7A553A]/20">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#D9D4C7]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#183D2E] text-[#DA9A4C] flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-2xl bg-[#F2B01E] text-[#1F2A24] flex items-center justify-center font-black shadow-sm">
                   <Sprout className="w-5 h-5" />
                 </div>
-                <h2 className="font-display text-lg font-bold text-[#183D2E]">
+                <h2 className="font-display text-lg font-bold text-[#1B5E3B]">
                   All Tools & Pages
                 </h2>
               </div>
@@ -125,7 +125,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
                 type="button"
                 onClick={() => setMoreOpen(false)}
                 aria-label="Close menu"
-                className="w-10 h-10 rounded-full bg-white border border-[#7A553A]/30 text-[#183D2E] flex items-center justify-center hover:bg-[#EFE7DE]"
+                className="w-10 h-10 rounded-full bg-white border border-[#D9D4C7] text-[#1F2A24] flex items-center justify-center hover:bg-[#F0ECE1]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -139,15 +139,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
                   setMoreOpen(false);
                   onStartTour();
                 }}
-                className="w-full mb-3 min-h-[48px] p-3 rounded-2xl bg-gradient-to-r from-[#183D2E] to-[#265C46] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm"
+                className="w-full mb-3 min-h-[52px] p-3 rounded-2xl bg-[#1B5E3B] hover:bg-[#24784C] text-white font-bold text-[16px] flex items-center justify-center gap-2 shadow-sm"
               >
-                <Sparkles className="w-5 h-5 text-[#DA9A4C]" />
+                <Sparkles className="w-5 h-5 text-[#F2B01E]" />
                 <span>Start Interactive Guided Tour</span>
               </button>
             )}
 
             {/* List of Other Pages */}
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 gap-2.5">
               {moreItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -155,16 +155,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
                     key={item.to}
                     to={item.to}
                     onClick={() => setMoreOpen(false)}
-                    className="min-h-[48px] p-3 rounded-2xl bg-white border border-[#7A553A]/15 hover:border-[#183D2E]/40 flex items-center gap-3 transition-all active:bg-[#EFE7DE]"
+                    className="min-h-[52px] p-3 rounded-2xl bg-white border border-[#D9D4C7] hover:border-[#1B5E3B] flex items-center gap-3 transition-all active:bg-[#F0ECE1]"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-[#FAF8F5] text-[#183D2E] border border-[#7A553A]/25 flex items-center justify-center shrink-0">
-                      <Icon className="w-5 h-5 text-[#183D2E]" />
+                    <div className="w-10 h-10 rounded-xl bg-[#FFFDF8] text-[#1B5E3B] border border-[#D9D4C7] flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5 text-[#1B5E3B]" />
                     </div>
                     <div className="flex-1 min-w-0 text-left">
-                      <span className="font-bold text-sm text-[#183D2E] block">
+                      <span className="font-bold text-[16px] text-[#1B5E3B] block">
                         {item.label}
                       </span>
-                      <span className="text-xs text-[#4E5F57] truncate block">
+                      <span className="text-[14px] text-[#4A5750] truncate block">
                         {item.desc}
                       </span>
                     </div>
@@ -174,14 +174,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
             </div>
 
             {/* Logout button at bottom of sheet */}
-            <div className="mt-4 pt-4 border-t border-[#7A553A]/20">
+            <div className="mt-4 pt-4 border-t border-[#D9D4C7]">
               <button
                 type="button"
                 onClick={() => {
                   setMoreOpen(false);
                   logout();
                 }}
-                className="w-full min-h-[48px] p-3 rounded-xl border border-red-300 bg-red-50 text-red-800 font-bold text-sm flex items-center justify-center gap-2"
+                className="w-full min-h-[52px] p-3 rounded-2xl border border-red-300 bg-red-50 text-red-800 font-bold text-[16px] flex items-center justify-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Sign Out of AgriSage</span>
