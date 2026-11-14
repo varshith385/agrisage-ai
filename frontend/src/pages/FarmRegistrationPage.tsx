@@ -266,10 +266,10 @@ export const FarmRegistrationPage: React.FC = () => {
       />
 
       {/* LEAD SUMMARY SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
         {/* Card 1: Active Farm Holding */}
-        <div className="bg-gradient-to-br from-[#FEF6E9] to-white rounded-2xl border-2 border-[#DA9A4C] p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
-          <div className="space-y-2">
+        <div className="bg-gradient-to-br from-[#FEF6E9] to-white rounded-2xl border-2 border-[#DA9A4C] p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
                 Active Farm Holding
@@ -280,7 +280,7 @@ export const FarmRegistrationPage: React.FC = () => {
             </div>
 
             <div className="flex items-baseline justify-between pt-1">
-              <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-[#183D2E]">
+              <h2 className="text-[20px] sm:text-[22px] font-display font-extrabold text-[#183D2E]">
                 {activeFarm ? activeFarm.name : name}
               </h2>
               <span className="text-xs font-semibold text-[#7A553A]">
@@ -307,7 +307,7 @@ export const FarmRegistrationPage: React.FC = () => {
         </div>
 
         {/* Card 2: Land Tenure Breakdown */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
@@ -348,7 +348,7 @@ export const FarmRegistrationPage: React.FC = () => {
         </div>
 
         {/* Card 3: Soil & Irrigation Configuration */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">

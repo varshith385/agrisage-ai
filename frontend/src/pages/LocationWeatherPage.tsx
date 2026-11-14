@@ -248,7 +248,7 @@ export const LocationWeatherPage: React.FC = () => {
         </div>
 
         {/* 4 Large Pictorial Tiles with REAL Values or Honest No-Data Fallback */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-start">
           {/* Tile 1: Temperature Gauge */}
           <PictorialTile
             title={language === 'te' ? 'ఉష్ణోగ్రత' : language === 'hi' ? 'तापमान' : 'Temperature'}
@@ -360,10 +360,10 @@ export const LocationWeatherPage: React.FC = () => {
 
       {/* LEAD SUMMARY SECTION (1 to 3 Large Cards + Primary Action) */}
       {weatherData && !isLoadingWeather && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
           {/* Card 1: Today's Weather & Rain Risk */}
-          <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
+          <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
                   Today's Agro-Weather
@@ -374,7 +374,7 @@ export const LocationWeatherPage: React.FC = () => {
               </div>
 
               <div className="flex items-baseline gap-3 pt-1">
-                <span className="text-4xl sm:text-5xl font-display font-black text-[#183D2E]">
+                <span className="text-2xl sm:text-[28px] font-display font-black text-[#183D2E]">
                   {weatherData.temperature_c.toFixed(0)}°C
                 </span>
                 <span className="text-sm font-semibold text-[#7A553A]">
@@ -401,8 +401,8 @@ export const LocationWeatherPage: React.FC = () => {
           </div>
 
           {/* Card 2: Evaporative Demand & Humidity */}
-          <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
+          <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                   <Droplets className="w-4 h-4 text-blue-600" />
@@ -416,13 +416,13 @@ export const LocationWeatherPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
                   <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Humidity</span>
-                  <span className="text-xl font-black text-[#183D2E]">
+                  <span className="text-lg font-black text-[#183D2E]">
                     {weatherData.relative_humidity_pct}%
                   </span>
                 </div>
                 <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
                   <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Wind Speed</span>
-                  <span className="text-xl font-black text-[#183D2E]">
+                  <span className="text-lg font-black text-[#183D2E]">
                     {weatherData.wind_speed_kmh} <span className="text-xs font-normal">km/h</span>
                   </span>
                 </div>
@@ -436,7 +436,7 @@ export const LocationWeatherPage: React.FC = () => {
           </div>
 
           {/* Card 3: Village Centroid & Farm Matching */}
-          <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">

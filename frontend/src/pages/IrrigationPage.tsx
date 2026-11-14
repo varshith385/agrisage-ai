@@ -262,7 +262,7 @@ export const IrrigationPage: React.FC = () => {
         />
 
         {/* Lead "Do This Today" Irrigation Decision Card */}
-        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div className="w-20 h-20 rounded-2xl bg-[#E1F5FE] border-2 border-[#1565A8] flex items-center justify-center shrink-0 shadow-sm">
               {hasPlan ? <WateringFieldIllustration size={64} /> : <NoDataIllustration size={64} />}
@@ -314,7 +314,7 @@ export const IrrigationPage: React.FC = () => {
         </div>
 
         {/* 3 Large Pictorial Tiles with REAL Values or Honest No-Data Fallback */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 items-start">
           {/* Tile 1: Water Needed with Drops Gauge */}
           <PictorialTile
             title={language === 'te' ? 'నీటి మోతాదు' : language === 'hi' ? 'पानी की मात्रा' : 'Water Needed'}
@@ -399,10 +399,10 @@ export const IrrigationPage: React.FC = () => {
       />
 
       {/* LEAD SUMMARY SECTION (1 to 3 Important Results as Large Cards + ONE clear CTA) */}
-      <div ref={resultsRef} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div ref={resultsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
         {/* Card 1: Today's Watering Decision */}
-        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
-          <div className="space-y-2">
+        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
                 {t('irrigation.next_irrigation_title')}
@@ -414,28 +414,28 @@ export const IrrigationPage: React.FC = () => {
 
             {plan?.rain_skip_triggered ? (
               <div className="flex items-center gap-2 text-teal-800">
-                <CloudRain className="w-6 h-6 text-teal-600 shrink-0" />
-                <h2 className="font-display text-xl sm:text-2xl font-extrabold">
+                <CloudRain className="w-5 h-5 text-teal-600 shrink-0" />
+                <h2 className="font-display text-[20px] sm:text-[22px] font-extrabold">
                   {t('irrigation.rain_skip_active')}
                 </h2>
               </div>
             ) : plan?.should_irrigate ? (
               <div className="flex items-center gap-2 text-amber-900">
-                <AlertTriangle className="w-6 h-6 text-[#DA9A4C] shrink-0" />
-                <h2 className="font-display text-xl sm:text-2xl font-extrabold">
+                <AlertTriangle className="w-5 h-5 text-[#DA9A4C] shrink-0" />
+                <h2 className="font-display text-[20px] sm:text-[22px] font-extrabold">
                   {t('irrigation.irrigate_now')}
                 </h2>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-emerald-900">
-                <CheckCircle2 className="w-6 h-6 text-emerald-700 shrink-0" />
-                <h2 className="font-display text-xl sm:text-2xl font-extrabold">
+                <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
+                <h2 className="font-display text-[20px] sm:text-[22px] font-extrabold">
                   {t('irrigation.adequate_moisture')}
                 </h2>
               </div>
             )}
 
-            <p className="text-sm font-semibold text-[#183D2E] leading-relaxed">
+            <p className="text-[13px] sm:text-[14px] font-semibold text-[#183D2E] leading-relaxed">
               {plan?.recommendation_text || 'Soil water depletion has reached RAW threshold. Irrigation required today.'}
             </p>
           </div>
@@ -445,7 +445,7 @@ export const IrrigationPage: React.FC = () => {
             <button
               type="button"
               onClick={handleComputeBudget}
-              className="min-h-[48px] px-5 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-sm shadow-sm"
+              className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs sm:text-sm shadow-sm"
             >
               <span>Compute Crop Water Budget</span>
               <ArrowRight className="w-4 h-4" />
@@ -454,8 +454,8 @@ export const IrrigationPage: React.FC = () => {
         </div>
 
         {/* Card 2: Required Water Volume & Depth */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
-          <div className="space-y-2">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
                 {t('irrigation.water_volume')}
@@ -466,7 +466,7 @@ export const IrrigationPage: React.FC = () => {
             </div>
 
             <div className="py-1">
-              <span className="text-3xl font-display font-black text-[#183D2E]">
+              <span className="text-2xl sm:text-[26px] font-display font-black text-[#183D2E]">
                 {plan?.litres_needed ? plan.litres_needed.toLocaleString() : '1,133,120'} L
               </span>
               <span className="text-xs text-[#4E5F57] block mt-0.5">
@@ -488,7 +488,7 @@ export const IrrigationPage: React.FC = () => {
         </div>
 
         {/* Card 3: Soil Water Level & Evapotranspiration */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">

@@ -393,7 +393,7 @@ export const EconomicsPage: React.FC = () => {
         />
 
         {/* Lead "Do This Today" Profit Card */}
-        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div className="w-20 h-20 rounded-2xl bg-[#FFF8E1] border-2 border-[#F2B01E] flex items-center justify-center shrink-0 shadow-sm">
               <CoinStackGauge netProfit={profitVal} className="w-16 h-16" />
@@ -429,7 +429,7 @@ export const EconomicsPage: React.FC = () => {
         </div>
 
         {/* 4 Large Pictorial Tiles with Real Values */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-start">
           {/* Tile 1: Net Profit */}
           <PictorialTile
             title={language === 'te' ? 'నికర లాభం' : language === 'hi' ? 'शुद्ध लाभ' : 'Net Profit'}
@@ -603,9 +603,9 @@ export const EconomicsPage: React.FC = () => {
       </div>
 
       {/* LEAD SUMMARY SECTION (1 to 3 Large Cards + ONE Primary Action) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
         {/* Card 1: Live Net Profit & Margin */}
-        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
@@ -651,7 +651,7 @@ export const EconomicsPage: React.FC = () => {
         </div>
 
         {/* Card 2: Revenue vs Expenditure Breakdown */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
@@ -687,7 +687,7 @@ export const EconomicsPage: React.FC = () => {
         </div>
 
         {/* Card 3: Break-Even Targets & Land Tenure Structure */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">

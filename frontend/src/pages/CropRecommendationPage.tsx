@@ -121,7 +121,7 @@ export const CropRecommendationPage: React.FC = () => {
         />
 
         {/* Lead "Do This Today" Best Crop Match Card */}
-        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div className="w-20 h-20 rounded-2xl bg-[#E8F5E9] border-2 border-[#1B5E3B] flex items-center justify-center shrink-0 shadow-sm">
               {hasTopCrop ? <LeafScanIllustration size={64} /> : <NoDataIllustration size={64} />}
@@ -166,7 +166,7 @@ export const CropRecommendationPage: React.FC = () => {
         </div>
 
         {/* 3 Pictorial Summary Tiles with Real Values */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 items-start">
           {/* Tile 1: Top Suitable Crop */}
           <PictorialTile
             title={language === 'te' ? 'అత్యంత అనుకూల పంట' : language === 'hi' ? 'उपयुक्त फसल' : 'Best Match'}
@@ -235,10 +235,10 @@ export const CropRecommendationPage: React.FC = () => {
       />
 
       {/* LEAD SUMMARY SECTION (1 to 3 Large Cards + Primary CTA) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
         {/* Card 1: Top Recommended Crop */}
-        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
-          <div className="space-y-2">
+        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
                 Rank #1 Recommendation
@@ -249,7 +249,7 @@ export const CropRecommendationPage: React.FC = () => {
             </div>
 
             <div className="flex items-baseline justify-between pt-1">
-              <h2 className="text-3xl sm:text-4xl font-display font-black text-[#183D2E] capitalize">
+              <h2 className="text-2xl sm:text-[26px] font-display font-black text-[#183D2E] capitalize">
                 {topCrop ? topCrop.crop_name : 'Cotton'}
               </h2>
               <span className="text-base font-mono font-bold text-[#183D2E]">
@@ -282,7 +282,7 @@ export const CropRecommendationPage: React.FC = () => {
         </div>
 
         {/* Card 2: Restorative Crop Rotation Break */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
@@ -311,7 +311,7 @@ export const CropRecommendationPage: React.FC = () => {
         </div>
 
         {/* Card 3: Soil Nutrient & Weather Mode */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">

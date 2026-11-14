@@ -373,7 +373,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* 4 Large Pictorial Tiles with REAL-Value Gauges or Grey No-Data Fallback */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 items-start">
           {/* Tile 1: Weather & Temperature */}
           <PictorialTile
             title={language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम' : 'Weather'}
@@ -513,10 +513,10 @@ export const DashboardPage: React.FC = () => {
       />
 
       {/* 1. LEAD SUMMARY SECTION (1 to 3 Important Results as Large Cards + ONE clear CTA) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
         {/* Card 1: What Should I Do Today? (Primary Action) */}
-        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
-          <div className="space-y-2">
+        <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
                 {language === 'te' ? 'ఈరోజు చేయాల్సిన ముఖ్య పని' : language === 'hi' ? 'आज का मुख्य कार्य' : 'What Should I Do Today?'}
@@ -527,10 +527,10 @@ export const DashboardPage: React.FC = () => {
                 {todayActionItem && hasIrrigationBackend ? 'Day 1 Priority' : 'No data yet'}
               </span>
             </div>
-            <h2 className="font-display text-xl font-bold text-[#183D2E]">
+            <h2 className="font-display text-[20px] sm:text-[22px] font-bold text-[#183D2E]">
               {todayActionTitle}
             </h2>
-            <p className="text-base text-[#4E5F57] leading-relaxed">
+            <p className="text-[14px] sm:text-[15px] text-[#4E5F57] leading-relaxed">
               {todayActionReason}
             </p>
           </div>
@@ -539,7 +539,7 @@ export const DashboardPage: React.FC = () => {
             <ReadAloudButton text={`Priority action today: ${todayActionTitle}. ${todayActionReason}`} />
             <Link
               to="/irrigation"
-              className="min-h-[48px] px-5 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-sm shadow-sm"
+              className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs sm:text-sm shadow-sm"
             >
               <span>Act on This</span>
               <ArrowRight className="w-4 h-4" />
@@ -548,7 +548,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Card 2: Today's Weather & Rain Risk */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
@@ -564,7 +564,7 @@ export const DashboardPage: React.FC = () => {
             ) : weatherData ? (
               <div className="flex items-center justify-between py-1">
                 <div>
-                  <span className="text-3xl font-display font-extrabold text-[#183D2E]">
+                  <span className="text-2xl sm:text-[26px] font-display font-extrabold text-[#183D2E]">
                     {weatherData.temperature_c}°C
                   </span>
                   <span className="text-xs text-[#4E5F57] block mt-0.5">
@@ -600,7 +600,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Card 3: Active Crop Phenology & Farm Holding */}
-        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">

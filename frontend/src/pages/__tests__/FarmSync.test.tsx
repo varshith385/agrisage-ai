@@ -11,6 +11,9 @@ import { farmsApi } from '../../api/farms';
 import { Farm } from '../../types/api';
 
 vi.mock('../../api/farms');
+vi.mock('../../api/reminders', () => ({
+  getReminders: vi.fn().mockResolvedValue([]),
+}));
 
 const mockFarmA: Farm = {
   id: 101,

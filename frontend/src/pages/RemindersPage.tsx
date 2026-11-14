@@ -260,7 +260,7 @@ export const RemindersPage: React.FC = () => {
               label="Read Summary"
             />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 items-start">
             <PictorialTile
               title={language === 'te' ? 'రానున్న పనులు' : language === 'hi' ? 'आगामी कार्य' : 'Upcoming Tasks'}
               phrase={`${upcomingReminders.length} Scheduled`}
@@ -373,7 +373,7 @@ export const RemindersPage: React.FC = () => {
       )}
 
       {/* Tabs & Active Reminders List */}
-      <div id="tabs" className="bg-white dark:bg-[#121A15] border border-stone-200 dark:border-stone-800 rounded-3xl p-4 sm:p-6 shadow-sm space-y-5">
+      <div id="tabs" className="bg-white dark:bg-[#121A15] border border-stone-200 dark:border-stone-800 rounded-3xl p-4 sm:p-5 shadow-sm space-y-4">
         {/* Tab Headers */}
         <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
           <div className="flex space-x-2 sm:space-x-3">

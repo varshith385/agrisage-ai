@@ -1,0 +1,6 @@
+CARD EMPTY SPACE MEASUREMENT REPORT
+Generated at: 2026-11-14T12:49:16.175Z
+Threshold: empty bottom space > 35px AND empty ratio > 20% of card height
+========================================================================
+
+Total Flagged Cards Across All Viewports: 0
