@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, AlertCircle } from 'lucide-react';
+import { Volume2, VolumeX, AlertCircle, X } from 'lucide-react';
 import {
   speakText,
   isSpeechSynthesisSupported,
@@ -22,7 +22,11 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
 }) => {
   const { language, t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
-  const [warning, setWarning] = useState<string | null>(null);
+  const [voiceNotice, setVoiceNotice] = useState<{
+    lang: string;
+    isMissingVoice: boolean;
+    message: string;
+  } | null>(null);
   const [currentSpeech, setCurrentSpeech] = useState<{ cancel: () => void } | null>(null);
 
   const handleSpeak = async () => {
@@ -34,8 +38,11 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
     }
 
     if (!isSpeechSynthesisSupported()) {
-      setWarning(t('voice.tts_unsupported', { defaultValue: 'Voice playback is not supported in this browser.' }));
-      setTimeout(() => setWarning(null), 4000);
+      setVoiceNotice({
+        lang: language,
+        isMissingVoice: false,
+        message: t('voice.tts_unsupported', { defaultValue: 'Speech synthesis is not supported in this browser.' }),
+      });
       return;
     }
 
@@ -43,21 +50,34 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
     const voice = findVoiceForLanguage(language as SupportedLanguage, voices);
 
     if (!voice && language !== 'en') {
-      const langName = language === 'te' ? 'Telugu' : 'Hindi';
-      setWarning(`Browser voice pack for ${langName} is not available in your browser. Audio cannot be read in the wrong language.`);
-      setTimeout(() => setWarning(null), 5000);
+      const isTe = language === 'te';
+      setVoiceNotice({
+        lang: isTe ? 'Telugu' : 'Hindi',
+        isMissingVoice: true,
+        message: isTe
+          ? 'Telugu (తెలుగు) speech voice is not installed in this browser. To enable audio: 1) In Windows Settings > Time & Language > Speech, install the Telugu speech voice pack, or 2) Open AgriSage AI in Microsoft Edge (which includes built-in Natural voices for Telugu). The text remains visible on screen.'
+          : 'Hindi (हिन्दी) speech voice is not installed in this browser. To enable audio: 1) In Windows Settings > Time & Language > Speech, install the Hindi speech voice pack, or 2) Open AgriSage AI in Microsoft Edge. The text remains visible on screen.',
+      });
       return;
     }
 
+    setVoiceNotice(null);
     const speech = speakText(text, language as SupportedLanguage, {
       onStart: () => setIsPlaying(true),
       onEnd: () => {
         setIsPlaying(false);
         setCurrentSpeech(null);
       },
-      onError: () => {
+      onError: (err) => {
         setIsPlaying(false);
         setCurrentSpeech(null);
+        if (String(err?.message || '').includes('NO_VOICE_FOR_LANG')) {
+          setVoiceNotice({
+            lang: language === 'te' ? 'Telugu' : 'Hindi',
+            isMissingVoice: true,
+            message: 'Browser voice pack not installed. Please add voice pack in Windows Speech settings or try Microsoft Edge.',
+          });
+        }
       },
     });
 
@@ -69,36 +89,55 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
       <button
         type="button"
         onClick={handleSpeak}
-        aria-label={isPlaying ? 'Stop browser voice read-aloud' : (label || 'Read aloud using browser voice in current language')}
-        title={isPlaying ? 'Stop browser voice' : (label || 'Listen to this explanation using browser voice')}
-        className={`min-h-[44px] min-w-[44px] p-2.5 rounded-xl border flex items-center justify-center gap-1.5 transition-all text-xs font-semibold ${
+        aria-label={isPlaying ? 'Stop browser voice playback' : (label || 'Listen to advisory text using browser voice')}
+        title={isPlaying ? 'Stop voice playback' : (label || 'Listen to this explanation')}
+        className={`min-h-[46px] px-3.5 py-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all text-xs font-bold ${
           isPlaying
-            ? 'bg-[#DA9A4C] text-[#0E241B] border-[#DA9A4C] animate-pulse'
-            : 'bg-[#FAF8F5] text-[#183D2E] border-[#7A553A]/25 hover:bg-[#EFE7DE] hover:border-[#183D2E]/40'
+            ? 'bg-[#F2B01E] text-[#1F2A24] border-[#F2B01E] animate-pulse shadow-xs'
+            : 'bg-white dark:bg-[#18241E] text-[#1B5E3B] dark:text-[#F2B01E] border-[#D9D4C7] dark:border-[#273B30] hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:border-[#1B5E3B]/40'
         } ${className}`}
       >
         {isPlaying ? (
           <>
-            <VolumeX className="w-5 h-5 text-[#0E241B]" />
-            <span className="hidden sm:inline">Stop</span>
+            <VolumeX className="w-4 h-4 text-[#1F2A24]" />
+            <span>Stop</span>
           </>
         ) : (
           <>
-            <Volume2 className="w-5 h-5 text-[#183D2E]" />
-            <span className="hidden sm:inline">{label || 'Listen'}</span>
+            <Volume2 className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E]" />
+            <span>{label || 'Listen'}</span>
           </>
         )}
       </button>
 
-      {warning && (
+      {/* Missing Voice How-To Dialog Card */}
+      {voiceNotice && (
         <div
           role="alert"
-          className="absolute left-0 top-full mt-2 z-50 w-72 p-3 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl shadow-lg text-xs leading-relaxed animate-fadeIn flex items-start gap-2"
+          className="absolute left-0 bottom-full mb-2 z-50 w-80 sm:w-96 p-4 bg-white dark:bg-[#18241E] border-2 border-[#F2B01E] text-[#1F2A24] dark:text-[#F2F5F3] rounded-2xl shadow-xl text-xs leading-relaxed animate-fadeIn"
         >
-          <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-          <div>{warning}</div>
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5 font-bold text-[#9E5B00] dark:text-[#FBBF24]">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>Voice Setup Required ({voiceNotice.lang})</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setVoiceNotice(null)}
+              className="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <p className="text-[#4A5750] dark:text-[#9EB0A5] mb-2">{voiceNotice.message}</p>
+          <div className="pt-2 border-t border-stone-200 dark:border-stone-700 text-[11px] text-stone-500 dark:text-stone-400 flex items-center justify-between">
+            <span>Honesty: Text never read in wrong accent.</span>
+            <span className="font-semibold text-[#1B5E3B] dark:text-[#F2B01E]">AgriSage Speech</span>
+          </div>
         </div>
       )}
     </div>
   );
 };
+
+export default ReadAloudButton;

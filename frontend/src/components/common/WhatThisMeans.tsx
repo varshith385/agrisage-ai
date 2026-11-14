@@ -23,32 +23,34 @@ export const WhatThisMeans: React.FC<WhatThisMeansProps> = ({
 
   return (
     <div
-      className={`rounded-2xl border p-4 sm:p-4.5 bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white border-[#DA9A4C]/35 shadow-sm ${className}`}
+      className={`w-full rounded-2xl border p-4 sm:p-5 bg-gradient-to-r from-amber-50/80 via-[#FFFDF8] to-emerald-50/40 dark:from-[#232014] dark:via-[#18241E] dark:to-[#142B1D] border-[#D9D4C7] dark:border-[#273B30] shadow-xs transition-all ${className}`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#DA9A4C]/20 text-[#7A553A] flex items-center justify-center shrink-0 mt-0.5">
-            <Lightbulb className="w-5 h-5 text-[#DA9A4C]" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-start gap-3.5 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-[#F2B01E]/20 text-[#1F2A24] dark:text-[#F2B01E] flex items-center justify-center shrink-0 mt-0.5">
+            <Lightbulb className="w-5 h-5 text-[#9E5B00] dark:text-[#F2B01E]" />
           </div>
-          <div>
-            <span className="text-xs font-black uppercase text-[#7A553A] tracking-wider block">
+          <div className="min-w-0">
+            <span className="text-[12px] font-bold uppercase tracking-wider text-[#9E5B00] dark:text-[#F2B01E] block">
               {t('common.what_this_means', { defaultValue: 'What this means for you' })}
             </span>
-            <p className="mt-1 text-base font-medium text-[#1A2421] leading-relaxed">
+            <p className="mt-1 text-[15px] sm:text-[16px] font-medium text-[#1F2A24] dark:text-[#F2F5F3] leading-[1.5] break-words">
               {message}
             </p>
             {confidenceNote && (
-              <p className="mt-1 text-xs text-[#7A553A] italic">
+              <p className="mt-1 text-[13px] text-[#4A5750] dark:text-[#9EB0A5] italic">
                 {confidenceNote}
               </p>
             )}
           </div>
         </div>
 
-        <div className="shrink-0">
+        <div className="shrink-0 self-end sm:self-center">
           <ReadAloudButton text={fullTextToRead} />
         </div>
       </div>
     </div>
   );
 };
+
+export default WhatThisMeans;

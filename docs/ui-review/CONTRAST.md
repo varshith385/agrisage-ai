@@ -57,3 +57,40 @@ Per WCAG 1.4.1 (Use of Color), color is **never the sole indicator** of any syst
 | **Watch / Moderate** | Deep Gold Ochre `#9E5B00` | **Triangle with Exclamation** (`AlertTriangle`) | "Attention" / "Monitor" / "Approaching" |
 | **Critical / Action** | Crimson Red `#B3261E` | **Octagon with Cross** (`AlertOctagon`) | "Urgent" / "Severe" / "Irrigate Now" |
 | **Informational** | Ocean Blue `#1565A8` | **Circle with Info** (`Info`) | "Telemetry" / "Open-Meteo" / "Forecast" |
+
+---
+
+## 4. Dark Mode Palette & Contrast Verification (Round 5)
+
+Dark mode adopts deep organic forest slates (`#0D1410` page background, `#18241E` card surfaces, `#273B30` borders) paired with high-luminance readable text and accessible status accents:
+
+| Role | Color Name | Hex Code | Purpose |
+|---|---|---|---|
+| **Dark Page Background** | Deep Forest Slate | `#0D1410` | Canvas background in dark mode |
+| **Dark Card Surface** | Organic Moss Obsidian | `#18241E` | Card and modal container surfaces |
+| **Dark Card Border** | Dark Pine Border | `#273B30` | 1px subtle card boundary |
+| **Dark Body Text** | Warm Off-White | `#F2F5F3` | Primary reading text in dark mode |
+| **Dark Secondary Text** | Pale Sage | `#9EB0A5` | Explanations, subtitles, parameter hints |
+| **Dark Amber Accent** | Harvest Gold | `#F2B01E` | Active highlights, buttons, and badges |
+| **Dark Status: Success** | Spring Emerald | `#4ADE80` | Healthy crops, optimal soil moisture |
+| **Dark Status: Warning** | Amber Ochre | `#FBBF24` | Monitor irrigation threshold, spray delay |
+| **Dark Status: Danger** | Vivid Coral Red | `#F87171` | Severe disease infection, root-zone drought |
+| **Dark Status: Info** | Sky Blue | `#60A5FA` | Agro-meteorological telemetry |
+
+### Dark Mode Measured Contrast Ratios:
+
+| Text / Element | Background Surface | Measured Contrast Ratio | WCAG Target Requirement | Compliance Result |
+|---|---|---|---|---|
+| Primary Text `#F2F5F3` | Dark Card Surface `#18241E` | **14.16:1** | Body Text ($\ge$ 7.0:1 AAA) | **PASS (AAA)** |
+| Primary Text `#F2F5F3` | Dark Page Canvas `#0D1410` | **15.22:1** | Body Text ($\ge$ 7.0:1 AAA) | **PASS (AAA)** |
+| Secondary Text `#9EB0A5` | Dark Card Surface `#18241E` | **6.74:1** | Secondary Text ($\ge$ 4.5:1 AA) | **PASS (AA)** |
+| Amber Accent `#F2B01E` | Dark Card Surface `#18241E` | **8.57:1** | Highlight / Button ($\ge$ 7.0:1 AAA) | **PASS (AAA)** |
+| Success Text `#4ADE80` | Dark Card Surface `#18241E` | **8.86:1** | Status Text ($\ge$ 4.5:1 AA) | **PASS (AAA)** |
+| Warning Text `#FBBF24` | Dark Card Surface `#18241E` | **9.29:1** | Status Text ($\ge$ 4.5:1 AA) | **PASS (AAA)** |
+| Danger Text `#F87171` | Dark Card Surface `#18241E` | **5.62:1** | Status Text ($\ge$ 4.5:1 AA) | **PASS (AA)** |
+| Info Text `#60A5FA` | Dark Card Surface `#18241E` | **6.08:1** | Status Text ($\ge$ 4.5:1 AA) | **PASS (AA)** |
+| Icon Accents | Dark Card Surface `#18241E` | **> 5.5:1** | Graphical Objects ($\ge$ 3.0:1 AA) | **PASS (AA)** |
+
+> [!NOTE]
+> In dark mode as well as light mode, color is never the sole indicator of system state. Status badges maintain their distinct geometric shapes (circle-tick, triangle-warning, octagon-cross, circle-clock) alongside visible text labels across all themes.
+

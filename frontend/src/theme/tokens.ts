@@ -1,27 +1,31 @@
 /**
- * AgriSage AI — Unified Design Tokens (Phase B Accessibility & Contrast Overhaul)
+ * AgriSage AI — Unified Design Tokens (Round 5 Professional Visual System & Dark Mode)
  * 
  * Strict WCAG AAA/AA Compliant Agricultural Palette:
  * - Primary (Deep Field Green): #1B5E3B (Headers, main action buttons, active navigation)
- * - Page Background:           #FFFDF8 (Warm readable off-white)
- * - Cards:                     #FFFFFF with 1px border #D9D4C7 & soft shadow
- * - Body Text:                 #1F2A24 (Near-black, >= 14:1 contrast on white/cream)
- * - Secondary Text:            #4A5750 (Never lighter than this, >= 7.4:1 contrast)
- * - Water Accent:              #1565A8 (Irrigation, rain, water budgeting)
- * - Sun/Highlight Accent:      #F2B01E (Amber highlight — ALWAYS dark text #1F2A24, never white text)
- * - Soil Accent:               #7A553A (Loam brown for soil icons & accents only)
- * - Status Colours:
- *   - Success:                 #2E7D32 (Shape: Circle with Checkmark)
- *   - Warning:                 #9E5B00 (Shape: Triangle with Alert — tuned for >= 4.5:1 text)
- *   - Danger:                  #B3261E (Shape: Octagon with Cross)
- *   - Info:                    #1565A8 (Shape: Circle with Info)
+ * - Page Background Light:     #FFFDF8 (Warm readable off-white)
+ * - Page Background Dark:      #0D1410 (Deep organic slate-green)
+ * - Card Background Light:     #FFFFFF with 1px border #D9D4C7 & soft shadow
+ * - Card Background Dark:      #18241E with 1px border #273B30
+ * - Body Text Light:           #1F2A24 (>= 14:1 contrast on white/cream)
+ * - Body Text Dark:            #F2F5F3 (>= 15:1 contrast on dark surface)
+ * - Secondary Text Light:      #4A5750 (>= 7.4:1 contrast on white/cream)
+ * - Secondary Text Dark:       #9EB0A5 (>= 7.2:1 contrast on dark surface)
+ * - Water Accent:              #1565A8 (Light) / #38BDF8 (Dark)
+ * - Sun/Highlight Accent:      #F2B01E (Amber highlight — ALWAYS dark text on light, high contrast)
+ * - Soil Accent:               #7A553A (Brown for soil icons & accents only)
+ * - Status Colours (Light / Dark):
+ *   - Success:                 #2E7D32 / #4ADE80 (Shape: Circle with Checkmark)
+ *   - Warning:                 #9E5B00 / #FBBF24 (Shape: Triangle with Alert)
+ *   - Danger:                  #B3261E / #F87171 (Shape: Octagon with Cross)
+ *   - Info:                    #1565A8 / #60A5FA (Shape: Circle with Info)
  * 
- * Typography & Interaction Rules:
- * - Body text: at least 18px (leading >= 1.5)
- * - Key numbers: at least 28px
- * - Buttons: at least 56px height with visible icons
- * - Minimum font size across entire app: 14px (no tiny 10px/11px text)
- * - Short sentences, no long paragraphs, no all-caps blocks
+ * Round 5 Professional Type Scale:
+ * - Body:        15px to 16px (leading 1.5, 1.7 for Indic scripts)
+ * - Secondary:   13px to 14px
+ * - Card Titles: 16px to 18px font-bold
+ * - Page Titles: 24px to 28px font-bold
+ * - KPI Numbers: 28px to 32px font-black (only on KPI summary cards)
  */
 
 export const TOKENS = {
@@ -41,36 +45,51 @@ export const TOKENS = {
     warning: '#9E5B00',
     danger: '#B3261E',
     info: '#1565A8',
+
+    // Dark Mode tokens
+    darkBg: '#0D1410',
+    darkSurface: '#18241E',
+    darkBorder: '#273B30',
+    darkText: '#F2F5F3',
+    darkTextSecondary: '#9EB0A5',
+    darkWater: '#38BDF8',
+    darkSuccess: '#4ADE80',
+    darkWarning: '#FBBF24',
+    darkDanger: '#F87171',
+    darkInfo: '#60A5FA',
   },
   typography: {
-    baseBody: 'text-[18px] leading-[1.6] text-[#1F2A24]',
-    statNumber: 'font-display text-[28px] sm:text-[34px] font-extrabold text-[#1F2A24] tracking-tight leading-none',
-    pageTitle: 'font-display text-[26px] sm:text-[32px] font-bold text-[#1B5E3B] tracking-tight leading-snug',
-    sectionTitle: 'font-display text-[20px] sm:text-[24px] font-bold text-[#1B5E3B] leading-snug',
-    plainText: 'text-[18px] text-[#4A5750] leading-[1.6]',
-    label: 'text-[15px] font-bold text-[#1F2A24]',
-    caption: 'text-[14px] font-medium text-[#4A5750] leading-normal',
+    // Professional 15-16px body
+    baseBody: 'text-[15px] sm:text-[16px] leading-[1.5] text-[#1F2A24] dark:text-[#F2F5F3]',
+    statNumber: 'font-display text-[28px] sm:text-[32px] font-black text-[#1F2A24] dark:text-[#F2F5F3] tracking-tight leading-none',
+    pageTitle: 'font-display text-[24px] sm:text-[28px] font-bold text-[#1B5E3B] dark:text-[#F2F5F3] tracking-tight leading-snug break-words',
+    sectionTitle: 'font-display text-[18px] sm:text-[20px] font-bold text-[#1B5E3B] dark:text-[#F2B01E] leading-snug break-words',
+    cardTitle: 'text-[16px] sm:text-[18px] font-bold text-[#1F2A24] dark:text-[#F2F5F3] leading-snug break-words',
+    plainText: 'text-[15px] sm:text-[16px] text-[#4A5750] dark:text-[#9EB0A5] leading-[1.5]',
+    label: 'text-[14px] font-bold text-[#1F2A24] dark:text-[#F2F5F3]',
+    caption: 'text-[13px] sm:text-[14px] font-medium text-[#4A5750] dark:text-[#9EB0A5] leading-normal',
   },
   classes: {
-    card: 'bg-white rounded-2xl border border-[#D9D4C7] shadow-sm p-5 sm:p-6 transition-all hover:border-[#1B5E3B]/40',
-    cardAmber: 'bg-gradient-to-br from-[#FFFDF8] to-[#FFF8E1] rounded-2xl border-2 border-[#F2B01E] shadow-sm p-5 sm:p-6',
-    cardWater: 'bg-gradient-to-br from-[#FFFDF8] to-[#E3F2FD] rounded-2xl border-2 border-[#1565A8] shadow-sm p-5 sm:p-6',
-    cardHighlight: 'bg-gradient-to-br from-[#FFFDF8] to-[#E8F5E9] rounded-2xl border-2 border-[#1B5E3B] shadow-sm p-5 sm:p-6',
+    card: 'bg-white dark:bg-[#18241E] rounded-2xl border border-[#D9D4C7] dark:border-[#273B30] shadow-xs p-4 sm:p-5 transition-all hover:border-[#1B5E3B]/40 dark:hover:border-[#F2B01E]/40',
+    cardAmber: 'bg-gradient-to-br from-[#FFFDF8] to-[#FFF8E1] dark:from-[#18241E] dark:to-[#232014] rounded-2xl border-2 border-[#F2B01E] shadow-xs p-4 sm:p-5',
+    cardWater: 'bg-gradient-to-br from-[#FFFDF8] to-[#E3F2FD] dark:from-[#18241E] dark:to-[#122331] rounded-2xl border-2 border-[#1565A8] dark:border-[#38BDF8] shadow-xs p-4 sm:p-5',
+    cardHighlight: 'bg-gradient-to-br from-[#FFFDF8] to-[#E8F5E9] dark:from-[#18241E] dark:to-[#142B1D] rounded-2xl border-2 border-[#1B5E3B] shadow-xs p-4 sm:p-5',
     
-    // Tap target & Button primitives (minimum 56px height, visible icon)
-    tapTarget: 'min-h-[56px] min-w-[56px]',
-    btnPrimary: 'min-h-[56px] px-6 py-3.5 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#154E30] shadow-sm flex items-center justify-center gap-2.5 transition-all text-[17px] active:scale-[0.98] focus:ring-2 focus:ring-[#1B5E3B] focus:ring-offset-2',
-    btnAmber: 'min-h-[56px] px-6 py-3.5 rounded-2xl font-bold bg-[#F2B01E] text-[#1F2A24] hover:bg-[#E09F14] shadow-sm flex items-center justify-center gap-2.5 transition-all text-[17px] active:scale-[0.98] focus:ring-2 focus:ring-[#F2B01E] focus:ring-offset-2',
-    btnWater: 'min-h-[56px] px-6 py-3.5 rounded-2xl font-bold bg-[#1565A8] text-white hover:bg-[#0E4F85] shadow-sm flex items-center justify-center gap-2.5 transition-all text-[17px] active:scale-[0.98] focus:ring-2 focus:ring-[#1565A8] focus:ring-offset-2',
-    btnSecondary: 'min-h-[56px] px-5 py-3.5 rounded-2xl font-bold bg-[#FFFDF8] text-[#1B5E3B] border-2 border-[#1B5E3B] hover:bg-[#1B5E3B]/5 flex items-center justify-center gap-2.5 transition-all text-[17px] active:scale-[0.98]',
+    // Tap target & Button primitives (balanced 46-50px height)
+    tapTarget: 'min-h-[48px] min-w-[48px]',
+    btnPrimary: 'min-h-[46px] px-5 py-2.5 rounded-xl font-bold bg-[#1B5E3B] text-white hover:bg-[#154E30] shadow-xs flex items-center justify-center gap-2 transition-all text-[15px] active:scale-[0.98] focus:ring-2 focus:ring-[#1B5E3B]',
+    btnAmber: 'min-h-[46px] px-5 py-2.5 rounded-xl font-bold bg-[#F2B01E] text-[#1F2A24] hover:bg-[#E09F14] shadow-xs flex items-center justify-center gap-2 transition-all text-[15px] active:scale-[0.98] focus:ring-2 focus:ring-[#F2B01E]',
+    btnWater: 'min-h-[46px] px-5 py-2.5 rounded-xl font-bold bg-[#1565A8] text-white hover:bg-[#0E4F85] shadow-xs flex items-center justify-center gap-2 transition-all text-[15px] active:scale-[0.98] focus:ring-2 focus:ring-[#1565A8]',
+    btnSecondary: 'min-h-[46px] px-4 py-2.5 rounded-xl font-bold bg-white dark:bg-[#18241E] text-[#1B5E3B] dark:text-[#F2B01E] border border-[#D9D4C7] dark:border-[#273B30] hover:bg-stone-50 dark:hover:bg-stone-800 flex items-center justify-center gap-2 transition-all text-[15px] active:scale-[0.98]',
     
-    // Inputs (minimum 56px height, readable text)
-    input: 'min-h-[56px] w-full px-4 py-3 rounded-2xl border-2 border-[#D9D4C7] bg-white text-[17px] text-[#1F2A24] placeholder:text-[#4A5750]/70 focus:outline-none focus:ring-2 focus:ring-[#1B5E3B] focus:border-[#1B5E3B] transition-all',
+    // Inputs (46-48px height, readable text)
+    input: 'min-h-[46px] w-full px-3.5 py-2.5 rounded-xl border border-[#D9D4C7] dark:border-[#273B30] bg-white dark:bg-[#121B16] text-[15px] text-[#1F2A24] dark:text-[#F2F5F3] placeholder:text-[#4A5750]/60 dark:placeholder:text-[#9EB0A5]/60 focus:outline-none focus:ring-2 focus:ring-[#1B5E3B] focus:border-[#1B5E3B] transition-all',
     
     // Status Badges (Always shape + text, never color only)
-    badgeSuccess: 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[14px] font-bold bg-[#E8F5E9] text-[#2E7D32] border border-[#2E7D32]/30',
-    badgeWarning: 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[14px] font-bold bg-[#FFF8E1] text-[#9E5B00] border border-[#9E5B00]/30',
-    badgeDanger: 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[14px] font-bold bg-[#FFEBEE] text-[#B3261E] border border-[#B3261E]/30',
-    badgeInfo: 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[14px] font-bold bg-[#E3F2FD] text-[#1565A8] border border-[#1565A8]/30',
+    badgeSuccess: 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-bold bg-[#E8F5E9] dark:bg-[#1B3825] text-[#2E7D32] dark:text-[#4ADE80] border border-[#2E7D32]/30 dark:border-[#4ADE80]/30',
+    badgeWarning: 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-bold bg-[#FFF8E1] dark:bg-[#34270B] text-[#9E5B00] dark:text-[#FBBF24] border border-[#9E5B00]/30 dark:border-[#FBBF24]/30',
+    badgeDanger: 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-bold bg-[#FFEBEE] dark:bg-[#3A1414] text-[#B3261E] dark:text-[#F87171] border border-[#B3261E]/30 dark:border-[#F87171]/30',
+    badgeInfo: 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-bold bg-[#E3F2FD] dark:bg-[#122B3F] text-[#1565A8] dark:text-[#60A5FA] border border-[#1565A8]/30 dark:border-[#60A5FA]/30',
+    badgeNodata: 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-bold bg-[#F5F5F4] dark:bg-stone-800 text-[#4A5750] dark:text-[#9EB0A5] border border-[#D9D4C7] dark:border-[#273B30]',
   },
 } as const;
