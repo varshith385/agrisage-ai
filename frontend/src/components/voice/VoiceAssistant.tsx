@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
-import { usePictorial } from '../../context/PictorialContext';
+import { usePictorial, useShowListen } from '../../context/PictorialContext';
 import { queryVoiceAssistant, VoiceQueryResponse } from '../../api/voice';
 import {
   isSpeechRecognitionSupported,
@@ -46,6 +46,7 @@ export const VoiceAssistant: React.FC = () => {
   const { t, language, setLanguage } = useTranslation();
   const { setTheme } = useTheme();
   const { setPictorial } = usePictorial();
+  const showListen = useShowListen();
   const navigate = useNavigate();
   const currentLang = (language as SupportedLanguage) || 'en';
 
@@ -587,7 +588,7 @@ export const VoiceAssistant: React.FC = () => {
                       {msg.role === 'assistant' && (
                         <div className="mt-3 pt-2.5 border-t border-stone-100 dark:border-stone-800 space-y-2">
                           <div className="flex flex-wrap items-center gap-2">
-                            {synthesisSupported && (
+                            {synthesisSupported && showListen && (
                               <button
                                 onClick={() => playTTS(msg.id, msg.text)}
                                 className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${

@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
   const { user, isAuthenticated, logout, farms, activeFarm, activeFarmId, setActiveFarmId } = useAuth();
   const { language, setLanguage, t } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
-  const { isPictorial, togglePictorial } = usePictorial();
+  const { isPictorial, togglePictorial, alwaysShowListen, toggleAlwaysShowListen } = usePictorial();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -332,6 +332,24 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                         <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isPictorial ? 'bg-[#F2B01E] text-[#1F2A24]' : 'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300'
                           }`}>
                           {isPictorial ? 'ON' : 'OFF'}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toggleAlwaysShowListen();
+                        }}
+                        aria-pressed={alwaysShowListen}
+                        className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-between transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Volume2 className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E]" />
+                          <span>{t('pictorial.always_show_listen', { defaultValue: 'Always show Listen buttons' })}</span>
+                        </div>
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${alwaysShowListen ? 'bg-[#1B5E3B] text-white' : 'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300'
+                          }`}>
+                          {alwaysShowListen ? 'ON' : 'OFF'}
                         </span>
                       </button>
                     </div>

@@ -108,12 +108,12 @@ export const CalendarPage: React.FC = () => {
     document.body.removeChild(a);
   };
 
-  const filteredEvents = calendarData?.events.filter((evt) => {
+  const filteredEvents = (calendarData?.events || []).filter((evt) => {
     if (eventTypeFilter === 'all') return true;
     return evt.event_type === eventTypeFilter;
   });
 
-  const activeStage = calendarData?.lifecycle_stages.find((st) => st.is_active);
+  const activeStage = (calendarData?.lifecycle_stages || []).find((st) => st.is_active);
   const nextEvent = filteredEvents?.[0];
 
   const plainMeaning = calendarData

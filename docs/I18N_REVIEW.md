@@ -297,4 +297,15 @@ The following translations were added in Round 5b for interactive voice reminder
 | **Voice Audio Guidance** | Open this site in Microsoft Edge, or add the Telugu language and its speech voice in Windows Settings. | ఈ సైట్‌ను Microsoft Edge లో తెరవండి లేదా Windows Settings లో తెలుగు భాష మరియు వాయిస్‌ను జోడించండి. | इस साइट को Microsoft Edge में खोलें, या Windows Settings में हिन्दी भाषा और वాయిస్ जोड़ें। | **Unverified**: Needs native review. |
 | **Schemes Pictorial Title** | Planned. Details to verify | ప్రణాళిక. వివరాలు ధృవీకరించబడాలి | प्रस्तावित। विवरण सत्यापित करें | **Unverified**: Needs native review. |
 
+---
+
+## 13. Round 5 Final Accessibility & Audio Override Translations (Unverified — Awaiting Native Review)
+
+The following translations were added for the user avatar menu toggle to support low-vision farmers who prefer Words mode but still need audio reading controls enabled:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Avatar Menu Accessibility** | Always show Listen buttons | ఎల్లప్పుడూ వినండి బటన్లు చూపించు | हमेशा सुनें बटन दिखाएं | **Unverified**: Needs native-speaker review. |
+
+
 

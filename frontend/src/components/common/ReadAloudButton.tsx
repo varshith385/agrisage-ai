@@ -8,6 +8,7 @@ import {
   SupportedLanguage,
 } from '../../services/speech';
 import { useTranslation } from '../../context/LanguageContext';
+import { useShowListen } from '../../context/PictorialContext';
 
 interface ReadAloudButtonProps {
   text: string;
@@ -20,6 +21,7 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
   className = '',
   label,
 }) => {
+  const showListen = useShowListen();
   const { language, t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [voiceNotice, setVoiceNotice] = useState<{
@@ -28,6 +30,10 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
     message: string;
   } | null>(null);
   const [currentSpeech, setCurrentSpeech] = useState<{ cancel: () => void } | null>(null);
+
+  if (!showListen) {
+    return null;
+  }
 
   const handleSpeak = async () => {
     if (isPlaying && currentSpeech) {

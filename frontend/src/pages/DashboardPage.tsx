@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
-import { usePictorial } from '../context/PictorialContext';
+import { usePictorial, useShowListen } from '../context/PictorialContext';
 import { weatherApi } from '../api/weather';
 import { agentsApi } from '../api/agents';
 import { advisoryApi } from '../api/advisory';
@@ -56,6 +56,7 @@ export const DashboardPage: React.FC = () => {
   const { user, activeFarm, activeFarmId, activeCrop } = useAuth();
   const { t, language } = useTranslation();
   const { isPictorial } = usePictorial();
+  const showListen = useShowListen();
 
   const farmData = activeFarm;
   const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
@@ -824,7 +825,7 @@ export const DashboardPage: React.FC = () => {
                   <h4 className="font-display text-base font-bold text-[#183D2E]">
                     7-Day Action Plan for {cropName}
                   </h4>
-                  {planItems.length > 0 && (
+                  {planItems.length > 0 && showListen && (
                     <button
                       type="button"
                       onClick={() => handleReadAloudPlan(planItems)}

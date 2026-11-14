@@ -229,16 +229,22 @@ export const RemindersPage: React.FC = () => {
             : 'Track spray intervals, irrigation water days, and harvest calendar milestones'
         }
         actions={
-          <button
-            onClick={() => {
-              setWizardStep(1);
-              setIsModalOpen(true);
-            }}
-            className="px-4 py-2 rounded-xl bg-[#1B5E3B] dark:bg-[#F2B01E] text-white dark:text-stone-900 font-bold text-xs flex items-center gap-1.5 shadow-xs"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>{language === 'te' ? '+ కొత్త జ్ఞాపిక' : language === 'hi' ? '+ नया रिमाइंडर' : '+ Add Reminder'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <ReadAloudButton
+              text={`Reminders overview: ${upcomingReminders.length} upcoming alerts, ${overdueReminders.length} overdue tasks, and ${suggestions.length} smart recommendations.`}
+              label="Listen"
+            />
+            <button
+              onClick={() => {
+                setWizardStep(1);
+                setIsModalOpen(true);
+              }}
+              className="px-4 py-2 rounded-xl bg-[#1B5E3B] dark:bg-[#F2B01E] text-white dark:text-stone-900 font-bold text-xs flex items-center gap-1.5 shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? '+ కొత్త జ్ఞాపిక' : language === 'hi' ? '+ नया रिमाइंडर' : '+ Add Reminder'}</span>
+            </button>
+          </div>
         }
       />
 
