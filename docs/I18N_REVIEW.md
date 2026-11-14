@@ -230,3 +230,25 @@ The following translations were added in Round 5 Phase C for deterministic navig
 | **Action** | Detailed words mode has been activated. | వివరాల పాఠ్య మోడ్ ఆన్ చేయబడింది. | विस्तृत टेक्स्ट मोड चालू कर दिया गया है। | **Unverified**: Needs native review. |
 | **Smalltalk** | Glad to help! What would you like to check next on your farm? | సంతోషం! మీ పొలానికి సంబంధించి తర్వాత ఏమి తనిఖీ చేయాలనుకుంటున్నారు? | बहुत बढ़िया! आप अपने खेत के बारे में आगे क्या जानना चाहते हैं? | **Unverified**: Needs native review. |
 | **Voice Advisory** | Telugu voice not installed on this device | తెలుగు వాయిస్ ప్యాక్ లేదు (Telugu voice not installed on this device) | डिवाइस पर तेलुगु वॉयस नहीं है | **Unverified**: Needs native review. |
+
+
+---
+
+## 10. Round 5 Phase D Reminders & Field Task Alerts Additions (Unverified — Awaiting Native Review)
+
+The following translations were added in Round 5 Phase D for the Reminders page, 3-step scheduling wizard, smart suggestions, and delivery limitation notices:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Reminders Header** | Reminders & Field Alerts | వ్యవసాయ జ్ఞాపికలు & అలర్ట్‌లు | कृषि स्मरणपत्र एवं अलर्ट | **Unverified**: Needs native review. |
+| **Reminders Subtitle** | Track spray intervals, irrigation water days, and harvest calendar milestones | నీటిపారుదల, ఎరువుల సమయం మరియు వాతావరణ హెచ్చరికలను ఎప్పటికీ మర్చిపోకండి | सिंचाई, खाद का समय और मौसम अलर्ट कभी न भूलें | **Unverified**: Needs native review. |
+| **Reminders Action** | + Add Reminder | + కొత్త జ్ఞాపిక | + नया रिमाइंडर | **Unverified**: Needs native review. |
+| **Reminders Tile** | Upcoming Tasks | రానున్న పనులు | आगामी कार्य | **Unverified**: Needs native review. |
+| **Reminders Tile** | Overdue Tasks | ఆలస్యమైన పనులు | अतिदेय कार्य | **Unverified**: Needs native review. |
+| **Reminders Tile** | Farm Suggestions | స్మార్ట్ సూచనలు | सुझाव | **Unverified**: Needs native review. |
+| **Reminders Notice** | Delivery Limitation Notice | నోటిఫికేషన్ సమాచారం (Delivery Notice) | अधिसूचना सूचना (Delivery Notice) | **Unverified**: Needs native review. |
+| **Reminders Delivery** | Reminders trigger when you open the app or enable browser notifications. SMS/WhatsApp alerts are planned for production rollout. | మీరు యాప్‌ను తెరిచినప్పుడు లేదా బ్రౌజర్ నోటిఫికేషన్‌లను అనుమతించినప్పుడు ఈ జ్ఞాపికలు కనిపిస్తాయి. SMS మరియు WhatsApp అలర్ట్‌లు ప్రొడక్షన్ విడుదల కోసం ప్రణాళిక చేయబడ్డాయి. ఫోన్ క్యాలెండర్‌లో అలర్ట్ పొందడానికి "ఫోన్ క్యాలెండర్‌కు జోడించు" (.ics) బటన్‌ను ఉపయోగించండి. | यह रिमाइंडर ऐप खोलने पर या ब्राउज़र नोटिफिकेशन सक्षम करने पर दिखाई देते हैं। एसएमएस एवं व्हाट्सएप अलर्ट आगामी रिलीज में जोड़े जाएंगे। फोन कैलेंडर में जोड़ने के लिए .ics बटन दबाएं। | **Unverified**: Needs native review. |
+| **Reminders 1-Tap** | Suggested for Your Farm (1-Tap Add) | మీ పొలం కోసం ఒకే-ట్యాప్ సూచనలు (Suggested for Your Farm) | आपके खेत हेतु त्वरित सुझाव (Suggested for Your Farm) | **Unverified**: Needs native review. |
+| **Reminders Modal** | Create Field Reminder | నూతన జ్ఞాపికను సృష్టించండి | नया स्मरणपत्र बनाएं | **Unverified**: Needs native review. |
+| **Reminders Action** | Mark Done | పూర్తయింది | पूर्ण हुआ | **Unverified**: Needs native review. |
+| **Reminders Action** | Add to Reminders | జోడించు | जोड़ें | **Unverified**: Needs native review. |

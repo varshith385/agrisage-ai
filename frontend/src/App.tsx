@@ -20,6 +20,7 @@ import { SchemesPage } from './pages/SchemesPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { HowToPage } from './pages/HowToPage';
 import { WatchHowToPage } from './pages/WatchHowToPage';
+import { RemindersPage } from './pages/RemindersPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,6 +54,7 @@ export const App: React.FC = () => {
                     <Route path="recommend" element={<CropRecommendationPage />} />
                     <Route path="schemes" element={<SchemesPage />} />
                     <Route path="community" element={<CommunityPage />} />
+                    <Route path="reminders" element={<RemindersPage />} />
                     <Route path="dashboard" element={<DashboardPage />} />
                     <Route path="how-to" element={<HowToPage />} />
                     <Route path="watch" element={<WatchHowToPage />} />

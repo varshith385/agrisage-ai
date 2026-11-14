@@ -24,6 +24,7 @@ import { usePictorial } from '../../context/PictorialContext';
 import { CommandPalette } from '../common/CommandPalette';
 import { Language } from '../../types/api';
 import { speakText, SupportedLanguage } from '../../services/speech';
+import { getReminders } from '../../api/reminders';
 
 interface HeaderProps {
   onStartTour?: () => void;
@@ -42,6 +43,17 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const [voiceTestStatus, setVoiceTestStatus] = useState<string | null>(null);
+  const [dueReminderCount, setDueReminderCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      getReminders({ farm_id: activeFarm?.id, status: 'pending' })
+        .then((rems) => {
+          setDueReminderCount(rems.length);
+        })
+        .catch(() => {});
+    }
+  }, [isAuthenticated, activeFarm?.id]);
 
   const farmRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
@@ -267,12 +279,18 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
             {/* 4. Reminders Bell with Count Badge */}
             <Link
               to="/reminders"
-              aria-label="View reminders and field tasks"
-              title="Reminders & automated alerts"
+              aria-label={`View reminders and field tasks (${dueReminderCount} pending)`}
+              title={`Reminders & field alerts (${dueReminderCount} pending)`}
               className="min-h-[38px] min-w-[38px] relative p-2 rounded-xl text-white/90 hover:text-white hover:bg-[#14462C] dark:hover:bg-[#18241E] transition-all flex items-center justify-center"
             >
               <Bell className="w-4 h-4 text-white" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#F2B01E] ring-2 ring-[#1B5E3B] dark:ring-[#121B16]" />
+              {dueReminderCount > 0 ? (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#F2B01E] text-stone-900 text-[10px] font-black flex items-center justify-center ring-2 ring-[#1B5E3B] dark:ring-[#121B16] shadow-xs">
+                  {dueReminderCount > 9 ? '9+' : dueReminderCount}
+                </span>
+              ) : (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#F2B01E]/60 ring-2 ring-[#1B5E3B] dark:ring-[#121B16]" />
+              )}
             </Link>
 
             {/* 5. Dark Mode Toggle (Icon Only) */}

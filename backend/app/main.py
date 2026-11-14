@@ -30,6 +30,7 @@ from backend.app.api.v1.machinery import router as machinery_router
 from backend.app.api.v1.outbreaks import router as outbreaks_router
 from backend.app.api.v1.market import router as market_router
 from backend.app.api.v1.marketplace import router as marketplace_router
+from backend.app.api.v1.reminders import router as reminders_router
 
 
 @asynccontextmanager
@@ -147,3 +148,4 @@ app.include_router(machinery_router, prefix=settings.API_V1_PREFIX)
 app.include_router(outbreaks_router, prefix=settings.API_V1_PREFIX)
 app.include_router(market_router, prefix=settings.API_V1_PREFIX)
 app.include_router(marketplace_router, prefix=settings.API_V1_PREFIX)
+app.include_router(reminders_router, prefix=settings.API_V1_PREFIX)

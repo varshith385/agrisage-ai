@@ -41,5 +41,6 @@ def init_db() -> None:
     import backend.app.models.community
     import backend.app.models.machinery
     import backend.app.models.market
+    import backend.app.models.reminder
 
     Base.metadata.create_all(bind=engine)

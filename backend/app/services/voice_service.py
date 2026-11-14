@@ -786,6 +786,40 @@ class VoiceAssistantService:
             if not farm:
                 farm = db.query(Farm).filter(Farm.user_id == user.id).first()
 
+            # 2.5 Voice Command: Deterministic Reminder Creation
+            from backend.app.services.reminder_parser import parse_reminder_voice_command
+            from backend.app.models.reminder import Reminder
+            reminder_parsed = parse_reminder_voice_command(request.query, lang)
+            if reminder_parsed:
+                rem_title, rem_due_at, rem_spoken = reminder_parsed
+                new_rem = Reminder(
+                    user_id=user.id,
+                    farm_id=farm.id if farm else None,
+                    title=rem_title,
+                    due_at=rem_due_at,
+                    repeat="none",
+                    status="pending",
+                    source="user",
+                )
+                db.add(new_rem)
+                db.commit()
+                db.refresh(new_rem)
+                return VoiceQueryResponse(
+                    intent="reminder",
+                    confidence=1.0,
+                    confidence_type="rule",
+                    spoken_text=rem_spoken,
+                    status="WORKING",
+                    sources=["AgriSage Field Reminder Engine"],
+                    action_link="/reminders",
+                    action_label="Open Reminders",
+                    action_type="navigate",
+                    confirmation_chip=f"Reminder: {rem_title}",
+                    mode="basic",
+                    suggestion_chips=["Show all reminders", "Check weather forecast"],
+                    structured_data={"reminder_id": new_rem.id, "title": rem_title, "due_at": rem_due_at.isoformat()},
+                )
+
             # 3. Build Grounded Real Farm Context Packet
             context_packet = await build_farm_context_packet(user, farm, db)
 
