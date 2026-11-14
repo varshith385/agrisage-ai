@@ -1,0 +1,4871 @@
+{
+  "metadata": {
+    "source": "Grow2Gain Open Geodata Catalog",
+    "license": "ODbL / MIT / CC BY 4.0",
+    "date": "2026-11-15",
+    "total_states": 36,
+    "total_districts": 742,
+    "telangana_districts_count": 33,
+    "andhra_pradesh_districts_count": 26
+  },
+  "states": [
+    {
+      "state": "Andaman and Nicobar Islands",
+      "latitude": 11.667,
+      "longitude": 92.742,
+      "district_count": 3,
+      "districts": [
+        {
+          "name": "Nicobar",
+          "latitude": 11.7401,
+          "longitude": 92.6586,
+          "is_fallback": false
+        },
+        {
+          "name": "North and Middle Andaman",
+          "latitude": 12.6519,
+          "longitude": 92.8976,
+          "is_fallback": false
+        },
+        {
+          "name": "South Andaman",
+          "latitude": 20.4167,
+          "longitude": 72.85,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Andhra Pradesh",
+      "latitude": 15.9129,
+      "longitude": 79.74,
+      "district_count": 26,
+      "districts": [
+        {
+          "name": "Alluri Sitharama Raju",
+          "latitude": 17.8226,
+          "longitude": 82.2722,
+          "is_fallback": false,
+          "te": "అల్లూరి సీతారామరాజు",
+          "hi": "अल्लूरी सीताराम राजू"
+        },
+        {
+          "name": "Anakapalli",
+          "latitude": 17.6772,
+          "longitude": 82.7476,
+          "is_fallback": false,
+          "te": "అనకాపల్లి",
+          "hi": "अनकापल्ली"
+        },
+        {
+          "name": "Ananthapuramu",
+          "latitude": 14.7464,
+          "longitude": 77.5273,
+          "is_fallback": false,
+          "te": "అనంతపురం",
+          "hi": "अनंतपुर"
+        },
+        {
+          "name": "Annamayya",
+          "latitude": 13.9645,
+          "longitude": 78.8458,
+          "is_fallback": false,
+          "te": "అన్నమయ్య",
+          "hi": "अन्नमय्या"
+        },
+        {
+          "name": "Bapatla",
+          "latitude": 15.8929,
+          "longitude": 80.3497,
+          "is_fallback": false,
+          "te": "బాపట్ల",
+          "hi": "बापटला"
+        },
+        {
+          "name": "Chittoor",
+          "latitude": 12.9337,
+          "longitude": 78.6665,
+          "is_fallback": false,
+          "te": "చిత్తూరు",
+          "hi": "चित्तूर"
+        },
+        {
+          "name": "Dr. B.R. Ambedkar Konaseema",
+          "latitude": 16.6741,
+          "longitude": 81.999,
+          "is_fallback": false,
+          "te": "డా. బి.ఆర్. అంబేద్కర్ కోనసీమ",
+          "hi": "डॉ. बी.आर. अंबेडकर कोनासीमा"
+        },
+        {
+          "name": "East Godavari",
+          "latitude": 17.0216,
+          "longitude": 81.7302,
+          "is_fallback": false,
+          "te": "తూర్పు గోదావరి",
+          "hi": "पूर्वी गोदावरी"
+        },
+        {
+          "name": "Eluru",
+          "latitude": 17.7281,
+          "longitude": 80.881,
+          "is_fallback": false,
+          "te": "ఏలూరు",
+          "hi": "एलुरु"
+        },
+        {
+          "name": "Guntur",
+          "latitude": 16.2473,
+          "longitude": 80.427,
+          "is_fallback": false,
+          "te": "గుంటూరు",
+          "hi": "गुंटूर"
+        },
+        {
+          "name": "Kakinada",
+          "latitude": 17.1288,
+          "longitude": 82.2014,
+          "is_fallback": false,
+          "te": "కాకినాడ",
+          "hi": "काकीनाडा"
+        },
+        {
+          "name": "Krishna",
+          "latitude": 16.3342,
+          "longitude": 81.034,
+          "is_fallback": false,
+          "te": "కృష్ణా",
+          "hi": "कृष्णा"
+        },
+        {
+          "name": "Kurnool",
+          "latitude": 15.5448,
+          "longitude": 77.6976,
+          "is_fallback": false,
+          "te": "కర్నూలు",
+          "hi": "कुरनूल"
+        },
+        {
+          "name": "Nandyal",
+          "latitude": 15.4143,
+          "longitude": 78.2121,
+          "is_fallback": false,
+          "te": "నంద్యాల",
+          "hi": "नंद्याल"
+        },
+        {
+          "name": "NTR",
+          "latitude": 16.8312,
+          "longitude": 80.4767,
+          "is_fallback": false,
+          "te": "ఎన్టీఆర్",
+          "hi": "एनटीआर"
+        },
+        {
+          "name": "Palnadu",
+          "latitude": 16.3,
+          "longitude": 79.9404,
+          "is_fallback": false,
+          "te": "పల్నాడు",
+          "hi": "पलनाडु"
+        },
+        {
+          "name": "Parvathipuram Manyam",
+          "latitude": 18.719,
+          "longitude": 83.5193,
+          "is_fallback": false,
+          "te": "పార్వతీపురం మన్యం",
+          "hi": "पार्वतीपुरम मान्यम"
+        },
+        {
+          "name": "Prakasam",
+          "latitude": 15.4263,
+          "longitude": 79.632,
+          "is_fallback": false,
+          "te": "ప్రకాశం",
+          "hi": "प्रकाशम"
+        },
+        {
+          "name": "Sri Potti Sriramulu Nellore",
+          "latitude": 14.7394,
+          "longitude": 79.5882,
+          "is_fallback": false,
+          "te": "శ్రీ పొట్టి శ్రీరాములు నెల్లూరు",
+          "hi": "श्री पोट्टी श्रीरामुलु नेल्लोर"
+        },
+        {
+          "name": "Sri Sathya Sai",
+          "latitude": 14.1185,
+          "longitude": 77.7026,
+          "is_fallback": false,
+          "te": "శ్రీ సత్యసాయి",
+          "hi": "श्री सत्य साई"
+        },
+        {
+          "name": "Srikakulam",
+          "latitude": 18.5854,
+          "longitude": 84.0097,
+          "is_fallback": false,
+          "te": "శ్రీకాకుళం",
+          "hi": "श्रीकाकुलम"
+        },
+        {
+          "name": "Tirupati",
+          "latitude": 13.8058,
+          "longitude": 79.5721,
+          "is_fallback": false,
+          "te": "తిరుపతి",
+          "hi": "तिरुपति"
+        },
+        {
+          "name": "Visakhapatnam",
+          "latitude": 17.8152,
+          "longitude": 83.3028,
+          "is_fallback": false,
+          "te": "విశాఖపట్నం",
+          "hi": "विशाखापट्टनम"
+        },
+        {
+          "name": "Vizianagaram",
+          "latitude": 18.3398,
+          "longitude": 83.4741,
+          "is_fallback": false,
+          "te": "విజయనగరం",
+          "hi": "विजयनगरम"
+        },
+        {
+          "name": "West Godavari",
+          "latitude": 16.685,
+          "longitude": 81.5468,
+          "is_fallback": false,
+          "te": "పశ్చిమ గోదావరి",
+          "hi": "पश्चिम गोदावरी"
+        },
+        {
+          "name": "YSR Kadapa",
+          "latitude": 14.6114,
+          "longitude": 78.7563,
+          "is_fallback": false,
+          "te": "వైఎస్సార్ కడప",
+          "hi": "वाईएसआर कडप्पा"
+        }
+      ]
+    },
+    {
+      "state": "Arunachal Pradesh",
+      "latitude": 28.218,
+      "longitude": 94.7278,
+      "district_count": 21,
+      "districts": [
+        {
+          "name": "Anjaw",
+          "latitude": 28.0667,
+          "longitude": 96.4922,
+          "is_fallback": false
+        },
+        {
+          "name": "Changlang",
+          "latitude": 27.1306,
+          "longitude": 95.7342,
+          "is_fallback": false
+        },
+        {
+          "name": "Dibang Valley",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "East Kameng",
+          "latitude": 24.8606,
+          "longitude": 93.8853,
+          "is_fallback": false
+        },
+        {
+          "name": "East Siang",
+          "latitude": 28.1097,
+          "longitude": 95.1432,
+          "is_fallback": false
+        },
+        {
+          "name": "Kra Daadi",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "Kurung Kumey",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "Lohit",
+          "latitude": 28.0045,
+          "longitude": 96.2084,
+          "is_fallback": false
+        },
+        {
+          "name": "Longding",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "Lower Dibang Valley",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "Lower Siang",
+          "latitude": 22.6,
+          "longitude": 83.05,
+          "is_fallback": false
+        },
+        {
+          "name": "Lower Subansiri",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "Namsai",
+          "latitude": 27.6692,
+          "longitude": 95.8644,
+          "is_fallback": false
+        },
+        {
+          "name": "Papum Pare",
+          "latitude": 27.1719,
+          "longitude": 93.7029,
+          "is_fallback": false
+        },
+        {
+          "name": "Siang",
+          "latitude": 22.6,
+          "longitude": 83.05,
+          "is_fallback": false
+        },
+        {
+          "name": "Tawang",
+          "latitude": 27.5833,
+          "longitude": 91.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Tirap",
+          "latitude": 27.1667,
+          "longitude": 95.8,
+          "is_fallback": false
+        },
+        {
+          "name": "Upper Siang",
+          "latitude": 22.6,
+          "longitude": 83.05,
+          "is_fallback": false
+        },
+        {
+          "name": "Upper Subansiri",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "West Kameng",
+          "latitude": 28.218,
+          "longitude": 94.7278,
+          "is_fallback": true
+        },
+        {
+          "name": "West Siang",
+          "latitude": 22.6,
+          "longitude": 83.05,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Assam",
+      "latitude": 26.2006,
+      "longitude": 92.9376,
+      "district_count": 33,
+      "districts": [
+        {
+          "name": "Baksa",
+          "latitude": 26.6935,
+          "longitude": 91.5984,
+          "is_fallback": false
+        },
+        {
+          "name": "Barpeta",
+          "latitude": 26.3167,
+          "longitude": 91.0,
+          "is_fallback": false
+        },
+        {
+          "name": "Biswanath",
+          "latitude": 26.7267,
+          "longitude": 93.1479,
+          "is_fallback": false
+        },
+        {
+          "name": "Bongaigaon",
+          "latitude": 26.4667,
+          "longitude": 90.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Cachar",
+          "latitude": 24.7821,
+          "longitude": 92.8577,
+          "is_fallback": false
+        },
+        {
+          "name": "Charaideo",
+          "latitude": 26.9413,
+          "longitude": 94.876,
+          "is_fallback": false
+        },
+        {
+          "name": "Chirang",
+          "latitude": 26.5387,
+          "longitude": 90.6939,
+          "is_fallback": false
+        },
+        {
+          "name": "Darrang",
+          "latitude": 26.6333,
+          "longitude": 92.8,
+          "is_fallback": false
+        },
+        {
+          "name": "Dhemaji",
+          "latitude": 27.4833,
+          "longitude": 94.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Dhubri",
+          "latitude": 26.0333,
+          "longitude": 89.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Dibrugarh",
+          "latitude": 27.4817,
+          "longitude": 94.9028,
+          "is_fallback": false
+        },
+        {
+          "name": "Dima Hasao",
+          "latitude": 25.3478,
+          "longitude": 93.0176,
+          "is_fallback": false
+        },
+        {
+          "name": "Goalpara",
+          "latitude": 26.1667,
+          "longitude": 90.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Golaghat",
+          "latitude": 26.5167,
+          "longitude": 93.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Hailakandi",
+          "latitude": 24.6833,
+          "longitude": 92.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Hojai",
+          "latitude": 26.0,
+          "longitude": 92.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Jorhat",
+          "latitude": 26.75,
+          "longitude": 94.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kamrup",
+          "latitude": 26.3161,
+          "longitude": 91.5984,
+          "is_fallback": false
+        },
+        {
+          "name": "Kamrup Metropolitan",
+          "latitude": 26.0794,
+          "longitude": 91.6372,
+          "is_fallback": false
+        },
+        {
+          "name": "Karbi Anglong",
+          "latitude": 25.8457,
+          "longitude": 93.4378,
+          "is_fallback": false
+        },
+        {
+          "name": "Karimganj",
+          "latitude": 24.8667,
+          "longitude": 92.35,
+          "is_fallback": false
+        },
+        {
+          "name": "Kokrajhar",
+          "latitude": 26.4,
+          "longitude": 90.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Lakhimpur",
+          "latitude": 27.2064,
+          "longitude": 94.1514,
+          "is_fallback": false
+        },
+        {
+          "name": "Majuli",
+          "latitude": 26.95,
+          "longitude": 94.1667,
+          "is_fallback": false
+        },
+        {
+          "name": "Morigaon",
+          "latitude": 26.2529,
+          "longitude": 92.337,
+          "is_fallback": false
+        },
+        {
+          "name": "Nagaon",
+          "latitude": 26.348,
+          "longitude": 92.6838,
+          "is_fallback": false
+        },
+        {
+          "name": "Nalbari",
+          "latitude": 26.4167,
+          "longitude": 91.4333,
+          "is_fallback": false
+        },
+        {
+          "name": "Sivasagar",
+          "latitude": 26.9826,
+          "longitude": 94.6425,
+          "is_fallback": false
+        },
+        {
+          "name": "Sonitpur",
+          "latitude": 26.2769,
+          "longitude": 94.0717,
+          "is_fallback": false
+        },
+        {
+          "name": "South Salmara-Mankachar",
+          "latitude": 26.2006,
+          "longitude": 92.9376,
+          "is_fallback": true
+        },
+        {
+          "name": "Tinsukia",
+          "latitude": 27.5,
+          "longitude": 95.3667,
+          "is_fallback": false
+        },
+        {
+          "name": "Udalguri",
+          "latitude": 26.7667,
+          "longitude": 92.1333,
+          "is_fallback": false
+        },
+        {
+          "name": "West Karbi Anglong",
+          "latitude": 25.8486,
+          "longitude": 92.5764,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Bihar",
+      "latitude": 25.0961,
+      "longitude": 85.3131,
+      "district_count": 38,
+      "districts": [
+        {
+          "name": "Araria",
+          "latitude": 26.15,
+          "longitude": 87.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "Arwal",
+          "latitude": 25.25,
+          "longitude": 84.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Aurangabad",
+          "latitude": 19.8762,
+          "longitude": 75.3433,
+          "is_fallback": false
+        },
+        {
+          "name": "Banka",
+          "latitude": 24.8833,
+          "longitude": 86.9167,
+          "is_fallback": false
+        },
+        {
+          "name": "Begusarai",
+          "latitude": 25.4167,
+          "longitude": 86.1333,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhagalpur",
+          "latitude": 26.1697,
+          "longitude": 83.8728,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhojpur",
+          "latitude": 25.4662,
+          "longitude": 84.5222,
+          "is_fallback": false
+        },
+        {
+          "name": "Buxar",
+          "latitude": 25.5833,
+          "longitude": 83.9833,
+          "is_fallback": false
+        },
+        {
+          "name": "Darbhanga",
+          "latitude": 26.1667,
+          "longitude": 85.9,
+          "is_fallback": false
+        },
+        {
+          "name": "East Champaran (Motihari)",
+          "latitude": 26.6098,
+          "longitude": 84.8568,
+          "is_fallback": false
+        },
+        {
+          "name": "Gaya",
+          "latitude": 24.7833,
+          "longitude": 85.0,
+          "is_fallback": false
+        },
+        {
+          "name": "Gopalganj",
+          "latitude": 26.4832,
+          "longitude": 84.4366,
+          "is_fallback": false
+        },
+        {
+          "name": "Jamui",
+          "latitude": 24.9167,
+          "longitude": 86.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Jehanabad",
+          "latitude": 25.2139,
+          "longitude": 84.9896,
+          "is_fallback": false
+        },
+        {
+          "name": "Kaimur (Bhabua)",
+          "latitude": 25.0426,
+          "longitude": 83.6056,
+          "is_fallback": false
+        },
+        {
+          "name": "Katihar",
+          "latitude": 25.5333,
+          "longitude": 87.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Khagaria",
+          "latitude": 25.5,
+          "longitude": 86.4833,
+          "is_fallback": false
+        },
+        {
+          "name": "Kishanganj",
+          "latitude": 25.7,
+          "longitude": 86.95,
+          "is_fallback": false
+        },
+        {
+          "name": "Lakhisarai",
+          "latitude": 25.1833,
+          "longitude": 86.0833,
+          "is_fallback": false
+        },
+        {
+          "name": "Madhepura",
+          "latitude": 25.924,
+          "longitude": 86.7946,
+          "is_fallback": false
+        },
+        {
+          "name": "Madhubani",
+          "latitude": 26.3667,
+          "longitude": 86.0833,
+          "is_fallback": false
+        },
+        {
+          "name": "Munger (Monghyr)",
+          "latitude": 25.3833,
+          "longitude": 86.4667,
+          "is_fallback": false
+        },
+        {
+          "name": "Muzaffarpur",
+          "latitude": 26.1167,
+          "longitude": 85.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Nalanda",
+          "latitude": 25.1241,
+          "longitude": 85.4595,
+          "is_fallback": false
+        },
+        {
+          "name": "Nawada",
+          "latitude": 24.8867,
+          "longitude": 85.5435,
+          "is_fallback": false
+        },
+        {
+          "name": "Patna",
+          "latitude": 25.5941,
+          "longitude": 85.1376,
+          "is_fallback": false
+        },
+        {
+          "name": "Purnia (Purnea)",
+          "latitude": 24.5167,
+          "longitude": 87.1333,
+          "is_fallback": false
+        },
+        {
+          "name": "Rohtas",
+          "latitude": 24.6287,
+          "longitude": 83.9202,
+          "is_fallback": false
+        },
+        {
+          "name": "Saharsa",
+          "latitude": 25.8833,
+          "longitude": 86.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Samastipur",
+          "latitude": 25.85,
+          "longitude": 85.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Saran",
+          "latitude": 25.856,
+          "longitude": 84.8568,
+          "is_fallback": false
+        },
+        {
+          "name": "Sheikhpura",
+          "latitude": 25.0848,
+          "longitude": 85.8896,
+          "is_fallback": false
+        },
+        {
+          "name": "Sheohar",
+          "latitude": 26.5167,
+          "longitude": 85.3,
+          "is_fallback": false
+        },
+        {
+          "name": "Sitamarhi",
+          "latitude": 26.6,
+          "longitude": 85.4833,
+          "is_fallback": false
+        },
+        {
+          "name": "Siwan",
+          "latitude": 24.1333,
+          "longitude": 84.8833,
+          "is_fallback": false
+        },
+        {
+          "name": "Supaul",
+          "latitude": 26.1167,
+          "longitude": 86.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Vaishali",
+          "latitude": 25.6838,
+          "longitude": 85.355,
+          "is_fallback": false
+        },
+        {
+          "name": "West Champaran",
+          "latitude": 27.1543,
+          "longitude": 84.3542,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Chandigarh",
+      "latitude": 30.7333,
+      "longitude": 76.7794,
+      "district_count": 1,
+      "districts": [
+        {
+          "name": "Chandigarh",
+          "latitude": 30.7372,
+          "longitude": 76.7872,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Chhattisgarh",
+      "latitude": 21.2787,
+      "longitude": 81.8661,
+      "district_count": 27,
+      "districts": [
+        {
+          "name": "Balod",
+          "latitude": 20.73,
+          "longitude": 81.2047,
+          "is_fallback": false
+        },
+        {
+          "name": "Baloda Bazar",
+          "latitude": 21.6667,
+          "longitude": 82.1667,
+          "is_fallback": false
+        },
+        {
+          "name": "Balrampur",
+          "latitude": 23.6112,
+          "longitude": 83.6109,
+          "is_fallback": false
+        },
+        {
+          "name": "Bastar",
+          "latitude": 19.2,
+          "longitude": 81.9333,
+          "is_fallback": false
+        },
+        {
+          "name": "Bemetara",
+          "latitude": 21.2787,
+          "longitude": 81.8661,
+          "is_fallback": true
+        },
+        {
+          "name": "Bijapur",
+          "latitude": 18.8,
+          "longitude": 80.8167,
+          "is_fallback": false
+        },
+        {
+          "name": "Bilaspur",
+          "latitude": 22.0833,
+          "longitude": 82.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Dantewada (South Bastar)",
+          "latitude": 19.2,
+          "longitude": 81.9333,
+          "is_fallback": false
+        },
+        {
+          "name": "Dhamtari",
+          "latitude": 20.7072,
+          "longitude": 81.5497,
+          "is_fallback": false
+        },
+        {
+          "name": "Durg",
+          "latitude": 21.1833,
+          "longitude": 81.2833,
+          "is_fallback": false
+        },
+        {
+          "name": "Gariyaband",
+          "latitude": 21.2787,
+          "longitude": 81.8661,
+          "is_fallback": true
+        },
+        {
+          "name": "Janjgir-Champa",
+          "latitude": 21.2787,
+          "longitude": 81.8661,
+          "is_fallback": true
+        },
+        {
+          "name": "Jashpur",
+          "latitude": 22.9,
+          "longitude": 84.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Kabirdham (Kawardha)",
+          "latitude": 20.75,
+          "longitude": 78.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kanker (North Bastar)",
+          "latitude": 19.2,
+          "longitude": 81.9333,
+          "is_fallback": false
+        },
+        {
+          "name": "Kondagaon",
+          "latitude": 19.6,
+          "longitude": 81.6667,
+          "is_fallback": false
+        },
+        {
+          "name": "Korba",
+          "latitude": 22.35,
+          "longitude": 82.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Korea (Koriya)",
+          "latitude": 23.3876,
+          "longitude": 82.3886,
+          "is_fallback": false
+        },
+        {
+          "name": "Mahasamund",
+          "latitude": 21.1,
+          "longitude": 82.1,
+          "is_fallback": false
+        },
+        {
+          "name": "Mungeli",
+          "latitude": 22.0667,
+          "longitude": 81.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Narayanpur",
+          "latitude": 22.0683,
+          "longitude": 88.295,
+          "is_fallback": false
+        },
+        {
+          "name": "Raigarh",
+          "latitude": 21.9,
+          "longitude": 83.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Raipur",
+          "latitude": 21.2514,
+          "longitude": 81.6296,
+          "is_fallback": false
+        },
+        {
+          "name": "Rajnandgaon",
+          "latitude": 21.0972,
+          "longitude": 81.0337,
+          "is_fallback": false
+        },
+        {
+          "name": "Sukma",
+          "latitude": 18.4,
+          "longitude": 81.6667,
+          "is_fallback": false
+        },
+        {
+          "name": "Surajpur  ",
+          "latitude": 23.2167,
+          "longitude": 82.85,
+          "is_fallback": false
+        },
+        {
+          "name": "Surguja",
+          "latitude": 23.1167,
+          "longitude": 83.2,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Dadra and Nagar Haveli and Daman and Diu",
+      "latitude": 20.4283,
+      "longitude": 72.8397,
+      "district_count": 3,
+      "districts": [
+        {
+          "name": "Dadra & Nagar Haveli",
+          "latitude": 20.1809,
+          "longitude": 73.0169,
+          "is_fallback": false
+        },
+        {
+          "name": "Daman",
+          "latitude": 20.4167,
+          "longitude": 72.85,
+          "is_fallback": false
+        },
+        {
+          "name": "Diu",
+          "latitude": 20.7,
+          "longitude": 70.9833,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Delhi",
+      "latitude": 28.7041,
+      "longitude": 77.1025,
+      "district_count": 11,
+      "districts": [
+        {
+          "name": "Central Delhi",
+          "latitude": 28.6643,
+          "longitude": 77.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "East Delhi",
+          "latitude": 28.628,
+          "longitude": 77.2956,
+          "is_fallback": false
+        },
+        {
+          "name": "New Delhi",
+          "latitude": 28.6,
+          "longitude": 77.2,
+          "is_fallback": false
+        },
+        {
+          "name": "North Delhi",
+          "latitude": 28.7484,
+          "longitude": 77.206,
+          "is_fallback": false
+        },
+        {
+          "name": "North East  Delhi",
+          "latitude": 28.6667,
+          "longitude": 77.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "North West  Delhi",
+          "latitude": 28.6667,
+          "longitude": 77.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Shahdara",
+          "latitude": 28.6894,
+          "longitude": 77.2919,
+          "is_fallback": false
+        },
+        {
+          "name": "South Delhi",
+          "latitude": 28.4817,
+          "longitude": 77.1873,
+          "is_fallback": false
+        },
+        {
+          "name": "South East Delhi",
+          "latitude": 28.563,
+          "longitude": 77.2611,
+          "is_fallback": false
+        },
+        {
+          "name": "South West  Delhi",
+          "latitude": 28.6667,
+          "longitude": 77.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "West Delhi",
+          "latitude": 28.6663,
+          "longitude": 77.068,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Goa",
+      "latitude": 15.2993,
+      "longitude": 74.124,
+      "district_count": 2,
+      "districts": [
+        {
+          "name": "North Goa",
+          "latitude": 15.4,
+          "longitude": 73.8,
+          "is_fallback": false
+        },
+        {
+          "name": "South Goa",
+          "latitude": 15.4,
+          "longitude": 73.8,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Gujarat",
+      "latitude": 22.2587,
+      "longitude": 71.1924,
+      "district_count": 33,
+      "districts": [
+        {
+          "name": "Ahmedabad",
+          "latitude": 23.0333,
+          "longitude": 72.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Amreli",
+          "latitude": 21.6167,
+          "longitude": 71.2333,
+          "is_fallback": false
+        },
+        {
+          "name": "Anand",
+          "latitude": 22.5667,
+          "longitude": 72.9333,
+          "is_fallback": false
+        },
+        {
+          "name": "Aravalli",
+          "latitude": 23.5205,
+          "longitude": 73.3709,
+          "is_fallback": false
+        },
+        {
+          "name": "Banaskantha (Palanpur)",
+          "latitude": 24.3476,
+          "longitude": 72.3283,
+          "is_fallback": false
+        },
+        {
+          "name": "Bharuch",
+          "latitude": 21.7,
+          "longitude": 72.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhavnagar",
+          "latitude": 21.7667,
+          "longitude": 72.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Botad",
+          "latitude": 22.1667,
+          "longitude": 71.6667,
+          "is_fallback": false
+        },
+        {
+          "name": "Chhota Udepur",
+          "latitude": 22.2587,
+          "longitude": 71.1924,
+          "is_fallback": true
+        },
+        {
+          "name": "Dahod",
+          "latitude": 22.8345,
+          "longitude": 74.2606,
+          "is_fallback": false
+        },
+        {
+          "name": "Dangs (Ahwa)",
+          "latitude": 27.9904,
+          "longitude": 82.3018,
+          "is_fallback": false
+        },
+        {
+          "name": "Devbhoomi Dwarka",
+          "latitude": 22.2587,
+          "longitude": 71.1924,
+          "is_fallback": true
+        },
+        {
+          "name": "Gandhinagar",
+          "latitude": 29.7828,
+          "longitude": 77.2422,
+          "is_fallback": false
+        },
+        {
+          "name": "Gir Somnath",
+          "latitude": 21.0119,
+          "longitude": 70.7168,
+          "is_fallback": false
+        },
+        {
+          "name": "Jamnagar",
+          "latitude": 22.4667,
+          "longitude": 70.0667,
+          "is_fallback": false
+        },
+        {
+          "name": "Junagadh",
+          "latitude": 21.5167,
+          "longitude": 70.4667,
+          "is_fallback": false
+        },
+        {
+          "name": "Kachchh",
+          "latitude": 22.2587,
+          "longitude": 71.1924,
+          "is_fallback": true
+        },
+        {
+          "name": "Kheda (Nadiad)",
+          "latitude": 22.75,
+          "longitude": 72.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Mahisagar",
+          "latitude": 23.1711,
+          "longitude": 73.5594,
+          "is_fallback": false
+        },
+        {
+          "name": "Mehsana",
+          "latitude": 23.6,
+          "longitude": 72.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Morbi",
+          "latitude": 22.8167,
+          "longitude": 70.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Narmada (Rajpipla)",
+          "latitude": 21.8757,
+          "longitude": 73.5594,
+          "is_fallback": false
+        },
+        {
+          "name": "Navsari",
+          "latitude": 20.9467,
+          "longitude": 72.952,
+          "is_fallback": false
+        },
+        {
+          "name": "Panchmahal (Godhra)",
+          "latitude": 22.8011,
+          "longitude": 73.5594,
+          "is_fallback": false
+        },
+        {
+          "name": "Patan",
+          "latitude": 23.85,
+          "longitude": 72.121,
+          "is_fallback": false
+        },
+        {
+          "name": "Porbandar",
+          "latitude": 21.6333,
+          "longitude": 69.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Rajkot",
+          "latitude": 22.3039,
+          "longitude": 70.8022,
+          "is_fallback": false
+        },
+        {
+          "name": "Sabarkantha (Himmatnagar)",
+          "latitude": 23.8477,
+          "longitude": 72.9933,
+          "is_fallback": false
+        },
+        {
+          "name": "Surat",
+          "latitude": 21.1702,
+          "longitude": 72.8311,
+          "is_fallback": false
+        },
+        {
+          "name": "Surendranagar",
+          "latitude": 22.7,
+          "longitude": 71.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Tapi (Vyara)",
+          "latitude": 22.2587,
+          "longitude": 71.1924,
+          "is_fallback": true
+        },
+        {
+          "name": "Vadodara",
+          "latitude": 22.3,
+          "longitude": 73.2,
+          "is_fallback": false
+        },
+        {
+          "name": "Valsad",
+          "latitude": 20.6333,
+          "longitude": 72.9333,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Haryana",
+      "latitude": 29.0588,
+      "longitude": 76.0856,
+      "district_count": 22,
+      "districts": [
+        {
+          "name": "Ambala",
+          "latitude": 30.3752,
+          "longitude": 76.7821,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhiwani",
+          "latitude": 28.7833,
+          "longitude": 76.1333,
+          "is_fallback": false
+        },
+        {
+          "name": "Charkhi Dadri",
+          "latitude": 28.6,
+          "longitude": 76.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Faridabad",
+          "latitude": 28.4333,
+          "longitude": 77.3167,
+          "is_fallback": false
+        },
+        {
+          "name": "Fatehabad",
+          "latitude": 29.5132,
+          "longitude": 75.451,
+          "is_fallback": false
+        },
+        {
+          "name": "Gurgaon",
+          "latitude": 19.3333,
+          "longitude": 77.2833,
+          "is_fallback": false
+        },
+        {
+          "name": "Hisar",
+          "latitude": 29.1667,
+          "longitude": 75.7167,
+          "is_fallback": false
+        },
+        {
+          "name": "Jhajjar",
+          "latitude": 28.6167,
+          "longitude": 76.65,
+          "is_fallback": false
+        },
+        {
+          "name": "Jind",
+          "latitude": 29.3167,
+          "longitude": 76.3167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kaithal",
+          "latitude": 29.8,
+          "longitude": 76.3833,
+          "is_fallback": false
+        },
+        {
+          "name": "Karnal",
+          "latitude": 29.6833,
+          "longitude": 76.9833,
+          "is_fallback": false
+        },
+        {
+          "name": "Kurukshetra",
+          "latitude": 29.9695,
+          "longitude": 76.8783,
+          "is_fallback": false
+        },
+        {
+          "name": "Mahendragarh",
+          "latitude": 28.2833,
+          "longitude": 76.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Mewat",
+          "latitude": 29.0588,
+          "longitude": 76.0856,
+          "is_fallback": true
+        },
+        {
+          "name": "Palwal",
+          "latitude": 28.1473,
+          "longitude": 77.326,
+          "is_fallback": false
+        },
+        {
+          "name": "Panchkula",
+          "latitude": 30.6942,
+          "longitude": 76.8606,
+          "is_fallback": false
+        },
+        {
+          "name": "Panipat",
+          "latitude": 29.3889,
+          "longitude": 76.9681,
+          "is_fallback": false
+        },
+        {
+          "name": "Rewari",
+          "latitude": 28.1833,
+          "longitude": 76.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Rohtak",
+          "latitude": 28.9,
+          "longitude": 76.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Sirsa",
+          "latitude": 29.5321,
+          "longitude": 75.0318,
+          "is_fallback": false
+        },
+        {
+          "name": "Sonipat",
+          "latitude": 28.9833,
+          "longitude": 77.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Yamunanagar",
+          "latitude": 30.1,
+          "longitude": 77.2833,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Himachal Pradesh",
+      "latitude": 31.1048,
+      "longitude": 77.1734,
+      "district_count": 12,
+      "districts": [
+        {
+          "name": "Bilaspur",
+          "latitude": 22.0833,
+          "longitude": 82.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Chamba",
+          "latitude": 32.9847,
+          "longitude": 74.9556,
+          "is_fallback": false
+        },
+        {
+          "name": "Hamirpur",
+          "latitude": 25.95,
+          "longitude": 80.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Kangra",
+          "latitude": 32.1,
+          "longitude": 76.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Kinnaur",
+          "latitude": 31.651,
+          "longitude": 78.4752,
+          "is_fallback": false
+        },
+        {
+          "name": "Kullu",
+          "latitude": 31.8246,
+          "longitude": 77.4702,
+          "is_fallback": false
+        },
+        {
+          "name": "Lahaul &amp; Spiti",
+          "latitude": 31.1048,
+          "longitude": 77.1734,
+          "is_fallback": true
+        },
+        {
+          "name": "Mandi",
+          "latitude": 25.6494,
+          "longitude": 75.5931,
+          "is_fallback": false
+        },
+        {
+          "name": "Shimla",
+          "latitude": 28.6833,
+          "longitude": 74.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Sirmaur (Sirmour)",
+          "latitude": 24.85,
+          "longitude": 81.3833,
+          "is_fallback": false
+        },
+        {
+          "name": "Solan",
+          "latitude": 30.9167,
+          "longitude": 77.1167,
+          "is_fallback": false
+        },
+        {
+          "name": "Una",
+          "latitude": 31.4833,
+          "longitude": 76.2833,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Jammu and Kashmir",
+      "latitude": 33.7782,
+      "longitude": 76.5762,
+      "district_count": 22,
+      "districts": [
+        {
+          "name": "Anantnag",
+          "latitude": 33.7333,
+          "longitude": 75.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Bandipore",
+          "latitude": 34.363,
+          "longitude": 74.4625,
+          "is_fallback": false
+        },
+        {
+          "name": "Baramulla",
+          "latitude": 34.1121,
+          "longitude": 74.7215,
+          "is_fallback": false
+        },
+        {
+          "name": "Budgam",
+          "latitude": 34.0655,
+          "longitude": 74.7585,
+          "is_fallback": false
+        },
+        {
+          "name": "Doda",
+          "latitude": 30.4,
+          "longitude": 74.65,
+          "is_fallback": false
+        },
+        {
+          "name": "Ganderbal",
+          "latitude": 34.2333,
+          "longitude": 74.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Jammu",
+          "latitude": 32.7333,
+          "longitude": 74.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Kargil",
+          "latitude": 34.5667,
+          "longitude": 76.1,
+          "is_fallback": false
+        },
+        {
+          "name": "Kathua",
+          "latitude": 32.3667,
+          "longitude": 75.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kishtwar",
+          "latitude": 33.3167,
+          "longitude": 75.7667,
+          "is_fallback": false
+        },
+        {
+          "name": "Kulgam",
+          "latitude": 33.65,
+          "longitude": 75.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kupwara",
+          "latitude": 34.0306,
+          "longitude": 74.2642,
+          "is_fallback": false
+        },
+        {
+          "name": "Leh",
+          "latitude": 34.1667,
+          "longitude": 77.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Poonch",
+          "latitude": 33.7782,
+          "longitude": 76.5762,
+          "is_fallback": true
+        },
+        {
+          "name": "Pulwama",
+          "latitude": 33.8833,
+          "longitude": 74.9167,
+          "is_fallback": false
+        },
+        {
+          "name": "Rajouri",
+          "latitude": 33.3716,
+          "longitude": 74.3152,
+          "is_fallback": false
+        },
+        {
+          "name": "Ramban",
+          "latitude": 33.25,
+          "longitude": 75.25,
+          "is_fallback": false
+        },
+        {
+          "name": "Reasi",
+          "latitude": 33.0804,
+          "longitude": 74.8364,
+          "is_fallback": false
+        },
+        {
+          "name": "Samba",
+          "latitude": 32.5667,
+          "longitude": 75.1167,
+          "is_fallback": false
+        },
+        {
+          "name": "Shopian",
+          "latitude": 33.7782,
+          "longitude": 76.5762,
+          "is_fallback": true
+        },
+        {
+          "name": "Srinagar",
+          "latitude": 34.0837,
+          "longitude": 74.7973,
+          "is_fallback": false
+        },
+        {
+          "name": "Udhampur",
+          "latitude": 32.9333,
+          "longitude": 75.1333,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Jharkhand",
+      "latitude": 23.6102,
+      "longitude": 85.2799,
+      "district_count": 24,
+      "districts": [
+        {
+          "name": "Bokaro",
+          "latitude": 23.7833,
+          "longitude": 85.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Chatra",
+          "latitude": 24.2167,
+          "longitude": 84.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Deoghar",
+          "latitude": 24.4833,
+          "longitude": 86.7,
+          "is_fallback": false
+        },
+        {
+          "name": "Dhanbad",
+          "latitude": 23.8,
+          "longitude": 86.45,
+          "is_fallback": false
+        },
+        {
+          "name": "Dumka",
+          "latitude": 24.2667,
+          "longitude": 87.25,
+          "is_fallback": false
+        },
+        {
+          "name": "East Singhbhum",
+          "latitude": 22.4867,
+          "longitude": 86.4997,
+          "is_fallback": false
+        },
+        {
+          "name": "Garhwa",
+          "latitude": 24.1549,
+          "longitude": 83.7996,
+          "is_fallback": false
+        },
+        {
+          "name": "Giridih",
+          "latitude": 24.1833,
+          "longitude": 86.3,
+          "is_fallback": false
+        },
+        {
+          "name": "Godda",
+          "latitude": 24.8333,
+          "longitude": 87.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Gumla",
+          "latitude": 23.05,
+          "longitude": 84.55,
+          "is_fallback": false
+        },
+        {
+          "name": "Hazaribag",
+          "latitude": 23.9833,
+          "longitude": 85.35,
+          "is_fallback": false
+        },
+        {
+          "name": "Jamtara",
+          "latitude": 23.95,
+          "longitude": 86.8,
+          "is_fallback": false
+        },
+        {
+          "name": "Khunti",
+          "latitude": 23.0833,
+          "longitude": 85.2833,
+          "is_fallback": false
+        },
+        {
+          "name": "Koderma",
+          "latitude": 24.4677,
+          "longitude": 85.5934,
+          "is_fallback": false
+        },
+        {
+          "name": "Latehar",
+          "latitude": 23.75,
+          "longitude": 84.5,
+          "is_fallback": false
+        },
+        {
+          "name": "Lohardaga",
+          "latitude": 23.4333,
+          "longitude": 84.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Pakur",
+          "latitude": 24.6337,
+          "longitude": 87.8501,
+          "is_fallback": false
+        },
+        {
+          "name": "Palamu",
+          "latitude": 24.1286,
+          "longitude": 84.1857,
+          "is_fallback": false
+        },
+        {
+          "name": "Ramgarh",
+          "latitude": 23.6524,
+          "longitude": 85.5612,
+          "is_fallback": false
+        },
+        {
+          "name": "Ranchi",
+          "latitude": 23.35,
+          "longitude": 85.3333,
+          "is_fallback": false
+        },
+        {
+          "name": "Sahibganj",
+          "latitude": 25.25,
+          "longitude": 87.65,
+          "is_fallback": false
+        },
+        {
+          "name": "Seraikela-Kharsawan",
+          "latitude": 23.6102,
+          "longitude": 85.2799,
+          "is_fallback": true
+        },
+        {
+          "name": "Simdega",
+          "latitude": 22.6167,
+          "longitude": 84.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "West Singhbhum",
+          "latitude": 22.3651,
+          "longitude": 85.4376,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Karnataka",
+      "latitude": 15.3173,
+      "longitude": 75.7139,
+      "district_count": 30,
+      "districts": [
+        {
+          "name": "Bagalkot",
+          "latitude": 16.1833,
+          "longitude": 75.7,
+          "is_fallback": false
+        },
+        {
+          "name": "Ballari (Bellary)",
+          "latitude": 15.15,
+          "longitude": 76.9333,
+          "is_fallback": false
+        },
+        {
+          "name": "Belagavi (Belgaum)",
+          "latitude": 15.8667,
+          "longitude": 74.5,
+          "is_fallback": false
+        },
+        {
+          "name": "Bengaluru (Bangalore) Rural",
+          "latitude": 12.9833,
+          "longitude": 77.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Bengaluru (Bangalore) Urban",
+          "latitude": 12.9833,
+          "longitude": 77.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Bidar",
+          "latitude": 17.9,
+          "longitude": 77.55,
+          "is_fallback": false
+        },
+        {
+          "name": "Chamarajanagar",
+          "latitude": 11.9261,
+          "longitude": 76.9437,
+          "is_fallback": false
+        },
+        {
+          "name": "Chikballapur",
+          "latitude": 15.3173,
+          "longitude": 75.7139,
+          "is_fallback": true
+        },
+        {
+          "name": "Chikkamagaluru (Chikmagalur)",
+          "latitude": 13.3167,
+          "longitude": 75.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Chitradurga",
+          "latitude": 14.2333,
+          "longitude": 76.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Dakshina Kannada",
+          "latitude": 12.8438,
+          "longitude": 75.2479,
+          "is_fallback": false
+        },
+        {
+          "name": "Davangere",
+          "latitude": 15.3173,
+          "longitude": 75.7139,
+          "is_fallback": true
+        },
+        {
+          "name": "Dharwad",
+          "latitude": 15.4667,
+          "longitude": 75.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Gadag",
+          "latitude": 15.4167,
+          "longitude": 75.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Hassan",
+          "latitude": 13.0006,
+          "longitude": 76.0994,
+          "is_fallback": false
+        },
+        {
+          "name": "Haveri",
+          "latitude": 14.8,
+          "longitude": 75.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Kalaburagi (Gulbarga)",
+          "latitude": 17.3297,
+          "longitude": 76.8343,
+          "is_fallback": false
+        },
+        {
+          "name": "Kodagu",
+          "latitude": 12.3375,
+          "longitude": 75.8069,
+          "is_fallback": false
+        },
+        {
+          "name": "Kolar",
+          "latitude": 13.1333,
+          "longitude": 78.1333,
+          "is_fallback": false
+        },
+        {
+          "name": "Koppal",
+          "latitude": 15.35,
+          "longitude": 76.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Mandya",
+          "latitude": 12.5242,
+          "longitude": 76.8958,
+          "is_fallback": false
+        },
+        {
+          "name": "Mysuru (Mysore)",
+          "latitude": 12.2958,
+          "longitude": 76.6394,
+          "is_fallback": false
+        },
+        {
+          "name": "Raichur",
+          "latitude": 16.2,
+          "longitude": 77.3667,
+          "is_fallback": false
+        },
+        {
+          "name": "Ramanagara",
+          "latitude": 12.7209,
+          "longitude": 77.2799,
+          "is_fallback": false
+        },
+        {
+          "name": "Shivamogga (Shimoga)",
+          "latitude": 13.9222,
+          "longitude": 75.5736,
+          "is_fallback": false
+        },
+        {
+          "name": "Tumakuru (Tumkur)",
+          "latitude": 13.3422,
+          "longitude": 77.1017,
+          "is_fallback": false
+        },
+        {
+          "name": "Udupi",
+          "latitude": 13.35,
+          "longitude": 74.75,
+          "is_fallback": false
+        },
+        {
+          "name": "Uttara Kannada (Karwar)",
+          "latitude": 14.7937,
+          "longitude": 74.6869,
+          "is_fallback": false
+        },
+        {
+          "name": "Vijayapura (Bijapur)",
+          "latitude": 18.8,
+          "longitude": 80.8167,
+          "is_fallback": false
+        },
+        {
+          "name": "Yadgir",
+          "latitude": 16.7667,
+          "longitude": 77.1333,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Kerala",
+      "latitude": 10.8505,
+      "longitude": 76.2711,
+      "district_count": 14,
+      "districts": [
+        {
+          "name": "Alappuzha",
+          "latitude": 9.4942,
+          "longitude": 76.3275,
+          "is_fallback": false
+        },
+        {
+          "name": "Ernakulam",
+          "latitude": 9.9833,
+          "longitude": 76.2833,
+          "is_fallback": false
+        },
+        {
+          "name": "Idukki",
+          "latitude": 9.85,
+          "longitude": 76.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Kannur",
+          "latitude": 11.8667,
+          "longitude": 75.3653,
+          "is_fallback": false
+        },
+        {
+          "name": "Kasaragod",
+          "latitude": 12.5,
+          "longitude": 75.0,
+          "is_fallback": false
+        },
+        {
+          "name": "Kollam",
+          "latitude": 8.8806,
+          "longitude": 76.5917,
+          "is_fallback": false
+        },
+        {
+          "name": "Kottayam",
+          "latitude": 9.5833,
+          "longitude": 76.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kozhikode",
+          "latitude": 11.25,
+          "longitude": 75.7667,
+          "is_fallback": false
+        },
+        {
+          "name": "Malappuram",
+          "latitude": 11.0667,
+          "longitude": 76.0667,
+          "is_fallback": false
+        },
+        {
+          "name": "Palakkad",
+          "latitude": 10.7725,
+          "longitude": 76.6514,
+          "is_fallback": false
+        },
+        {
+          "name": "Pathanamthitta",
+          "latitude": 9.2667,
+          "longitude": 76.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Thiruvananthapuram",
+          "latitude": 8.5069,
+          "longitude": 76.9569,
+          "is_fallback": false
+        },
+        {
+          "name": "Thrissur",
+          "latitude": 10.5167,
+          "longitude": 76.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Wayanad",
+          "latitude": 11.7032,
+          "longitude": 76.0834,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Ladakh",
+      "latitude": 34.1526,
+      "longitude": 77.5771,
+      "district_count": 2,
+      "districts": [
+        {
+          "name": "Kargil",
+          "latitude": 34.5667,
+          "longitude": 76.1,
+          "is_fallback": false
+        },
+        {
+          "name": "Leh",
+          "latitude": 34.1667,
+          "longitude": 77.5833,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Lakshadweep",
+      "latitude": 10.5667,
+      "longitude": 72.6417,
+      "district_count": 10,
+      "districts": [
+        {
+          "name": "Agatti",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Amini",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Androth",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Bithra",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Chethlath",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Kadmath",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Kalpeni",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Kavaratti",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Kilthan",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        },
+        {
+          "name": "Minicoy",
+          "latitude": 10.5667,
+          "longitude": 72.6417,
+          "is_fallback": true
+        }
+      ]
+    },
+    {
+      "state": "Madhya Pradesh",
+      "latitude": 22.9734,
+      "longitude": 78.6569,
+      "district_count": 51,
+      "districts": [
+        {
+          "name": "Agar Malwa",
+          "latitude": 22.9734,
+          "longitude": 78.6569,
+          "is_fallback": true
+        },
+        {
+          "name": "Alirajpur",
+          "latitude": 22.3,
+          "longitude": 74.35,
+          "is_fallback": false
+        },
+        {
+          "name": "Anuppur",
+          "latitude": 23.1,
+          "longitude": 81.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Ashoknagar",
+          "latitude": 24.5667,
+          "longitude": 77.7167,
+          "is_fallback": false
+        },
+        {
+          "name": "Balaghat",
+          "latitude": 21.7833,
+          "longitude": 80.25,
+          "is_fallback": false
+        },
+        {
+          "name": "Barwani",
+          "latitude": 22.0333,
+          "longitude": 74.9,
+          "is_fallback": false
+        },
+        {
+          "name": "Betul",
+          "latitude": 21.8561,
+          "longitude": 77.9275,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhind",
+          "latitude": 26.5642,
+          "longitude": 78.7883,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhopal",
+          "latitude": 23.2667,
+          "longitude": 77.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Burhanpur",
+          "latitude": 21.3,
+          "longitude": 76.2333,
+          "is_fallback": false
+        },
+        {
+          "name": "Chhatarpur",
+          "latitude": 24.9168,
+          "longitude": 79.591,
+          "is_fallback": false
+        },
+        {
+          "name": "Chhindwara",
+          "latitude": 22.0667,
+          "longitude": 78.9333,
+          "is_fallback": false
+        },
+        {
+          "name": "Damoh",
+          "latitude": 23.8333,
+          "longitude": 79.45,
+          "is_fallback": false
+        },
+        {
+          "name": "Datia",
+          "latitude": 25.6667,
+          "longitude": 78.4667,
+          "is_fallback": false
+        },
+        {
+          "name": "Dewas",
+          "latitude": 22.9667,
+          "longitude": 76.0667,
+          "is_fallback": false
+        },
+        {
+          "name": "Dhar",
+          "latitude": 22.6,
+          "longitude": 75.3,
+          "is_fallback": false
+        },
+        {
+          "name": "Dindori",
+          "latitude": 22.95,
+          "longitude": 81.0833,
+          "is_fallback": false
+        },
+        {
+          "name": "Guna",
+          "latitude": 24.65,
+          "longitude": 77.3167,
+          "is_fallback": false
+        },
+        {
+          "name": "Gwalior",
+          "latitude": 26.2236,
+          "longitude": 78.1792,
+          "is_fallback": false
+        },
+        {
+          "name": "Harda",
+          "latitude": 22.3433,
+          "longitude": 77.089,
+          "is_fallback": false
+        },
+        {
+          "name": "Hoshangabad",
+          "latitude": 22.75,
+          "longitude": 77.7167,
+          "is_fallback": false
+        },
+        {
+          "name": "Indore",
+          "latitude": 22.7167,
+          "longitude": 75.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Jabalpur",
+          "latitude": 23.1667,
+          "longitude": 79.95,
+          "is_fallback": false
+        },
+        {
+          "name": "Jhabua",
+          "latitude": 22.7667,
+          "longitude": 74.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Katni",
+          "latitude": 23.8167,
+          "longitude": 80.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Khandwa",
+          "latitude": 21.8333,
+          "longitude": 76.3333,
+          "is_fallback": false
+        },
+        {
+          "name": "Khargone",
+          "latitude": 21.8167,
+          "longitude": 75.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Mandla",
+          "latitude": 22.6,
+          "longitude": 80.3833,
+          "is_fallback": false
+        },
+        {
+          "name": "Mandsaur",
+          "latitude": 24.0667,
+          "longitude": 75.0667,
+          "is_fallback": false
+        },
+        {
+          "name": "Morena",
+          "latitude": 26.4969,
+          "longitude": 78.0,
+          "is_fallback": false
+        },
+        {
+          "name": "Narsinghpur",
+          "latitude": 22.95,
+          "longitude": 79.2,
+          "is_fallback": false
+        },
+        {
+          "name": "Neemuch",
+          "latitude": 24.45,
+          "longitude": 74.87,
+          "is_fallback": false
+        },
+        {
+          "name": "Panna",
+          "latitude": 24.7167,
+          "longitude": 80.2,
+          "is_fallback": false
+        },
+        {
+          "name": "Raisen",
+          "latitude": 23.3333,
+          "longitude": 77.8,
+          "is_fallback": false
+        },
+        {
+          "name": "Rajgarh",
+          "latitude": 23.8509,
+          "longitude": 76.7337,
+          "is_fallback": false
+        },
+        {
+          "name": "Ratlam",
+          "latitude": 23.3167,
+          "longitude": 75.0667,
+          "is_fallback": false
+        },
+        {
+          "name": "Rewa",
+          "latitude": 24.5333,
+          "longitude": 81.3,
+          "is_fallback": false
+        },
+        {
+          "name": "Sagar",
+          "latitude": 23.8388,
+          "longitude": 78.7378,
+          "is_fallback": false
+        },
+        {
+          "name": "Satna",
+          "latitude": 24.5833,
+          "longitude": 80.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Sehore",
+          "latitude": 23.2,
+          "longitude": 77.0833,
+          "is_fallback": false
+        },
+        {
+          "name": "Seoni",
+          "latitude": 22.0833,
+          "longitude": 79.5333,
+          "is_fallback": false
+        },
+        {
+          "name": "Shahdol",
+          "latitude": 23.2833,
+          "longitude": 81.35,
+          "is_fallback": false
+        },
+        {
+          "name": "Shajapur",
+          "latitude": 23.4333,
+          "longitude": 76.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Sheopur",
+          "latitude": 25.6667,
+          "longitude": 76.7,
+          "is_fallback": false
+        },
+        {
+          "name": "Shivpuri",
+          "latitude": 25.432,
+          "longitude": 77.6644,
+          "is_fallback": false
+        },
+        {
+          "name": "Sidhi",
+          "latitude": 24.4167,
+          "longitude": 81.8833,
+          "is_fallback": false
+        },
+        {
+          "name": "Singrauli",
+          "latitude": 24.1443,
+          "longitude": 82.3886,
+          "is_fallback": false
+        },
+        {
+          "name": "Tikamgarh",
+          "latitude": 24.7333,
+          "longitude": 78.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Ujjain",
+          "latitude": 23.1833,
+          "longitude": 75.7667,
+          "is_fallback": false
+        },
+        {
+          "name": "Umaria",
+          "latitude": 23.5333,
+          "longitude": 80.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Vidisha",
+          "latitude": 23.5333,
+          "longitude": 77.8167,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Maharashtra",
+      "latitude": 19.7515,
+      "longitude": 75.7139,
+      "district_count": 36,
+      "districts": [
+        {
+          "name": "Ahmednagar",
+          "latitude": 19.0833,
+          "longitude": 74.7333,
+          "is_fallback": false
+        },
+        {
+          "name": "Akola",
+          "latitude": 20.7002,
+          "longitude": 77.0082,
+          "is_fallback": false
+        },
+        {
+          "name": "Amravati",
+          "latitude": 20.9333,
+          "longitude": 77.75,
+          "is_fallback": false
+        },
+        {
+          "name": "Aurangabad",
+          "latitude": 19.8762,
+          "longitude": 75.3433,
+          "is_fallback": false
+        },
+        {
+          "name": "Beed",
+          "latitude": 18.9891,
+          "longitude": 75.7601,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhandara",
+          "latitude": 21.1777,
+          "longitude": 79.657,
+          "is_fallback": false
+        },
+        {
+          "name": "Buldhana",
+          "latitude": 20.5292,
+          "longitude": 76.1842,
+          "is_fallback": false
+        },
+        {
+          "name": "Chandrapur",
+          "latitude": 19.6,
+          "longitude": 79.2961,
+          "is_fallback": false
+        },
+        {
+          "name": "Dhule",
+          "latitude": 20.9,
+          "longitude": 74.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Gadchiroli",
+          "latitude": 20.1849,
+          "longitude": 79.9948,
+          "is_fallback": false
+        },
+        {
+          "name": "Gondia",
+          "latitude": 20.7833,
+          "longitude": 85.8,
+          "is_fallback": false
+        },
+        {
+          "name": "Hingoli",
+          "latitude": 19.7174,
+          "longitude": 77.1494,
+          "is_fallback": false
+        },
+        {
+          "name": "Jalgaon",
+          "latitude": 21.0486,
+          "longitude": 75.5626,
+          "is_fallback": false
+        },
+        {
+          "name": "Jalna",
+          "latitude": 19.8333,
+          "longitude": 75.8833,
+          "is_fallback": false
+        },
+        {
+          "name": "Kolhapur",
+          "latitude": 16.7,
+          "longitude": 74.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Latur",
+          "latitude": 18.4,
+          "longitude": 76.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Mumbai City",
+          "latitude": 18.975,
+          "longitude": 72.8258,
+          "is_fallback": false
+        },
+        {
+          "name": "Mumbai Suburban",
+          "latitude": 18.975,
+          "longitude": 72.8258,
+          "is_fallback": false
+        },
+        {
+          "name": "Nagpur",
+          "latitude": 21.1458,
+          "longitude": 79.0882,
+          "is_fallback": false
+        },
+        {
+          "name": "Nanded",
+          "latitude": 19.15,
+          "longitude": 77.3333,
+          "is_fallback": false
+        },
+        {
+          "name": "Nandurbar",
+          "latitude": 21.3667,
+          "longitude": 74.25,
+          "is_fallback": false
+        },
+        {
+          "name": "Nashik",
+          "latitude": 19.9975,
+          "longitude": 73.7898,
+          "is_fallback": false
+        },
+        {
+          "name": "Osmanabad",
+          "latitude": 18.1667,
+          "longitude": 76.05,
+          "is_fallback": false
+        },
+        {
+          "name": "Palghar",
+          "latitude": 19.6833,
+          "longitude": 72.75,
+          "is_fallback": false
+        },
+        {
+          "name": "Parbhani",
+          "latitude": 19.2667,
+          "longitude": 76.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Pune",
+          "latitude": 18.5333,
+          "longitude": 73.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Raigad",
+          "latitude": 18.5158,
+          "longitude": 73.1822,
+          "is_fallback": false
+        },
+        {
+          "name": "Ratnagiri",
+          "latitude": 16.9902,
+          "longitude": 73.312,
+          "is_fallback": false
+        },
+        {
+          "name": "Sangli",
+          "latitude": 16.8667,
+          "longitude": 74.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Satara",
+          "latitude": 17.6833,
+          "longitude": 73.9833,
+          "is_fallback": false
+        },
+        {
+          "name": "Sindhudurg",
+          "latitude": 16.3492,
+          "longitude": 73.5594,
+          "is_fallback": false
+        },
+        {
+          "name": "Solapur",
+          "latitude": 17.6833,
+          "longitude": 75.9167,
+          "is_fallback": false
+        },
+        {
+          "name": "Thane",
+          "latitude": 19.2,
+          "longitude": 72.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Wardha",
+          "latitude": 20.75,
+          "longitude": 78.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Washim",
+          "latitude": 20.1,
+          "longitude": 77.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Yavatmal",
+          "latitude": 20.4,
+          "longitude": 78.1333,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Manipur",
+      "latitude": 24.6637,
+      "longitude": 93.9063,
+      "district_count": 16,
+      "districts": [
+        {
+          "name": "Bishnupur",
+          "latitude": 22.3833,
+          "longitude": 88.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Chandel",
+          "latitude": 24.3262,
+          "longitude": 94.0006,
+          "is_fallback": false
+        },
+        {
+          "name": "Churachandpur",
+          "latitude": 24.3333,
+          "longitude": 93.6667,
+          "is_fallback": false
+        },
+        {
+          "name": "Imphal East",
+          "latitude": 24.7807,
+          "longitude": 93.9674,
+          "is_fallback": false
+        },
+        {
+          "name": "Imphal West",
+          "latitude": 24.7828,
+          "longitude": 93.8859,
+          "is_fallback": false
+        },
+        {
+          "name": "Jiribam",
+          "latitude": 24.6637,
+          "longitude": 93.9063,
+          "is_fallback": true
+        },
+        {
+          "name": "Kakching",
+          "latitude": 24.4833,
+          "longitude": 93.9833,
+          "is_fallback": false
+        },
+        {
+          "name": "Kamjong",
+          "latitude": 24.857,
+          "longitude": 94.5135,
+          "is_fallback": false
+        },
+        {
+          "name": "Kangpokpi",
+          "latitude": 25.1333,
+          "longitude": 93.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Noney",
+          "latitude": 24.8547,
+          "longitude": 93.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Pherzawl",
+          "latitude": 24.2637,
+          "longitude": 93.1893,
+          "is_fallback": false
+        },
+        {
+          "name": "Senapati",
+          "latitude": 25.3203,
+          "longitude": 94.1514,
+          "is_fallback": false
+        },
+        {
+          "name": "Tamenglong",
+          "latitude": 24.9667,
+          "longitude": 93.55,
+          "is_fallback": false
+        },
+        {
+          "name": "Tengnoupal",
+          "latitude": 24.3838,
+          "longitude": 94.1482,
+          "is_fallback": false
+        },
+        {
+          "name": "Thoubal",
+          "latitude": 24.6333,
+          "longitude": 94.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Ukhrul",
+          "latitude": 25.1167,
+          "longitude": 94.3667,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Meghalaya",
+      "latitude": 25.467,
+      "longitude": 91.3662,
+      "district_count": 11,
+      "districts": [
+        {
+          "name": "East Garo Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "East Jaintia Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "East Khasi Hills",
+          "latitude": 25.3682,
+          "longitude": 91.7539,
+          "is_fallback": false
+        },
+        {
+          "name": "North Garo Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "Ri Bhoi",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "South Garo Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "South West Garo Hills ",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "South West Khasi Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "West Garo Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "West Jaintia Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        },
+        {
+          "name": "West Khasi Hills",
+          "latitude": 25.467,
+          "longitude": 91.3662,
+          "is_fallback": true
+        }
+      ]
+    },
+    {
+      "state": "Mizoram",
+      "latitude": 23.1645,
+      "longitude": 92.9376,
+      "district_count": 8,
+      "districts": [
+        {
+          "name": "Aizawl",
+          "latitude": 23.7244,
+          "longitude": 92.7175,
+          "is_fallback": false
+        },
+        {
+          "name": "Champhai",
+          "latitude": 23.4566,
+          "longitude": 93.3282,
+          "is_fallback": false
+        },
+        {
+          "name": "Kolasib",
+          "latitude": 24.2246,
+          "longitude": 92.676,
+          "is_fallback": false
+        },
+        {
+          "name": "Lawngtlai",
+          "latitude": 22.3114,
+          "longitude": 92.6984,
+          "is_fallback": false
+        },
+        {
+          "name": "Lunglei",
+          "latitude": 22.8833,
+          "longitude": 92.7333,
+          "is_fallback": false
+        },
+        {
+          "name": "Mamit",
+          "latitude": 23.9333,
+          "longitude": 92.4833,
+          "is_fallback": false
+        },
+        {
+          "name": "Saiha",
+          "latitude": 22.4833,
+          "longitude": 92.9667,
+          "is_fallback": false
+        },
+        {
+          "name": "Serchhip",
+          "latitude": 23.3,
+          "longitude": 92.8333,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Nagaland",
+      "latitude": 26.1584,
+      "longitude": 94.5624,
+      "district_count": 11,
+      "districts": [
+        {
+          "name": "Dimapur",
+          "latitude": 25.9,
+          "longitude": 93.7333,
+          "is_fallback": false
+        },
+        {
+          "name": "Kiphire",
+          "latitude": 26.1584,
+          "longitude": 94.5624,
+          "is_fallback": true
+        },
+        {
+          "name": "Kohima",
+          "latitude": 25.6667,
+          "longitude": 94.1167,
+          "is_fallback": false
+        },
+        {
+          "name": "Longleng",
+          "latitude": 26.1584,
+          "longitude": 94.5624,
+          "is_fallback": true
+        },
+        {
+          "name": "Mokokchung",
+          "latitude": 26.3333,
+          "longitude": 94.5333,
+          "is_fallback": false
+        },
+        {
+          "name": "Mon",
+          "latitude": 26.75,
+          "longitude": 95.1,
+          "is_fallback": false
+        },
+        {
+          "name": "Peren",
+          "latitude": 25.5125,
+          "longitude": 93.7391,
+          "is_fallback": false
+        },
+        {
+          "name": "Phek",
+          "latitude": 25.6667,
+          "longitude": 94.5,
+          "is_fallback": false
+        },
+        {
+          "name": "Tuensang",
+          "latitude": 26.2833,
+          "longitude": 94.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Wokha",
+          "latitude": 26.1,
+          "longitude": 94.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Zunheboto",
+          "latitude": 25.9667,
+          "longitude": 94.5167,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Odisha",
+      "latitude": 20.9517,
+      "longitude": 85.0985,
+      "district_count": 30,
+      "districts": [
+        {
+          "name": "Angul",
+          "latitude": 20.85,
+          "longitude": 85.1,
+          "is_fallback": false
+        },
+        {
+          "name": "Balangir",
+          "latitude": 20.7167,
+          "longitude": 83.4833,
+          "is_fallback": false
+        },
+        {
+          "name": "Balasore",
+          "latitude": 21.4942,
+          "longitude": 86.9317,
+          "is_fallback": false
+        },
+        {
+          "name": "Bargarh",
+          "latitude": 21.347,
+          "longitude": 83.632,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhadrak",
+          "latitude": 21.0528,
+          "longitude": 86.52,
+          "is_fallback": false
+        },
+        {
+          "name": "Boudh",
+          "latitude": 20.8418,
+          "longitude": 84.32,
+          "is_fallback": false
+        },
+        {
+          "name": "Cuttack",
+          "latitude": 20.5,
+          "longitude": 85.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Deogarh",
+          "latitude": 21.5383,
+          "longitude": 84.7289,
+          "is_fallback": false
+        },
+        {
+          "name": "Dhenkanal",
+          "latitude": 20.6667,
+          "longitude": 85.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Gajapati",
+          "latitude": 19.1912,
+          "longitude": 84.1857,
+          "is_fallback": false
+        },
+        {
+          "name": "Ganjam",
+          "latitude": 19.3874,
+          "longitude": 85.0515,
+          "is_fallback": false
+        },
+        {
+          "name": "Jagatsinghapur",
+          "latitude": 20.2667,
+          "longitude": 86.1667,
+          "is_fallback": false
+        },
+        {
+          "name": "Jajpur",
+          "latitude": 20.85,
+          "longitude": 86.3333,
+          "is_fallback": false
+        },
+        {
+          "name": "Jharsuguda",
+          "latitude": 21.85,
+          "longitude": 84.0333,
+          "is_fallback": false
+        },
+        {
+          "name": "Kalahandi",
+          "latitude": 19.9137,
+          "longitude": 83.1649,
+          "is_fallback": false
+        },
+        {
+          "name": "Kandhamal",
+          "latitude": 20.1342,
+          "longitude": 84.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kendrapara",
+          "latitude": 20.5,
+          "longitude": 86.4167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kendujhar (Keonjhar)",
+          "latitude": 21.6289,
+          "longitude": 85.5817,
+          "is_fallback": false
+        },
+        {
+          "name": "Khordha",
+          "latitude": 20.1833,
+          "longitude": 85.6167,
+          "is_fallback": false
+        },
+        {
+          "name": "Koraput",
+          "latitude": 18.8167,
+          "longitude": 82.7167,
+          "is_fallback": false
+        },
+        {
+          "name": "Malkangiri",
+          "latitude": 18.35,
+          "longitude": 81.9,
+          "is_fallback": false
+        },
+        {
+          "name": "Mayurbhanj",
+          "latitude": 21.935,
+          "longitude": 86.7214,
+          "is_fallback": false
+        },
+        {
+          "name": "Nabarangpur",
+          "latitude": 25.1,
+          "longitude": 76.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "Nayagarh",
+          "latitude": 20.1333,
+          "longitude": 85.1,
+          "is_fallback": false
+        },
+        {
+          "name": "Nuapada",
+          "latitude": 20.806,
+          "longitude": 82.5361,
+          "is_fallback": false
+        },
+        {
+          "name": "Puri",
+          "latitude": 19.8135,
+          "longitude": 85.8312,
+          "is_fallback": false
+        },
+        {
+          "name": "Rayagada",
+          "latitude": 19.1667,
+          "longitude": 83.4167,
+          "is_fallback": false
+        },
+        {
+          "name": "Sambalpur",
+          "latitude": 21.4669,
+          "longitude": 83.9812,
+          "is_fallback": false
+        },
+        {
+          "name": "Sonepur",
+          "latitude": 20.9517,
+          "longitude": 85.0985,
+          "is_fallback": true
+        },
+        {
+          "name": "Sundargarh",
+          "latitude": 22.1167,
+          "longitude": 84.0333,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Puducherry",
+      "latitude": 11.9416,
+      "longitude": 79.8083,
+      "district_count": 4,
+      "districts": [
+        {
+          "name": "Karaikal",
+          "latitude": 10.9167,
+          "longitude": 79.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Mahe",
+          "latitude": 11.7,
+          "longitude": 75.5333,
+          "is_fallback": false
+        },
+        {
+          "name": "Pondicherry",
+          "latitude": 11.9416,
+          "longitude": 79.8083,
+          "is_fallback": true
+        },
+        {
+          "name": "Yanam",
+          "latitude": 16.7333,
+          "longitude": 82.2167,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Punjab",
+      "latitude": 31.1471,
+      "longitude": 75.3412,
+      "district_count": 22,
+      "districts": [
+        {
+          "name": "Amritsar",
+          "latitude": 31.6331,
+          "longitude": 74.8656,
+          "is_fallback": false
+        },
+        {
+          "name": "Barnala",
+          "latitude": 30.3833,
+          "longitude": 75.55,
+          "is_fallback": false
+        },
+        {
+          "name": "Bathinda",
+          "latitude": 30.211,
+          "longitude": 74.9455,
+          "is_fallback": false
+        },
+        {
+          "name": "Faridkot",
+          "latitude": 30.6667,
+          "longitude": 74.75,
+          "is_fallback": false
+        },
+        {
+          "name": "Fatehgarh Sahib",
+          "latitude": 30.5333,
+          "longitude": 75.7167,
+          "is_fallback": false
+        },
+        {
+          "name": "Fazilka",
+          "latitude": 30.4,
+          "longitude": 74.0333,
+          "is_fallback": false
+        },
+        {
+          "name": "Ferozepur",
+          "latitude": 30.9167,
+          "longitude": 74.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Gurdaspur",
+          "latitude": 32.0333,
+          "longitude": 75.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "Hoshiarpur",
+          "latitude": 31.5322,
+          "longitude": 75.9172,
+          "is_fallback": false
+        },
+        {
+          "name": "Jalandhar",
+          "latitude": 31.326,
+          "longitude": 75.5762,
+          "is_fallback": false
+        },
+        {
+          "name": "Kapurthala",
+          "latitude": 31.3794,
+          "longitude": 75.3847,
+          "is_fallback": false
+        },
+        {
+          "name": "Ludhiana",
+          "latitude": 30.9,
+          "longitude": 75.85,
+          "is_fallback": false
+        },
+        {
+          "name": "Mansa",
+          "latitude": 29.9833,
+          "longitude": 75.3833,
+          "is_fallback": false
+        },
+        {
+          "name": "Moga",
+          "latitude": 30.8,
+          "longitude": 75.1667,
+          "is_fallback": false
+        },
+        {
+          "name": "Muktsar",
+          "latitude": 30.4762,
+          "longitude": 74.5122,
+          "is_fallback": false
+        },
+        {
+          "name": "Nawanshahr (Shahid Bhagat Singh Nagar)",
+          "latitude": 31.1256,
+          "longitude": 76.1186,
+          "is_fallback": false
+        },
+        {
+          "name": "Pathankot",
+          "latitude": 32.2833,
+          "longitude": 75.65,
+          "is_fallback": false
+        },
+        {
+          "name": "Patiala",
+          "latitude": 30.3267,
+          "longitude": 76.4003,
+          "is_fallback": false
+        },
+        {
+          "name": "Rupnagar",
+          "latitude": 30.9661,
+          "longitude": 76.5231,
+          "is_fallback": false
+        },
+        {
+          "name": "Sahibzada Ajit Singh Nagar (Mohali)",
+          "latitude": 31.1471,
+          "longitude": 75.3412,
+          "is_fallback": true
+        },
+        {
+          "name": "Sangrur",
+          "latitude": 30.2333,
+          "longitude": 75.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Tarn Taran",
+          "latitude": 31.45,
+          "longitude": 74.9253,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Rajasthan",
+      "latitude": 27.0238,
+      "longitude": 74.2179,
+      "district_count": 33,
+      "districts": [
+        {
+          "name": "Ajmer",
+          "latitude": 26.45,
+          "longitude": 74.6333,
+          "is_fallback": false
+        },
+        {
+          "name": "Alwar",
+          "latitude": 27.5667,
+          "longitude": 76.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Banswara",
+          "latitude": 23.55,
+          "longitude": 74.45,
+          "is_fallback": false
+        },
+        {
+          "name": "Baran",
+          "latitude": 25.1,
+          "longitude": 76.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "Barmer",
+          "latitude": 25.75,
+          "longitude": 71.3833,
+          "is_fallback": false
+        },
+        {
+          "name": "Bharatpur",
+          "latitude": 27.2152,
+          "longitude": 77.503,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhilwara",
+          "latitude": 25.35,
+          "longitude": 74.6333,
+          "is_fallback": false
+        },
+        {
+          "name": "Bikaner",
+          "latitude": 28.0167,
+          "longitude": 73.3,
+          "is_fallback": false
+        },
+        {
+          "name": "Bundi",
+          "latitude": 25.4417,
+          "longitude": 75.6417,
+          "is_fallback": false
+        },
+        {
+          "name": "Chittorgarh",
+          "latitude": 24.8887,
+          "longitude": 74.6269,
+          "is_fallback": false
+        },
+        {
+          "name": "Churu",
+          "latitude": 28.3,
+          "longitude": 74.95,
+          "is_fallback": false
+        },
+        {
+          "name": "Dausa",
+          "latitude": 26.8833,
+          "longitude": 76.3333,
+          "is_fallback": false
+        },
+        {
+          "name": "Dholpur",
+          "latitude": 26.7,
+          "longitude": 77.9,
+          "is_fallback": false
+        },
+        {
+          "name": "Dungarpur",
+          "latitude": 23.8333,
+          "longitude": 73.7167,
+          "is_fallback": false
+        },
+        {
+          "name": "Hanumangarh",
+          "latitude": 29.5833,
+          "longitude": 74.3167,
+          "is_fallback": false
+        },
+        {
+          "name": "Jaipur",
+          "latitude": 26.9124,
+          "longitude": 75.7873,
+          "is_fallback": false
+        },
+        {
+          "name": "Jaisalmer",
+          "latitude": 26.9167,
+          "longitude": 70.9,
+          "is_fallback": false
+        },
+        {
+          "name": "Jalore",
+          "latitude": 25.3445,
+          "longitude": 72.6254,
+          "is_fallback": false
+        },
+        {
+          "name": "Jhalawar",
+          "latitude": 24.6,
+          "longitude": 76.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Jhunjhunu",
+          "latitude": 28.1333,
+          "longitude": 75.4,
+          "is_fallback": false
+        },
+        {
+          "name": "Jodhpur",
+          "latitude": 26.2867,
+          "longitude": 73.03,
+          "is_fallback": false
+        },
+        {
+          "name": "Karauli",
+          "latitude": 26.5,
+          "longitude": 77.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kota",
+          "latitude": 25.2138,
+          "longitude": 75.8648,
+          "is_fallback": false
+        },
+        {
+          "name": "Nagaur",
+          "latitude": 27.2,
+          "longitude": 73.7333,
+          "is_fallback": false
+        },
+        {
+          "name": "Pali",
+          "latitude": 25.7781,
+          "longitude": 73.3311,
+          "is_fallback": false
+        },
+        {
+          "name": "Pratapgarh",
+          "latitude": 25.9333,
+          "longitude": 81.9833,
+          "is_fallback": false
+        },
+        {
+          "name": "Rajsamand",
+          "latitude": 25.0667,
+          "longitude": 73.8833,
+          "is_fallback": false
+        },
+        {
+          "name": "Sawai Madhopur",
+          "latitude": 25.9833,
+          "longitude": 76.3667,
+          "is_fallback": false
+        },
+        {
+          "name": "Sikar",
+          "latitude": 27.6167,
+          "longitude": 75.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Sirohi",
+          "latitude": 24.8833,
+          "longitude": 72.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Sri Ganganagar",
+          "latitude": 29.9167,
+          "longitude": 73.8833,
+          "is_fallback": false
+        },
+        {
+          "name": "Tonk",
+          "latitude": 26.1659,
+          "longitude": 75.7963,
+          "is_fallback": false
+        },
+        {
+          "name": "Udaipur",
+          "latitude": 24.5854,
+          "longitude": 73.7125,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Sikkim",
+      "latitude": 27.533,
+      "longitude": 88.5122,
+      "district_count": 4,
+      "districts": [
+        {
+          "name": "East Sikkim",
+          "latitude": 27.533,
+          "longitude": 88.5122,
+          "is_fallback": false
+        },
+        {
+          "name": "North Sikkim",
+          "latitude": 27.533,
+          "longitude": 88.5122,
+          "is_fallback": false
+        },
+        {
+          "name": "South Sikkim",
+          "latitude": 27.533,
+          "longitude": 88.5122,
+          "is_fallback": false
+        },
+        {
+          "name": "West Sikkim",
+          "latitude": 27.533,
+          "longitude": 88.5122,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Tamil Nadu",
+      "latitude": 11.1271,
+      "longitude": 78.6569,
+      "district_count": 32,
+      "districts": [
+        {
+          "name": "Ariyalur",
+          "latitude": 11.1333,
+          "longitude": 79.0833,
+          "is_fallback": false
+        },
+        {
+          "name": "Chennai",
+          "latitude": 13.0833,
+          "longitude": 80.2833,
+          "is_fallback": false
+        },
+        {
+          "name": "Coimbatore",
+          "latitude": 10.9925,
+          "longitude": 76.9614,
+          "is_fallback": false
+        },
+        {
+          "name": "Cuddalore",
+          "latitude": 11.75,
+          "longitude": 79.75,
+          "is_fallback": false
+        },
+        {
+          "name": "Dharmapuri",
+          "latitude": 12.1333,
+          "longitude": 78.1667,
+          "is_fallback": false
+        },
+        {
+          "name": "Dindigul",
+          "latitude": 10.35,
+          "longitude": 77.95,
+          "is_fallback": false
+        },
+        {
+          "name": "Erode",
+          "latitude": 11.35,
+          "longitude": 77.7333,
+          "is_fallback": false
+        },
+        {
+          "name": "Kanchipuram",
+          "latitude": 11.1271,
+          "longitude": 78.6569,
+          "is_fallback": true
+        },
+        {
+          "name": "Kanyakumari",
+          "latitude": 8.0761,
+          "longitude": 77.5483,
+          "is_fallback": false
+        },
+        {
+          "name": "Karur",
+          "latitude": 10.95,
+          "longitude": 78.0833,
+          "is_fallback": false
+        },
+        {
+          "name": "Krishnagiri",
+          "latitude": 12.5333,
+          "longitude": 78.2333,
+          "is_fallback": false
+        },
+        {
+          "name": "Madurai",
+          "latitude": 9.9333,
+          "longitude": 78.1167,
+          "is_fallback": false
+        },
+        {
+          "name": "Nagapattinam",
+          "latitude": 10.7667,
+          "longitude": 79.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Namakkal",
+          "latitude": 11.2333,
+          "longitude": 78.1667,
+          "is_fallback": false
+        },
+        {
+          "name": "Nilgiris",
+          "latitude": 11.1271,
+          "longitude": 78.6569,
+          "is_fallback": true
+        },
+        {
+          "name": "Perambalur",
+          "latitude": 11.2333,
+          "longitude": 78.8833,
+          "is_fallback": false
+        },
+        {
+          "name": "Pudukkottai",
+          "latitude": 10.3833,
+          "longitude": 78.8167,
+          "is_fallback": false
+        },
+        {
+          "name": "Ramanathapuram",
+          "latitude": 9.3833,
+          "longitude": 78.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Salem",
+          "latitude": 11.6643,
+          "longitude": 78.146,
+          "is_fallback": false
+        },
+        {
+          "name": "Sivaganga",
+          "latitude": 9.8667,
+          "longitude": 78.4833,
+          "is_fallback": false
+        },
+        {
+          "name": "Thanjavur",
+          "latitude": 10.8,
+          "longitude": 79.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Theni",
+          "latitude": 10.0145,
+          "longitude": 77.453,
+          "is_fallback": false
+        },
+        {
+          "name": "Thoothukudi (Tuticorin)",
+          "latitude": 11.1271,
+          "longitude": 78.6569,
+          "is_fallback": true
+        },
+        {
+          "name": "Tiruchirappalli",
+          "latitude": 10.805,
+          "longitude": 78.6856,
+          "is_fallback": false
+        },
+        {
+          "name": "Tirunelveli",
+          "latitude": 8.7333,
+          "longitude": 77.7,
+          "is_fallback": false
+        },
+        {
+          "name": "Tiruppur",
+          "latitude": 11.1,
+          "longitude": 77.35,
+          "is_fallback": false
+        },
+        {
+          "name": "Tiruvallur",
+          "latitude": 11.1271,
+          "longitude": 78.6569,
+          "is_fallback": true
+        },
+        {
+          "name": "Tiruvannamalai",
+          "latitude": 12.2167,
+          "longitude": 79.0667,
+          "is_fallback": false
+        },
+        {
+          "name": "Tiruvarur",
+          "latitude": 11.1271,
+          "longitude": 78.6569,
+          "is_fallback": true
+        },
+        {
+          "name": "Vellore",
+          "latitude": 12.9333,
+          "longitude": 79.1333,
+          "is_fallback": false
+        },
+        {
+          "name": "Viluppuram",
+          "latitude": 11.9369,
+          "longitude": 79.4873,
+          "is_fallback": false
+        },
+        {
+          "name": "Virudhunagar",
+          "latitude": 9.568,
+          "longitude": 77.9624,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Telangana",
+      "latitude": 17.8749,
+      "longitude": 78.1008,
+      "district_count": 33,
+      "districts": [
+        {
+          "name": "Adilabad",
+          "latitude": 19.6038,
+          "longitude": 78.5949,
+          "is_fallback": false,
+          "te": "ఆదిలాబాద్",
+          "hi": "आदिलाबाद"
+        },
+        {
+          "name": "Bhadradri Kothagudem",
+          "latitude": 17.6696,
+          "longitude": 80.7502,
+          "is_fallback": false,
+          "te": "భద్రాద్రి కొత్తగూడెం",
+          "hi": "भद्राद्री कोठागुडेम"
+        },
+        {
+          "name": "Hanumakonda",
+          "latitude": 18.0445,
+          "longitude": 79.5,
+          "is_fallback": false,
+          "te": "హనుమకొండ",
+          "hi": "हनुमकोंडा"
+        },
+        {
+          "name": "Hyderabad",
+          "latitude": 17.3865,
+          "longitude": 78.4612,
+          "is_fallback": false,
+          "te": "హైదరాబాద్",
+          "hi": "हैदराबाद"
+        },
+        {
+          "name": "Jagtial",
+          "latitude": 18.8,
+          "longitude": 78.933333,
+          "is_fallback": false,
+          "te": "జగిత్యాల",
+          "hi": "जगतियाल"
+        },
+        {
+          "name": "Jangaon",
+          "latitude": 17.7447,
+          "longitude": 79.2295,
+          "is_fallback": false,
+          "te": "జనగాం",
+          "hi": "जनगांव"
+        },
+        {
+          "name": "Jayashankar Bhupalpally",
+          "latitude": 18.4143,
+          "longitude": 79.8241,
+          "is_fallback": false,
+          "te": "జయశంకర్ భూపాలపల్లి",
+          "hi": "जयशंकर भूपालपल्ली"
+        },
+        {
+          "name": "Jogulamba Gadwal",
+          "latitude": 16.0431,
+          "longitude": 77.725,
+          "is_fallback": false,
+          "te": "జోగులాంబ గద్వాల",
+          "hi": "जोगुलाम्बा गडवाल"
+        },
+        {
+          "name": "Kamareddy",
+          "latitude": 18.2986,
+          "longitude": 77.9917,
+          "is_fallback": false,
+          "te": "కామారెడ్డి",
+          "hi": "कामारेड्डी"
+        },
+        {
+          "name": "Karimnagar",
+          "latitude": 18.3974,
+          "longitude": 79.2081,
+          "is_fallback": false,
+          "te": "కరీంనగర్",
+          "hi": "करीमनगर"
+        },
+        {
+          "name": "Khammam",
+          "latitude": 17.15,
+          "longitude": 80.3201,
+          "is_fallback": false,
+          "te": "ఖమ్మం",
+          "hi": "ఖమ్మం"
+        },
+        {
+          "name": "Kumuram Bheem Asifabad",
+          "latitude": 19.3199,
+          "longitude": 79.4831,
+          "is_fallback": false,
+          "te": "కొమరం భీమ్ ఆసిఫాబాద్",
+          "hi": "कोमराम भीम आसिफाबाद"
+        },
+        {
+          "name": "Mahabubabad",
+          "latitude": 17.5772,
+          "longitude": 79.8759,
+          "is_fallback": false,
+          "te": "మహబూబాబాద్",
+          "hi": "महबूबाबाद"
+        },
+        {
+          "name": "Mahabubnagar",
+          "latitude": 16.7282,
+          "longitude": 77.8527,
+          "is_fallback": false,
+          "te": "మహబూబ్ నగర్",
+          "hi": "महबूबनगर"
+        },
+        {
+          "name": "Mancherial",
+          "latitude": 19.1203,
+          "longitude": 79.5057,
+          "is_fallback": false,
+          "te": "మంచిర్యాల",
+          "hi": "मंचिरियाल"
+        },
+        {
+          "name": "Medak",
+          "latitude": 17.9381,
+          "longitude": 78.2491,
+          "is_fallback": false,
+          "te": "మెదక్",
+          "hi": "मेदक"
+        },
+        {
+          "name": "Medchal-Malkajgiri",
+          "latitude": 17.5463,
+          "longitude": 78.557,
+          "is_fallback": false,
+          "te": "మేడ్చల్ మల్కాజ్‌గిరి",
+          "hi": "मेडचल-मलकाजगिरी"
+        },
+        {
+          "name": "Mulugu",
+          "latitude": 18.301,
+          "longitude": 80.0777,
+          "is_fallback": false,
+          "te": "ములుగు",
+          "hi": "मुलुगु"
+        },
+        {
+          "name": "Nagarkurnool",
+          "latitude": 16.4461,
+          "longitude": 78.4577,
+          "is_fallback": false,
+          "te": "నాగర్‌కర్నూల్",
+          "hi": "नागरकुरनूल"
+        },
+        {
+          "name": "Nalgonda",
+          "latitude": 16.8891,
+          "longitude": 78.9763,
+          "is_fallback": false,
+          "te": "నల్గొండ",
+          "hi": "नलगोंडा"
+        },
+        {
+          "name": "Narayanpet",
+          "latitude": 16.7181,
+          "longitude": 77.6899,
+          "is_fallback": false,
+          "te": "నారాయణపేట",
+          "hi": "नारायणपेट"
+        },
+        {
+          "name": "Nirmal",
+          "latitude": 19.1023,
+          "longitude": 78.2158,
+          "is_fallback": false,
+          "te": "నిర్మల్",
+          "hi": "निर्मल"
+        },
+        {
+          "name": "Nizamabad",
+          "latitude": 18.6914,
+          "longitude": 78.2119,
+          "is_fallback": false,
+          "te": "నిజామాబాద్",
+          "hi": "निजामाबाद"
+        },
+        {
+          "name": "Peddapalli",
+          "latitude": 18.6242,
+          "longitude": 79.2995,
+          "is_fallback": false,
+          "te": "పెద్దపల్లి",
+          "hi": "पेद्दापल्ली"
+        },
+        {
+          "name": "Rajanna Sircilla",
+          "latitude": 18.3848,
+          "longitude": 78.8206,
+          "is_fallback": false,
+          "te": "రాజన్న సిరిసిల్ల",
+          "hi": "राजन्ना सिरसिला"
+        },
+        {
+          "name": "Rangareddy",
+          "latitude": 17.153,
+          "longitude": 78.3768,
+          "is_fallback": false,
+          "te": "రంగారెడ్డి",
+          "hi": "रंगारेड्डी"
+        },
+        {
+          "name": "Sangareddy",
+          "latitude": 17.7714,
+          "longitude": 77.9404,
+          "is_fallback": false,
+          "te": "సంగారెడ్డి",
+          "hi": "संगारेड्डी"
+        },
+        {
+          "name": "Siddipet",
+          "latitude": 18.0368,
+          "longitude": 78.8634,
+          "is_fallback": false,
+          "te": "సిద్దిపేట",
+          "hi": "सिद्दीपेट"
+        },
+        {
+          "name": "Suryapet",
+          "latitude": 17.2173,
+          "longitude": 79.7631,
+          "is_fallback": false,
+          "te": "సూర్యాపేట",
+          "hi": "सूर्यापेट"
+        },
+        {
+          "name": "Vikarabad",
+          "latitude": 17.2544,
+          "longitude": 77.8028,
+          "is_fallback": false,
+          "te": "వికారాబాద్",
+          "hi": "विकाराबाद"
+        },
+        {
+          "name": "Wanaparthy",
+          "latitude": 16.3538,
+          "longitude": 78.0797,
+          "is_fallback": false,
+          "te": "వనపర్తి",
+          "hi": "वनपर्थी"
+        },
+        {
+          "name": "Warangal",
+          "latitude": 17.9564,
+          "longitude": 79.6986,
+          "is_fallback": false,
+          "te": "వరంగల్",
+          "hi": "वारंगल"
+        },
+        {
+          "name": "Yadadri Bhuvanagiri",
+          "latitude": 17.4329,
+          "longitude": 78.9641,
+          "is_fallback": false,
+          "te": "యాదాద్రి భువనగిరి",
+          "hi": "यादाद्री भुवनगिरी"
+        }
+      ]
+    },
+    {
+      "state": "Tripura",
+      "latitude": 23.9408,
+      "longitude": 91.9882,
+      "district_count": 8,
+      "districts": [
+        {
+          "name": "Dhalai",
+          "latitude": 24.6,
+          "longitude": 92.8333,
+          "is_fallback": false
+        },
+        {
+          "name": "Gomati",
+          "latitude": 23.5167,
+          "longitude": 91.6372,
+          "is_fallback": false
+        },
+        {
+          "name": "Khowai",
+          "latitude": 24.1,
+          "longitude": 91.6333,
+          "is_fallback": false
+        },
+        {
+          "name": "North Tripura",
+          "latitude": 24.0797,
+          "longitude": 92.263,
+          "is_fallback": false
+        },
+        {
+          "name": "Sepahijala",
+          "latitude": 23.9408,
+          "longitude": 91.9882,
+          "is_fallback": true
+        },
+        {
+          "name": "South Tripura",
+          "latitude": 23.2317,
+          "longitude": 91.5596,
+          "is_fallback": false
+        },
+        {
+          "name": "Unakoti",
+          "latitude": 31.4833,
+          "longitude": 76.2833,
+          "is_fallback": false
+        },
+        {
+          "name": "West Tripura",
+          "latitude": 23.8997,
+          "longitude": 91.4048,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Uttar Pradesh",
+      "latitude": 26.8467,
+      "longitude": 80.9462,
+      "district_count": 75,
+      "districts": [
+        {
+          "name": "Agra",
+          "latitude": 27.1833,
+          "longitude": 78.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Aligarh",
+          "latitude": 27.8833,
+          "longitude": 78.0833,
+          "is_fallback": false
+        },
+        {
+          "name": "Allahabad",
+          "latitude": 25.4358,
+          "longitude": 81.8463,
+          "is_fallback": false
+        },
+        {
+          "name": "Ambedkar Nagar",
+          "latitude": 27.8076,
+          "longitude": 79.768,
+          "is_fallback": false
+        },
+        {
+          "name": "Amethi (Chatrapati Sahuji Mahraj Nagar)",
+          "latitude": 24.2167,
+          "longitude": 84.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Amroha (J.P. Nagar)",
+          "latitude": 28.9167,
+          "longitude": 78.4667,
+          "is_fallback": false
+        },
+        {
+          "name": "Auraiya",
+          "latitude": 26.4667,
+          "longitude": 79.5167,
+          "is_fallback": false
+        },
+        {
+          "name": "Azamgarh",
+          "latitude": 26.06,
+          "longitude": 83.1861,
+          "is_fallback": false
+        },
+        {
+          "name": "Baghpat",
+          "latitude": 28.95,
+          "longitude": 77.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Bahraich",
+          "latitude": 27.5833,
+          "longitude": 81.6,
+          "is_fallback": false
+        },
+        {
+          "name": "Ballia",
+          "latitude": 28.2,
+          "longitude": 79.3667,
+          "is_fallback": false
+        },
+        {
+          "name": "Balrampur",
+          "latitude": 23.6112,
+          "longitude": 83.6109,
+          "is_fallback": false
+        },
+        {
+          "name": "Banda",
+          "latitude": 25.4833,
+          "longitude": 80.3333,
+          "is_fallback": false
+        },
+        {
+          "name": "Barabanki",
+          "latitude": 26.9268,
+          "longitude": 81.1834,
+          "is_fallback": false
+        },
+        {
+          "name": "Bareilly",
+          "latitude": 28.35,
+          "longitude": 79.4167,
+          "is_fallback": false
+        },
+        {
+          "name": "Basti",
+          "latitude": 26.8,
+          "longitude": 82.7167,
+          "is_fallback": false
+        },
+        {
+          "name": "Bhadohi",
+          "latitude": 25.4167,
+          "longitude": 82.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Bijnor",
+          "latitude": 29.15,
+          "longitude": 78.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Budaun",
+          "latitude": 28.05,
+          "longitude": 79.1167,
+          "is_fallback": false
+        },
+        {
+          "name": "Bulandshahr",
+          "latitude": 28.4,
+          "longitude": 77.85,
+          "is_fallback": false
+        },
+        {
+          "name": "Chandauli",
+          "latitude": 25.2667,
+          "longitude": 83.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Chitrakoot",
+          "latitude": 25.1094,
+          "longitude": 81.0755,
+          "is_fallback": false
+        },
+        {
+          "name": "Deoria",
+          "latitude": 26.5047,
+          "longitude": 83.7872,
+          "is_fallback": false
+        },
+        {
+          "name": "Etah",
+          "latitude": 27.6333,
+          "longitude": 78.6667,
+          "is_fallback": false
+        },
+        {
+          "name": "Etawah",
+          "latitude": 26.7667,
+          "longitude": 79.0333,
+          "is_fallback": false
+        },
+        {
+          "name": "Faizabad",
+          "latitude": 26.7833,
+          "longitude": 82.1333,
+          "is_fallback": false
+        },
+        {
+          "name": "Farrukhabad",
+          "latitude": 27.4,
+          "longitude": 79.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Fatehpur",
+          "latitude": 25.921,
+          "longitude": 80.7996,
+          "is_fallback": false
+        },
+        {
+          "name": "Firozabad",
+          "latitude": 27.15,
+          "longitude": 78.4167,
+          "is_fallback": false
+        },
+        {
+          "name": "Gautam Buddha Nagar",
+          "latitude": 28.359,
+          "longitude": 77.5508,
+          "is_fallback": false
+        },
+        {
+          "name": "Ghaziabad",
+          "latitude": 28.6667,
+          "longitude": 77.4333,
+          "is_fallback": false
+        },
+        {
+          "name": "Ghazipur",
+          "latitude": 25.5833,
+          "longitude": 83.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Gonda",
+          "latitude": 27.1333,
+          "longitude": 81.9333,
+          "is_fallback": false
+        },
+        {
+          "name": "Gorakhpur",
+          "latitude": 26.755,
+          "longitude": 83.3739,
+          "is_fallback": false
+        },
+        {
+          "name": "Hamirpur",
+          "latitude": 25.95,
+          "longitude": 80.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Hapur (Panchsheel Nagar)",
+          "latitude": 28.7167,
+          "longitude": 77.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Hardoi",
+          "latitude": 27.1167,
+          "longitude": 80.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Hathras",
+          "latitude": 27.6,
+          "longitude": 78.05,
+          "is_fallback": false
+        },
+        {
+          "name": "Jalaun",
+          "latitude": 26.15,
+          "longitude": 79.35,
+          "is_fallback": false
+        },
+        {
+          "name": "Jaunpur",
+          "latitude": 25.7333,
+          "longitude": 82.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Jhansi",
+          "latitude": 25.4333,
+          "longitude": 78.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Kannauj",
+          "latitude": 27.0667,
+          "longitude": 79.9167,
+          "is_fallback": false
+        },
+        {
+          "name": "Kanpur Dehat",
+          "latitude": 26.5267,
+          "longitude": 79.8297,
+          "is_fallback": false
+        },
+        {
+          "name": "Kanpur Nagar",
+          "latitude": 26.4148,
+          "longitude": 80.2321,
+          "is_fallback": false
+        },
+        {
+          "name": "Kanshiram Nagar (Kasganj)",
+          "latitude": 27.8167,
+          "longitude": 78.65,
+          "is_fallback": false
+        },
+        {
+          "name": "Kaushambi",
+          "latitude": 25.428,
+          "longitude": 81.2791,
+          "is_fallback": false
+        },
+        {
+          "name": "Kushinagar (Padrauna)",
+          "latitude": 31.4833,
+          "longitude": 76.2833,
+          "is_fallback": false
+        },
+        {
+          "name": "Lakhimpur - Kheri",
+          "latitude": 27.2064,
+          "longitude": 94.1514,
+          "is_fallback": false
+        },
+        {
+          "name": "Lalitpur",
+          "latitude": 24.6833,
+          "longitude": 78.4167,
+          "is_fallback": false
+        },
+        {
+          "name": "Lucknow",
+          "latitude": 26.85,
+          "longitude": 80.9167,
+          "is_fallback": false
+        },
+        {
+          "name": "Maharajganj",
+          "latitude": 27.1333,
+          "longitude": 83.5667,
+          "is_fallback": false
+        },
+        {
+          "name": "Mahoba",
+          "latitude": 25.2833,
+          "longitude": 79.8667,
+          "is_fallback": false
+        },
+        {
+          "name": "Mainpuri",
+          "latitude": 27.2333,
+          "longitude": 79.0167,
+          "is_fallback": false
+        },
+        {
+          "name": "Mathura",
+          "latitude": 27.5,
+          "longitude": 77.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Mau",
+          "latitude": 25.9417,
+          "longitude": 83.5611,
+          "is_fallback": false
+        },
+        {
+          "name": "Meerut",
+          "latitude": 28.9833,
+          "longitude": 77.7,
+          "is_fallback": false
+        },
+        {
+          "name": "Mirzapur",
+          "latitude": 25.15,
+          "longitude": 82.5833,
+          "is_fallback": false
+        },
+        {
+          "name": "Moradabad",
+          "latitude": 28.8333,
+          "longitude": 78.7833,
+          "is_fallback": false
+        },
+        {
+          "name": "Muzaffarnagar",
+          "latitude": 29.4667,
+          "longitude": 77.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Pilibhit",
+          "latitude": 28.6333,
+          "longitude": 79.8,
+          "is_fallback": false
+        },
+        {
+          "name": "Pratapgarh",
+          "latitude": 25.9333,
+          "longitude": 81.9833,
+          "is_fallback": false
+        },
+        {
+          "name": "RaeBareli",
+          "latitude": 26.8467,
+          "longitude": 80.9462,
+          "is_fallback": true
+        },
+        {
+          "name": "Rampur",
+          "latitude": 28.7983,
+          "longitude": 79.022,
+          "is_fallback": false
+        },
+        {
+          "name": "Saharanpur",
+          "latitude": 29.9667,
+          "longitude": 77.55,
+          "is_fallback": false
+        },
+        {
+          "name": "Sambhal (Bhim Nagar)",
+          "latitude": 28.5833,
+          "longitude": 78.55,
+          "is_fallback": false
+        },
+        {
+          "name": "Sant Kabir Nagar",
+          "latitude": 26.7672,
+          "longitude": 83.0361,
+          "is_fallback": false
+        },
+        {
+          "name": "Shahjahanpur",
+          "latitude": 27.8833,
+          "longitude": 79.9167,
+          "is_fallback": false
+        },
+        {
+          "name": "Shamali (Prabuddh Nagar)",
+          "latitude": 26.8467,
+          "longitude": 80.9462,
+          "is_fallback": true
+        },
+        {
+          "name": "Shravasti",
+          "latitude": 26.8467,
+          "longitude": 80.9462,
+          "is_fallback": true
+        },
+        {
+          "name": "Siddharth Nagar",
+          "latitude": 22.6,
+          "longitude": 75.3,
+          "is_fallback": false
+        },
+        {
+          "name": "Sitapur",
+          "latitude": 27.5667,
+          "longitude": 80.6833,
+          "is_fallback": false
+        },
+        {
+          "name": "Sonbhadra",
+          "latitude": 24.685,
+          "longitude": 83.0684,
+          "is_fallback": false
+        },
+        {
+          "name": "Sultanpur",
+          "latitude": 29.75,
+          "longitude": 78.1167,
+          "is_fallback": false
+        },
+        {
+          "name": "Unnao",
+          "latitude": 26.5333,
+          "longitude": 80.5,
+          "is_fallback": false
+        },
+        {
+          "name": "Varanasi",
+          "latitude": 25.3333,
+          "longitude": 83.0,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "Uttarakhand",
+      "latitude": 30.0668,
+      "longitude": 79.0193,
+      "district_count": 13,
+      "districts": [
+        {
+          "name": "Almora",
+          "latitude": 29.6167,
+          "longitude": 79.6667,
+          "is_fallback": false
+        },
+        {
+          "name": "Bageshwar",
+          "latitude": 29.85,
+          "longitude": 79.7667,
+          "is_fallback": false
+        },
+        {
+          "name": "Chamoli",
+          "latitude": 30.4,
+          "longitude": 79.35,
+          "is_fallback": false
+        },
+        {
+          "name": "Champawat",
+          "latitude": 29.3333,
+          "longitude": 80.1,
+          "is_fallback": false
+        },
+        {
+          "name": "Dehradun",
+          "latitude": 30.3165,
+          "longitude": 78.0322,
+          "is_fallback": false
+        },
+        {
+          "name": "Haridwar",
+          "latitude": 29.9667,
+          "longitude": 78.1667,
+          "is_fallback": false
+        },
+        {
+          "name": "Nainital",
+          "latitude": 29.3803,
+          "longitude": 79.4636,
+          "is_fallback": false
+        },
+        {
+          "name": "Pauri Garhwal",
+          "latitude": 29.8688,
+          "longitude": 78.8383,
+          "is_fallback": false
+        },
+        {
+          "name": "Pithoragarh",
+          "latitude": 29.5833,
+          "longitude": 80.2167,
+          "is_fallback": false
+        },
+        {
+          "name": "Rudraprayag",
+          "latitude": 30.2833,
+          "longitude": 78.9833,
+          "is_fallback": false
+        },
+        {
+          "name": "Tehri Garhwal",
+          "latitude": 30.3826,
+          "longitude": 78.4738,
+          "is_fallback": false
+        },
+        {
+          "name": "Udham Singh Nagar",
+          "latitude": 28.961,
+          "longitude": 79.5154,
+          "is_fallback": false
+        },
+        {
+          "name": "Uttarkashi",
+          "latitude": 30.7333,
+          "longitude": 78.45,
+          "is_fallback": false
+        }
+      ]
+    },
+    {
+      "state": "West Bengal",
+      "latitude": 22.9868,
+      "longitude": 87.855,
+      "district_count": 21,
+      "districts": [
+        {
+          "name": "Alipurduar",
+          "latitude": 26.4922,
+          "longitude": 89.532,
+          "is_fallback": false
+        },
+        {
+          "name": "Bankura",
+          "latitude": 23.25,
+          "longitude": 87.0667,
+          "is_fallback": false
+        },
+        {
+          "name": "Birbhum",
+          "latitude": 24.3575,
+          "longitude": 87.8427,
+          "is_fallback": false
+        },
+        {
+          "name": "Burdwan (Bardhaman)",
+          "latitude": 22.9868,
+          "longitude": 87.855,
+          "is_fallback": true
+        },
+        {
+          "name": "Cooch Behar",
+          "latitude": 26.3167,
+          "longitude": 89.4333,
+          "is_fallback": false
+        },
+        {
+          "name": "Dakshin Dinajpur (South Dinajpur)",
+          "latitude": 25.3715,
+          "longitude": 88.5565,
+          "is_fallback": false
+        },
+        {
+          "name": "Darjeeling",
+          "latitude": 27.0333,
+          "longitude": 88.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Hooghly",
+          "latitude": 22.8956,
+          "longitude": 88.4025,
+          "is_fallback": false
+        },
+        {
+          "name": "Howrah",
+          "latitude": 22.5892,
+          "longitude": 88.3103,
+          "is_fallback": false
+        },
+        {
+          "name": "Jalpaiguri",
+          "latitude": 26.5167,
+          "longitude": 88.7333,
+          "is_fallback": false
+        },
+        {
+          "name": "Kalimpong",
+          "latitude": 27.0594,
+          "longitude": 88.4695,
+          "is_fallback": false
+        },
+        {
+          "name": "Kolkata",
+          "latitude": 22.5697,
+          "longitude": 88.3697,
+          "is_fallback": false
+        },
+        {
+          "name": "Malda",
+          "latitude": 25.0333,
+          "longitude": 88.15,
+          "is_fallback": false
+        },
+        {
+          "name": "Murshidabad",
+          "latitude": 24.1833,
+          "longitude": 88.2667,
+          "is_fallback": false
+        },
+        {
+          "name": "Nadia",
+          "latitude": 23.4167,
+          "longitude": 88.3667,
+          "is_fallback": false
+        },
+        {
+          "name": "North 24 Parganas",
+          "latitude": 22.5833,
+          "longitude": 88.4315,
+          "is_fallback": false
+        },
+        {
+          "name": "Paschim Medinipur (West Medinipur)",
+          "latitude": 22.408,
+          "longitude": 87.3811,
+          "is_fallback": false
+        },
+        {
+          "name": "Purba Medinipur (East Medinipur)",
+          "latitude": 21.9373,
+          "longitude": 87.7763,
+          "is_fallback": false
+        },
+        {
+          "name": "Purulia",
+          "latitude": 23.3333,
+          "longitude": 86.3667,
+          "is_fallback": false
+        },
+        {
+          "name": "South 24 Parganas",
+          "latitude": 22.1352,
+          "longitude": 88.4016,
+          "is_fallback": false
+        },
+        {
+          "name": "Uttar Dinajpur (North Dinajpur)",
+          "latitude": 25.981,
+          "longitude": 88.051,
+          "is_fallback": false
+        }
+      ]
+    }
+  ]
+}

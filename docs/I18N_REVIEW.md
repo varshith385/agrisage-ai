@@ -529,6 +529,33 @@ The following agronomic, economic, workflow, and interface strings were added in
 | **Market** | Selling {{quantity}} quintals of {{crop}} at {{mandi}} gives your highest net payout of ₹{{rate}}/q after deducting transport and mandi fees. | రవాణా మరియు మార్కెట్ రుసుములను తీసివేసిన తర్వాత {{mandi}}లో {{quantity}} క్వింటాళ్ల {{crop}} అమ్మితే క్వింటాల్‌కు అత్యధికంగా ₹{{rate}} నికర ఆదాయం లభిస్తుంది. | भाड़ा और मंडी सेस घटाने के बाद {{mandi}} में {{quantity}} क्विंटल {{crop}} बेचने पर आपको प्रति क्विंटल सबसे अधिक ₹{{rate}} की शुद्ध प्राप्ति मिलती है। | **Unverified**: Not native-reviewed. |
 | **Market** | Calculating net mandi realization rankings... | మండీల నికర ఆదాయ ర్యాంకింగ్‌లు లెక్కిస్తోంది... | मंडियों की शुद्ध प्राप्ति रैंकिंग की गणना की जा रही है... | **Unverified**: Not native-reviewed. |
 
+---
+
+## 7. Phase 5 Location Dropdowns & District Names (`docs/I18N_REVIEW.md`)
+
+**Date:** 2026-11-15  
+**Scope:** Cascading State & District dropdowns for Farm Registration & Location Management.  
+**Policy:** Telangana (33) and Andhra Pradesh (26) districts are provided with official state government transliterations in Telugu and Hindi. All other 34 States and UTs show their English administrative names with an `[EN]` marker when Telugu or Hindi is active.
+
+| Category | English / Admin Name | Telugu (`te`) | Hindi (`hi`) | Review Status |
+|---|---|---|---|---|
+| **State** | Telangana | తెలంగాణ | तेलंगाना | **Verified**: Official constitutional state name. |
+| **State** | Andhra Pradesh | ఆంధ్రప్రదేశ్ | आंध्र प्रदेश | **Verified**: Official constitutional state name. |
+| **District (TS)** | Warangal | వరంగల్ | वारंगल | **Unverified**: Standard administrative transliteration. |
+| **District (TS)** | Hanumakonda | హనుమకొండ | हनुमकोंडा | **Unverified**: Standard administrative transliteration. |
+| **District (TS)** | Adilabad | ఆదిలాబాద్ | आदिलाबाद | **Unverified**: Standard administrative transliteration. |
+| **District (TS)** | Bhadradri Kothagudem | భద్రాద్రి కొత్తగూడెం | भद्राद्री कोठागुडेम | **Unverified**: Standard administrative transliteration. |
+| **District (TS)** | Mulugu | ములుగు | मुलुगु | **Unverified**: Standard administrative transliteration. |
+| **District (AP)** | Alluri Sitharama Raju | అల్లూరి సీతారామరాజు | अल्लूरी सीताराम राजू | **Unverified**: Standard administrative transliteration. |
+| **District (AP)** | Dr. B.R. Ambedkar Konaseema | డా. బి.ఆర్. అంబేద్కర్ కోనసీమ | डॉ. बी.आर. अंबेडकर कोनासीमा | **Unverified**: Standard administrative transliteration. |
+| **District (AP)** | Guntur | గుంటూరు | गुंटूर | **Unverified**: Standard administrative transliteration. |
+| **District (AP)** | Kurnool | కర్నూలు | कुरनूल | **Unverified**: Standard administrative transliteration. |
+| **Other States** | Non-TS/AP Districts | Name + `[EN]` | Name + `[EN]` | **Verified Fallback**: Explicit marker prevents simulated translations. |
+| **UI Label** | approximate district centre | జిల్లా కేంద్రం సుమారు | जिला केंद्र अनुमानित | **Unverified**: Awaiting native agronomist review. |
+| **UI Label** | Edit Farm Parcel | పొలం వివరాలు సవరించండి | खेत विवरण बदलें | **Unverified**: Awaiting native agronomist review. |
+| **UI Label** | Save Changes | మార్పులను భద్రపరచండి | बदलाव सहेजें | **Unverified**: Awaiting native agronomist review. |
+
+
 
 
 

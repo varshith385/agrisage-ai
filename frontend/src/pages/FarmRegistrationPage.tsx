@@ -9,6 +9,8 @@ import {
   ArrowRight,
   Sparkles,
   Droplets,
+  Edit3,
+  X,
 } from 'lucide-react';
 import { farmsApi } from '../api/farms';
 import { Farm, OwnershipType, IrrigationMethod } from '../types/api';
@@ -25,6 +27,13 @@ import { WateringFieldIllustration } from '../components/common/FarmerIllustrati
 import { PictorialTile } from '../components/common/PictorialTile';
 import { translateBackendString } from '../utils/safeTranslation';
 import { StepFlow } from '../components/common/StepFlow';
+import {
+  getIndianStates,
+  getDistrictsForState,
+  getDistrictCoordinates,
+  getLocalizedStateName,
+  getLocalizedDistrictName,
+} from '../utils/indiaGeo';
 
 export const FarmRegistrationPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -57,8 +66,113 @@ export const FarmRegistrationPage: React.FC = () => {
   const [village, setVillage] = useState('Dharmasagar');
   const [district, setDistrict] = useState('Warangal');
   const [state, setState] = useState('Telangana');
-  const [latitude, setLatitude] = useState<number>(17.9944);
-  const [longitude, setLongitude] = useState<number>(79.4589);
+  const [latitude, setLatitude] = useState<number>(17.9689);
+  const [longitude, setLongitude] = useState<number>(79.5941);
+  const [isCoordFallback, setIsCoordFallback] = useState<boolean>(false);
+
+  // Edit Farm State
+  const [editingFarm, setEditingFarm] = useState<Farm | null>(null);
+  const [editName, setEditName] = useState<string>('');
+  const [editArea, setEditArea] = useState<number>(0);
+  const [editState, setEditState] = useState<string>('Telangana');
+  const [editDistrict, setEditDistrict] = useState<string>('Warangal');
+  const [editVillage, setEditVillage] = useState<string>('');
+  const [editLatitude, setEditLatitude] = useState<number>(17.9689);
+  const [editLongitude, setEditLongitude] = useState<number>(79.5941);
+  const [editIsFallback, setEditIsFallback] = useState<boolean>(false);
+  const [isSavingEdit, setIsSavingEdit] = useState<boolean>(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
+  const handleStateChange = (newState: string) => {
+    setState(newState);
+    const districts = getDistrictsForState(newState);
+    if (districts.length > 0) {
+      const firstDistrict = districts[0];
+      setDistrict(firstDistrict.name);
+      setLatitude(firstDistrict.latitude);
+      setLongitude(firstDistrict.longitude);
+      setIsCoordFallback(Boolean(firstDistrict.is_fallback));
+    } else {
+      setDistrict('');
+      const coords = getDistrictCoordinates(newState, '');
+      setLatitude(coords.latitude);
+      setLongitude(coords.longitude);
+      setIsCoordFallback(true);
+    }
+  };
+
+  const handleDistrictChange = (newDistrict: string) => {
+    setDistrict(newDistrict);
+    const coords = getDistrictCoordinates(state, newDistrict);
+    setLatitude(coords.latitude);
+    setLongitude(coords.longitude);
+    setIsCoordFallback(coords.isFallback);
+  };
+
+  const startEditFarm = (f: Farm) => {
+    setEditingFarm(f);
+    setEditName(f.name);
+    setEditArea(f.area);
+    setEditVillage(f.village || '');
+    setEditState(f.state);
+    setEditDistrict(f.district);
+    setEditLatitude(f.latitude);
+    setEditLongitude(f.longitude);
+    setEditIsFallback(false);
+    setEditError(null);
+  };
+
+  const handleEditStateChange = (newState: string) => {
+    setEditState(newState);
+    const districts = getDistrictsForState(newState);
+    if (districts.length > 0) {
+      const firstDistrict = districts[0];
+      setEditDistrict(firstDistrict.name);
+      setEditLatitude(firstDistrict.latitude);
+      setEditLongitude(firstDistrict.longitude);
+      setEditIsFallback(Boolean(firstDistrict.is_fallback));
+    } else {
+      setEditDistrict('');
+      const coords = getDistrictCoordinates(newState, '');
+      setEditLatitude(coords.latitude);
+      setEditLongitude(coords.longitude);
+      setEditIsFallback(true);
+    }
+  };
+
+  const handleEditDistrictChange = (newDistrict: string) => {
+    setEditDistrict(newDistrict);
+    const coords = getDistrictCoordinates(editState, newDistrict);
+    setEditLatitude(coords.latitude);
+    setEditLongitude(coords.longitude);
+    setEditIsFallback(coords.isFallback);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingFarm) return;
+    setIsSavingEdit(true);
+    setEditError(null);
+    try {
+      await farmsApi.updateFarm(editingFarm.id, {
+        name: editName,
+        area: editArea,
+        village: editVillage,
+        state: editState,
+        district: editDistrict,
+        latitude: editLatitude,
+        longitude: editLongitude,
+      });
+      await fetchFarms();
+      if (refreshFarms) await refreshFarms();
+      setEditingFarm(null);
+      setFormSuccess(t('farms.success_updated', { defaultValue: 'Farm parcel successfully updated!' }));
+    } catch (err: any) {
+      setEditError(err?.message || 'Failed to update farm parcel');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   const fetchFarms = async () => {
     setIsLoadingFarms(true);
@@ -709,29 +823,49 @@ export const FarmRegistrationPage: React.FC = () => {
                   <div className="space-y-4 animate-fadeIn">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.state_label', { defaultValue: 'State' })}</label>
-                        <input
-                          type="text"
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="farm-state-select">
+                          {t('farms.state_label', { defaultValue: 'State' })}
+                        </label>
+                        <select
+                          id="farm-state-select"
                           value={state}
-                          onChange={(e) => setState(e.target.value)}
-                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
-                        />
+                          onChange={(e) => handleStateChange(e.target.value)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs bg-white text-[#183D2E] font-medium"
+                        >
+                          {getIndianStates().map((s) => (
+                            <option key={s.state} value={s.state}>
+                              {getLocalizedStateName(s.state, language)}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.district_label', { defaultValue: 'District' })}</label>
-                        <input
-                          type="text"
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="farm-district-select">
+                          {t('farms.district_label', { defaultValue: 'District' })}
+                        </label>
+                        <select
+                          id="farm-district-select"
                           value={district}
-                          onChange={(e) => setDistrict(e.target.value)}
-                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
-                        />
+                          onChange={(e) => handleDistrictChange(e.target.value)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs bg-white text-[#183D2E] font-medium"
+                        >
+                          {getDistrictsForState(state).map((d) => (
+                            <option key={d.name} value={d.name}>
+                              {getLocalizedDistrictName(d, language)}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.village_label', { defaultValue: 'Village' })}</label>
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="farm-village-input">
+                          {t('farms.village_label', { defaultValue: 'Village' })}
+                        </label>
                         <input
+                          id="farm-village-input"
                           type="text"
                           value={village}
                           onChange={(e) => setVillage(e.target.value)}
+                          placeholder="Village or Mandal"
                           className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
                         />
                       </div>
@@ -739,26 +873,48 @@ export const FarmRegistrationPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                       <div>
-                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.latitude_label', { defaultValue: 'Latitude' })}</label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-xs font-bold text-[#183D2E]" htmlFor="farm-latitude-input">
+                            {t('farms.latitude_label', { defaultValue: 'Latitude' })}
+                          </label>
+                          <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                            approximate district centre
+                          </span>
+                        </div>
                         <input
+                          id="farm-latitude-input"
                           type="number"
                           step="0.0001"
                           value={latitude}
-                          onChange={(e) => setLatitude(parseFloat(e.target.value) || 0)}
-                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                          readOnly
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/20 bg-[#FAF8F5] text-xs font-mono text-[#543924] cursor-not-allowed"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#183D2E] mb-1">{t('farms.longitude_label', { defaultValue: 'Longitude' })}</label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-xs font-bold text-[#183D2E]" htmlFor="farm-longitude-input">
+                            {t('farms.longitude_label', { defaultValue: 'Longitude' })}
+                          </label>
+                          <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                            approximate district centre
+                          </span>
+                        </div>
                         <input
+                          id="farm-longitude-input"
                           type="number"
                           step="0.0001"
                           value={longitude}
-                          onChange={(e) => setLongitude(parseFloat(e.target.value) || 0)}
-                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                          readOnly
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/20 bg-[#FAF8F5] text-xs font-mono text-[#543924] cursor-not-allowed"
                         />
                       </div>
                     </div>
+
+                    {isCoordFallback && (
+                      <p className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                        approximate: District coordinates approximate (state centre fallback).
+                      </p>
+                    )}
 
                     <div className="flex justify-between pt-4">
                       <button
@@ -873,6 +1029,15 @@ export const FarmRegistrationPage: React.FC = () => {
 
                     {/* Active Farm Switcher Action */}
                     <div className="pt-2 flex items-center justify-between border-t border-[#7A553A]/15">
+                      <button
+                        type="button"
+                        onClick={() => startEditFarm(farm)}
+                        className="text-xs font-bold text-[#7A553A] hover:text-[#183D2E] flex items-center gap-1.5 py-1.5 px-3 rounded-lg hover:bg-[#FAF8F5] transition-all"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-[#DA9A4C]" />
+                        <span>{language === 'te' ? 'సవరించండి' : language === 'hi' ? 'बदलें' : 'Edit Parcel'}</span>
+                      </button>
+
                       {farm.id === activeFarmId ? (
                         <span className="text-xs font-bold text-[#183D2E] bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-[#183D2E]" />
@@ -895,6 +1060,173 @@ export const FarmRegistrationPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* EDIT FARM LOCATION & DETAILS MODAL */}
+      {editingFarm && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-[#7A553A]/20 space-y-4 max-h-[90vh] overflow-y-auto animate-scaleUp">
+            <div className="flex items-center justify-between border-b border-[#7A553A]/15 pb-3">
+              <h3 className="font-display text-lg font-bold text-[#183D2E]">
+                {language === 'te' ? 'పొలం వివరాలు సవరించండి' : language === 'hi' ? 'खेत विवरण बदलें' : 'Edit Farm Parcel'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingFarm(null)}
+                className="p-1 rounded-lg text-[#7A553A] hover:bg-[#FAF8F5]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {editError && (
+              <p className="text-xs text-red-700 bg-red-50 p-2.5 rounded-xl border border-red-200">
+                {editError}
+              </p>
+            )}
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                  {t('farms.name_label', { defaultValue: 'Parcel Name' })}
+                </label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                  {t('farms.area_label', { defaultValue: 'Total Land Acreage' })}
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={editArea}
+                  onChange={(e) => setEditArea(parseFloat(e.target.value) || 0)}
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="edit-farm-state-select">
+                    {t('farms.state_label', { defaultValue: 'State' })}
+                  </label>
+                  <select
+                    id="edit-farm-state-select"
+                    value={editState}
+                    onChange={(e) => handleEditStateChange(e.target.value)}
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs bg-white text-[#183D2E] font-medium"
+                  >
+                    {getIndianStates().map((s) => (
+                      <option key={s.state} value={s.state}>
+                        {getLocalizedStateName(s.state, language)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="edit-farm-district-select">
+                    {t('farms.district_label', { defaultValue: 'District' })}
+                  </label>
+                  <select
+                    id="edit-farm-district-select"
+                    value={editDistrict}
+                    onChange={(e) => handleEditDistrictChange(e.target.value)}
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs bg-white text-[#183D2E] font-medium"
+                  >
+                    {getDistrictsForState(editState).map((d) => (
+                      <option key={d.name} value={d.name}>
+                        {getLocalizedDistrictName(d, language)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#183D2E] mb-1">
+                  {t('farms.village_label', { defaultValue: 'Village' })}
+                </label>
+                <input
+                  type="text"
+                  value={editVillage}
+                  onChange={(e) => setEditVillage(e.target.value)}
+                  placeholder="Village or Mandal"
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-[#183D2E]">
+                      {t('farms.latitude_label', { defaultValue: 'Latitude' })}
+                    </label>
+                    <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                      approximate district centre
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    step="0.0001"
+                    value={editLatitude}
+                    readOnly
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/20 bg-[#FAF8F5] text-xs font-mono text-[#543924] cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-[#183D2E]">
+                      {t('farms.longitude_label', { defaultValue: 'Longitude' })}
+                    </label>
+                    <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                      approximate district centre
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    step="0.0001"
+                    value={editLongitude}
+                    readOnly
+                    className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/20 bg-[#FAF8F5] text-xs font-mono text-[#543924] cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              {editIsFallback && (
+                <p className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  approximate: District coordinates approximate (state centre fallback).
+                </p>
+              )}
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#7A553A]/15">
+                <button
+                  type="button"
+                  onClick={() => setEditingFarm(null)}
+                  className="min-h-[44px] px-4 py-2 border border-[#7A553A]/30 rounded-xl text-xs font-bold text-[#7A553A] hover:bg-[#FAF8F5]"
+                >
+                  {language === 'te' ? 'రద్దు చేయండి' : language === 'hi' ? 'रद्द करें' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEdit}
+                  className="min-h-[44px] px-6 py-2 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold rounded-xl text-xs transition-all shadow-xs disabled:opacity-50"
+                >
+                  {isSavingEdit
+                    ? (language === 'te' ? 'భద్రపరుస్తోంది...' : language === 'hi' ? 'सहेजा जा रहा है...' : 'Saving...')
+                    : (language === 'te' ? 'మార్పులను భద్రపరచండి' : language === 'hi' ? 'बदलाव सहेजें' : 'Save Changes')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

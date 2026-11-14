@@ -16,9 +16,17 @@ export const farmsApi = {
       body: JSON.stringify(payload),
     });
   },
+
+  updateFarm: async (id: number, payload: Partial<FarmCreatePayload>): Promise<Farm> => {
+    return apiRequest<Farm>(`/api/v1/farms/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
 };
 
 export const getFarms = farmsApi.getFarms;
 export const getFarmById = farmsApi.getFarmById;
 export const createFarm = farmsApi.createFarm;
+export const updateFarm = farmsApi.updateFarm;
 

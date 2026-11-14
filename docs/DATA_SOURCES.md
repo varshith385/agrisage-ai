@@ -33,7 +33,26 @@
 
 ---
 
-## 3. Verification Action Plan
+## 4. Indian States, Districts, and Geographic Coordinates (`frontend/src/data/india_districts.json`)
+
+**Retrieved Date**: 2026-11-15  
+**Coverage**: 36 States and Union Territories, 742 Districts Total (682 with exact measured coordinates, 60 with state center fallback)
+
+### Data Provenance & Licenses
+
+| Jurisdiction / Component | Source Repository & URL | License Status | District Count | Verification & Notes |
+|---|---|---|---|---|
+| **Telangana Official Districts** | [`gpavanb1/Telangana-Visualisation`](https://raw.githubusercontent.com/gpavanb1/Telangana-Visualisation/master/data/Telangana.geojson) | Government Open Data License - India (GODL) / Open Data Telangana (`data.telangana.gov.in`) | **33 districts** | **100% Verified**: Matched all 33 official districts including Hanumakonda (Warangal Urban), Warangal (Warangal Rural), Mulugu, and Jayashankar Bhupalpally. Coordinates calculated directly from boundary polygon centroids. Zero fallbacks. |
+| **Andhra Pradesh Official Districts** | [`satishvmadala/andhrapradesh_opendata_locations`](https://raw.githubusercontent.com/satishvmadala/andhrapradesh_opendata_locations/master/AndhraPradesh_Districts.geojson) | GNU General Public License v3.0 (GPL-3.0) / AP Official Gazette (2022 Reorganization) | **26 districts** | **100% Verified**: Matched all 26 official post-2022 districts including Alluri Sitharama Raju, Dr. B.R. Ambedkar Konaseema, Anakapalli, Nandyal, Palnadu, and NTR. Coordinates calculated directly from boundary polygon centroids. Zero fallbacks. |
+| **Pan-India District Coordinates** | [`nswamy14/geoJson`](https://raw.githubusercontent.com/nswamy14/geoJson/master/indianDistrictLatLong.json) | MIT License (Copyright 2020 Narayana Swamy) | **771 centroids** | Provides pan-India district headquarters coordinates across remaining 34 States and Union Territories. |
+| **State & District Hierarchy** | [`sab99r/Indian-States-And-Districts`](https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json) | Open Access Public Domain / Community Sourced | **36 States/UTs** | Augmented with Andaman and Nicobar Islands and Ladakh UTs. |
+| **Geocoding Fallback Engine** | Open-Meteo Geocoding API (`geocoding-api.open-meteo.com`) | Open Database License (ODbL) | Ad-hoc fallback | Where district coordinates are absent, falls back to state centroid with visible `is_fallback: true` ("approximate district centre") label. |
+
+### Verification Ledger for Telangana and Andhra Pradesh
+- **Telangana Official 33 Districts**: Adilabad, Bhadradri Kothagudem, Hanumakonda, Hyderabad, Jagtial, Jangaon, Jayashankar Bhupalpally, Jogulamba Gadwal, Kamareddy, Karimnagar, Khammam, Kumuram Bheem Asifabad, Mahabubabad, Mahabubnagar, Mancherial, Medak, Medchal-Malkajgiri, Mulugu, Nagarkurnool, Nalgonda, Narayanpet, Nirmal, Nizamabad, Peddapalli, Rajanna Sircilla, Rangareddy, Sangareddy, Siddipet, Suryapet, Vikarabad, Wanaparthy, Warangal, Yadadri Bhuvanagiri.
+- **Andhra Pradesh Official 26 Districts**: Alluri Sitharama Raju, Anakapalli, Ananthapuramu, Annamayya, Bapatla, Chittoor, Dr. B.R. Ambedkar Konaseema, East Godavari, Eluru, Guntur, Kakinada, Krishna, Kurnool, Nandyal, NTR, Palnadu, Parvathipuram Manyam, Prakasam, Sri Potti Sriramulu Nellore, Sri Sathya Sai, Srikakulam, Tirupati, Visakhapatnam, Vizianagaram, West Godavari, YSR Kadapa.
+- **Localizations**: Both Telangana and Andhra Pradesh districts carry official Telugu (`te`) and Hindi (`hi`) transliterations. Other Indian states carry English names with `[EN]` indicators in multilingual mode.
+
 
 Before moving to Phase 3 and Phase 5 implementations:
 1. **Model Weights & Class Labels**:
