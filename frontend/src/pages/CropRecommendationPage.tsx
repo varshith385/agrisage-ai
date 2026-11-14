@@ -28,6 +28,7 @@ import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { EmptyPlotIllustration, NoDataIllustration, LeafScanIllustration } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { ErrorState } from '../components/common/ErrorState';
 
 export const CropRecommendationPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -47,6 +48,7 @@ export const CropRecommendationPage: React.FC = () => {
 
   const [mlResult, setMlResult] = useState<CropRecommendationResponse | null>(null);
   const [loadingMl, setLoadingMl] = useState<boolean>(false);
+  const [errorMl, setErrorMl] = useState<string | null>(null);
 
   // Crop Rotation Inputs (synchronized with active crop)
   const [prevCrop, setPrevCrop] = useState<string>(activeCrop || 'Cotton');
@@ -62,6 +64,7 @@ export const CropRecommendationPage: React.FC = () => {
 
   const fetchRecommendation = async () => {
     setLoadingMl(true);
+    setErrorMl(null);
     try {
       const payload: any = {
         temperature: temp,
@@ -79,8 +82,9 @@ export const CropRecommendationPage: React.FC = () => {
         body: JSON.stringify(payload),
       });
       setMlResult(res);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to fetch crop recommendation:', e);
+      setErrorMl(e?.message || 'Failed to fetch crop recommendation');
     } finally {
       setLoadingMl(false);
     }
@@ -132,6 +136,14 @@ export const CropRecommendationPage: React.FC = () => {
           title={language === 'te' ? 'పంట సిఫార్సు' : language === 'hi' ? 'फसल चयन' : 'Crop Recommendation'}
           purpose={language === 'te' ? 'మీ నేల మరియు వాతావరణానికి తగిన పంటను ఎంచుకోండి' : language === 'hi' ? 'अपनी मिट्टी और मौसम के लिए सबसे सही फसल चुनें' : 'Visual crop recommendation based on soil and weather.'}
         />
+
+        {errorMl && (
+          <ErrorState
+            title={language === 'te' ? 'సిఫార్సులను లోడ్ చేయడం సాధ్యం కాలేదు' : language === 'hi' ? 'सिफारिश लोड नहीं हो सकी' : 'Could not load recommendation'}
+            message={errorMl}
+            onRetry={fetchRecommendation}
+          />
+        )}
 
         {/* Lead "Do This Today" Best Crop Match Card */}
         <div className="bg-[#FFFDF8] rounded-3xl border-2 border-[#1B5E3B] p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
@@ -256,6 +268,14 @@ export const CropRecommendationPage: React.FC = () => {
         }
       />
 
+      {errorMl && (
+        <ErrorState
+          title={language === 'te' ? 'సిఫార్సులను లోడ్ చేయడం సాధ్యం కాలేదు' : language === 'hi' ? 'सिफारिश लोड नहीं हो सकी' : 'Could not load recommendation'}
+          message={errorMl}
+          onRetry={fetchRecommendation}
+        />
+      )}
+
       {/* LEAD SUMMARY SECTION (1 to 3 Large Cards + Primary CTA) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
         {/* Card 1: Top Recommended Crop */}
@@ -274,10 +294,10 @@ export const CropRecommendationPage: React.FC = () => {
 
             <div className="flex items-baseline justify-between pt-1">
               <h2 className="text-2xl sm:text-[26px] font-display font-black text-[#183D2E] capitalize">
-                {topCrop ? translateBackendString(topCrop.crop_name, language) : (language === 'te' ? 'పత్తి' : language === 'hi' ? 'कपास' : 'Cotton')}
+                {topCrop ? translateBackendString(topCrop.crop_name, language) : '—'}
               </h2>
               <span className="text-base font-mono font-bold text-[#183D2E]">
-                {topCrop ? `${(topCrop.probability * 100).toFixed(0)}%` : '85%'} {t('recommend.match_label', { defaultValue: 'match' })}
+                {topCrop ? `${(topCrop.probability * 100).toFixed(0)}%` : '—'} {t('recommend.match_label', { defaultValue: 'match' })}
               </span>
             </div>
 
@@ -288,7 +308,7 @@ export const CropRecommendationPage: React.FC = () => {
             )}
 
             <p className="text-xs text-[#4E5F57] leading-relaxed pt-1">
-              {topCrop?.reasons?.[0] ? translateBackendString(topCrop.reasons[0], language) : (language === 'te' ? 'వేర్లు బలంగా నాటుకోవడానికి అనుకూలమైన ఉష్ణోగ్రత మరియు తేమ పరిస్థితులు.' : language === 'hi' ? 'जड़ों के अच्छे विकास के लिए अनुकूल तापमान और नमी की स्थिति।' : 'Favourable thermal and moisture conditions for root establishment.')}
+              {topCrop?.reasons?.[0] ? translateBackendString(topCrop.reasons[0], language) : '—'}
             </p>
 
             {topCrop?.suitability_note && (
@@ -299,7 +319,7 @@ export const CropRecommendationPage: React.FC = () => {
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">
-            <ReadAloudButton text={`Top recommended crop is ${topCrop?.crop_name || 'Cotton'}. ${plainMeaning}`} />
+            <ReadAloudButton text={`Top recommended crop is ${topCrop?.crop_name || '—'}. ${plainMeaning}`} />
             <button
               type="button"
               onClick={() => setActiveTab('candidates')}

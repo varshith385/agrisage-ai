@@ -495,19 +495,19 @@ export const SchemesPage: React.FC = () => {
               <div className="flex justify-between items-center">
                 <span className="text-[#4E5F57]">{t('soilcard.weather_baseline_mode', { defaultValue: 'Weather Baseline Mode:' })}</span>
                 <strong className="text-[#7A553A]">
-                  {impactData ? `${Math.round((impactData.without_soil_card.confidence || 0.52) * 100)}%` : '52%'} Confidence
+                  {impactData?.without_soil_card?.confidence != null ? `${Math.round(impactData.without_soil_card.confidence * 100)}% Confidence` : '—'}
                 </strong>
               </div>
               <div className="flex justify-between items-center text-emerald-800 font-bold">
                 <span>{t('soilcard.with_confirmed_card', { defaultValue: 'With Confirmed Soil Card:' })}</span>
                 <span>
-                  {impactData ? `${Math.round((impactData.with_soil_card.confidence || 0.85) * 100)}% Confidence` : 'Calibrated upon card entry'}
+                  {impactData?.with_soil_card?.confidence != null ? `${Math.round(impactData.with_soil_card.confidence * 100)}% Confidence` : 'Calibrated upon card entry'}
                 </span>
               </div>
               <div className="w-full bg-stone-200 h-2 rounded-full overflow-hidden mt-1">
                 <div
                   className="bg-emerald-600 h-2 rounded-full transition-all"
-                  style={{ width: `${impactData ? Math.round((impactData.with_soil_card.confidence || 0.85) * 100) : 0}%` }}
+                  style={{ width: `${impactData?.with_soil_card?.confidence != null ? Math.round(impactData.with_soil_card.confidence * 100) : 0}%` }}
                 />
               </div>
             </div>

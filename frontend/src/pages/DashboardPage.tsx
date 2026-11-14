@@ -974,7 +974,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <p className="text-xs text-[#4E5F57]">
                   {diseaseOutputs?.detected_disease
-                    ? `${language === 'te' ? 'గుర్తించబడింది' : language === 'hi' ? 'पहचाना गया' : 'Detected'}: ${translateBackendString(diseaseOutputs.detected_disease, language)} (${Math.round((diseaseOutputs.prediction_confidence || 0.85) * 100)}% ${language === 'te' ? 'విశ్వసనీయత' : language === 'hi' ? 'विश्वसनीयता' : 'confidence'})`
+                    ? `${language === 'te' ? 'గుర్తించబడింది' : language === 'hi' ? 'पहचाना गया' : 'Detected'}: ${translateBackendString(diseaseOutputs.detected_disease, language)}${diseaseOutputs.prediction_confidence != null ? ` (${Math.round(diseaseOutputs.prediction_confidence * 100)}% ${language === 'te' ? 'విశ్వసనీయత' : language === 'hi' ? 'विश्वसनीयता' : 'confidence'})` : ''}`
                     : t('dashboard.no_active_scan', { defaultValue: 'No active symptomatic scan attached. Use Disease Diagnosis to scan leaves.' })}
                 </p>
                 <Link to="/disease" className="text-xs font-bold text-[#183D2E] hover:underline block pt-2">

@@ -553,7 +553,7 @@ export const IrrigationPage: React.FC = () => {
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 text-xs text-[#7A553A] italic">
-            {language === 'te' ? 'నేల' : language === 'hi' ? 'मिट्टी' : 'Soil'}: <strong>{translateBackendString(plan?.soil_type || soilType, language)}</strong> &bull; {language === 'te' ? 'పరిమితి' : language === 'hi' ? 'सीमा' : 'Raw threshold'}: {plan?.raw_mm || 123.5} mm
+            {language === 'te' ? 'నేల' : language === 'hi' ? 'मिट्टी' : 'Soil'}: <strong>{translateBackendString(plan?.soil_type || soilType, language)}</strong> &bull; {language === 'te' ? 'పరిమితి' : language === 'hi' ? 'सीमा' : 'Raw threshold'}: {plan?.raw_mm != null ? `${plan.raw_mm} mm` : '—'}
           </div>
         </div>
       </div>

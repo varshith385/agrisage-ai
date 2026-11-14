@@ -1,6 +1,6 @@
 # Grow2Gain — Data Sources Catalog (`docs/DATA_SOURCES.md`)
 
-**Yuktik 2026 Hackathon | Data Provenance & Verification Ledger**
+**Grow2Gain Platform | Data Provenance & Verification Ledger**
 
 > [!IMPORTANT]
 > In strict accordance with the **Honesty Rules** and Phase 1 instructions, licenses, row counts, terms, and dataset details are **NOT** assumed as verified facts. Every license and dataset detail below is explicitly marked **"to verify"** unless directly inspected and authenticated from the official primary source. No metrics or figures are invented.
@@ -29,7 +29,7 @@
 2. **Training Data Overlap**: PlantVillage images in the test set may overlap with the model's training data (the model `neghani/plantvillage-mobilenetv2` was trained on PlantVillage). Therefore, benchmark results ($100\%$ on these 3 samples) are highly **optimistic**.
 3. **Not Field Accuracy**: These results are **not** a measure of real-world field accuracy under variable lighting, natural field backgrounds, blur, or complex leaf angles.
 4. **Dataset Licence**: The upstream dataset licence is marked **"to verify"** unless the upstream licence page is directly inspected.
-5. **App UI Policy**: In accordance with Yuktik Honesty Rules, **no accuracy number is shown in the app UI as the model's accuracy**. Confidence scores in the UI represent uncalibrated softmax probabilities of the individual prediction and are explicitly labelled as uncalibrated.
+5. **App UI Policy**: In accordance with Honesty Rules, **no accuracy number is shown in the app UI as the model's accuracy**. Confidence scores in the UI represent uncalibrated softmax probabilities of the individual prediction and are explicitly labelled as uncalibrated.
 
 ---
 

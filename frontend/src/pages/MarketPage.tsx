@@ -541,11 +541,11 @@ export const MarketPage: React.FC = () => {
               </div>
               <div className="flex justify-between text-red-700">
                 <span>{t('market.freight_logistics', { defaultValue: 'Freight Logistics' })}:</span>
-                <strong>-₹{bestMandi ? bestMandi.transport_cost.toLocaleString('en-IN') : '750'}</strong>
+                <strong>{bestMandi ? `-₹${bestMandi.transport_cost.toLocaleString('en-IN')}` : '—'}</strong>
               </div>
               <div className="flex justify-between text-red-700">
                 <span>{t('market.mandi_cess', { defaultValue: 'Mandi Cess' })} ({marketFeePct}%):</span>
-                <strong>-₹{bestMandi ? bestMandi.market_fee.toLocaleString('en-IN') : '1,440'}</strong>
+                <strong>{bestMandi ? `-₹${bestMandi.market_fee.toLocaleString('en-IN')}` : '—'}</strong>
               </div>
             </div>
 
