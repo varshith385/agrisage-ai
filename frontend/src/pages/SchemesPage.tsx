@@ -356,10 +356,10 @@ export const SchemesPage: React.FC = () => {
           {/* Tile 3: Schemes (Planned. Details to verify) */}
           <PictorialTile
             title={language === 'te' ? 'ప్రణాళిక. వివరాలు ధృవీకరించబడాలి' : language === 'hi' ? 'प्रस्तावित। विवरण सत्यापित करें' : 'Planned. Details to verify'}
-            phrase={language === 'te' ? 'వివరాలు ధృవీకరించబడాలి (Planned, details to verify)' : language === 'hi' ? 'सत्यापन आवश्यक (Planned, details to verify)' : 'Directory planned (details to verify)'}
+            phrase={language === 'te' ? 'వివరాలు ధృవీకరించాలి (డెమో సమాచారం)' : language === 'hi' ? 'विवरण सत्यापित करें (डेमो जानकारी)' : 'Directory planned (details to verify)'}
             illustration={<Landmark className="w-16 h-16 text-[#7A553A]" />}
             status="warning"
-            statusWord={language === 'te' ? 'ధృవీకరించండి' : language === 'hi' ? 'सत्यापित करें' : 'Details to verify'}
+            statusWord={language === 'te' ? 'ధృవీకరించండి' : language === 'hi' ? 'सत्यापित करें' : 'details to verify'}
             spokenText="Welfare schemes directory is planned. Details require verification from local agriculture extension offices."
             onOpenDetails={() => { setActiveTab('schemes'); setMode('words'); }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
@@ -472,7 +472,7 @@ export const SchemesPage: React.FC = () => {
               onClick={() => setActiveTab('upload')}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
-              <span>Calibrate Soil</span>
+              <span>{t('soilcard.calibrate_soil_btn', { defaultValue: 'Calibrate Soil' })}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -484,22 +484,22 @@ export const SchemesPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <TrendingUp className="w-4 h-4 text-[#DA9A4C]" />
-                Agronomic Precision
+                {t('soilcard.agronomic_precision', { defaultValue: 'Agronomic Precision' })}
               </span>
               <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
-                Evaluation Shift
+                {t('soilcard.evaluation_shift', { defaultValue: 'Evaluation Shift' })}
               </span>
             </div>
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
               <div className="flex justify-between items-center">
-                <span className="text-[#4E5F57]">Weather Baseline Mode:</span>
+                <span className="text-[#4E5F57]">{t('soilcard.weather_baseline_mode', { defaultValue: 'Weather Baseline Mode:' })}</span>
                 <strong className="text-[#7A553A]">
                   {impactData ? `${Math.round((impactData.without_soil_card.confidence || 0.52) * 100)}%` : '52%'} Confidence
                 </strong>
               </div>
               <div className="flex justify-between items-center text-emerald-800 font-bold">
-                <span>With Confirmed Soil Card:</span>
+                <span>{t('soilcard.with_confirmed_card', { defaultValue: 'With Confirmed Soil Card:' })}</span>
                 <span>
                   {impactData ? `${Math.round((impactData.with_soil_card.confidence || 0.85) * 100)}% Confidence` : 'Calibrated upon card entry'}
                 </span>
@@ -573,7 +573,7 @@ export const SchemesPage: React.FC = () => {
             }`}
           >
             <Upload className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Upload & Calibrate Soil Card</span>
+            <span>{t('soilcard.upload_calibrate_tab', { defaultValue: 'Upload & Calibrate Soil Card' })}</span>
           </button>
 
           <button
@@ -586,7 +586,7 @@ export const SchemesPage: React.FC = () => {
             }`}
           >
             <TrendingUp className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Agronomic Impact Shift</span>
+            <span>{t('soilcard.impact_shift_tab', { defaultValue: 'Agronomic Impact Shift' })}</span>
           </button>
 
           <button
@@ -599,7 +599,7 @@ export const SchemesPage: React.FC = () => {
             }`}
           >
             <BookOpen className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Welfare Schemes (Planned)</span>
+            <span>{t('soilcard.welfare_schemes_tab', { defaultValue: 'Welfare Schemes (Planned)' })}</span>
           </button>
 
           <button

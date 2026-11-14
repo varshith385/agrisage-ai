@@ -213,7 +213,12 @@ export const VoiceAssistant: React.FC = () => {
       const errorMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        text: 'Sorry, unable to process your voice query. Please verify network connectivity or sign in again.',
+        text:
+          currentLang === 'te'
+            ? 'క్షమించండి, మీ ప్రశ్నను ప్రాసెస్ చేయలేకపోయాము. దయచేసి ఇంటర్నెట్ కనెక్షన్‌ను తనిఖీ చేయండి లేదా మళ్లీ ప్రయత్నించండి.'
+            : currentLang === 'hi'
+            ? 'क्षमा करें, आपके अनुरोध को पूरा नहीं किया जा सका। कृपया नेटवर्क कनेक्शन जांचें या पुनः प्रयास करें।'
+            : 'Sorry, unable to process your voice query. Please verify network connectivity or sign in again.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -522,10 +527,16 @@ export const VoiceAssistant: React.FC = () => {
                   <div className="bg-white dark:bg-[#15211B] border border-stone-200 dark:border-stone-800 rounded-xl p-3 max-w-md mx-auto text-left shadow-sm">
                     <p className="text-xs font-semibold text-agri-green-800 dark:text-agri-green-300 flex items-center space-x-1 mb-1">
                       <Compass className="w-3.5 h-3.5" />
-                      <span>Instant Voice Commands</span>
+                      <span>{currentLang === 'te' ? 'తక్షణ వాయిస్ ఆదేశాలు' : currentLang === 'hi' ? 'त्वरित वॉयस कमांड' : 'Instant Voice Commands'}</span>
                     </p>
                     <p className="text-[11px] text-stone-600 dark:text-stone-400">
-                      Try saying: <span className="font-medium text-stone-900 dark:text-stone-200">"open irrigation"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"take me to market"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"switch to Telugu"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"turn on dark mode"</span>, or <span className="font-medium text-stone-900 dark:text-stone-200">"start the tour"</span>.
+                      {currentLang === 'te' ? (
+                        <>ఇలా అడిగి చూడండి: <span className="font-medium text-stone-900 dark:text-stone-200">"నీటిపారుదల తెరవండి"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"మండికి వెళ్లండి"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"తెలుగులోకి మార్చండి"</span>, లేదా <span className="font-medium text-stone-900 dark:text-stone-200">"టూర్ ప్రారంభించండి"</span>.</>
+                      ) : currentLang === 'hi' ? (
+                        <>ऐसे बोलकर देखें: <span className="font-medium text-stone-900 dark:text-stone-200">"सिंचाई खोलो"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"मंडी ले चलो"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"हिन्दी में बदलो"</span>, या <span className="font-medium text-stone-900 dark:text-stone-200">"टूर शुरू करो"</span>.</>
+                      ) : (
+                        <>Try saying: <span className="font-medium text-stone-900 dark:text-stone-200">"open irrigation"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"take me to market"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"switch to Telugu"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"turn on dark mode"</span>, or <span className="font-medium text-stone-900 dark:text-stone-200">"start the tour"</span>.</>
+                      )}
                     </p>
                   </div>
 
@@ -533,16 +544,15 @@ export const VoiceAssistant: React.FC = () => {
                   <div className="bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3 max-w-md mx-auto text-left shadow-sm">
                     <p className="text-xs font-semibold text-amber-900 dark:text-amber-200 flex items-center space-x-1.5 mb-1">
                       <Volume2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
-                      <span>{currentLang === 'te' ? 'తెలుగు ఆడియో మార్గదర్శకం' : 'Voice Audio Tip'}</span>
+                      <span>{currentLang === 'te' ? 'తెలుగు ఆడియో మార్గదర్శకం' : currentLang === 'hi' ? 'ऑडियो मार्गदर्शन' : 'Voice Audio Tip'}</span>
                     </p>
                     <p className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
-                      Open this site in Microsoft Edge, or add the Telugu language and its speech voice in Windows Settings.
+                      {currentLang === 'te'
+                        ? 'ఈ సైట్‌ను Microsoft Edge లో తెరవండి లేదా Windows Settings లో తెలుగు భాష మరియు వాయిస్‌ను జోడించండి.'
+                        : currentLang === 'hi'
+                        ? 'इस साइट को Microsoft Edge में खोलें, या Windows Settings में हिन्दी भाषा और वॉयस पैक जोड़ें।'
+                        : 'Open this site in Microsoft Edge, or add your language and speech voice in Windows Settings.'}
                     </p>
-                    {currentLang === 'te' && (
-                      <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-1">
-                        ఈ సైట్‌ను Microsoft Edge లో తెరవండి లేదా Windows Settings లో తెలుగు భాష మరియు వాయిస్‌ను జోడించండి.
-                      </p>
-                    )}
                   </div>
 
                   {/* Quick Suggestions Chips */}

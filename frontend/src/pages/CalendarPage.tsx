@@ -452,18 +452,18 @@ export const CalendarPage: React.FC = () => {
 
             <div className="space-y-1 text-xs">
               <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                <span className="text-[#7A553A] block text-[10px]">Season Period:</span>
+                <span className="text-[#7A553A] block text-[10px]">{t('calendar.season_period_label', { defaultValue: 'Season Period:' })}</span>
                 <strong className="text-[#183D2E]">{seasonData?.season_period || 'June to October'}</strong>
               </div>
               <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                <span className="text-[#7A553A] block text-[10px]">Primary Seasonal Risk:</span>
+                <span className="text-[#7A553A] block text-[10px]">{t('calendar.primary_seasonal_risk', { defaultValue: 'Primary Seasonal Risk:' })}</span>
                 <strong className="text-amber-900">{seasonData?.primary_risks?.[0] || 'Unseasonal rain during flowering'}</strong>
               </div>
             </div>
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between text-xs text-[#7A553A]">
-            <span>IMD Agromet Guidelines</span>
+            <span>{t('calendar.imd_agromet_guidelines', { defaultValue: 'IMD Agromet Guidelines' })}</span>
             <button
               type="button"
               onClick={() => setActiveTab('season')}
@@ -647,7 +647,7 @@ export const CalendarPage: React.FC = () => {
                       </span>
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FAF8F5] px-2.5 py-1 rounded-lg border border-[#7A553A]/20 text-[#7A553A]">
-                      IMD Agromet Guidelines
+                      {t('calendar.imd_agromet_guidelines', { defaultValue: 'IMD Agromet Guidelines' })}
                     </span>
                   </div>
 
@@ -673,7 +673,7 @@ export const CalendarPage: React.FC = () => {
                     </div>
 
                     <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                      <span className="text-xs font-bold text-amber-900 block mb-1">Primary Seasonal Risks:</span>
+                      <span className="text-xs font-bold text-amber-900 block mb-1">{t('calendar.primary_seasonal_risks_colon', { defaultValue: 'Primary Seasonal Risks:' })}</span>
                       <ul className="text-[11px] text-amber-800 space-y-1">
                         {seasonData.primary_risks.map((r, i) => (
                           <li key={i}>• {r}</li>

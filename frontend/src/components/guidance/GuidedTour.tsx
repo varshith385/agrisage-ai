@@ -20,6 +20,7 @@ import {
   MoneyProfitIllustration,
 } from '../common/FarmerIllustrations';
 import { ReadAloudButton } from '../common/ReadAloudButton';
+import { useTranslation } from '../../context/LanguageContext';
 
 const TOUR_STORAGE_KEY = 'agrisage_tour_completed_v1';
 
@@ -39,70 +40,85 @@ interface GuidedTourProps {
 
 export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { t, language } = useTranslation();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const steps: TourStep[] = [
     {
       id: 'language',
-      title: 'Step 1: Choose Your Language (భాష / भाषा)',
-      description:
-        'Switch between English, Telugu (తెలుగు), and Hindi (हिन्दी) anytime from the top bar. All recommendations and audio read-aloud support your local language.',
+      title: t('tour.step1_title', { defaultValue: 'Step 1: Choose Your Language (భాష / भाषा)' }),
+      description: t('tour.step1_desc', {
+        defaultValue:
+          'Switch between English, Telugu (తెలుగు), and Hindi (हिन्दी) anytime from the top bar. All recommendations and audio read-aloud support your local language.',
+      }),
       icon: Globe,
-      actionText: 'Next: Farm Setup',
+      actionText: t('tour.step1_action', { defaultValue: 'Next: Farm Setup' }),
     },
     {
       id: 'farm',
-      title: 'Step 2: Choose or Add Your Farm Parcel',
-      description:
-        'Select your active farm parcel or add a new one. Enter whether land is owned or leased so irrigation and profit models reflect your true costs.',
+      title: t('tour.step2_title', { defaultValue: 'Step 2: Choose or Add Your Farm Parcel' }),
+      description: t('tour.step2_desc', {
+        defaultValue:
+          'Select your active farm parcel or add a new one. Enter whether land is owned or leased so irrigation and profit models reflect your true costs.',
+      }),
       icon: Layers,
       route: '/farms',
-      actionText: 'View My Farms',
+      actionText: t('tour.step2_action', { defaultValue: 'View My Farms' }),
     },
     {
       id: 'weather',
-      title: 'Step 3: Check Agro-Weather & 7-Day Forecast',
-      description:
-        'View live weather conditions and rainfall forecasts calibrated to your village. See daily reference evapotranspiration (ET0) for crop water demand.',
+      title: t('tour.step3_title', { defaultValue: 'Step 3: Check Agro-Weather & 7-Day Forecast' }),
+      description: t('tour.step3_desc', {
+        defaultValue:
+          'View live weather conditions and rainfall forecasts calibrated to your village. See daily reference evapotranspiration (ET0) for crop water demand.',
+      }),
       icon: CloudSun,
       route: '/setup',
-      actionText: 'View Weather',
+      actionText: t('tour.step3_action', { defaultValue: 'View Weather' }),
     },
     {
       id: 'water',
-      title: 'Step 4: Crop Water Budget & Irrigation Advice',
-      description:
-        'Know exactly when and how much to water your field using FAO-56 agro-meteorological models. Avoid water wastage and protect root zones.',
+      title: t('tour.step4_title', { defaultValue: 'Step 4: Crop Water Budget & Irrigation Advice' }),
+      description: t('tour.step4_desc', {
+        defaultValue:
+          'Know exactly when and how much to water your field using FAO-56 agro-meteorological models. Avoid water wastage and protect root zones.',
+      }),
       icon: Droplets,
       route: '/irrigation',
-      actionText: 'Check Water Budget',
+      actionText: t('tour.step4_action', { defaultValue: 'Check Water Budget' }),
     },
     {
       id: 'disease',
-      title: 'Step 5: Scan Crop Leaf for Disease Diagnosis',
-      description:
-        'Upload or take a photo of a crop leaf to identify diseases with confidence ratings, symptoms, and organic or chemical treatment advice.',
+      title: t('tour.step5_title', { defaultValue: 'Step 5: Scan Crop Leaf for Disease Diagnosis' }),
+      description: t('tour.step5_desc', {
+        defaultValue:
+          'Upload or take a photo of a crop leaf to identify diseases with confidence ratings, symptoms, and organic or chemical treatment advice.',
+      }),
       icon: Leaf,
       route: '/disease',
-      actionText: 'Diagnose Leaf',
+      actionText: t('tour.step5_action', { defaultValue: 'Diagnose Leaf' }),
     },
     {
       id: 'economics',
-      title: 'Step 6: Understand Farm Costs & Live Profit',
-      description:
-        'Calculate operating expenses, compare crops, and use the interactive What-If slider to estimate your net profit under changing yields and mandi prices.',
+      title: t('tour.step6_title', { defaultValue: 'Step 6: Understand Farm Costs & Live Profit' }),
+      description: t('tour.step6_desc', {
+        defaultValue:
+          'Calculate operating expenses, compare crops, and use the interactive What-If slider to estimate your net profit under changing yields and mandi prices.',
+      }),
       icon: Coins,
       route: '/economics',
-      actionText: 'See Economics',
+      actionText: t('tour.step6_action', { defaultValue: 'See Economics' }),
     },
     {
       id: 'voice',
-      title: 'Step 7: Ask the Voice Assistant Anytime',
-      description:
-        'Tap the Voice button to speak in Telugu, Hindi, or English. Ask questions like "Will it rain today?", "Should I irrigate?", or "What is the mandi price?".',
+      title: t('tour.step7_title', { defaultValue: 'Step 7: Ask the Voice Assistant Anytime' }),
+      description: t('tour.step7_desc', {
+        defaultValue:
+          'Tap the Voice button to speak in Telugu, Hindi, or English. Ask questions like "Will it rain today?", "Should I irrigate?", or "What is the mandi price?".',
+      }),
       icon: Mic,
       route: '/dashboard',
-      actionText: 'Go to Dashboard',
+      actionText: t('tour.step7_action', { defaultValue: 'Go to Dashboard' }),
     },
   ];
 
@@ -219,7 +235,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
           )}
 
           <div className="flex justify-center mb-6">
-            <ReadAloudButton text={readText} label="Listen to this step" />
+            <ReadAloudButton
+              text={readText}
+              label={language === 'te' ? 'ఈ దశను వినండి' : language === 'hi' ? 'यह चरण सुनें' : 'Listen to this step'}
+            />
           </div>
 
           {/* Progress dots */}
@@ -258,7 +277,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
             }`}
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Previous</span>
+            <span>{t('tour.previous', { defaultValue: 'Previous' })}</span>
           </button>
 
           <button
@@ -266,7 +285,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
             onClick={handleComplete}
             className="text-xs font-semibold text-[#7A553A] hover:text-[#183D2E] px-2"
           >
-            Skip Tour
+            {t('tour.skip', { defaultValue: 'Skip Tour' })}
           </button>
 
           <button
@@ -274,7 +293,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
             onClick={handleNext}
             className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold text-sm bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 shadow-sm active:scale-[0.98] transition-all"
           >
-            <span>{currentStepIndex === steps.length - 1 ? 'Finish Tour' : 'Next'}</span>
+            <span>{currentStepIndex === steps.length - 1 ? t('tour.finish', { defaultValue: 'Finish Tour' }) : (language === 'te' ? 'తదుపరి' : language === 'hi' ? 'आगे' : 'Next')}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

@@ -40,7 +40,7 @@ export const HowToPage: React.FC = () => {
       icon: Globe,
       illustration: null,
       linkTo: '/dashboard',
-      linkText: 'Go to Dashboard',
+      linkText: language === 'te' ? 'డాష్‌బోర్డ్‌కు వెళ్లండి' : language === 'hi' ? 'डैशबोर्ड पर जाएं' : 'Go to Dashboard',
     },
     {
       step: 2,
@@ -53,7 +53,7 @@ export const HowToPage: React.FC = () => {
       icon: Layers,
       illustration: null,
       linkTo: '/farms',
-      linkText: 'Manage Farms',
+      linkText: language === 'te' ? 'పొలాలను నిర్వహించండి' : language === 'hi' ? 'खेत प्रबंधित करें' : 'Manage Farms',
     },
     {
       step: 3,
@@ -66,7 +66,7 @@ export const HowToPage: React.FC = () => {
       icon: CloudSun,
       illustration: <WeatherIllustration size={72} />,
       linkTo: '/setup',
-      linkText: 'Check Weather',
+      linkText: language === 'te' ? 'వాతావరణం చూడండి' : language === 'hi' ? 'मौसम देखें' : 'Check Weather',
     },
     {
       step: 4,
@@ -79,7 +79,7 @@ export const HowToPage: React.FC = () => {
       icon: Droplets,
       illustration: <WateringFieldIllustration size={72} />,
       linkTo: '/irrigation',
-      linkText: 'View Water Budget',
+      linkText: language === 'te' ? 'నీటి బడ్జెట్ చూడండి' : language === 'hi' ? 'जल बजट देखें' : 'View Water Budget',
     },
     {
       step: 5,
@@ -92,7 +92,7 @@ export const HowToPage: React.FC = () => {
       icon: Leaf,
       illustration: <LeafScanIllustration size={72} />,
       linkTo: '/disease',
-      linkText: 'Diagnose Leaf',
+      linkText: language === 'te' ? 'ఆకును నిర్ధారించండి' : language === 'hi' ? 'पत्ती का निदान करें' : 'Diagnose Leaf',
     },
     {
       step: 6,
@@ -105,7 +105,7 @@ export const HowToPage: React.FC = () => {
       icon: Coins,
       illustration: <MoneyProfitIllustration size={72} />,
       linkTo: '/economics',
-      linkText: 'Explore Economics',
+      linkText: language === 'te' ? 'ఆర్థిక వివరాలు చూడండి' : language === 'hi' ? 'आर्थिक विवरण देखें' : 'Explore Economics',
     },
     {
       step: 7,
@@ -118,7 +118,7 @@ export const HowToPage: React.FC = () => {
       icon: Mic,
       illustration: null,
       linkTo: '/dashboard',
-      linkText: 'Open Dashboard',
+      linkText: language === 'te' ? 'డాష్‌బోర్డ్ తెరవండి' : language === 'hi' ? 'डैशबोर्ड खोलें' : 'Open Dashboard',
     },
   ];
 
@@ -142,14 +142,14 @@ export const HowToPage: React.FC = () => {
                 className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#DA9A4C] text-[#0E241B] hover:bg-[#F5C989] shadow-xs flex items-center gap-2 transition-all text-xs"
               >
                 <Video className="w-4 h-4" />
-                <span>{language === 'te' ? 'వీడియో చూడండి' : 'Watch Video'}</span>
+                <span>{language === 'te' ? 'వీడియో చూడండి' : language === 'hi' ? 'वीडियो देखें' : 'Watch Video'}</span>
               </Link>
               <button
                 type="button"
                 onClick={() => setMode('words')}
                 className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-stone-700 flex items-center gap-1.5 text-xs shadow-xs"
               >
-                <span>{language === 'te' ? 'పూర్తి టెక్స్ట్ గైడ్' : 'Full Text Guide'}</span>
+                <span>{language === 'te' ? 'పూర్తి టెక్స్ట్ గైడ్' : language === 'hi' ? 'पूर्ण पाठ गाइड' : 'Full Text Guide'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

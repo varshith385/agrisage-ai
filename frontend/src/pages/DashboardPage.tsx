@@ -617,7 +617,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-stone-500">Live weather available in Weather tab.</p>
+              <p className="text-xs text-stone-500">{t('dashboard.live_weather_tab_note', { defaultValue: 'Live weather available in Weather tab.' })}</p>
             )}
 
             <WhatThisMeans
@@ -756,7 +756,7 @@ export const DashboardPage: React.FC = () => {
               <FileText className="w-6 h-6 text-[#183D2E]" />
             </div>
             <span className="text-sm font-bold text-[#183D2E] block">{t('nav.schemes', { defaultValue: 'Soil Card & Schemes' })}</span>
-            <span className="text-[11px] text-[#4E5F57] mt-0.5">Nutrient Shifts</span>
+            <span className="text-[11px] text-[#4E5F57] mt-0.5">{t('dashboard.nutrient_shifts', { defaultValue: 'Nutrient Shifts' })}</span>
           </Link>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { ReadAloudButton } from './ReadAloudButton';
+import { useTranslation } from '../../context/LanguageContext';
 
 export interface StepItem {
   stepNumber: number;
@@ -24,7 +25,9 @@ export const StepFlow: React.FC<StepFlowProps> = ({
   spokenText,
   className = '',
 }) => {
+  const { language } = useTranslation();
   const defaultSpoken = spokenText || `${heading}: ${steps.map((s) => `Step ${s.stepNumber}. ${s.title}: ${s.desc}`).join('. ')}`;
+  const listenLabel = language === 'te' ? 'దశలు వినండి' : language === 'hi' ? 'कदम सुनें' : 'Listen to steps';
 
   return (
     <div
@@ -35,7 +38,7 @@ export const StepFlow: React.FC<StepFlowProps> = ({
         <h3 className="font-display text-[20px] font-bold text-[#1B5E3B]">
           {heading}
         </h3>
-        <ReadAloudButton text={defaultSpoken} label="Listen to steps" />
+        <ReadAloudButton text={defaultSpoken} label={listenLabel} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 relative">

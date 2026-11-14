@@ -116,7 +116,7 @@ export const AuthPage: React.FC = () => {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FEF6E9] text-[#183D2E] text-xs font-bold border border-[#DA9A4C]">
               <Sprout className="w-4 h-4 text-[#DA9A4C]" />
-              <span>Smallholder Agricultural Decision Intelligence</span>
+              <span>{t('auth.tagline', { defaultValue: 'Smallholder Agricultural Decision Intelligence' })}</span>
             </div>
             <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-[#183D2E] leading-tight">
               {t('auth.welcome_title', { defaultValue: 'Smart Farming Advice Built for Indian Farmers' })}
@@ -130,10 +130,10 @@ export const AuthPage: React.FC = () => {
           <div className="bg-gradient-to-br from-[#183D2E] to-[#265C46] text-white p-6 sm:p-7 rounded-3xl shadow-lg border-2 border-[#DA9A4C] space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase tracking-wider text-[#DA9A4C]">
-                Instant Evaluation
+                {t('auth.instant_evaluation', { defaultValue: 'Instant Evaluation' })}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#DA9A4C] text-[#183D2E]">
-                ONE-CLICK LOGIN
+                {t('auth.one_click_badge', { defaultValue: 'ONE-CLICK LOGIN' })}
               </span>
             </div>
 
@@ -154,7 +154,7 @@ export const AuthPage: React.FC = () => {
               className="w-full min-h-[48px] flex items-center justify-center gap-2 py-3 px-4 bg-[#DA9A4C] hover:bg-[#C28538] text-[#183D2E] font-extrabold rounded-2xl shadow-md transition-all active:scale-98 disabled:opacity-50 text-sm"
             >
               <UserCheck className="w-4 h-4" />
-              <span>{isLoading ? t('common.loading', { defaultValue: 'Loading demo profile...' }) : 'One-Click Demo Access'}</span>
+              <span>{isLoading ? t('common.loading', { defaultValue: 'Loading demo profile...' }) : t('auth.one_click_access', { defaultValue: 'One-Click Demo Access' })}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

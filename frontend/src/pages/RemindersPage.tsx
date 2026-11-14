@@ -402,7 +402,7 @@ export const RemindersPage: React.FC = () => {
 
         {/* Reminders List */}
         {isLoading ? (
-          <div className="py-12 text-center text-sm text-stone-400">Loading reminders...</div>
+          <div className="py-12 text-center text-sm text-stone-400">{t('reminders.loading', { defaultValue: 'Loading reminders...' })}</div>
         ) : activeList.length === 0 ? (
           <div className="py-12 text-center space-y-3">
             <div className="w-12 h-12 mx-auto rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400">

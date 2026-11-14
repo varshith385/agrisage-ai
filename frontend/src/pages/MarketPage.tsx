@@ -248,8 +248,14 @@ export const MarketPage: React.FC = () => {
   const isLiveMandi = Boolean(rankingData?.source && !rankingData.source.toLowerCase().includes('demo'));
 
   const plainMeaning = bestMandi
-    ? `Selling ${quantity} quintals of ${selectedCrop} at ${bestMandi.mandi} gives your highest net payout of ₹${bestMandi.net_realization_per_q.toFixed(0)}/q after deducting transport and mandi fees.`
-    : 'Calculating net mandi realization rankings...';
+    ? t('market.plain_meaning_best', {
+        quantity,
+        crop: selectedCrop,
+        mandi: bestMandi.mandi,
+        rate: bestMandi.net_realization_per_q.toFixed(0),
+        defaultValue: `Selling ${quantity} quintals of ${selectedCrop} at ${bestMandi.mandi} gives your highest net payout of ₹${bestMandi.net_realization_per_q.toFixed(0)}/q after deducting transport and mandi fees.`,
+      })
+    : t('market.calculating_ranking', { defaultValue: 'Calculating net mandi realization rankings...' });
 
   // PICTORIAL MODE v2
   if (isPictorial) {
@@ -346,10 +352,10 @@ export const MarketPage: React.FC = () => {
           {/* Tile 3: Direct Trade Listings */}
           <PictorialTile
             title={language === 'te' ? 'రైతు విక్రయాలు' : language === 'hi' ? 'किसान खरीद-बिक्री' : 'Direct Trade'}
-            phrase={`${listings.length} trade listings in area`}
+            phrase={language === 'te' ? `${listings.length} అమ్మకపు జాబితాలు అందుబాటులో ఉన్నాయి` : language === 'hi' ? `${listings.length} व्यापार लिस्टिंग उपलब्ध हैं` : `${listings.length} trade listings in area`}
             illustration={<Truck className="w-16 h-16 text-[#1B5E3B]" />}
             status="info"
-            statusWord={`${listings.length} Listings`}
+            statusWord={language === 'te' ? `${listings.length} జాబితాలు` : language === 'hi' ? `${listings.length} लिस्टिंग` : `${listings.length} Listings`}
             spokenText={`There are ${listings.length} active peer-to-peer trade listings in your region.`}
             onOpenDetails={() => setMode('words')}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
@@ -425,7 +431,7 @@ export const MarketPage: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
-                Top Mandi Realization
+                {t('market.top_mandi_realization', { defaultValue: 'Top Mandi Realization' })}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
                 {selectedCrop}
@@ -453,12 +459,12 @@ export const MarketPage: React.FC = () => {
                   )}
                 </>
               ) : (
-                <span className="text-xl text-[#7A553A]">Awaiting prices</span>
+                <span className="text-xl text-[#7A553A]">{t('market.awaiting_prices', { defaultValue: 'Awaiting prices' })}</span>
               )}
             </div>
 
             <p className="text-xs text-[#4E5F57] leading-relaxed">
-              Total Net Payout: <strong>{bestMandi ? `₹${bestMandi.net_realization.toLocaleString('en-IN')}` : 'Calculating...'}</strong> for {quantity} quintals {!isLiveMandi && <span className="font-bold text-amber-800">(DEMO DATA)</span>}.
+              {t('market.total_net_payout', { defaultValue: 'Total Net Payout' })}: <strong>{bestMandi ? `₹${bestMandi.net_realization.toLocaleString('en-IN')}` : '...'}</strong> ({quantity} q) {!isLiveMandi && <span className="font-bold text-amber-800">(DEMO DATA)</span>}.
             </p>
           </div>
 
@@ -469,7 +475,7 @@ export const MarketPage: React.FC = () => {
               onClick={() => setActiveTab('mandi')}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
-              <span>View All Mandis</span>
+              <span>{t('market.view_all_mandis', { defaultValue: 'View All Mandis' })}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -518,7 +524,7 @@ export const MarketPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <Truck className="w-4 h-4 text-[#DA9A4C]" />
-                Transport & Cess Math
+                {t('market.transport_cess_math', { defaultValue: 'Transport & Cess Math' })}
               </span>
               <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
                 ₹{transportRate}/km/q
@@ -527,24 +533,24 @@ export const MarketPage: React.FC = () => {
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
               <div className="flex justify-between text-[#4E5F57]">
-                <span>Gross Realization ({quantity} q):</span>
+                <span>{t('market.gross_realization', { defaultValue: 'Gross Realization' })} ({quantity} q):</span>
                 <strong>
-                  {bestMandi ? `₹${(bestMandi.modal_price * quantity).toLocaleString('en-IN')}` : 'Calculating...'}
+                  {bestMandi ? `₹${(bestMandi.modal_price * quantity).toLocaleString('en-IN')}` : '...'}
                   {!isLiveMandi && <span className="ml-1 text-[9px] font-bold text-amber-800">(DEMO DATA)</span>}
                 </strong>
               </div>
               <div className="flex justify-between text-red-700">
-                <span>Freight Logistics:</span>
+                <span>{t('market.freight_logistics', { defaultValue: 'Freight Logistics' })}:</span>
                 <strong>-₹{bestMandi ? bestMandi.transport_cost.toLocaleString('en-IN') : '750'}</strong>
               </div>
               <div className="flex justify-between text-red-700">
-                <span>Mandi Cess ({marketFeePct}%):</span>
+                <span>{t('market.mandi_cess', { defaultValue: 'Mandi Cess' })} ({marketFeePct}%):</span>
                 <strong>-₹{bestMandi ? bestMandi.market_fee.toLocaleString('en-IN') : '1,440'}</strong>
               </div>
             </div>
 
             <p className="text-[11px] text-[#7A553A]">
-              Gross modal price is misleading without transport cost. Always choose based on net realization.
+              {t('market.misleading_modal_warning', { defaultValue: 'Gross modal price is misleading without transport cost. Always choose based on net realization.' })}
             </p>
           </div>
 
@@ -557,7 +563,7 @@ export const MarketPage: React.FC = () => {
             className="w-full min-h-[44px] py-2 px-3 rounded-xl border border-[#DA9A4C] bg-[#FEF6E9] hover:bg-[#FAF8F5] font-bold text-xs text-[#183D2E] flex items-center justify-center gap-2 transition-all shadow-sm"
           >
             <Plus className="w-4 h-4 text-[#DA9A4C]" />
-            <span>List Harvest for Farm-Gate Sale</span>
+            <span>{t('market.list_harvest_btn', { defaultValue: 'List Harvest for Farm-Gate Sale' })}</span>
           </button>
         </div>
       </div>
@@ -574,7 +580,7 @@ export const MarketPage: React.FC = () => {
               }`}
           >
             <TrendingUp className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Mandi Rankings & Trends</span>
+            <span>{t('market.mandi_rankings_trends', { defaultValue: 'Mandi Rankings & Trends' })}</span>
             {mandiLoading && <span className="text-[10px] text-[#7A553A] font-normal">(Loading...)</span>}
           </button>
 
@@ -587,7 +593,7 @@ export const MarketPage: React.FC = () => {
               }`}
           >
             <Store className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Farm-Gate Marketplace</span>
+            <span>{t('market.farm_gate_marketplace', { defaultValue: 'Farm-Gate Marketplace' })}</span>
             {listings.length > 0 && (
               <span className="px-2 py-0.2 rounded-full text-[10px] bg-[#183D2E] text-white">
                 {listings.length}
@@ -604,7 +610,7 @@ export const MarketPage: React.FC = () => {
               }`}
           >
             <Mail className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Buyer Inquiries & Inbox</span>
+            <span>{t('market.buyer_inquiries_inbox', { defaultValue: 'Buyer Inquiries & Inbox' })}</span>
             {inquiries.length > 0 && (
               <span className="px-2 py-0.2 rounded-full text-[10px] bg-[#DA9A4C] text-[#183D2E] font-black">
                 {inquiries.length}
@@ -629,7 +635,7 @@ export const MarketPage: React.FC = () => {
                       &bull; Source: datasets/demo/mandi_prices.csv
                     </p>
                     <p className="text-[11px] text-[#7A553A] leading-relaxed">
-                      APMC modal prices and transport rates are calibrated on illustrative market datasets.
+                      {t('market.calibrated_datasets_note', { defaultValue: 'APMC modal prices and transport rates are calibrated on illustrative market datasets.' })}
                     </p>
                   </div>
                 </div>
@@ -640,7 +646,7 @@ export const MarketPage: React.FC = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#7A553A]/15 pb-3">
                   <h3 className="text-sm font-bold text-[#183D2E] flex items-center gap-1.5">
                     <Sliders className="w-4 h-4 text-[#DA9A4C]" />
-                    <span>Realization Simulator Parameters</span>
+                    <span>{t('market.realization_simulator_params', { defaultValue: 'Realization Simulator Parameters' })}</span>
                   </h3>
                   <button
                     type="button"
@@ -713,10 +719,10 @@ export const MarketPage: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold text-[#183D2E]">
-                    APMC Mandis Ranked by Net Realization ({selectedCrop})
+                    {t('market.mandi_ranked_by_net', { defaultValue: 'APMC Mandis Ranked by Net Realization' })} ({selectedCrop})
                   </h3>
                   <span className="text-xs text-[#7A553A]">
-                    Formula: (Modal Price &times; Qty) - Transport Cost - Mandi Fee
+                    {t('market.formula_label', { defaultValue: 'Formula: (Modal Price × Qty) - Transport Cost - Mandi Fee' })}
                   </span>
                 </div>
 
@@ -725,15 +731,15 @@ export const MarketPage: React.FC = () => {
                     <table className="w-full text-left border-collapse text-xs">
                       <thead>
                         <tr className="bg-[#FAF8F5] text-[#183D2E] border-b border-[#7A553A]/20">
-                          <th className="p-3 font-bold">Rank</th>
-                          <th className="p-3 font-bold">Mandi</th>
-                          <th className="p-3 font-bold">Distance</th>
-                          <th className="p-3 font-bold">Modal Price</th>
-                          <th className="p-3 font-bold">Transport Cost</th>
-                          <th className="p-3 font-bold">Mandi Fee</th>
-                          <th className="p-3 font-bold">Net Realization / q</th>
-                          <th className="p-3 font-bold">Total Net Payout {!isLiveMandi && <span className="text-[10px] font-normal text-amber-800">(DEMO)</span>}</th>
-                          <th className="p-3 font-bold text-right">Details</th>
+                          <th className="p-3 font-bold">{t('market.col_rank', { defaultValue: 'Rank' })}</th>
+                          <th className="p-3 font-bold">{t('market.col_mandi', { defaultValue: 'Mandi' })}</th>
+                          <th className="p-3 font-bold">{t('market.col_distance', { defaultValue: 'Distance' })}</th>
+                          <th className="p-3 font-bold">{t('market.col_modal_price', { defaultValue: 'Modal Price' })}</th>
+                          <th className="p-3 font-bold">{t('market.col_transport_cost', { defaultValue: 'Transport Cost' })}</th>
+                          <th className="p-3 font-bold">{t('market.col_market_fee', { defaultValue: 'Mandi Fee' })}</th>
+                          <th className="p-3 font-bold">{t('market.col_net_per_q', { defaultValue: 'Net Realization / q' })}</th>
+                          <th className="p-3 font-bold">{t('market.total_net_payout', { defaultValue: 'Total Net Payout' })} {!isLiveMandi && <span className="text-[10px] font-normal text-amber-800">(DEMO)</span>}</th>
+                          <th className="p-3 font-bold text-right">{t('market.details_label', { defaultValue: 'Details' })}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#7A553A]/15">

@@ -366,7 +366,7 @@ export const LocationWeatherPage: React.FC = () => {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
-                  Today's Agro-Weather
+                  {t('location.today_agro_weather', { defaultValue: "Today's Agro-Weather" })}
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
                   {selectedVillage}
@@ -378,7 +378,7 @@ export const LocationWeatherPage: React.FC = () => {
                   {weatherData.temperature_c.toFixed(0)}°C
                 </span>
                 <span className="text-sm font-semibold text-[#7A553A]">
-                  Rain: <strong>{weatherData.expected_rainfall_today_mm.toFixed(1)} mm</strong>
+                  {t('location.rain_label', { defaultValue: 'Rain:' })} <strong>{weatherData.expected_rainfall_today_mm.toFixed(1)} mm</strong>
                 </span>
               </div>
 
@@ -394,7 +394,7 @@ export const LocationWeatherPage: React.FC = () => {
                 onClick={() => setActiveTab('forecast')}
                 className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
               >
-                <span>7-Day Outlook</span>
+                <span>{t('location.seven_day_outlook', { defaultValue: '7-Day Outlook' })}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -406,7 +406,7 @@ export const LocationWeatherPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                   <Droplets className="w-4 h-4 text-blue-600" />
-                  Atmospheric Demand
+                  {t('location.atmospheric_demand', { defaultValue: 'Atmospheric Demand' })}
                 </span>
                 <span className="text-xs text-[#7A553A] font-semibold">
                   FAO-56 ET0 ({weatherData.reference_et0_mm} mm)
@@ -415,13 +415,13 @@ export const LocationWeatherPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Humidity</span>
+                  <span className="text-[10px] font-bold text-[#7A553A] uppercase block">{t('location.humidity_label', { defaultValue: 'Humidity' })}</span>
                   <span className="text-lg font-black text-[#183D2E]">
                     {weatherData.relative_humidity_pct}%
                   </span>
                 </div>
                 <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Wind Speed</span>
+                  <span className="text-[10px] font-bold text-[#7A553A] uppercase block">{t('location.wind_speed_label', { defaultValue: 'Wind Speed' })}</span>
                   <span className="text-lg font-black text-[#183D2E]">
                     {weatherData.wind_speed_kmh} <span className="text-xs font-normal">km/h</span>
                   </span>
@@ -441,7 +441,7 @@ export const LocationWeatherPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-[#DA9A4C]" />
-                  Active Agro-Centroid
+                  {t('location.active_agro_centroid', { defaultValue: 'Active Agro-Centroid' })}
                 </span>
                 <span className="text-xs font-bold text-[#183D2E]">
                   {selectedDistrict}
@@ -457,20 +457,20 @@ export const LocationWeatherPage: React.FC = () => {
                 </p>
                 {activeFarm && (
                   <p className="text-emerald-800 font-semibold pt-1 border-t border-[#7A553A]/10">
-                    Linked to farm: {activeFarm.name} ({activeFarm.area} ac)
+                    {t('location.linked_to_farm', { defaultValue: 'Linked to farm:' })} {activeFarm.name} ({activeFarm.area} ac)
                   </p>
                 )}
               </div>
             </div>
 
             <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between text-xs text-[#7A553A]">
-              <span>Indicative village-level centroid.</span>
+              <span>{t('location.indicative_centroid', { defaultValue: 'Indicative village-level centroid.' })}</span>
               <button
                 type="button"
                 onClick={() => setActiveTab('location')}
                 className="text-xs font-bold text-[#183D2E] hover:underline"
               >
-                Change Village →
+                {t('location.change_village', { defaultValue: 'Change Village →' })}
               </button>
             </div>
           </div>
@@ -491,7 +491,7 @@ export const LocationWeatherPage: React.FC = () => {
             }`}
           >
             <Calendar className="w-4 h-4 text-[#DA9A4C]" />
-            <span>7-Day Agro-Forecast ({dailyForecast.length} days)</span>
+            <span>{t('location.seven_day_agro_forecast', { defaultValue: '7-Day Agro-Forecast' })} ({dailyForecast.length} days)</span>
           </button>
           <button
             type="button"
@@ -503,7 +503,7 @@ export const LocationWeatherPage: React.FC = () => {
             }`}
           >
             <MapPin className="w-4 h-4 text-[#183D2E]" />
-            <span>Village & Location Selector</span>
+            <span>{t('location.village_location_selector', { defaultValue: 'Village & Location Selector' })}</span>
           </button>
           <button
             type="button"
@@ -515,7 +515,7 @@ export const LocationWeatherPage: React.FC = () => {
             }`}
           >
             <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span>Crop Climate Suitability</span>
+            <span>{t('location.crop_climate_suitability', { defaultValue: 'Crop Climate Suitability' })}</span>
           </button>
         </div>
 
@@ -534,7 +534,7 @@ export const LocationWeatherPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-bold text-[#183D2E]">
-                      7-Day Daily Rain & Evapotranspiration
+                      {t('location.seven_day_rain_et0', { defaultValue: '7-Day Daily Rain & Evapotranspiration' })}
                     </h3>
                     <span className="text-xs text-[#7A553A]">
                       Rainfall in mm &bull; ET0 demand
@@ -543,7 +543,7 @@ export const LocationWeatherPage: React.FC = () => {
                   <ForecastChart data={dailyForecast} />
                 </div>
               ) : (
-                <p className="text-xs text-neutral-500 text-center py-6">Forecast data loading...</p>
+                <p className="text-xs text-neutral-500 text-center py-6">{t('location.forecast_loading', { defaultValue: 'Forecast data loading...' })}</p>
               )}
             </div>
           )}
@@ -554,7 +554,7 @@ export const LocationWeatherPage: React.FC = () => {
               <div className="flex items-center gap-2 border-b border-[#7A553A]/15 pb-3">
                 <MapPin className="w-5 h-5 text-[#183D2E]" />
                 <h3 className="text-sm font-bold text-[#183D2E]">
-                  Select Agro-Climatic Zone & Village Coordinates
+                  {t('location.select_zone_coords', { defaultValue: 'Select Agro-Climatic Zone & Village Coordinates' })}
                 </h3>
               </div>
 

@@ -383,6 +383,154 @@ The following queries and backend-generated conversational spoken responses were
 | **Chat Response** | आपकी Cotton फसल को आज सिंचाई की आवश्यकता नहीं है। सिंचाई गहराई 25.0 मिमी (कुल 150,000 लीटर) है। बारिश के पूर्वानुमान से अनुमानित जल बचत 0 लीटर है। | `hi` | Your Cotton crop does not need irrigation today. Irrigation depth is 25.0 mm (total 150,000 litres). Estimated water savings from rain forecast is 0 litres. | **Unverified**: Not native-reviewed. |
 | **Chat Smalltalk** | Glad to help! What would you like to check next on your farm? | `en` | Conversational acknowledgment response for "okay" | **English**: Standard extension tone. |
 
+---
+
+## 16. Round 7 Phase 2 Complete Multilingual Translation Additions (Unverified — Awaiting Native Review)
+
+The following agronomic, economic, workflow, and interface strings were added in Round 7 Phase 2 across all 15 pages and global components (Auth, WatchHowTo, HowTo, Disease, Weather, Economics, Market, Farms, Schemes, Community, Calendar, Recommend, Dashboard, Reminders, GuidedTour, CommandPalette, VisualModeChooser). In accordance with honesty guidelines, all newly translated Telugu (`te`) and Hindi (`hi`) strings are catalogued as **unverified** and strictly marked as needing native-speaker review:
+
+| Category | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Auth** | Smallholder Agricultural Decision Intelligence | సన్నకారు రైతుల వ్యవసాయ నిర్ణయ వేదిక | लघु किसान कृषि निर्णय मंच | **Unverified**: Not native-reviewed. |
+| **Auth** | Instant Evaluation | తక్షణ పరిశీలన | त्वरित मूल्यांकन | **Unverified**: Not native-reviewed. |
+| **Auth** | ONE-CLICK LOGIN | ఒకే క్లిక్ ప్రవేశం | एक-क्लिक लॉगिन | **Unverified**: Not native-reviewed. |
+| **Auth** | One-Click Demo Access | ఒకే క్లిక్ డెమో ప్రవేశం | एक-क्लिक डेमो प्रवेश | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Walkthrough Slot | వీడియో భాగం | वीडियो स्लॉट | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Video Coming Soon | వీడియో త్వరలో అందుబాటులోకి వస్తుంది | वीडियो जल्द आ रहा है | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Video coming soon. Please follow the written steps below. | వీడియో త్వరలో అందుబాటులోకి వస్తుంది. దయచేసి క్రింది లిఖితపూర్వక దశలను అనుసరించండి. | वीडियो जल्द आ रहा है। कृपया नीचे दिए गए लिखित चरणों का पालन करें। | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Read Illustrated Written Steps | బొమ్మలతో కూడిన దశలను చదవండి | सचित्र चरणबद्ध गाइड पढ़ें | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Quick Summary of Steps | దశల సంక్షిప్త సారాంశం | चरणों का त्वरित सारांश | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Listen to summary | సారాంశం వినండి | सारांश सुनें | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Step 1 • Language & Farm | దశ 1 • భాష & పొలం | चरण 1 • भाषा एवं खेत | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Step 2 • Weather & Rain | దశ 2 • వాతావరణం & వర్షం | चरण 2 • मौसम एवं बारिश | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Step 3 • Water Budget | దశ 3 • నీటి బడ్జెట్ | चरण 3 • जल बजट | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Step 4 • Disease Diagnosis | దశ 4 • తెగుళ్ల నిర్ధారణ | चरण 4 • रोग निदान | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Step 5 • Profit What-If | దశ 5 • లాభాల సిమ్యులేటర్ | चरण 5 • लाभ सिम्युलेटर | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Step 6 • Voice Assistant | దశ 6 • వాయిస్ అసిస్టెంట్ | चरण 6 • वॉयस असिस्टेंट | **Unverified**: Not native-reviewed. |
+| **Disease** | Compressed & ready for pretrained PyTorch MobileNetV2 leaf scan | ప్రీట్రైన్డ్ PyTorch MobileNetV2 స్కాన్ కోసం సిద్ధం చేయబడింది | प्रीट्रेंड PyTorch MobileNetV2 स्कैन के लिए तैयार | **Unverified**: Not native-reviewed. |
+| **Disease** | Analyzing Leaf... | ఆకును విశ్లేషిస్తోంది... | पत्ती का विश्लेषण हो रहा है... | **Unverified**: Not native-reviewed. |
+| **Disease** | Scan Another Leaf | మరో ఆకును స్కాన్ చేయండి | दूसरी पत्ती स्कैन करें | **Unverified**: Not native-reviewed. |
+| **Disease** | Primary IPM Action | ప్రాథమిక సహజ నివారణ చర్య | प्राथमिक समन्वित कीट प्रबंधन (IPM) कार्रवाई | **Unverified**: Not native-reviewed. |
+| **Disease** | Zero Chemical | రసాయనాలు లేని పద్ధతి | शून्य रसायन | **Unverified**: Not native-reviewed. |
+| **Disease** | Microclimate Spore Risk | సూక్ష్మ వాతావరణ శిలీంధ్ర ప్రమాదం | सूक्ष्म-जलवायु बीजाणु जोखिम | **Unverified**: Not native-reviewed. |
+| **Disease** | Elevated Risk | ఎక్కువ ప్రమాదం | बढ़ा हुआ जोखिम | **Unverified**: Not native-reviewed. |
+| **Disease** | Low Atmospheric Risk | తక్కువ వాతావరణ ప్రమాదం | कम वायुमंडलीय जोखिम | **Unverified**: Not native-reviewed. |
+| **Disease** | Centroid: | కేంద్ర బిందువు: | केंद्र बिंदु: | **Unverified**: Not native-reviewed. |
+| **Disease** | Indicative microclimate assessment based on open agro-meteorological data. | ఓపెన్ వాతావరణ సమాచారం ఆధారంగా సూచించిన అంచనా మాత్రమే. | खुले कृषि-मौसम डेटा पर आधारित सांकेतिक सूक्ष्म-जलवायु मूल्यांकन। | **Unverified**: Not native-reviewed. |
+| **Disease** | Leaf Specimen & Farm Parameters | ఆకు నమూనా & పొలం వివరాలు | पत्ती का नमूना एवं खेत पैरामीटर | **Unverified**: Not native-reviewed. |
+| **Disease** | Photo Loaded | ఫోటో లోడ్ అయింది | फोटो लोड हो गया | **Unverified**: Not native-reviewed. |
+| **Disease** | No Photo Selected | ఫోటో ఎంచుకోలేదు | कोई फोटो नहीं चुना | **Unverified**: Not native-reviewed. |
+| **Disease** | Invalid File | చెల్లని ఫైల్ | अमान्य फ़ाइल | **Unverified**: Not native-reviewed. |
+| **Disease** | Borderline Agricultural Confidence | సరిహద్దు వ్యవసాయ విశ్వసనీయత | सीमांत कृषि विश्वास | **Unverified**: Not native-reviewed. |
+| **Disease** | Visual indication only, not a soil moisture measurement. Please confirm to proceed. | దృశ్య సంకేతం మాత్రమే, నేల తేమ కొలత కాదు. కొనసాగడానికి నిర్ధారించండి. | केवल दृश्य संकेत, मिट्टी की नमी का माप नहीं। आगे बढ़ने के लिए पुष्टि करें। | **Unverified**: Not native-reviewed. |
+| **Disease** | Confirm and Continue | నిర్ధారించి కొనసాగించండి | पुष्टि करें और जारी रखें | **Unverified**: Not native-reviewed. |
+| **Disease** | Image Gate Verification Rejected | చిత్ర తనిఖీ తిరస్కరించబడింది | छवि सत्यापन अस्वीकृत | **Unverified**: Not native-reviewed. |
+| **Disease** | Non-agricultural photo detected. No diagnosis generated. | వ్యవసాయేతర ఫోటో గుర్తించబడింది. ఎటువంటి రోగ నిర్ధారణ చేయలేదు. | गैर-कृषि फोटो पाई गई। कोई निदान नहीं किया गया। | **Unverified**: Not native-reviewed. |
+| **Weather** | Today's Agro-Weather | నేటి వ్యవసాయ వాతావరణం | आज का कृषि-मौसम | **Unverified**: Not native-reviewed. |
+| **Weather** | Rain Expected | వర్ష సూచన | बारिश की संभावना | **Unverified**: Not native-reviewed. |
+| **Weather** | Clear Skies | నిర్మలమైన ఆకాశం | साफ आसमान | **Unverified**: Not native-reviewed. |
+| **Weather** | Rain: | వర్షం: | बारिश: | **Unverified**: Not native-reviewed. |
+| **Weather** | 7-Day Outlook | 7 రోజుల వాతావరణ సూచన | 7-दिवसीय दृष्टिकोण | **Unverified**: Not native-reviewed. |
+| **Weather** | Atmospheric Demand | వాతావరణ నీటి ఆవిరి డిమాండ్ | वायुमंडलीय जल मांग | **Unverified**: Not native-reviewed. |
+| **Weather** | Humidity | గాలిలో తేమ | आर्द्रता | **Unverified**: Not native-reviewed. |
+| **Weather** | Wind Speed | గాలి వేగం | हवा की गति | **Unverified**: Not native-reviewed. |
+| **Weather** | Active Agro-Centroid | క్రియాశీల వ్యవసాయ కేంద్రం | सक्रिय कृषि-केंद्र | **Unverified**: Not native-reviewed. |
+| **Weather** | Linked to farm: | లింక్ చేయబడిన పొలం: | जुड़ा हुआ खेत: | **Unverified**: Not native-reviewed. |
+| **Weather** | Indicative village-level centroid. | గ్రామ స్థాయి సూచిక కేంద్రం. | सांकेतिक ग्राम-स्तरीय केंद्र। | **Unverified**: Not native-reviewed. |
+| **Weather** | Change Village → | గ్రామాన్ని మార్చండి → | गांव बदलें → | **Unverified**: Not native-reviewed. |
+| **Weather** | 7-Day Agro-Forecast | 7 రోజుల వ్యవసాయ సూచన | 7-दिवसीय कृषि पूर्वानुमान | **Unverified**: Not native-reviewed. |
+| **Weather** | Village & Location Selector | గ్రామం & ప్రాంత ఎంపిక | गांव एवं स्थान चयनकर्ता | **Unverified**: Not native-reviewed. |
+| **Weather** | Crop Climate Suitability | పంట వాతావరణ అనుకూలత | फसल जलवायु उपयुक्तता | **Unverified**: Not native-reviewed. |
+| **Weather** | 7-Day Daily Rain & Evapotranspiration | 7 రోజుల వర్షపాతం & నీటి ఆవిరి | 7-दिवसीय दैनिक वर्षा एवं वाष्पोत्सर्जन | **Unverified**: Not native-reviewed. |
+| **Weather** | Select Agro-Climatic Zone & Village Coordinates | వ్యవసాయ వాతావరణ మండలం & గ్రామ కోఆర్డినేట్లను ఎంచుకోండి | कृषि-जलवायु क्षेत्र एवं ग्राम निर्देशांक चुनें | **Unverified**: Not native-reviewed. |
+| **Weather** | Forecast data loading... | వాతావరణ సూచన లోడ్ అవుతోంది... | पूर्वानुमान डेटा लोड हो रहा है... | **Unverified**: Not native-reviewed. |
+| **Economics** | Financial Baseline | ఆర్థిక ప్రాథమిక వివరాలు | वित्तीय आधार रेखा | **Unverified**: Not native-reviewed. |
+| **Economics** | Margin: | లాభ శాతం: | मार्जिन: | **Unverified**: Not native-reviewed. |
+| **Economics** | Per Acre: | ఎకరాకు: | प्रति एकड़: | **Unverified**: Not native-reviewed. |
+| **Economics** | Change vs Baseline: | బేస్‌లైన్‌తో పోలిక: | आधार से बदलाव: | **Unverified**: Not native-reviewed. |
+| **Economics** | Simulate What-If | వాట్-ఇఫ్ ప్రత్యక్ష అంచనా | व्हाट-इफ सिम्युलेटर | **Unverified**: Not native-reviewed. |
+| **Economics** | Gross Revenue | మొత్తం ఆదాయం | सकल राजस्व | **Unverified**: Not native-reviewed. |
+| **Economics** | Total Cost | మొత్తం ఖర్చు | कुल लागत | **Unverified**: Not native-reviewed. |
+| **Economics** | Break-Even Thresholds | సమతూక (బ్రేక్-ఈవెన్) పరిమితులు | संतुलन (ब्रेक-इवेन) सीमाएं | **Unverified**: Not native-reviewed. |
+| **Economics** | Land | భూమి | भूमि | **Unverified**: Not native-reviewed. |
+| **Economics** | Break-Even Price: | కనీస సమతూక ధర: | संतुलन मूल्य: | **Unverified**: Not native-reviewed. |
+| **Economics** | Break-Even Yield: | కనీస సమతూక దిగుబడి: | संतुलन उपज: | **Unverified**: Not native-reviewed. |
+| **Economics** | Tenure Structure: | యాజమాన్య వివరాలు: | भूमि पट्टा संरचना: | **Unverified**: Not native-reviewed. |
+| **Economics** | Prices below break-even result in seasonal debt. Verify prices at local APMC mandi. | సమతూక ధర కంటే తక్కువ ధర లభిస్తే నష్టం వస్తుంది. స్థానిక APMC మార్కెట్లో ధరలను ధృవీకరించుకోండి. | संतुलन मूल्य से कम भाव मिलने पर घाटा हो सकता है। स्थानीय APMC मंडी में भाव सत्यापित करें। | **Unverified**: Not native-reviewed. |
+| **Economics** | What-If Simulator | వాట్-ఇఫ్ ప్రత్యక్ష లాభాల సిమ్యులేటర్ | व्हाट-इफ लाभ सिम्युलेटर | **Unverified**: Not native-reviewed. |
+| **Market** | List Harvest for Farm-Gate Sale | పంటను నేరుగా విక్రయించడానికి జాబితా చేయండి | खेत से बिक्री के लिए फसल सूचीबद्ध करें | **Unverified**: Not native-reviewed. |
+| **Market** | Mandi Rankings & Trends | మండి ర్యాంకులు & ధరల ధోరణి | मंडी रैंकिंग एवं रुझान | **Unverified**: Not native-reviewed. |
+| **Market** | Farm-Gate Marketplace | నేరుగా పొలం వద్ద కొనుగోలు మార్కెట్ | खेत-गेट बाज़ार | **Unverified**: Not native-reviewed. |
+| **Market** | Buyer Inquiries & Inbox | కొనుగోలుదారుల విచారణలు & సందేశాలు | खरीदार पूछताछ व इनबॉक्स | **Unverified**: Not native-reviewed. |
+| **Market** | Gross modal price is misleading without transport cost. Always choose based on net realization. | రవాణా ఖర్చు పరిగణనలోకి తీసుకోకుండా స్థూల ధరను నమ్మవద్దు. ఎల్లప్పుడూ నికర ధర ఆధారంగానే మండిని ఎంచుకోండి. | परिवहन लागत के बिना केवल थोक भाव भ्रमित कर सकता है। हमेशा शुद्ध आय के आधार पर ही मंडी चुनें। | **Unverified**: Not native-reviewed. |
+| **Market** | APMC modal prices and transport rates are calibrated on illustrative market datasets. | APMC మోడల్ ధరలు మరియు రవాణా రేట్లు మార్కెట్ సమాచారం ఆధారంగా లెక్కించబడ్డాయి. | APMC मॉडल भाव और परिवहन दरें बाज़ार डेटा पर आधारित हैं। | **Unverified**: Not native-reviewed. |
+| **Market** | Realization Simulator Parameters | నికర ఆదాయ సిమ్యులేటర్ కొలతలు | शुद्ध आय सिम्युलेटर पैरामीटर | **Unverified**: Not native-reviewed. |
+| **Market** | APMC Mandis Ranked by Net Realization | నికర ఆదాయం ప్రకారం APMC మండీల ర్యాంకులు | शुद्ध आय के आधार पर APMC मंडियों की रैंकिंग | **Unverified**: Not native-reviewed. |
+| **Market** | Formula: (Modal Price × Qty) - Transport Cost - Mandi Fee | సూత్రం: (మార్కెట్ ధర × పరిమాణం) - రవాణా ఖర్చు - మండి రుసుము | सूत्र: (मॉडल भाव × मात्रा) - परिवहन लागत - मंडी शुल्क | **Unverified**: Not native-reviewed. |
+| **Market** | Modal Price | మార్కెట్ ధర | मॉडल भाव | **Unverified**: Not native-reviewed. |
+| **Market** | Transport Cost | రవాణా ఖర్చు | परिवहन लागत | **Unverified**: Not native-reviewed. |
+| **Market** | Mandi Fee | మండి రుసుము | मंडी शुल्क | **Unverified**: Not native-reviewed. |
+| **Market** | Net Realization / q | క్వింటాల్‌కు నికర ధర | प्रति क्विंटल शुद्ध आय | **Unverified**: Not native-reviewed. |
+| **Market** | Total Net Payout | మొత్తం నికర చెల్లింపు | कुल शुद्ध भुगतान | **Unverified**: Not native-reviewed. |
+| **Market** | Details | వివరాలు | विवरण | **Unverified**: Not native-reviewed. |
+| **Farms** | Total Acreage: | మొత్తం విస్తీర్ణం: | कुल रकबा: | **Unverified**: Not native-reviewed. |
+| **Farms** | Owned Land: | సొంత భూమి: | स्वामित्व भूमि: | **Unverified**: Not native-reviewed. |
+| **Farms** | Leased Land: | కౌలు భూమి: | पट्टे की भूमि: | **Unverified**: Not native-reviewed. |
+| **Farms** | Annual Lease Rent: | వార్షిక కౌలు మొత్తం: | वार्षिक पट्टा किराया: | **Unverified**: Not native-reviewed. |
+| **Farms** | Soil Type: | నేల రకం: | मिट्टी का प्रकार: | **Unverified**: Not native-reviewed. |
+| **Farms** | Water Source: | నీటి వనరు: | जल स्रोत: | **Unverified**: Not native-reviewed. |
+| **Farms** | Irrigation Method: | నీటి పారుదల పద్ధతి: | सिंचाई विधि: | **Unverified**: Not native-reviewed. |
+| **Farms** | Irrigation method directly influences application efficiency (Drip 90%, Flood 60%). | సాగునీటి పద్ధతి నీటి సామర్థ్యంపై ప్రత్యక్ష ప్రభావం చూపుతుంది (డ్రిప్ 90%, వరద పారుదల 60%). | सिंचाई विधि जल उपयोग दक्षता को सीधे प्रभावित करती है (ड्रिप 90%, सतही थाला 60%)। | **Unverified**: Not native-reviewed. |
+| **Schemes** | Calibrate Soil | నేల వివరాలను నమోదు చేయండి | मिट्टी डेटा दर्ज करें | **Unverified**: Not native-reviewed. |
+| **Schemes** | Agronomic Precision | వ్యవసాయ ఖచ్చితత్వం | कृषि सटीकता | **Unverified**: Not native-reviewed. |
+| **Schemes** | Evaluation Shift | విశ్లేషణ మార్పు | मूल्यांकन बदलाव | **Unverified**: Not native-reviewed. |
+| **Schemes** | Weather Baseline Mode: | వాతావరణ ఆధారిత విధానం: | मौसम आधार मोड: | **Unverified**: Not native-reviewed. |
+| **Schemes** | With Confirmed Soil Card: | ధృవీకరించిన సాయిల్ కార్డుతో: | पुष्टित मृदा स्वास्थ्य कार्ड के साथ: | **Unverified**: Not native-reviewed. |
+| **Schemes** | Upload & Calibrate Soil Card | సాయిల్ కార్డును అప్‌లోడ్ చేసి సరిచూడండి | मृदा कार्ड अपलोड कर जांचें | **Unverified**: Not native-reviewed. |
+| **Schemes** | Agronomic Impact Shift | వ్యవసాయ ప్రభావంలో మార్పు | कृषि प्रभाव में बदलाव | **Unverified**: Not native-reviewed. |
+| **Schemes** | Welfare Schemes (Planned) | సంక్షేమ పథకాలు (ప్రణాళిక చేయబడినవి) | कल्याणकारी योजनाएं (नियोजित) | **Unverified**: Not native-reviewed. |
+| **Community** | Browse Machinery | యంత్రాలను చూడండి | मशीनरी ब्राउज़ करें | **Unverified**: Not native-reviewed. |
+| **Community** | View Groups | రైతు సంఘాలను చూడండి | समूह देखें | **Unverified**: Not native-reviewed. |
+| **Community** | Open Split Calculator | ఖర్చుల విభజన కాలిక్యులేటర్ తెరవండి | लागत विभाजन कैलकुलेटर खोलें | **Unverified**: Not native-reviewed. |
+| **Calendar** | Season Period: | పంట కాలం: | ऋतु अवधि: | **Unverified**: Not native-reviewed. |
+| **Calendar** | Primary Seasonal Risk: | ముఖ్యమైన కాల ప్రమాదం: | मुख्य मौसमी जोखिम: | **Unverified**: Not native-reviewed. |
+| **Calendar** | IMD Agromet Guidelines | భారత వాతావరణ శాఖ (IMD) మార్గదర్శకాలు | IMD कृषि-मौसम दिशा-निर्देश | **Unverified**: Not native-reviewed. |
+| **Calendar** | Primary Seasonal Risks: | ముఖ్యమైన కాల ప్రమాదాలు: | मुख्य मौसमी जोखिम: | **Unverified**: Not native-reviewed. |
+| **Recommend** | Climate Suitability Warnings: | వాతావరణ అనుకూలత హెచ్చరికలు: | जलवायु उपयुक्तता चेतावनियाँ: | **Unverified**: Not native-reviewed. |
+| **Dashboard** | Live weather available in Weather tab. | ప్రత్యక్ష వాతావరణం 'వాతావరణం' ట్యాబ్‌లో అందుబాటులో ఉంది. | लाइव मौसम 'मौसम' टैब में उपलब्ध है। | **Unverified**: Not native-reviewed. |
+| **Dashboard** | Nutrient Shifts | పోషకాల మార్పులు | पोषक तत्व बदलाव | **Unverified**: Not native-reviewed. |
+| **Reminders** | Loading reminders... | జ్ఞాపికలు లోడ్ అవుతున్నాయి... | स्मरणपत्र लोड हो रहे हैं... | **Unverified**: Not native-reviewed. |
+| **Pictorial** | Recommended | సిఫార్సు చేయబడింది | अनुशंसित | **Unverified**: Not native-reviewed. |
+| **Pictorial** | Standard | సాధారణం | मानक | **Unverified**: Not native-reviewed. |
+| **Tour** | Grow2Gain Guided Tour | Grow2Gain సహాయక టూర్ | Grow2Gain निर्देशित टूर | **Unverified**: Not native-reviewed. |
+| **Tour** | Step 1: Choose Your Language | దశ 1: మీ భాషను ఎంచుకోండి | चरण 1: अपनी भाषा चुनें | **Unverified**: Not native-reviewed. |
+| **Tour** | Step 2: Choose or Add Your Farm Parcel | దశ 2: మీ పొలాన్ని ఎంచుకోండి లేదా జోడించండి | चरण 2: अपना खेत चुनें या जोड़ें | **Unverified**: Not native-reviewed. |
+| **Tour** | Step 3: Check Agro-Weather & 7-Day Forecast | దశ 3: వ్యవసాయ వాతావరణం & 7 రోజుల సూచన | चरण 3: कृषि-मौसम एवं 7-दिवसीय पूर्वानुमान | **Unverified**: Not native-reviewed. |
+| **Tour** | Step 4: Crop Water Budget & Irrigation Advice | దశ 4: పంట నీటి బడ్జెట్ & సాగునీటి సలహా | चरण 4: फसल जल बजट एवं सिंचाई सलाह | **Unverified**: Not native-reviewed. |
+| **Tour** | Step 5: Scan Crop Leaf for Disease Diagnosis | దశ 5: తెగుళ్లను గుర్తించడానికి ఆకును స్కాన్ చేయండి | चरण 5: रोग निदान के लिए फसल की पत्ती स्कैन करें | **Unverified**: Not native-reviewed. |
+| **Tour** | Step 6: Understand Farm Costs & Live Profit | దశ 6: వ్యవసాయ ఖర్చులు & ప్రత్యక్ష లాభాలు | चरण 6: खेत की लागत एवं लाइव लाभ समझें | **Unverified**: Not native-reviewed. |
+| **Tour** | Step 7: Ask the Voice Assistant Anytime | దశ 7: ఎప్పుడైనా వాయిస్ అసిస్టెంట్‌ను అడగండి | चरण 7: किसी भी समय वॉयस असिस्टेंट से पूछें | **Unverified**: Not native-reviewed. |
+| **Command** | No matching pages or tools found | సరిపోలే పేజీలు లేదా సాధనాలు కనుగొనబడలేదు | कोई मेल खाते पेज या टूल नहीं मिले | **Unverified**: Not native-reviewed. |
+| **Command** | Try searching for "weather", "irrigation", "mandi" or "language" | "వాతావరణం", "నీటిపారుదల", "మండి" లేదా "భాష" కోసం వెతకండి | "मौसम", "सिंचाई", "मंडी" या "भाषा" खोजें | **Unverified**: Not native-reviewed. |
+| **WatchHowTo** | Your browser does not support HTML5 video. | మీ బ్రౌజర్ HTML5 వీడియోకు మద్దతు ఇవ్వదు. | आपका ब्राउज़र HTML5 वीडियो का समर्थन नहीं करता है। | **Unverified**: Not native-reviewed. |
+| **Disease** | Upload or capture a sharp photo of an affected leaf to identify symptoms and safe cultural treatments. | లక్షణాలను గుర్తించి సురక్షిత సేంద్రీయ నివారణలను తెలుసుకోవడానికి ప్రభావిత ఆకు ఫోటోను తీయండి లేదా అప్‌లోడ్ చేయండి. | लक्षणों की पहचान और सुरक्षित जैविक उपचार जानने के लिए प्रभावित पत्ती का स्पष्ट फोटो खींचें या अपलोड करें। | **Unverified**: Not native-reviewed. |
+| **Community** | Community tools allow you to pool transport with neighbouring farmers in {{village}} and rent idle farm machinery at fair daily rates. | {{village}} పరిసరాల్లోని రైతులతో కలిసి సరుకు రవాణా పంచుకోవడానికి మరియు అందుబాటు ధరల్లో వ్యవసాయ యంత్రాలను అద్దెకు తీసుకోవడానికి Grow2Gain కమ్యూనిటీ వేదిక సహాయపడుతుంది. | {{village}} के आसपास के साथी किसानों के साथ मिलकर वाहन साझा करने और उचित दरों पर कृषि मशीनरी किराए पर लेने में मदद मिलती है। | **Unverified**: Not native-reviewed. |
+| **Community** | Local Hub | స్థానిక కేంద్రం | स्थानीय केंद्र | **Unverified**: Not native-reviewed. |
+| **Market** | Top Mandi Realization | అత్యుత్తమ మార్కెట్ ఆదాయం | सर्वोत्तम मंडी शुद्ध प्राप्ति | **Unverified**: Not native-reviewed. |
+| **Market** | Awaiting prices | ధరల కోసం వేచి ఉంది | भाव की प्रतीक्षा है | **Unverified**: Not native-reviewed. |
+| **Market** | Total Net Payout | మొత్తం నికర ఆదాయం | कुल शुद्ध भुगतान | **Unverified**: Not native-reviewed. |
+| **Market** | View All Mandis | అన్ని మండీలు చూడండి | सभी मंडियां देखें | **Unverified**: Not native-reviewed. |
+| **Market** | Transport & Cess Math | రవాణా మరియు సెస్ లెక్కలు | भाड़ा और मंडी सेस गणना | **Unverified**: Not native-reviewed. |
+| **Market** | Gross Realization | మొత్తం అమ్మకం ఆదాయం | सकल प्राप्ति | **Unverified**: Not native-reviewed. |
+| **Market** | Freight Logistics | రవాణా చార్జీలు | मालभाड़ा खर्च | **Unverified**: Not native-reviewed. |
+| **Market** | Mandi Cess | మార్కెట్ సెస్ | मंडी सेस | **Unverified**: Not native-reviewed. |
+| **Economics** | At current price of ₹{{price}}/q and harvest yield of {{yield}} q/acre, your estimated net profit is ₹{{profit}} with a {{margin}}% margin. | ప్రస్తుత ధర ₹{{price}}/క్వింటాల్ మరియు దిగుబడి {{yield}} క్వింటాళ్లు/ఎకరా లెక్కన, మీ అంచనా నికర లాభం ₹{{profit}} ({{margin}}% మార్జిన్). | वर्तमान मूल्य ₹{{price}}/क्विंटल और पैदावार {{yield}} क्विंटल/एकड़ पर, आपका अनुमानित शुद्ध लाभ ₹{{profit}} ({{margin}}% मार्जिन) है। | **Unverified**: Not native-reviewed. |
+| **Economics** | Warning: Projected net deficit of ₹{{deficit}}. Break-even requires at least ₹{{breakeven}}/q or reduced operating expenditure. | హెచ్చరిక: ₹{{deficit}} అంచనా నికర నష్టం. లాభనష్టాలు సమానం కావడానికి కనీసం ₹{{breakeven}}/క్వింటాల్ ధర లేదా నిర్వహణ ఖర్చులు తగ్గించాలి. | चेतावनी: ₹{{deficit}} का अनुमानित घाटा। लागत निकालने के लिए कम से कम ₹{{breakeven}}/क्विंटल भाव या परिचालन खर्च में कमी की आवश्यकता है। | **Unverified**: Not native-reviewed. |
+| **Market** | Selling {{quantity}} quintals of {{crop}} at {{mandi}} gives your highest net payout of ₹{{rate}}/q after deducting transport and mandi fees. | రవాణా మరియు మార్కెట్ రుసుములను తీసివేసిన తర్వాత {{mandi}}లో {{quantity}} క్వింటాళ్ల {{crop}} అమ్మితే క్వింటాల్‌కు అత్యధికంగా ₹{{rate}} నికర ఆదాయం లభిస్తుంది. | भाड़ा और मंडी सेस घटाने के बाद {{mandi}} में {{quantity}} क्विंटल {{crop}} बेचने पर आपको प्रति क्विंटल सबसे अधिक ₹{{rate}} की शुद्ध प्राप्ति मिलती है। | **Unverified**: Not native-reviewed. |
+| **Market** | Calculating net mandi realization rankings... | మండీల నికర ఆదాయ ర్యాంకింగ్‌లు లెక్కిస్తోంది... | मंडियों की शुद्ध प्राप्ति रैंकिंग की गणना की जा रही है... | **Unverified**: Not native-reviewed. |
+
+
+
 
 
 

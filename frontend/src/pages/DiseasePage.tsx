@@ -193,7 +193,7 @@ export const DiseasePage: React.FC = () => {
   // Derived plain meaning
   const plainMeaning = result?.success
     ? `Identified condition is ${result.predicted_disease} on ${result.predicted_crop} with ${Math.round((result.prediction_confidence || 0) * 100)}% visual similarity. Zero chemical pesticides recommended; implement the organic cultural practices below.`
-    : 'Upload or capture a sharp photo of an affected leaf to identify symptoms and safe cultural treatments.';
+    : t('disease.plain_meaning_default', { defaultValue: 'Upload or capture a sharp photo of an affected leaf to identify symptoms and safe cultural treatments.' });
 
   // PICTORIAL MODE v2
   if (isPictorial) {
@@ -292,7 +292,7 @@ export const DiseasePage: React.FC = () => {
                     {selectedFile?.name || 'Leaf specimen image'}
                   </span>
                   <span className="text-[13px] text-[#4A5750]">
-                    Compressed & ready for pretrained PyTorch MobileNetV2 leaf scan
+                    {language === 'te' ? 'ప్రీట్రైన్డ్ PyTorch MobileNetV2 స్కాన్ కోసం సిద్ధం చేయబడింది' : language === 'hi' ? 'प्रीट्रेंड PyTorch MobileNetV2 स्कैन के लिए तैयार' : 'Compressed & ready for pretrained PyTorch MobileNetV2 leaf scan'}
                   </span>
                 </div>
               </div>
@@ -306,7 +306,7 @@ export const DiseasePage: React.FC = () => {
                 {diagnoseMutation.isPending ? (
                   <>
                     <RefreshCw className="w-5 h-5 animate-spin" />
-                    <span>Analyzing Leaf...</span>
+                    <span>{t('disease.analyzing_leaf', { defaultValue: 'Analyzing Leaf...' })}</span>
                   </>
                 ) : (
                   <>
@@ -511,7 +511,7 @@ export const DiseasePage: React.FC = () => {
                 onClick={handleClearImage}
                 className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
               >
-                <span>Scan Another Leaf</span>
+                <span>{t('disease.scan_another_leaf', { defaultValue: 'Scan Another Leaf' })}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -523,10 +523,10 @@ export const DiseasePage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  Primary IPM Action
+                  {t('disease.primary_ipm_action', { defaultValue: 'Primary IPM Action' })}
                 </span>
                 <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-                  Zero Chemical
+                  {t('disease.zero_chemical', { defaultValue: 'Zero Chemical' })}
                 </span>
               </div>
 
@@ -549,7 +549,7 @@ export const DiseasePage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1">
                   <CloudRain className="w-4 h-4 text-[#DA9A4C]" />
-                  Microclimate Spore Risk
+                  {t('disease.microclimate_spore_risk', { defaultValue: 'Microclimate Spore Risk' })}
                 </span>
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -558,7 +558,9 @@ export const DiseasePage: React.FC = () => {
                       : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                   }`}
                 >
-                  {result.weather_fungal_risk?.elevated ? 'Elevated Risk' : 'Low Atmospheric Risk'}
+                  {result.weather_fungal_risk?.elevated
+                    ? t('disease.elevated_risk', { defaultValue: 'Elevated Risk' })
+                    : t('disease.low_atmospheric_risk', { defaultValue: 'Low Atmospheric Risk' })}
                 </span>
               </div>
 
@@ -570,13 +572,13 @@ export const DiseasePage: React.FC = () => {
               {activeFarm && (
                 <div className="pt-2 flex items-center gap-1 text-xs text-[#7A553A] font-medium">
                   <MapPin className="w-3.5 h-3.5 text-[#183D2E]" />
-                  <span>Centroid: {activeFarm.village}, {activeFarm.district}</span>
+                  <span>{t('disease.centroid_label', { defaultValue: 'Centroid:' })} {activeFarm.village}, {activeFarm.district}</span>
                 </div>
               )}
             </div>
 
             <div className="pt-2 border-t border-[#7A553A]/15 text-xs text-[#7A553A]">
-              <span>Indicative microclimate assessment based on open agro-meteorological data.</span>
+              <span>{t('disease.indicative_microclimate', { defaultValue: 'Indicative microclimate assessment based on open agro-meteorological data.' })}</span>
             </div>
           </div>
         </div>
@@ -587,10 +589,10 @@ export const DiseasePage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#7A553A]/15">
           <h2 className="text-lg font-display font-bold text-[#183D2E] flex items-center gap-2">
             <Camera className="w-5 h-5 text-[#DA9A4C]" />
-            <span>Leaf Specimen & Farm Parameters</span>
+            <span>{t('disease.leaf_parameters_heading', { defaultValue: 'Leaf Specimen & Farm Parameters' })}</span>
           </h2>
           <span className="text-xs text-[#7A553A] font-semibold">
-            {selectedFile ? 'Photo Loaded' : 'No Photo Selected'}
+            {selectedFile ? t('disease.photo_loaded', { defaultValue: 'Photo Loaded' }) : t('disease.no_photo_selected', { defaultValue: 'No Photo Selected' })}
           </span>
         </div>
 
@@ -599,7 +601,7 @@ export const DiseasePage: React.FC = () => {
           <div className="bg-red-50 border border-red-300 text-red-900 rounded-xl p-4 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-sm font-bold text-red-900">Invalid File</h4>
+              <h4 className="text-sm font-bold text-red-900">{t('disease.invalid_file', { defaultValue: 'Invalid File' })}</h4>
               <p className="text-xs text-red-800 mt-1 leading-relaxed">{validationError}</p>
             </div>
           </div>
@@ -611,11 +613,11 @@ export const DiseasePage: React.FC = () => {
               <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-bold text-amber-900">
-                  Borderline Agricultural Confidence ({Math.round(borderlineWarning.confidence * 100)}%)
+                  {t('disease.borderline_confidence', { defaultValue: 'Borderline Agricultural Confidence' })} ({Math.round(borderlineWarning.confidence * 100)}%)
                 </h4>
                 <p className="text-xs text-amber-800 mt-1 leading-relaxed">{borderlineWarning.message}</p>
                 <p className="text-[11px] text-amber-700 italic mt-1">
-                  Visual indication only, not a soil moisture measurement. Please confirm to proceed.
+                  {t('disease.visual_indication_only', { defaultValue: 'Visual indication only, not a soil moisture measurement. Please confirm to proceed.' })}
                 </p>
               </div>
             </div>
@@ -628,7 +630,7 @@ export const DiseasePage: React.FC = () => {
                 }}
                 className="min-h-[44px] px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all active:scale-95"
               >
-                Confirm and Continue
+                {t('disease.confirm_and_continue', { defaultValue: 'Confirm and Continue' })}
               </button>
             </div>
           </div>
@@ -638,12 +640,12 @@ export const DiseasePage: React.FC = () => {
           <div className="bg-red-50 border border-red-300 text-red-900 rounded-xl p-4 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-sm font-bold text-red-900">Image Gate Verification Rejected</h4>
+              <h4 className="text-sm font-bold text-red-900">{t('disease.gate_rejected', { defaultValue: 'Image Gate Verification Rejected' })}</h4>
               <p className="text-xs text-red-800 mt-1 font-medium leading-relaxed">
                 {diagnoseMutation.error instanceof Error ? diagnoseMutation.error.message : 'Upload rejected.'}
               </p>
               <p className="text-[11px] text-red-700 mt-1">
-                Non-agricultural photo detected. No diagnosis generated.
+                {t('disease.non_agri_detected', { defaultValue: 'Non-agricultural photo detected. No diagnosis generated.' })}
               </p>
             </div>
           </div>

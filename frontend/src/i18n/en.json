@@ -44,7 +44,11 @@
     "honesty_badge": "Honesty Principles Active",
     "honesty_desc": "Zero synthetic or fabricated telemetry",
     "fao_badge": "FAO-56 Calibrated",
-    "fao_desc": "Agro-meteorological crop water budgeting"
+    "fao_desc": "Agro-meteorological crop water budgeting",
+    "tagline": "Smallholder Agricultural Decision Intelligence",
+    "instant_evaluation": "Instant Evaluation",
+    "one_click_badge": "ONE-CLICK LOGIN",
+    "one_click_access": "One-Click Demo Access"
   },
   "location": {
     "title": "Location & Agro-Weather Setup",
@@ -68,7 +72,25 @@
     "stale_explanation": "Live Open-Meteo weather service was unreachable. Displaying cached forecast recorded at:",
     "proceed_to_farm": "Configure Farm Profile →",
     "expected_rain_mm": "Expected Rain (mm)",
-    "et0_demand_mm": "ET0 Water Demand (mm)"
+    "et0_demand_mm": "ET0 Water Demand (mm)",
+    "today_agro_weather": "Today's Agro-Weather",
+    "rain_expected": "Rain Expected",
+    "clear_skies": "Clear Skies",
+    "rain_label": "Rain:",
+    "seven_day_outlook": "7-Day Outlook",
+    "atmospheric_demand": "Atmospheric Demand",
+    "humidity_label": "Humidity",
+    "wind_speed_label": "Wind Speed",
+    "active_agro_centroid": "Active Agro-Centroid",
+    "linked_to_farm": "Linked to farm:",
+    "indicative_centroid": "Indicative village-level centroid.",
+    "change_village": "Change Village →",
+    "seven_day_agro_forecast": "7-Day Agro-Forecast",
+    "village_location_selector": "Village & Location Selector",
+    "crop_climate_suitability": "Crop Climate Suitability",
+    "seven_day_rain_et0": "7-Day Daily Rain & Evapotranspiration",
+    "select_zone_coords": "Select Agro-Climatic Zone & Village Coordinates",
+    "forecast_loading": "Forecast data loading..."
   },
   "farms": {
     "title": "Farm Profile & Land Tenure Management",
@@ -118,7 +140,15 @@
     "no_farm_selected": "No Farm Selected",
     "complete_profile_cta": "Complete your farm profile",
     "complete_profile_prompt": "No active farm profile found. Please register your farm to enable personalized advisories.",
-    "register_new": "+ Register New Farm"
+    "register_new": "+ Register New Farm",
+    "total_acreage_label": "Total Acreage:",
+    "owned_land_label": "Owned Land:",
+    "leased_land_label": "Leased Land:",
+    "annual_lease_rent_label": "Annual Lease Rent:",
+    "soil_type_colon": "Soil Type:",
+    "water_source_colon": "Water Source:",
+    "irrigation_method_colon": "Irrigation Method:",
+    "irrigation_efficiency_note": "Irrigation method directly influences application efficiency (Drip 90%, Flood 60%)."
   },
   "dashboard": {
     "title": "Executive Farmer Dashboard",
@@ -212,7 +242,9 @@
     "wind_label": "Wind:",
     "crop_phenology_holding_title": "Crop Phenology & Holding",
     "active_growth_stage_label": "Active Growth Stage:",
-    "farm_health_index_label": "Farm Health Index:"
+    "farm_health_index_label": "Farm Health Index:",
+    "live_weather_tab_note": "Live weather available in Weather tab.",
+    "nutrient_shifts": "Nutrient Shifts"
   },
   "explain": {
     "title": "Why this recommendation?",
@@ -345,11 +377,28 @@
     "zero_chemical_dosages": "Zero Chemical Dosages",
     "elevated_spore_risk": "Elevated Spore Risk",
     "low_atmospheric_risk": "Low Atmospheric Risk",
-    "indicative_microclimate": "(Indicative Microclimate Telemetry)",
+    "indicative_microclimate": "Indicative microclimate assessment based on open agro-meteorological data.",
     "anonymized_centroids": "Anonymized Village Centroids Only",
     "consult_officer": "Consult local extension officer.",
     "speech_not_supported": "Speech synthesis is not supported in this browser.",
-    "no_voice_for_language": "No speech synthesis voice found on your device for {lang}. Audio cannot be played."
+    "no_voice_for_language": "No speech synthesis voice found on your device for {lang}. Audio cannot be played.",
+    "analyzing_leaf": "Analyzing Leaf...",
+    "scan_another_leaf": "Scan Another Leaf",
+    "primary_ipm_action": "Primary IPM Action",
+    "zero_chemical": "Zero Chemical",
+    "microclimate_spore_risk": "Microclimate Spore Risk",
+    "elevated_risk": "Elevated Risk",
+    "centroid_label": "Centroid:",
+    "leaf_parameters_heading": "Leaf Specimen & Farm Parameters",
+    "photo_loaded": "Photo Loaded",
+    "no_photo_selected": "No Photo Selected",
+    "invalid_file": "Invalid File",
+    "borderline_confidence": "Borderline Agricultural Confidence",
+    "visual_indication_only": "Visual indication only, not a soil moisture measurement. Please confirm to proceed.",
+    "confirm_and_continue": "Confirm and Continue",
+    "gate_rejected": "Image Gate Verification Rejected",
+    "non_agri_detected": "Non-agricultural photo detected. No diagnosis generated.",
+    "plain_meaning_default": "Upload or capture a sharp photo of an affected leaf to identify symptoms and safe cultural treatments."
   },
   "irrigation": {
     "title": "FAO-56 Irrigation Water Budget & Field Diagnostics",
@@ -460,7 +509,23 @@
     "explain_title": "Economic Formulas & Methodology Explanation",
     "price_notice_title": "Price Source Notice",
     "price_your_estimate": "Price: Your Estimate",
-    "msp_not_verified": "MSP Not Verified"
+    "msp_not_verified": "MSP Not Verified",
+    "financial_baseline": "Financial Baseline",
+    "margin_label": "Margin:",
+    "per_acre_label": "Per Acre:",
+    "change_vs_baseline_label": "Change vs Baseline:",
+    "simulate_what_if": "Simulate What-If",
+    "gross_revenue_label": "Gross Revenue",
+    "total_cost_label": "Total Cost",
+    "break_even_thresholds": "Break-Even Thresholds",
+    "land_suffix": "Land",
+    "break_even_price_label": "Break-Even Price:",
+    "break_even_yield_label": "Break-Even Yield:",
+    "tenure_structure_label": "Tenure Structure:",
+    "below_break_even_debt": "Prices below break-even result in seasonal debt. Verify prices at local APMC mandi.",
+    "what_if_simulator_tab": "What-If Simulator",
+    "plain_meaning_profit": "At current price of ₹{{price}}/q and harvest yield of {{yield}} q/acre, your estimated net profit is ₹{{profit}} with a {{margin}}% margin.",
+    "plain_meaning_deficit": "Warning: Projected net deficit of ₹{{deficit}}. Break-even requires at least ₹{{breakeven}}/q or reduced operating expenditure."
   },
   "calendar": {
     "title": "Crop Lifecycle & Field Operation Calendar",
@@ -490,7 +555,11 @@
     "tab_season": "Seasonal Awareness & IMD Agromet",
     "tab_methodology": "Methodology & Disclaimers",
     "filter_tasks_label": "Filter Scheduled Actions:",
-    "no_upcoming_tasks": "No upcoming tasks scheduled"
+    "no_upcoming_tasks": "No upcoming tasks scheduled",
+    "season_period_label": "Season Period:",
+    "primary_seasonal_risk": "Primary Seasonal Risk:",
+    "imd_agromet_guidelines": "IMD Agromet Guidelines",
+    "primary_seasonal_risks_colon": "Primary Seasonal Risks:"
   },
   "recommend": {
     "title": "Crop Recommendation",
@@ -520,7 +589,8 @@
     "rainfall_label": "Rainfall",
     "npk_label": "NPK (kg/ha)",
     "soil_ph_label": "Soil pH",
-    "humidity_label": "Relative Humidity (%)"
+    "humidity_label": "Relative Humidity (%)",
+    "climate_suitability_warnings": "Climate Suitability Warnings:"
   },
   "voice": {
     "fab_label": "Grow2Gain Voice Assistant",
@@ -604,7 +674,15 @@
     "disclaimer_label": "Agronomic Disclaimer",
     "placeholders_admin_title": "Admin & Governance Placeholders",
     "admin_console_desc": "Admin moderation, consent audit logging, and data privacy deletion modules are scheduled for the next phase.",
-    "reupload_btn": "Upload / Calibrate New Card"
+    "reupload_btn": "Upload / Calibrate New Card",
+    "calibrate_soil_btn": "Calibrate Soil",
+    "agronomic_precision": "Agronomic Precision",
+    "evaluation_shift": "Evaluation Shift",
+    "weather_baseline_mode": "Weather Baseline Mode:",
+    "with_confirmed_card": "With Confirmed Soil Card:",
+    "upload_calibrate_tab": "Upload & Calibrate Soil Card",
+    "impact_shift_tab": "Agronomic Impact Shift",
+    "welfare_schemes_tab": "Welfare Schemes (Planned)"
   },
   "community": {
     "title": "Community Collaboration & Disease Outbreak Hub",
@@ -747,7 +825,11 @@
       "weekly_trend": "4-Week Incidence Trend:",
       "hotspot_villages": "Hotspot Villages (High Incidence):",
       "officer_advisories": "Recommended Extension Actions:"
-    }
+    },
+    "browse_machinery": "Browse Machinery",
+    "view_groups": "View Groups",
+    "open_split_calculator": "Open Split Calculator",
+    "plain_meaning": "Community tools allow you to pool transport with neighbouring farmers in {{village}} and rent idle farm machinery at fair daily rates."
   },
   "market": {
     "title": "Market Intelligence & Produce Marketplace",
@@ -767,11 +849,11 @@
     "col_district": "District & State",
     "col_modal_price": "Modal Price",
     "col_distance": "Distance (Haversine)",
-    "col_transport_cost": "Transport Deduction",
-    "col_market_fee": "Market Fee",
+    "col_transport_cost": "Transport Cost",
+    "col_market_fee": "Mandi Fee",
     "col_gross": "Gross Revenue",
     "col_net": "Net Realization",
-    "col_net_per_q": "Take-Home / Quintal",
+    "col_net_per_q": "Net Realization / q",
     "best_choice_badge": "Best Net Return",
     "reasoning_label": "Calculation Reasoning",
     "assumptions_title": "Editable Calculation Assumptions",
@@ -840,7 +922,27 @@
     "admin_verify_action": "Verify Farmer",
     "admin_unverify_action": "Revoke Verification",
     "use_mandi_price": "Use Mandi Price",
-    "use_mandi_price_success": "Expected price updated to current mandi modal price: ₹"
+    "use_mandi_price_success": "Expected price updated to current mandi modal price: ₹",
+    "list_harvest_btn": "List Harvest for Farm-Gate Sale",
+    "mandi_rankings_trends": "Mandi Rankings & Trends",
+    "farm_gate_marketplace": "Farm-Gate Marketplace",
+    "buyer_inquiries_inbox": "Buyer Inquiries & Inbox",
+    "misleading_modal_warning": "Gross modal price is misleading without transport cost. Always choose based on net realization.",
+    "calibrated_datasets_note": "APMC modal prices and transport rates are calibrated on illustrative market datasets.",
+    "realization_simulator_params": "Realization Simulator Parameters",
+    "mandi_ranked_by_net": "APMC Mandis Ranked by Net Realization",
+    "formula_label": "Formula: (Modal Price × Qty) - Transport Cost - Mandi Fee",
+    "total_net_payout": "Total Net Payout",
+    "details_label": "Details",
+    "top_mandi_realization": "Top Mandi Realization",
+    "awaiting_prices": "Awaiting prices",
+    "view_all_mandis": "View All Mandis",
+    "transport_cess_math": "Transport & Cess Math",
+    "gross_realization": "Gross Realization",
+    "freight_logistics": "Freight Logistics",
+    "mandi_cess": "Mandi Cess",
+    "plain_meaning_best": "Selling {{quantity}} quintals of {{crop}} at {{mandi}} gives your highest net payout of ₹{{rate}}/q after deducting transport and mandi fees.",
+    "calculating_ranking": "Calculating net mandi realization rankings..."
   },
   "pictorial": {
     "choose_view": "Choose How to View",
@@ -856,7 +958,9 @@
     "profit_title": "Farm Profit",
     "health_title": "Farm Health",
     "how_it_helps": "4 Steps for Your Farm Today",
-    "always_show_listen": "Always show Listen buttons"
+    "always_show_listen": "Always show Listen buttons",
+    "recommended_badge": "Recommended",
+    "standard_badge": "Standard"
   },
   "reminders": {
     "title": "Reminders & Field Alerts",
@@ -913,6 +1017,61 @@
     "save_reminder_btn": "Save Reminder",
     "repeat_label": "Repeat:",
     "snoozed_badge": "Snoozed",
-    "due_label": "Due:"
+    "due_label": "Due:",
+    "loading": "Loading reminders..."
+  },
+  "howto": {
+    "walkthrough_slot": "Walkthrough Slot",
+    "video_coming_soon": "Video Coming Soon",
+    "video_fallback_desc": "Video coming soon. Please follow the written steps below.",
+    "read_illustrated_steps": "Read Illustrated Written Steps",
+    "quick_summary_title": "Quick Summary of Steps",
+    "listen_summary": "Listen to summary",
+    "step1_title": "Step 1 • Language & Farm",
+    "step1_desc": "Select your preferred language (English, Telugu, Hindi) and verify your registered farm holding in the banner.",
+    "step2_title": "Step 2 • Weather & Rain",
+    "step2_desc": "Check whether rainfall is expected today. High rainfall forecasts trigger rain-skips to save pump electricity.",
+    "step3_title": "Step 3 • Water Budget",
+    "step3_desc": "Compute water budget to see root-zone moisture depletion and required irrigation depth in millimetres and litres.",
+    "step4_title": "Step 4 • Disease Diagnosis",
+    "step4_desc": "Upload a leaf photo. AI models identify leaf spots or blight with confidence percentage and IPM treatments.",
+    "step5_title": "Step 5 • Profit What-If",
+    "step5_desc": "Adjust expected yield and mandi market price sliders to see live impact on net profit and operational margins.",
+    "step6_title": "Step 6 • Voice Assistant",
+    "step6_desc": "Speak naturally with voice assistant in Telugu, Hindi or English for instant answers linked to the exact screens.",
+    "video_not_supported": "Your browser does not support HTML5 video."
+  },
+  "tour": {
+    "title_prefix": "Step",
+    "tour_label": "Grow2Gain Guided Tour",
+    "step1_title": "Step 1: Choose Your Language (భాష / भाषा)",
+    "step1_desc": "Switch between English, Telugu (తెలుగు), and Hindi (हिन्दी) anytime from the top bar. All recommendations and audio read-aloud support your local language.",
+    "step1_action": "Next: Farm Setup",
+    "step2_title": "Step 2: Choose or Add Your Farm Parcel",
+    "step2_desc": "Select your active farm parcel or add a new one. Enter whether land is owned or leased so irrigation and profit models reflect your true costs.",
+    "step2_action": "View My Farms",
+    "step3_title": "Step 3: Check Agro-Weather & 7-Day Forecast",
+    "step3_desc": "View live weather conditions and rainfall forecasts calibrated to your village. See daily reference evapotranspiration (ET0) for crop water demand.",
+    "step3_action": "View Weather",
+    "step4_title": "Step 4: Crop Water Budget & Irrigation Advice",
+    "step4_desc": "Know exactly when and how much to water your field using FAO-56 agro-meteorological models. Avoid water wastage and protect root zones.",
+    "step4_action": "Check Water Budget",
+    "step5_title": "Step 5: Scan Crop Leaf for Disease Diagnosis",
+    "step5_desc": "Upload or take a photo of a crop leaf to identify diseases with confidence ratings, symptoms, and organic or chemical treatment advice.",
+    "step5_action": "Diagnose Leaf",
+    "step6_title": "Step 6: Understand Farm Costs & Live Profit",
+    "step6_desc": "Calculate operating expenses, compare crops, and use the interactive What-If slider to estimate your net profit under changing yields and mandi prices.",
+    "step6_action": "See Economics",
+    "step7_title": "Step 7: Ask the Voice Assistant Anytime",
+    "step7_desc": "Tap the Voice button to speak in Telugu, Hindi, or English. Ask questions like \"Will it rain today?\", \"Should I irrigate?\", or \"What is the mandi price?\".",
+    "step7_action": "Go to Dashboard",
+    "skip": "Skip Tour",
+    "previous": "Previous",
+    "finish": "Finish Tour"
+  },
+  "command": {
+    "no_results": "No matching pages or tools found",
+    "try_searching": "Try searching for \"weather\", \"irrigation\", \"mandi\" or \"language\"",
+    "footer_nav": "Use ↑ ↓ arrows to navigate, Enter to select"
   }
 }

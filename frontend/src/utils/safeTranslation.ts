@@ -72,6 +72,16 @@ export const STATUS_MAP: Record<string, { te: string; hi: string }> = {
   'normal optimal agro-climatic conditions.': { te: 'సాధారణ అనుకూల వ్యవసాయ వాతావరణ పరిస్థితులు.', hi: 'सामान्य इष्टतम कृषि-जलवायु स्थितियां।' },
   'multi-agent evaluated': { te: 'ఏజెంట్లు అంచనా వేసినది', hi: 'एजेंटों द्वारा मूल्यांकित' },
   'awaiting run': { te: 'స్కాన్ కోసం వేచి ఉంది', hi: 'समीक्षा प्रतीक्षित' },
+  'high heat': { te: 'తీవ్ర ఎండ', hi: 'तेज धूप' },
+  'rain alert': { te: 'వర్ష హెచ్చరిక', hi: 'बारिश चेतावनी' },
+  'rain likely': { te: 'వర్షం కురిసే అవకాశం', hi: 'बारिश की संभावना' },
+  'dry & clear': { te: 'ఎండ & నిర్మలం', hi: 'धूप और साफ' },
+  'optimal limits': { te: 'అనుకూల పరిమితులు', hi: 'इष्टतम सीमा' },
+  elevated: { te: 'ఎక్కువగా ఉంది', hi: 'बढ़ा हुआ' },
+  low: { te: 'తక్కువగా ఉంది', hi: 'कम' },
+  active: { te: 'క్రియాశీలం', hi: 'सक्रिय' },
+  unverified: { te: 'ధృవీకరించబడలేదు', hi: 'असत्यापित' },
+  verified: { te: 'ధృవీకరించబడింది', hi: 'सत्यापित' },
 };
 
 export const PRIORITY_MAP: Record<string, { te: string; hi: string }> = {
@@ -122,6 +132,23 @@ export const CROP_MAP: Record<string, { te: string; hi: string }> = {
   chickpea: { te: 'శనగలు', hi: 'चना' },
   soybean: { te: 'సోయాబీన్', hi: 'सोयाबीन' },
   mustard: { te: 'ఆవాలు', hi: 'सरसों' },
+  coffee: { te: 'కాఫీ', hi: 'कॉफ़ी' },
+  jute: { te: 'జనపనార', hi: 'जूट' },
+  blackgram: { te: 'మినుములు', hi: 'उड़द' },
+  lentil: { te: 'మసూర్ పప్పు', hi: 'मसूर' },
+  mothbeans: { te: 'బొబ్బర్లు', hi: 'मोठ' },
+  mungbean: { te: 'పెసలు', hi: 'मूंग' },
+  kidneybeans: { te: 'రాజ్మా', hi: 'राजमा' },
+  banana: { te: 'అరటి', hi: 'केला' },
+  mango: { te: 'మామిడి', hi: 'आम' },
+  grapes: { te: 'ద్రాక్ష', hi: 'अंगूर' },
+  watermelon: { te: 'పుచ్చకాయ', hi: 'तरबूज' },
+  muskmelon: { te: 'ఖర్బూజా', hi: 'खरबूजा' },
+  apple: { te: 'యాపిల్', hi: 'सेब' },
+  orange: { te: 'నారింజ', hi: 'संतरा' },
+  papaya: { te: 'బొప్పాయి', hi: 'पपीता' },
+  coconut: { te: 'కొబ్బరి', hi: 'नारियल' },
+  pomegranate: { te: 'దానిమ్మ', hi: 'अनार' },
 };
 
 export const HEALTH_COMPONENT_MAP: Record<string, { te: string; hi: string }> = {

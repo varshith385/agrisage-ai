@@ -374,8 +374,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
           {filteredItems.length === 0 ? (
             <div className="py-12 text-center text-[#4A5750] dark:text-[#9EB0A5]">
               <Search className="w-10 h-10 mx-auto text-stone-300 dark:text-stone-600 mb-2" />
-              <p className="text-[15px] font-semibold">No matching pages or tools found</p>
-              <p className="text-xs text-stone-400 mt-1">Try searching for "weather", "irrigation", "mandi" or "language"</p>
+              <p className="text-[15px] font-semibold">{t('command.no_results', { defaultValue: 'No matching pages or tools found' })}</p>
+              <p className="text-xs text-stone-400 mt-1">{t('command.try_searching', { defaultValue: 'Try searching for "weather", "irrigation", "mandi" or "language"' })}</p>
             </div>
           ) : (
             filteredItems.map((item, idx) => {
@@ -429,7 +429,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 
         {/* Footer info bar */}
         <div className="px-5 py-2.5 border-t border-[#D9D4C7] dark:border-[#273B30] bg-[#FFFDF8] dark:bg-[#121B16] flex items-center justify-between text-[11px] text-[#4A5750] dark:text-[#9EB0A5]">
-          <span>Use &uarr; &darr; arrows to navigate, Enter to select</span>
+          <span>{t('command.footer_nav', { defaultValue: 'Use ↑ ↓ arrows to navigate, Enter to select' })}</span>
           <span className="font-semibold text-[#1B5E3B] dark:text-[#F2B01E]">Grow2Gain Command Palette</span>
         </div>
       </div>

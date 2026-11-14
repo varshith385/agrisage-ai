@@ -57,7 +57,7 @@ export const PictorialTile: React.FC<PictorialTileProps> = ({
 
       {/* Bottom Controls: Big Speaker Button & "Details" Button */}
       <div className="pt-2 border-t border-[#D9D4C7] dark:border-[#273B30] flex items-center justify-between gap-3">
-        <ReadAloudButton text={fullSpoken} label="Listen" />
+        <ReadAloudButton text={fullSpoken} />
 
         {onOpenDetails ? (
           <button

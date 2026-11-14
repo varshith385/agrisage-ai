@@ -23,6 +23,7 @@ import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { WateringFieldIllustration } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
+import { translateBackendString } from '../utils/safeTranslation';
 import { StepFlow } from '../components/common/StepFlow';
 
 export const FarmRegistrationPage: React.FC = () => {
@@ -169,7 +170,7 @@ export const FarmRegistrationPage: React.FC = () => {
               onClick={() => setMode('words')}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-stone-700 flex items-center gap-1.5 text-xs shadow-xs"
             >
-              <span>{language === 'te' ? 'పూర్తి వివరాలు & రిజిస్ట్రేషన్' : 'View / Edit Parcels'}</span>
+              <span>{language === 'te' ? 'పూర్తి వివరాలు & రిజిస్ట్రేషన్' : language === 'hi' ? 'खेत विवरण देखें / बदलें' : 'View / Edit Parcels'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           }
@@ -179,35 +180,35 @@ export const FarmRegistrationPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <PictorialTile
             title={language === 'te' ? 'యాక్టివ్ పొలం' : language === 'hi' ? 'सक्रिय खेत' : 'Active Parcel'}
-            phrase={`${activeFarm?.area || area} Acres (${activeFarm?.village || village})`}
+            phrase={language === 'te' ? `${activeFarm?.area || area} ఎకరాలు (${activeFarm?.village || village})` : language === 'hi' ? `${activeFarm?.area || area} एकड़ (${activeFarm?.village || village})` : `${activeFarm?.area || area} Acres (${activeFarm?.village || village})`}
             illustration={<WateringFieldIllustration size={80} />}
             status={activeFarm ? 'success' : 'nodata'}
-            statusWord={activeFarm ? `${activeFarm.area} ac` : 'No farm'}
+            statusWord={activeFarm ? `${activeFarm.area} ac` : (language === 'te' ? 'పొలం లేదు' : language === 'hi' ? 'खेत नहीं' : 'No farm')}
             spokenText={`Active farm is ${activeFarm?.name || 'My Farmland'}, total area ${activeFarm?.area || area} acres located in ${activeFarm?.village || village}.`}
             onOpenDetails={() => setMode('words')}
-            detailsLabel={language === 'te' ? 'వివరాలు' : 'Details'}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
 
           <PictorialTile
             title={language === 'te' ? 'భూమి హక్కులు' : language === 'hi' ? 'मालिकाना हक' : 'Land Tenure'}
-            phrase={`${activeFarm?.ownership_type || ownershipType} tenure (${activeFarm?.owned_area || ownedArea} ac owned)`}
+            phrase={language === 'te' ? `${translateBackendString(String(activeFarm?.ownership_type || ownershipType), language)} హక్కు (${activeFarm?.owned_area || ownedArea} ఎకరాలు సొంతం)` : language === 'hi' ? `${translateBackendString(String(activeFarm?.ownership_type || ownershipType), language)} हक (${activeFarm?.owned_area || ownedArea} एकड़ खुद की)` : `${activeFarm?.ownership_type || ownershipType} tenure (${activeFarm?.owned_area || ownedArea} ac owned)`}
             illustration={<Layers className="w-16 h-16 text-[#1B5E3B]" />}
             status="info"
-            statusWord={String(activeFarm?.ownership_type || ownershipType)}
+            statusWord={translateBackendString(String(activeFarm?.ownership_type || ownershipType), language)}
             spokenText={`Land tenure is ${activeFarm?.ownership_type || ownershipType}. ${activeFarm?.owned_area || ownedArea} acres owned and ${activeFarm?.leased_area || leasedArea} acres leased.`}
             onOpenDetails={() => setMode('words')}
-            detailsLabel={language === 'te' ? 'వివరాలు' : 'Details'}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
 
           <PictorialTile
             title={language === 'te' ? 'నీటిపారుదల రకం' : language === 'hi' ? 'सिंचाई प्रणाली' : 'Irrigation Profile'}
-            phrase={`${activeFarm?.irrigation_method || irrigationMethod} (${activeFarm?.water_source || waterSource})`}
+            phrase={language === 'te' ? `${translateBackendString(String(activeFarm?.irrigation_method || irrigationMethod), language)} (${translateBackendString(String(activeFarm?.water_source || waterSource), language)})` : language === 'hi' ? `${translateBackendString(String(activeFarm?.irrigation_method || irrigationMethod), language)} (${translateBackendString(String(activeFarm?.water_source || waterSource), language)})` : `${activeFarm?.irrigation_method || irrigationMethod} (${activeFarm?.water_source || waterSource})`}
             illustration={<Droplets className="w-16 h-16 text-sky-600" />}
             status="good"
-            statusWord={String(activeFarm?.irrigation_method || irrigationMethod)}
+            statusWord={translateBackendString(String(activeFarm?.irrigation_method || irrigationMethod), language)}
             spokenText={`Irrigation method is ${activeFarm?.irrigation_method || irrigationMethod} utilizing ${activeFarm?.water_source || waterSource} water.`}
             onOpenDetails={() => setMode('words')}
-            detailsLabel={language === 'te' ? 'వివరాలు' : 'Details'}
+            detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
         </div>
 
@@ -321,20 +322,20 @@ export const FarmRegistrationPage: React.FC = () => {
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
               <div className="flex justify-between text-[#4E5F57]">
-                <span>Total Acreage:</span>
+                <span>{t('farms.total_acreage_label', { defaultValue: 'Total Acreage:' })}</span>
                 <strong className="text-[#183D2E]">{activeFarm ? activeFarm.area : area} Acres</strong>
               </div>
               <div className="flex justify-between text-[#4E5F57]">
-                <span>Owned Land:</span>
+                <span>{t('farms.owned_land_label', { defaultValue: 'Owned Land:' })}</span>
                 <strong className="text-[#183D2E]">{activeFarm ? activeFarm.owned_area : ownedArea} Acres</strong>
               </div>
               <div className="flex justify-between text-[#4E5F57]">
-                <span>Leased Land:</span>
+                <span>{t('farms.leased_land_label', { defaultValue: 'Leased Land:' })}</span>
                 <strong className="text-[#7A553A]">{activeFarm ? activeFarm.leased_area : leasedArea} Acres</strong>
               </div>
               {(activeFarm?.lease_amount || leaseAmount) > 0 && (
                 <div className="flex justify-between text-amber-800 border-t border-[#7A553A]/10 pt-1 font-semibold">
-                  <span>Annual Lease Rent:</span>
+                  <span>{t('farms.annual_lease_rent_label', { defaultValue: 'Annual Lease Rent:' })}</span>
                   <strong>₹{(activeFarm ? activeFarm.lease_amount : leaseAmount).toLocaleString('en-IN')}</strong>
                 </div>
               )}
@@ -362,16 +363,16 @@ export const FarmRegistrationPage: React.FC = () => {
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
               <div className="flex justify-between text-[#4E5F57]">
-                <span>Soil Type:</span>
-                <strong className="text-[#183D2E]">{activeFarm ? activeFarm.soil_type : soilType}</strong>
+                <span>{t('farms.soil_type_colon', { defaultValue: 'Soil Type:' })}</span>
+                <strong className="text-[#183D2E]">{activeFarm ? translateBackendString(activeFarm.soil_type || '', language, activeFarm.soil_type || '') : translateBackendString(soilType, language, soilType)}</strong>
               </div>
               <div className="flex justify-between text-[#4E5F57]">
-                <span>Water Source:</span>
-                <strong className="text-[#183D2E]">{activeFarm ? activeFarm.water_source : waterSource}</strong>
+                <span>{t('farms.water_source_colon', { defaultValue: 'Water Source:' })}</span>
+                <strong className="text-[#183D2E]">{activeFarm ? translateBackendString(activeFarm.water_source || '', language, activeFarm.water_source || '') : translateBackendString(waterSource, language, waterSource)}</strong>
               </div>
               <div className="flex justify-between text-[#4E5F57]">
-                <span>Irrigation Method:</span>
-                <strong className="text-[#183D2E] capitalize">{activeFarm ? activeFarm.irrigation_method : irrigationMethod}</strong>
+                <span>{t('farms.irrigation_method_colon', { defaultValue: 'Irrigation Method:' })}</span>
+                <strong className="text-[#183D2E] capitalize">{activeFarm ? translateBackendString(activeFarm.irrigation_method || '', language, activeFarm.irrigation_method || '') : translateBackendString(irrigationMethod, language, irrigationMethod)}</strong>
               </div>
               <div className="flex justify-between text-[#4E5F57]">
                 <span>Seasonal Budget:</span>
@@ -380,7 +381,7 @@ export const FarmRegistrationPage: React.FC = () => {
             </div>
 
             <p className="text-[11px] text-[#7A553A]">
-              Irrigation method directly influences application efficiency (Drip 90%, Flood 60%).
+              {t('farms.irrigation_efficiency_note', { defaultValue: 'Irrigation method directly influences application efficiency (Drip 90%, Flood 60%).' })}
             </p>
           </div>
 

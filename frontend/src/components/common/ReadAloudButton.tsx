@@ -90,13 +90,18 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
     setCurrentSpeech(speech);
   };
 
+  const defaultLabel = language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen';
+  const stopLabel = language === 'te' ? 'ఆపండి' : language === 'hi' ? 'रोकें' : 'Stop';
+  const defaultAria = language === 'te' ? 'వాయిస్ ద్వారా వివరణ వినండి' : language === 'hi' ? 'आवाज से विवरण सुनें' : 'Listen to advisory text using browser voice';
+  const stopAria = language === 'te' ? 'వాయిస్ ప్లేబ్యాక్ ఆపండి' : language === 'hi' ? 'आवाज प्लेबैक रोकें' : 'Stop browser voice playback';
+
   return (
     <div className="relative inline-flex items-center">
       <button
         type="button"
         onClick={handleSpeak}
-        aria-label={isPlaying ? 'Stop browser voice playback' : (label || 'Listen to advisory text using browser voice')}
-        title={isPlaying ? 'Stop voice playback' : (label || 'Listen to this explanation')}
+        aria-label={isPlaying ? stopAria : (label || defaultAria)}
+        title={isPlaying ? stopLabel : (label || defaultLabel)}
         className={`min-h-[46px] px-3.5 py-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all text-xs font-bold ${
           isPlaying
             ? 'bg-[#F2B01E] text-[#1F2A24] border-[#F2B01E] animate-pulse shadow-xs'
@@ -106,12 +111,12 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
         {isPlaying ? (
           <>
             <VolumeX className="w-4 h-4 text-[#1F2A24]" />
-            <span>Stop</span>
+            <span>{stopLabel}</span>
           </>
         ) : (
           <>
             <Volume2 className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E]" />
-            <span>{label || 'Listen'}</span>
+            <span>{label || defaultLabel}</span>
           </>
         )}
       </button>

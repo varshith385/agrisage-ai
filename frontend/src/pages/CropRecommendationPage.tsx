@@ -496,7 +496,7 @@ export const CropRecommendationPage: React.FC = () => {
 
               {mlResult?.climate_warnings && mlResult.climate_warnings.length > 0 && (
                 <div className="bg-red-50 border border-red-200 text-red-900 p-4 rounded-xl text-xs space-y-1">
-                  <span className="font-bold block">Climate Suitability Warnings:</span>
+                  <span className="font-bold block">{t('recommend.climate_suitability_warnings', { defaultValue: 'Climate Suitability Warnings:' })}</span>
                   <ul className="list-disc list-inside space-y-0.5 text-red-800">
                     {mlResult.climate_warnings.map((w: string, i: number) => (
                       <li key={i}>{w}</li>

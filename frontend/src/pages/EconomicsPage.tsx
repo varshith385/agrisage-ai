@@ -50,6 +50,7 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { MoneyProfitIllustration, CoinStackGauge, NoDataIllustration } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
+import { translateBackendString } from '../utils/safeTranslation';
 
 export const EconomicsPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -372,8 +373,18 @@ export const EconomicsPage: React.FC = () => {
 
   // Plain meaning explanation
   const plainMeaning = liveResult.net_profit >= 0
-    ? `At current price of ₹${sliderPrice}/q and harvest yield of ${sliderYield} q/acre, your estimated net profit is ₹${Math.round(liveResult.net_profit).toLocaleString('en-IN')} with a ${liveResult.margin_pct.toFixed(1)}% margin.`
-    : `Warning: Projected net deficit of ₹${Math.abs(Math.round(liveResult.net_profit)).toLocaleString('en-IN')}. Break-even requires at least ₹${liveResult.break_even_price?.toFixed(0) || 'N/A'}/q or reduced operating expenditure.`;
+    ? t('economics.plain_meaning_profit', {
+        price: sliderPrice,
+        yield: sliderYield,
+        profit: Math.round(liveResult.net_profit).toLocaleString('en-IN'),
+        margin: liveResult.margin_pct.toFixed(1),
+        defaultValue: `At current price of ₹${sliderPrice}/q and harvest yield of ${sliderYield} q/acre, your estimated net profit is ₹${Math.round(liveResult.net_profit).toLocaleString('en-IN')} with a ${liveResult.margin_pct.toFixed(1)}% margin.`,
+      })
+    : t('economics.plain_meaning_deficit', {
+        deficit: Math.abs(Math.round(liveResult.net_profit)).toLocaleString('en-IN'),
+        breakeven: liveResult.break_even_price?.toFixed(0) || 'N/A',
+        defaultValue: `Warning: Projected net deficit of ₹${Math.abs(Math.round(liveResult.net_profit)).toLocaleString('en-IN')}. Break-even requires at least ₹${liveResult.break_even_price?.toFixed(0) || 'N/A'}/q or reduced operating expenditure.`,
+      });
 
   // PICTORIAL MODE v2
   if (isPictorial) {
@@ -412,7 +423,7 @@ export const EconomicsPage: React.FC = () => {
               <h2 className="font-display text-[24px] sm:text-[30px] font-black text-[#1F2A24] leading-snug">
                 ₹{Math.round(profitVal).toLocaleString('en-IN')}
                 <span className="text-[16px] font-medium text-[#4A5750] ml-2">
-                  ({selectedCrop} &bull; {sliderArea} acres &bull; Margin {liveResult.margin_pct.toFixed(1)}%)
+                  ({selectedCrop} &bull; {sliderArea} {language === 'te' ? 'ఎకరాలు' : language === 'hi' ? 'एकड़' : 'acres'} &bull; {language === 'te' ? 'మార్జిన్' : language === 'hi' ? 'मार्जिन' : 'Margin'} {liveResult.margin_pct.toFixed(1)}%)
                 </span>
               </h2>
               <p className="text-[16px] text-[#4A5750] max-w-xl">
@@ -625,13 +636,13 @@ export const EconomicsPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3 text-xs font-semibold text-[#4E5F57] pt-1">
-              <span>Margin: <strong>{liveResult.margin_pct.toFixed(1)}%</strong></span>
+              <span>{t('economics.margin_label', { defaultValue: 'Margin:' })} <strong>{liveResult.margin_pct.toFixed(1)}%</strong></span>
               <span>&bull;</span>
-              <span>Per Acre: <strong>₹{Math.round(liveResult.net_profit / (sliderArea || 1)).toLocaleString('en-IN')}</strong></span>
+              <span>{t('economics.per_acre_label', { defaultValue: 'Per Acre:' })} <strong>₹{Math.round(liveResult.net_profit / (sliderArea || 1)).toLocaleString('en-IN')}</strong></span>
             </div>
 
             <p className="text-xs text-[#7A553A] font-medium pt-1">
-              Change vs Baseline: <strong className={changeVsBaseline >= 0 ? 'text-emerald-700' : 'text-red-700'}>
+              {t('economics.change_vs_baseline_label', { defaultValue: 'Change vs Baseline:' })} <strong className={changeVsBaseline >= 0 ? 'text-emerald-700' : 'text-red-700'}>
                 {changeVsBaseline >= 0 ? '+' : ''}₹{Math.round(changeVsBaseline).toLocaleString('en-IN')}
               </strong>
             </p>
@@ -644,7 +655,7 @@ export const EconomicsPage: React.FC = () => {
               onClick={() => setActiveTab('whatif')}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
-              <span>Simulate What-If</span>
+              <span>{t('economics.simulate_what_if', { defaultValue: 'Simulate What-If' })}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -655,7 +666,7 @@ export const EconomicsPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
-                Financial Baseline
+                {t('economics.financial_baseline', { defaultValue: 'Financial Baseline' })}
               </span>
               <span className="text-xs text-[#7A553A] font-semibold">
                 {sliderArea} acres &bull; {selectedCrop}
@@ -664,14 +675,14 @@ export const EconomicsPage: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-2 pt-1">
               <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Gross Revenue</span>
+                <span className="text-[10px] font-bold text-[#7A553A] uppercase block">{t('economics.gross_revenue_label', { defaultValue: 'Gross Revenue' })}</span>
                 <span className="text-lg font-black text-[#183D2E]">
                   ₹{liveResult.gross_revenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </span>
                 <span className="text-[10px] text-[#4E5F57] block">@ ₹{sliderPrice}/q</span>
               </div>
               <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] font-bold text-[#7A553A] uppercase block">Total Cost</span>
+                <span className="text-[10px] font-bold text-[#7A553A] uppercase block">{t('economics.total_cost_label', { defaultValue: 'Total Cost' })}</span>
                 <span className="text-lg font-black text-[#7A553A]">
                   ₹{liveResult.total_cost.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </span>
@@ -691,22 +702,22 @@ export const EconomicsPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
-                Break-Even Thresholds
+                {t('economics.break_even_thresholds', { defaultValue: 'Break-Even Thresholds' })}
               </span>
               <span className="text-xs font-bold text-[#DA9A4C] capitalize">
-                {ownershipType} Land
+                {translateBackendString(ownershipType, language, ownershipType)} {t('economics.land_suffix', { defaultValue: 'Land' })}
               </span>
             </div>
 
             <div className="space-y-2 pt-1 text-xs">
               <div className="flex justify-between items-center p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                <span className="font-medium text-[#4E5F57]">Break-Even Price:</span>
+                <span className="font-medium text-[#4E5F57]">{t('economics.break_even_price_label', { defaultValue: 'Break-Even Price:' })}</span>
                 <strong className="text-sm font-black text-[#183D2E]">
                   {liveResult.break_even_price !== null ? `₹${liveResult.break_even_price.toLocaleString('en-IN', { maximumFractionDigits: 1 })}/q` : 'N/A'}
                 </strong>
               </div>
               <div className="flex justify-between items-center p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                <span className="font-medium text-[#4E5F57]">Break-Even Yield:</span>
+                <span className="font-medium text-[#4E5F57]">{t('economics.break_even_yield_label', { defaultValue: 'Break-Even Yield:' })}</span>
                 <strong className="text-sm font-black text-[#183D2E]">
                   {liveResult.break_even_yield !== null ? `${liveResult.break_even_yield.toFixed(1)} q/ac` : 'N/A'}
                 </strong>
@@ -714,12 +725,12 @@ export const EconomicsPage: React.FC = () => {
             </div>
 
             <div className="pt-1 text-[11px] text-[#7A553A]">
-              Tenure Structure: <strong>{ownershipType === 'mixed' ? `${ownedArea} ac own + ${leasedArea} ac lease` : `${area} acres`}</strong>
+              {t('economics.tenure_structure_label', { defaultValue: 'Tenure Structure:' })} <strong>{ownershipType === 'mixed' ? `${ownedArea} ac own + ${leasedArea} ac lease` : `${area} acres`}</strong>
             </div>
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 text-[11px] text-[#7A553A]">
-            Prices below break-even result in seasonal debt. Verify prices at local APMC mandi.
+            {t('economics.below_break_even_debt', { defaultValue: 'Prices below break-even result in seasonal debt. Verify prices at local APMC mandi.' })}
           </div>
         </div>
       </div>
@@ -738,7 +749,7 @@ export const EconomicsPage: React.FC = () => {
             }`}
           >
             <Sliders className="w-4 h-4 text-[#DA9A4C]" />
-            <span>What-If Simulator</span>
+            <span>{t('economics.what_if_simulator_tab', { defaultValue: 'What-If Simulator' })}</span>
           </button>
           <button
             type="button"

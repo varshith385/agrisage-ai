@@ -7,7 +7,7 @@ const CHOOSER_STORAGE_KEY = 'agrisage_visual_choice_v1';
 
 export const VisualModeChooserModal: React.FC = () => {
   const { setPictorial } = usePictorial();
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export const VisualModeChooserModal: React.FC = () => {
             </div>
             <span className="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
               <Check className="w-3 h-3" />
-              <span>Recommended</span>
+              <span>{t('pictorial.recommended_badge', { defaultValue: 'Recommended' })}</span>
             </span>
           </button>
 
@@ -110,7 +110,7 @@ export const VisualModeChooserModal: React.FC = () => {
                 {language === 'te' ? 'పూర్తి టెక్స్ట్' : language === 'hi' ? 'विस्तृत टेक्स्ट' : 'Detailed Tables & Specs'}
               </span>
             </div>
-            <span className="text-[10px] text-stone-400 font-medium">Standard</span>
+            <span className="text-[10px] text-stone-400 font-medium">{t('pictorial.standard_badge', { defaultValue: 'Standard' })}</span>
           </button>
         </div>
       </div>

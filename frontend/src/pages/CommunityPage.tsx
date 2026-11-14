@@ -46,7 +46,10 @@ export const CommunityPage: React.FC = () => {
   const villageName = activeFarm?.village || userLoc?.village || 'Geikonda';
   const districtName = activeFarm?.district || userLoc?.district || 'Warangal';
 
-  const plainMeaning = `Community tools allow you to pool transport with neighbouring farmers in ${villageName} and rent idle farm machinery at fair daily rates.`;
+  const plainMeaning = t('community.plain_meaning', {
+    village: villageName,
+    defaultValue: `Community tools allow you to pool transport with neighbouring farmers in ${villageName} and rent idle farm machinery at fair daily rates.`,
+  });
 
   // PICTORIAL MODE v2
   if (isPictorial) {
@@ -71,7 +74,7 @@ export const CommunityPage: React.FC = () => {
                 </span>
                 <StatusBadge
                   status="success"
-                  label="Local Hub"
+                  label={language === 'te' ? 'స్థానిక కేంద్రం' : language === 'hi' ? 'स्थानीय केंद्र' : 'Local Hub'}
                   size="sm"
                 />
               </div>
@@ -107,7 +110,7 @@ export const CommunityPage: React.FC = () => {
             phrase={language === 'te' ? 'ట్రాక్టర్లు, దున్నే యంత్రాల అద్దె' : language === 'hi' ? 'ट्रैक्टर व कृषि उपकरण किराया' : 'Rent tractors & implements'}
             illustration={<Wrench className="w-16 h-16 text-[#1B5E3B]" />}
             status="info"
-            statusWord="Machinery"
+            statusWord={language === 'te' ? 'యంత్రాలు' : language === 'hi' ? 'मशीनरी' : 'Machinery'}
             spokenText="Rent idle tractors, rotavators, and sprayers at transparent hourly rates."
             onOpenDetails={() => {
               setMode('words');
@@ -122,7 +125,7 @@ export const CommunityPage: React.FC = () => {
             phrase={language === 'te' ? 'కలిసి మండికి రవాణా ఖర్చులు తగ్గించుకోండి' : language === 'hi' ? 'मंडी के लिए साझा वाहन' : 'Pool freight to APMC'}
             illustration={<Truck className="w-16 h-16 text-[#DA9A4C]" />}
             status="info"
-            statusWord="Freight Pool"
+            statusWord={language === 'te' ? 'రవాణా సమూహం' : language === 'hi' ? 'साझा परिवहन' : 'Freight Pool'}
             spokenText="Pool harvest freight with neighbouring farmers to reduce per-quintal transportation costs."
             onOpenDetails={() => {
               setMode('words');
@@ -137,7 +140,7 @@ export const CommunityPage: React.FC = () => {
             phrase={language === 'te' ? 'సమీప గ్రామాల తెగుళ్ల సమాచారం' : language === 'hi' ? 'आसपास के गांवों में कीट प्रकोप' : 'Pest outbreak reports'}
             illustration={<AlertTriangle className="w-16 h-16 text-[#B3261E]" />}
             status="warning"
-            statusWord="Community Watch"
+            statusWord={language === 'te' ? 'సమాజ నిఘా' : language === 'hi' ? 'सामुदायिक निगरानी' : 'Community Watch'}
             spokenText="Community pest outbreak radar tracks reported foliar infections across neighbouring mandals."
             onOpenDetails={() => {
               setMode('words');
@@ -169,7 +172,7 @@ export const CommunityPage: React.FC = () => {
             className="min-h-[48px] px-5 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2"
           >
             <Wrench className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Browse Machinery</span>
+            <span>{t('community.browse_machinery', { defaultValue: 'Browse Machinery' })}</span>
           </button>
         }
       />
@@ -230,7 +233,7 @@ export const CommunityPage: React.FC = () => {
               onClick={() => setActiveTab('groups')}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
-              <span>View Groups</span>
+              <span>{t('community.view_groups', { defaultValue: 'View Groups' })}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -265,7 +268,7 @@ export const CommunityPage: React.FC = () => {
               onClick={() => setActiveTab('calculator')}
               className="text-xs font-bold text-[#183D2E] hover:underline flex items-center gap-1"
             >
-              <span>Open Split Calculator</span>
+              <span>{t('community.open_split_calculator', { defaultValue: 'Open Split Calculator' })}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
