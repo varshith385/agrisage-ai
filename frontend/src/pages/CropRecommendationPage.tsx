@@ -309,7 +309,7 @@ export const CropRecommendationPage: React.FC = () => {
 
             <WhatThisMeans
               message={plainMeaning}
-              confidenceNote="Indicative agronomic advice based on ICAR crop rotation guidelines (details to verify with KVK)."
+              confidenceNote="Indicative agronomic advice based on general crop rotation principles (details to verify with local extension officer)."
             />
           </div>
         </div>

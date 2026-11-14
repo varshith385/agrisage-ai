@@ -1081,7 +1081,7 @@ export const DiseasePage: React.FC = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="text-xs text-neutral-500">Government ICAR/KVK package of practices citations appear here upon diagnosis.</p>
+                  <p className="text-xs text-neutral-500">Agronomic package of practices guidance appears here upon diagnosis.</p>
                 )}
               </div>
 

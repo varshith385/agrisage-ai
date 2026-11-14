@@ -203,6 +203,21 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onClose }) => {
             {currentStep.description}
           </p>
 
+          {currentStep.id === 'voice' && (
+            <div className="bg-[#EFE7DE] border border-[#7A553A]/30 rounded-2xl p-3.5 mb-5 text-left text-xs text-[#183D2E]">
+              <p className="font-bold flex items-center gap-1.5 mb-1 text-[#183D2E]">
+                <Mic className="w-4 h-4 text-[#DA9A4C]" />
+                <span>Telugu & Regional Voice Tip:</span>
+              </p>
+              <p className="text-xs text-[#4E5F57] leading-relaxed">
+                Open this site in Microsoft Edge, or add the Telugu language and its speech voice in Windows Settings.
+              </p>
+              <p className="text-xs text-[#183D2E] font-medium mt-1">
+                ఈ సైట్‌ను Microsoft Edge లో తెరవండి లేదా Windows Settings లో తెలుగు భాష మరియు వాయిస్‌ను జోడించండి.
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-center mb-6">
             <ReadAloudButton text={readText} label="Listen to this step" />
           </div>

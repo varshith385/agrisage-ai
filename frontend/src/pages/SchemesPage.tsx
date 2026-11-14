@@ -356,14 +356,14 @@ export const SchemesPage: React.FC = () => {
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
 
-          {/* Tile 3: Government Schemes (Planned) */}
+          {/* Tile 3: Schemes (Planned. Details to verify) */}
           <PictorialTile
-            title={language === 'te' ? 'ప్రభుత్వ పథకాలు (ప్రణాళిక)' : language === 'hi' ? 'सरकारी योजनाएं (प्रस्तावित)' : 'Welfare Schemes (Planned)'}
+            title={language === 'te' ? 'ప్రణాళిక. వివరాలు ధృవీకరించబడాలి' : language === 'hi' ? 'प्रस्तावित। विवरण सत्यापित करें' : 'Planned. Details to verify'}
             phrase={language === 'te' ? 'వివరాలు ధృవీకరించబడాలి (Planned, details to verify)' : language === 'hi' ? 'सत्यापन आवश्यक (Planned, details to verify)' : 'Directory planned (details to verify)'}
             illustration={<Landmark className="w-16 h-16 text-[#7A553A]" />}
             status="warning"
-            statusWord={language === 'te' ? 'పరిశీలించండి' : language === 'hi' ? 'सत्यापित करें' : 'Planned'}
-            spokenText="Government welfare schemes directory is planned. Details require verification from official local agriculture extension offices."
+            statusWord={language === 'te' ? 'ధృవీకరించండి' : language === 'hi' ? 'सत्यापित करें' : 'Details to verify'}
+            spokenText="Welfare schemes directory is planned. Details require verification from local agriculture extension offices."
             onOpenDetails={() => { setActiveTab('schemes'); setMode('words'); }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />

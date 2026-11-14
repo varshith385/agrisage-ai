@@ -283,3 +283,18 @@ The following translations were added in Round 5 Phase E for the First-Run Visua
 | **Farm StepFlow** | Crop & Soil Selection | పంట & నేల రకం ఎంపిక | फसल और मिट्टी का चयन | **Unverified**: Needs native review. |
 | **Farm StepFlow** | Land Acreage & Tenure | ఎకరాలు & యాజమాన్య హక్కు | रकबा व स्वामित्व पट्टा | **Unverified**: Needs native review. |
 
+---
+
+## 12. Round 5b Pluggable LLM, Voice Confirmation, and Voice Guidance Registry (Unverified — Awaiting Native Review)
+
+The following translations were added in Round 5b for interactive voice reminder confirmations (asking before saving), reminder cancellations, and browser/system voice configuration guidance cards:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Voice Reminders Prompt** | Would you like me to schedule a reminder: '{title}' for {time}? Reminder scheduled only after your confirmation. Reply 'Yes' to confirm or 'No' to cancel. | మీరు ఈ జ్ఞాపిక షెడ్యూల్ చేయాలనుకుంటున్నారా: '{title}', సమయం {time} (Asia/Kolkata)? జ్ఞాపిక నమోదు చేయబడింది నిర్ధారణ తర్వాత మాత్రమే. సేవ్ చేయడానికి 'అవును' లేదా రద్దు చేయడానికి 'వద్దు' అనండి. | क्या आप यह स्मरणपत्र जोड़ना चाहते हैं: '{title}', समय {time} (Asia/Kolkata)? स्मरणपत्र दर्ज किया गया पुष्टि के बाद ही। सहेजने के लिए 'हाँ' या रद्द करने के लिए 'नहीं' कहें। | **Unverified**: Needs native review. |
+| **Voice Reminders Saved** | Reminder saved successfully: '{title}'. You will see it on your Reminders page. | జ్ఞాపిక విజయవంతంగా భద్రపరచబడింది: '{title}'. మీ రిమైండర్ల పేజీలో ఇది కనిపిస్తుంది. | स्मरणपत्र सफलतापूर्वक जोड़ दिया गया: '{title}'। आपके स्मरणपत्र पृष्ठ पर यह उपलब्ध है। | **Unverified**: Needs native review. |
+| **Voice Reminders Cancelled** | Reminder was cancelled. | జ్ఞాపిక రద్దు చేయబడింది. | स्मरणपत्र रद्द कर दिया गया। | **Unverified**: Needs native review. |
+| **Voice Audio Guidance** | Open this site in Microsoft Edge, or add the Telugu language and its speech voice in Windows Settings. | ఈ సైట్‌ను Microsoft Edge లో తెరవండి లేదా Windows Settings లో తెలుగు భాష మరియు వాయిస్‌ను జోడించండి. | इस साइट को Microsoft Edge में खोलें, या Windows Settings में हिन्दी भाषा और वాయిస్ जोड़ें। | **Unverified**: Needs native review. |
+| **Schemes Pictorial Title** | Planned. Details to verify | ప్రణాళిక. వివరాలు ధృవీకరించబడాలి | प्रस्तावित। विवरण सत्यापित करें | **Unverified**: Needs native review. |
+
+

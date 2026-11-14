@@ -697,7 +697,7 @@ export const CalendarPage: React.FC = () => {
                   ],
                   sources: [
                     "FAO Irrigation and Drainage Paper 56 — Crop Stages and Lengths",
-                    "ICAR Krishi Vigyan Kendra (KVK) Agronomic Calendar Schedules",
+                    "General agronomic calendar schedules (details to verify with local extension officer)",
                   ],
                   limitations: [
                     "Weather anomalies (monsoon delay, heavy unseasonal rain) may accelerate or retard phenological DAS by 5-7 days.",

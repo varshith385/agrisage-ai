@@ -60,6 +60,7 @@ export const VoiceAssistant: React.FC = () => {
   // Assistant operational mode: 'basic' or 'ai'
   const [assistantMode, setAssistantMode] = useState<'basic' | 'ai'>('basic');
   const [privacyNotice, setPrivacyNotice] = useState<string | null>(null);
+  const [upstreamStatus, setUpstreamStatus] = useState<string>('Basic mode (no AI key)');
 
   // Capability & voice states
   const [recognitionSupported, setRecognitionSupported] = useState(true);
@@ -178,10 +179,16 @@ export const VoiceAssistant: React.FC = () => {
 
       if (res.mode === 'ai') {
         setAssistantMode('ai');
-        setPrivacyNotice(res.privacy_notice || 'Farm context is securely sent to Google to generate tailored answers.');
+        setPrivacyNotice(res.privacy_notice || 'Farm context is securely sent to the AI provider to generate tailored answers.');
       } else {
         setAssistantMode('basic');
         setPrivacyNotice(null);
+      }
+
+      if (res.upstream_status) {
+        setUpstreamStatus(res.upstream_status);
+      } else {
+        setUpstreamStatus(res.mode === 'ai' ? 'AI connected' : 'Basic mode (no AI key)');
       }
 
       const assistantMsg: ChatMessage = {
@@ -371,17 +378,17 @@ export const VoiceAssistant: React.FC = () => {
                       {LANGUAGE_LOCALE_MAP[currentLang]}
                     </span>
                   </div>
-                  {/* Status chip: AI connected vs Basic mode */}
+                  {/* Status chip: AI connected (Provider) vs Basic mode */}
                   <div className="flex items-center space-x-1.5 mt-0.5">
                     {assistantMode === 'ai' ? (
                       <span className="inline-flex items-center space-x-1 text-[11px] font-medium text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/40">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        <span>AI connected</span>
+                        <span>{upstreamStatus}</span>
                       </span>
                     ) : (
                       <span className="inline-flex items-center space-x-1 text-[11px] font-medium text-stone-300 bg-stone-800/80 px-2 py-0.5 rounded-full border border-stone-600/50">
                         <Info className="w-3 h-3 text-stone-300" />
-                        <span>Basic mode (no AI key)</span>
+                        <span>{upstreamStatus}</span>
                       </span>
                     )}
                   </div>
@@ -441,6 +448,9 @@ export const VoiceAssistant: React.FC = () => {
                 </div>
                 <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-snug">
                   ఈ పరికరంలో సహజమైన తెలుగు ఆడియో వినడానికి Windows Settings &gt; Time &amp; Language &gt; Speech లో "Telugu Speech Pack" ఇన్‌స్టాల్ చేయండి లేదా Microsoft Edge బ్రౌజర్ ఉపయోగించండి. సమాధానాలు స్క్రీన్ పై స్పష్టంగా కనిపిస్తాయి.
+                </p>
+                <p className="text-[11px] text-amber-700 dark:text-amber-300 font-medium">
+                  Open this site in Microsoft Edge, or add the Telugu language and its speech voice in Windows Settings.
                 </p>
               </div>
             )}
@@ -516,6 +526,22 @@ export const VoiceAssistant: React.FC = () => {
                     <p className="text-[11px] text-stone-600 dark:text-stone-400">
                       Try saying: <span className="font-medium text-stone-900 dark:text-stone-200">"open irrigation"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"take me to market"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"switch to Telugu"</span>, <span className="font-medium text-stone-900 dark:text-stone-200">"turn on dark mode"</span>, or <span className="font-medium text-stone-900 dark:text-stone-200">"start the tour"</span>.
                     </p>
+                  </div>
+
+                  {/* Telugu & Regional Voice Audio Guide Card */}
+                  <div className="bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3 max-w-md mx-auto text-left shadow-sm">
+                    <p className="text-xs font-semibold text-amber-900 dark:text-amber-200 flex items-center space-x-1.5 mb-1">
+                      <Volume2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+                      <span>{currentLang === 'te' ? 'తెలుగు ఆడియో మార్గదర్శకం' : 'Voice Audio Tip'}</span>
+                    </p>
+                    <p className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                      Open this site in Microsoft Edge, or add the Telugu language and its speech voice in Windows Settings.
+                    </p>
+                    {currentLang === 'te' && (
+                      <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-1">
+                        ఈ సైట్‌ను Microsoft Edge లో తెరవండి లేదా Windows Settings లో తెలుగు భాష మరియు వాయిస్‌ను జోడించండి.
+                      </p>
+                    )}
                   </div>
 
                   {/* Quick Suggestions Chips */}
@@ -660,7 +686,7 @@ export const VoiceAssistant: React.FC = () => {
                 <div className="flex items-center space-x-2 text-stone-600 dark:text-stone-300 text-xs py-2 px-3 bg-white dark:bg-[#17241D] border border-stone-200 dark:border-stone-800 rounded-xl w-fit shadow-sm animate-pulse">
                   <Sparkles className="w-4 h-4 text-agri-green-600 dark:text-agri-green-400 animate-spin" />
                   <span className="font-medium">
-                    {assistantMode === 'ai' ? 'Thinking... analyzing real farm telemetry with Gemini' : 'Analyzing farm telemetry...'}
+                    {assistantMode === 'ai' ? 'Thinking... analyzing real farm telemetry with AI' : 'Analyzing farm telemetry...'}
                   </span>
                 </div>
               )}
