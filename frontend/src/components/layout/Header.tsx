@@ -1,165 +1,444 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
+  Search,
   Sprout,
-  LogOut,
+  ChevronDown,
+  Globe,
+  Bell,
+  Sun,
+  Moon,
   User as UserIcon,
-  Mic,
-  Image as ImageIcon,
+  LogOut,
   Sparkles,
+  HelpCircle,
+  Volume2,
+  Image as ImageIcon,
+  Check,
+  Plus,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { usePictorial } from '../../context/PictorialContext';
+import { CommandPalette } from '../common/CommandPalette';
 import { Language } from '../../types/api';
+import { speakText, SupportedLanguage } from '../../services/speech';
 
 interface HeaderProps {
   onStartTour?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, farms, activeFarm, activeFarmId, setActiveFarmId } = useAuth();
   const { language, setLanguage, t } = useTranslation();
+  const { isDark, toggleTheme } = useTheme();
   const { isPictorial, togglePictorial } = usePictorial();
+  const location = useLocation();
 
-  const handleVoiceAssistantClick = () => {
-    // Focus or open global voice assistant
-    const fab = document.querySelector('#global-voice-assistant-slot button') as HTMLButtonElement | null;
-    if (fab) {
-      fab.click();
-    }
+  // Dropdown states
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [farmDropdownOpen, setFarmDropdownOpen] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const [voiceTestStatus, setVoiceTestStatus] = useState<string | null>(null);
+
+  const farmRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (farmRef.current && !farmRef.current.contains(target)) {
+        setFarmDropdownOpen(false);
+      }
+      if (langRef.current && !langRef.current.contains(target)) {
+        setLangDropdownOpen(false);
+      }
+      if (avatarRef.current && !avatarRef.current.contains(target)) {
+        setAvatarMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Compute page title / breadcrumb from current path
+  const getPageTitle = (path: string): string => {
+    if (path.startsWith('/dashboard')) return t('nav.dashboard', { defaultValue: 'Dashboard' });
+    if (path.startsWith('/setup')) return t('nav.weather', { defaultValue: 'Weather & Setup' });
+    if (path.startsWith('/irrigation')) return t('nav.irrigation', { defaultValue: 'Irrigation & Water' });
+    if (path.startsWith('/disease')) return t('nav.disease', { defaultValue: 'Disease Diagnosis' });
+    if (path.startsWith('/economics')) return t('nav.economics', { defaultValue: 'Economics & Profit' });
+    if (path.startsWith('/farms')) return t('nav.farms', { defaultValue: 'My Farms' });
+    if (path.startsWith('/calendar')) return t('nav.calendar', { defaultValue: 'Crop Calendar' });
+    if (path.startsWith('/recommend')) return t('nav.recommend', { defaultValue: 'Crop Advisory' });
+    if (path.startsWith('/market')) return t('nav.market', { defaultValue: 'Mandi Market' });
+    if (path.startsWith('/schemes')) return t('nav.schemes', { defaultValue: 'Soil Card & Schemes' });
+    if (path.startsWith('/community')) return t('nav.community', { defaultValue: 'Community & Map' });
+    if (path.startsWith('/reminders')) return 'Reminders';
+    if (path.startsWith('/how-to')) return t('nav.how_to', { defaultValue: 'How to Use' });
+    if (path.startsWith('/watch')) return t('nav.watch', { defaultValue: 'Watch Video' });
+    return 'AgriSage AI';
+  };
+
+  const handleTestVoice = (langCode: SupportedLanguage) => {
+    const phrases: Record<SupportedLanguage, string> = {
+      en: 'AgriSage voice test: system is ready to read agronomic advisories.',
+      te: 'వ్యవసాయ సలహా ఆడియో పరీక్ష: అగ్రిసేజ్ వాయిస్ సిద్ధంగా ఉంది.',
+      hi: 'कृषि सलाहकार ऑडियो परीक्षण: एग्रीसेज आवाज तैयार है।',
+    };
+    setVoiceTestStatus(`Testing ${langCode.toUpperCase()}...`);
+    speakText(phrases[langCode], langCode, {
+      onStart: () => setVoiceTestStatus(`Playing ${langCode.toUpperCase()}...`),
+      onEnd: () => setVoiceTestStatus(null),
+      onError: (err) => {
+        if (String(err?.message || '').includes('NO_VOICE_FOR_LANG')) {
+          setVoiceTestStatus(`No ${langCode.toUpperCase()} voice installed in browser.`);
+        } else {
+          setVoiceTestStatus('Audio unavailable');
+        }
+        setTimeout(() => setVoiceTestStatus(null), 3500);
+      },
+    });
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#1B5E3B] text-white shadow-md border-b border-[#164E30]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 sm:h-20">
-          {/* Left: Brand Logo */}
-          <div className="flex items-center gap-3">
-            <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-3 group">
-              <div className="w-11 h-11 rounded-2xl bg-[#F2B01E] text-[#1F2A24] flex items-center justify-center font-black shadow-sm group-hover:scale-105 transition-transform shrink-0">
-                <Sprout className="w-7 h-7" />
-              </div>
-              <div>
-                <span className="font-display text-lg sm:text-xl font-black tracking-tight text-white block leading-none">
-                  {t('app.name')}
-                </span>
-                <span className="text-[12px] text-[#F2B01E] font-bold tracking-wide hidden sm:block mt-0.5">
-                  {t('app.tagline')}
-                </span>
-              </div>
-            </Link>
+    <>
+      <header
+        aria-label="Application header"
+        className="sticky top-0 z-40 h-14 max-h-[56px] bg-[#1B5E3B] dark:bg-[#121B16] text-white shadow-xs border-b border-[#164E30] dark:border-[#273B30] flex items-center select-none"
+      >
+        <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between gap-2">
+          {/* Left: Breadcrumb / Page Title */}
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="font-display text-base sm:text-lg font-bold text-white tracking-tight truncate">
+              {getPageTitle(location.pathname)}
+            </h1>
           </div>
 
-          {/* Right Controls: Language Switcher, Pictorial Toggle, Tour, Voice, User */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            {/* Language Switcher Buttons (min 48px touch targets) */}
-            <div
-              role="group"
-              aria-label="Language selection"
-              className="flex items-center bg-[#14462C] rounded-2xl p-1 border border-[#24784C]"
-            >
-              {(['en', 'te', 'hi'] as Language[]).map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => setLanguage(lang)}
-                  aria-pressed={language === lang}
-                  aria-label={`Switch to ${lang === 'te' ? 'Telugu' : lang === 'hi' ? 'Hindi' : 'English'}`}
-                  className={`min-h-[48px] px-3 sm:px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
-                    language === lang
-                      ? 'bg-[#F2B01E] text-[#1F2A24] shadow-sm font-black'
-                      : 'text-white/80 hover:text-white hover:bg-[#24784C]/60'
-                  }`}
-                >
-                  {lang === 'en' ? 'EN' : lang === 'te' ? 'తెలుగు' : 'हिन्दी'}
-                </button>
-              ))}
-            </div>
-
-            {/* Pictorial Mode Toggle Button */}
+          {/* Center / Right Controls */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* 1. Global "Go to..." Search Palette Button */}
             <button
+              id="agrisage-command-palette-btn"
               type="button"
-              onClick={togglePictorial}
-              aria-pressed={isPictorial}
-              aria-label="Toggle pictorial visual mode"
-              title="Pictorial visual mode with large icons and simple text"
-              className={`min-h-[48px] px-3.5 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 transition-all border-2 ${
-                isPictorial
-                  ? 'bg-[#F2B01E] text-[#1F2A24] border-[#F2B01E] shadow-sm font-black'
-                  : 'bg-[#14462C] text-white border-[#24784C] hover:bg-[#24784C]'
-              }`}
+              onClick={() => setCommandOpen(true)}
+              aria-label="Open command palette (Ctrl+K)"
+              title="Search pages, tools, and actions (Ctrl+K)"
+              className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white/90 hover:text-white hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-2 transition-all text-xs font-semibold"
             >
-              <ImageIcon className="w-5 h-5 shrink-0" />
-              <span className="hidden sm:inline">
-                {language === 'te' ? 'చిత్రాలు' : language === 'hi' ? 'चित्र' : 'Pictures'}
-              </span>
-              <span className={`text-[11px] px-2 py-0.5 rounded-full font-black ${
-                isPictorial ? 'bg-[#1F2A24] text-[#F2B01E]' : 'bg-black/30 text-white'
-              }`}>
-                {isPictorial ? 'ON' : 'OFF'}
-              </span>
+              <Search className="w-4 h-4 text-[#F2B01E] shrink-0" />
+              <span className="hidden md:inline">Go to...</span>
+              <kbd className="hidden sm:inline text-[10px] bg-black/25 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono text-white/70">
+                Ctrl+K
+              </kbd>
             </button>
 
-            {/* Guided Tour Trigger Button */}
-            {onStartTour && (
-              <button
-                type="button"
-                onClick={onStartTour}
-                aria-label="Start guided tour"
-                title="Start guided walkthrough of AgriSage AI"
-                className="min-h-[48px] px-3.5 py-2 rounded-2xl text-sm font-bold bg-[#14462C] text-white border border-[#24784C] hover:bg-[#24784C] flex items-center gap-1.5 transition-all hidden sm:flex"
-              >
-                <Sparkles className="w-5 h-5 text-[#F2B01E]" />
-                <span>Tour</span>
-              </button>
+            {/* 2. Active Farm Chip with Switcher */}
+            {isAuthenticated && (
+              <div ref={farmRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setFarmDropdownOpen((prev) => !prev)}
+                  aria-expanded={farmDropdownOpen}
+                  aria-label="Switch active farm"
+                  title="Switch active farm holding"
+                  className="min-h-[38px] max-w-[180px] sm:max-w-[220px] px-2.5 py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white/95 hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-1.5 transition-all text-xs font-bold truncate"
+                >
+                  <Sprout className="w-3.5 h-3.5 text-[#F2B01E] shrink-0" />
+                  <span className="truncate">
+                    {activeFarm?.name || t('farms.no_farm_selected')}
+                  </span>
+                  {activeFarm && (
+                    <span className="hidden lg:inline text-[10px] text-[#F2B01E] font-semibold">
+                      ({activeFarm.area} ac)
+                    </span>
+                  )}
+                  <ChevronDown className="w-3.5 h-3.5 text-white/70 shrink-0 ml-0.5" />
+                </button>
+
+                {farmDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#18241E] text-[#1F2A24] dark:text-[#F2F5F3] rounded-2xl border border-[#D9D4C7] dark:border-[#273B30] shadow-xl py-2 z-50 animate-scaleUp">
+                    <div className="px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#4A5750] dark:text-[#9EB0A5] border-b border-[#D9D4C7]/50 dark:border-[#273B30]">
+                      Your Registered Farms
+                    </div>
+                    <div className="max-h-56 overflow-y-auto py-1">
+                      {farms.length === 0 ? (
+                        <div className="px-3.5 py-2 text-xs text-[#4A5750] dark:text-[#9EB0A5]">
+                          No farms registered yet.
+                        </div>
+                      ) : (
+                        farms.map((f) => {
+                          const isCurrent = f.id === activeFarmId;
+                          return (
+                            <button
+                              key={f.id}
+                              type="button"
+                              onClick={() => {
+                                setActiveFarmId(f.id);
+                                setFarmDropdownOpen(false);
+                              }}
+                              className={`w-full px-3.5 py-2 text-left text-xs font-bold flex items-center justify-between transition-colors ${
+                                isCurrent
+                                  ? 'bg-[#1B5E3B]/10 dark:bg-[#1B5E3B]/30 text-[#1B5E3B] dark:text-[#F2B01E]'
+                                  : 'hover:bg-stone-100 dark:hover:bg-stone-800'
+                              }`}
+                            >
+                              <div className="truncate">
+                                <div className="truncate">{f.name}</div>
+                                <div className="text-[10px] text-[#4A5750] dark:text-[#9EB0A5] font-normal">
+                                  {f.area} ac &bull; {f.district || f.village || 'Telangana'}
+                                </div>
+                              </div>
+                              {isCurrent && <Check className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E] shrink-0" />}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div className="pt-1.5 border-t border-[#D9D4C7]/50 dark:border-[#273B30] px-2">
+                      <Link
+                        to="/farms"
+                        onClick={() => setFarmDropdownOpen(false)}
+                        className="w-full px-3 py-1.5 rounded-xl text-xs font-bold text-[#1B5E3B] dark:text-[#F2B01E] hover:bg-emerald-50 dark:hover:bg-emerald-950/40 flex items-center gap-1.5 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Manage / Add New Farm</span>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
-            {/* Voice Assistant Header Button */}
+            {/* 3. Compact Language Dropdown */}
+            <div ref={langRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setLangDropdownOpen((prev) => !prev)}
+                aria-expanded={langDropdownOpen}
+                aria-label="Language selection"
+                title="Select language"
+                className="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-1.5 transition-all text-xs font-bold"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#F2B01E] shrink-0" />
+                <span>
+                  {language === 'en' ? 'EN' : language === 'te' ? 'తెలుగు' : 'हिन्दी'}
+                </span>
+                <ChevronDown className="w-3 h-3 text-white/70 shrink-0" />
+              </button>
+
+              {langDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-[#18241E] text-[#1F2A24] dark:text-[#F2F5F3] rounded-2xl border border-[#D9D4C7] dark:border-[#273B30] shadow-xl py-1 z-50 animate-scaleUp">
+                  {[
+                    { code: 'en', label: 'English', native: 'EN' },
+                    { code: 'te', label: 'తెలుగు', native: 'Telugu' },
+                    { code: 'hi', label: 'हिन्दी', native: 'Hindi' },
+                  ].map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => {
+                        setLanguage(l.code as Language);
+                        setLangDropdownOpen(false);
+                      }}
+                      className={`w-full px-3.5 py-2 text-left text-xs font-bold flex items-center justify-between transition-colors ${
+                        language === l.code
+                          ? 'bg-[#1B5E3B]/10 dark:bg-[#1B5E3B]/30 text-[#1B5E3B] dark:text-[#F2B01E]'
+                          : 'hover:bg-stone-100 dark:hover:bg-stone-800'
+                      }`}
+                    >
+                      <div>
+                        <span>{l.label}</span>
+                        <span className="block text-[10px] text-[#4A5750] dark:text-[#9EB0A5] font-normal">
+                          {l.native}
+                        </span>
+                      </div>
+                      {language === l.code && <Check className="w-3.5 h-3.5 text-[#1B5E3B] dark:text-[#F2B01E]" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 4. Reminders Bell with Count Badge */}
+            <Link
+              to="/reminders"
+              aria-label="View reminders and field tasks"
+              title="Reminders & automated alerts"
+              className="min-h-[38px] min-w-[38px] relative p-2 rounded-xl text-white/90 hover:text-white hover:bg-[#14462C] dark:hover:bg-[#18241E] transition-all flex items-center justify-center"
+            >
+              <Bell className="w-4 h-4 text-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#F2B01E] ring-2 ring-[#1B5E3B] dark:ring-[#121B16]" />
+            </Link>
+
+            {/* 5. Dark Mode Toggle (Icon Only) */}
             <button
               type="button"
-              onClick={handleVoiceAssistantClick}
-              aria-label="Ask Voice Assistant"
-              title="Ask Voice Assistant in Telugu, Hindi or English"
-              className="min-h-[48px] px-4 py-2.5 rounded-2xl text-sm font-bold bg-[#F2B01E] text-[#1F2A24] hover:bg-[#e09f14] shadow-sm flex items-center gap-2 transition-all active:scale-[0.98]"
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={isDark ? 'Light mode' : 'Dark mode'}
+              className="min-h-[38px] min-w-[38px] p-2 rounded-xl text-white/90 hover:text-white hover:bg-[#14462C] dark:hover:bg-[#18241E] transition-all flex items-center justify-center"
             >
-              <Mic className="w-5 h-5" />
-              <span className="hidden md:inline font-black">Voice</span>
+              {isDark ? (
+                <Sun className="w-4 h-4 text-[#F2B01E]" />
+              ) : (
+                <Moon className="w-4 h-4 text-white" />
+              )}
             </button>
 
-            {/* User Profile / Logout */}
+            {/* 6. User Avatar Menu (Profile, How-To, Tour, Logout) */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <div className="hidden lg:flex flex-col text-right">
-                  <span className="text-sm font-bold text-white leading-tight">
-                    {user?.full_name || 'Farmer'}
-                  </span>
-                  <span className="text-[11px] text-[#F2B01E] font-semibold">
-                    {user?.role || 'Farmer'}
-                  </span>
-                </div>
+              <div ref={avatarRef} className="relative">
                 <button
                   type="button"
-                  onClick={logout}
-                  aria-label="Logout"
-                  title="Sign out of AgriSage AI"
-                  className="min-h-[48px] min-w-[48px] p-2.5 rounded-2xl text-white/80 hover:text-white hover:bg-[#24784C] transition-all flex items-center justify-center border border-transparent hover:border-[#24784C]"
+                  onClick={() => setAvatarMenuOpen((prev) => !prev)}
+                  aria-expanded={avatarMenuOpen}
+                  aria-label="User account menu"
+                  title="Account and settings"
+                  className="min-h-[38px] min-w-[38px] p-1.5 rounded-xl bg-[#F2B01E] text-[#1F2A24] font-black text-xs hover:bg-[#E09F14] shadow-xs flex items-center justify-center transition-all"
                 >
-                  <LogOut className="w-5 h-5" />
+                  {user?.full_name ? user.full_name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
                 </button>
+
+                {avatarMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#18241E] text-[#1F2A24] dark:text-[#F2F5F3] rounded-2xl border border-[#D9D4C7] dark:border-[#273B30] shadow-xl py-2 z-50 animate-scaleUp">
+                    {/* User Profile Header */}
+                    <div className="px-4 py-2 border-b border-[#D9D4C7]/50 dark:border-[#273B30]">
+                      <div className="font-bold text-sm truncate">{user?.full_name || 'Farmer'}</div>
+                      <div className="text-[11px] text-[#4A5750] dark:text-[#9EB0A5] truncate">{user?.email || 'User'}</div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-1">
+                      <Link
+                        to="/farms"
+                        onClick={() => setAvatarMenuOpen(false)}
+                        className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2.5 transition-colors"
+                      >
+                        <Sprout className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E]" />
+                        <span>Farm Profile & Holdings</span>
+                      </Link>
+
+                      <Link
+                        to="/how-to"
+                        onClick={() => setAvatarMenuOpen(false)}
+                        className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2.5 transition-colors"
+                      >
+                        <HelpCircle className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E]" />
+                        <span>How to Use Guide</span>
+                      </Link>
+
+                      {onStartTour && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAvatarMenuOpen(false);
+                            onStartTour();
+                          }}
+                          className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2.5 transition-colors"
+                        >
+                          <Sparkles className="w-4 h-4 text-[#F2B01E]" />
+                          <span>Start Guided Tour</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          togglePictorial();
+                          setAvatarMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-between transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <ImageIcon className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E]" />
+                          <span>Pictorial Visual Mode</span>
+                        </div>
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                          isPictorial ? 'bg-[#F2B01E] text-[#1F2A24]' : 'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300'
+                        }`}>
+                          {isPictorial ? 'ON' : 'OFF'}
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Test Voice Section */}
+                    <div className="pt-2 border-t border-[#D9D4C7]/50 dark:border-[#273B30] px-4 py-1.5">
+                      <div className="text-[11px] font-bold text-[#4A5750] dark:text-[#9EB0A5] mb-1.5 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <Volume2 className="w-3.5 h-3.5 text-[#F2B01E]" />
+                          <span>Test Browser Voice</span>
+                        </span>
+                        {voiceTestStatus && (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-normal truncate max-w-[120px]">
+                            {voiceTestStatus}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleTestVoice('en')}
+                          className="px-2 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-[11px] font-bold text-center"
+                        >
+                          EN
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleTestVoice('te')}
+                          className="px-2 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-[11px] font-bold text-center"
+                        >
+                          తెలుగు
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleTestVoice('hi')}
+                          className="px-2 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-[11px] font-bold text-center"
+                        >
+                          हिन्दी
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Sign out */}
+                    <div className="pt-1.5 border-t border-[#D9D4C7]/50 dark:border-[#273B30] px-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAvatarMenuOpen(false);
+                          logout();
+                        }}
+                        className="w-full px-3 py-1.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center gap-2 transition-colors"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Link
                 to="/login"
-                className="min-h-[48px] px-5 py-2.5 rounded-2xl text-sm font-bold bg-[#F2B01E] text-[#1F2A24] hover:bg-[#e09f14] transition-all flex items-center gap-2 font-black"
+                className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-[#F2B01E] text-[#1F2A24] font-bold text-xs hover:bg-[#E09F14] transition-all shadow-xs"
               >
-                <UserIcon className="w-5 h-5" />
-                <span>Sign In</span>
+                Sign In
               </Link>
             )}
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Global Command Palette Dialog */}
+      <CommandPalette
+        isOpen={commandOpen}
+        onClose={() => setCommandOpen(false)}
+        onStartTour={onStartTour}
+      />
+    </>
   );
 };

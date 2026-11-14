@@ -18,6 +18,7 @@ import {
   Sparkles,
   X,
   LogOut,
+  Bell,
 } from 'lucide-react';
 import { useTranslation } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -47,6 +48,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
     { to: '/recommend', label: t('nav.recommend', { defaultValue: 'Crop Advisory' }), icon: Sprout, desc: 'AI soil & agro-climatic crop matching' },
     { to: '/schemes', label: t('nav.schemes', { defaultValue: 'Soil Card & Schemes' }), icon: FileText, desc: 'Soil nutrient calibration & advisory notices' },
     { to: '/farms', label: t('nav.farms', { defaultValue: 'My Farms' }), icon: Layers, desc: 'Parcel registration & mixed land tenure' },
+    { to: '/reminders', label: 'Reminders & Alerts', icon: Bell, desc: 'Task scheduling, irrigation alarms & field alerts' },
     { to: '/community', label: t('nav.community', { defaultValue: 'Community & Map' }), icon: Users, desc: 'Farmer forum, machinery rental & pest outbreaks' },
     { to: '/how-to', label: 'How to Use AgriSage', icon: HelpCircle, desc: 'Illustrated step-by-step guidance' },
     { to: '/watch', label: 'Watch Video Guide', icon: Video, desc: 'Short video walkthrough for farmers' },
@@ -57,7 +59,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
       {/* Mobile Bottom Navigation Bar */}
       <nav
         aria-label="Mobile navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1B5E3B]/95 backdrop-blur-md text-white border-t border-[#164E30] px-1 py-1.5 shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1B5E3B]/95 dark:bg-[#121B16]/95 backdrop-blur-md text-white border-t border-[#164E30] dark:border-[#273B30] px-1 py-1.5 shadow-lg"
       >
         <div className="flex items-center justify-around">
           {primaryItems.map((item) => {
@@ -69,7 +71,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
                 className={({ isActive }) =>
                   `min-h-[52px] min-w-[60px] flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all ${
                     isActive
-                      ? 'text-[#F2B01E] font-black bg-[#24784C] shadow-inner'
+                      ? 'text-[#F2B01E] font-black bg-[#24784C] dark:bg-[#1B5E3B] shadow-inner'
                       : 'text-white/80 hover:text-white font-semibold'
                   }`
                 }
@@ -88,7 +90,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
             aria-label="More navigation pages"
             className={`min-h-[52px] min-w-[60px] flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all ${
               moreOpen
-                ? 'text-[#F2B01E] font-black bg-[#24784C]'
+                ? 'text-[#F2B01E] font-black bg-[#24784C] dark:bg-[#1B5E3B]'
                 : 'text-white/80 hover:text-white font-semibold'
             }`}
           >
@@ -108,16 +110,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
           onClick={() => setMoreOpen(false)}
         >
           <div
-            className="bg-[#FFFDF8] rounded-t-3xl border-t-2 border-[#1B5E3B] p-5 max-h-[85vh] overflow-y-auto text-[#1F2A24] shadow-xl"
+            className="bg-[#FFFDF8] dark:bg-[#18241E] rounded-t-3xl border-t-2 border-[#1B5E3B] p-5 max-h-[85vh] overflow-y-auto text-[#1F2A24] dark:text-[#F2F5F3] shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Sheet Header */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#D9D4C7]">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#D9D4C7] dark:border-[#273B30]">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-2xl bg-[#F2B01E] text-[#1F2A24] flex items-center justify-center font-black shadow-sm">
                   <Sprout className="w-5 h-5" />
                 </div>
-                <h2 className="font-display text-lg font-bold text-[#1B5E3B]">
+                <h2 className="font-display text-lg font-bold text-[#1B5E3B] dark:text-[#F2B01E]">
                   All Tools & Pages
                 </h2>
               </div>
@@ -125,7 +127,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
                 type="button"
                 onClick={() => setMoreOpen(false)}
                 aria-label="Close menu"
-                className="w-10 h-10 rounded-full bg-white border border-[#D9D4C7] text-[#1F2A24] flex items-center justify-center hover:bg-[#F0ECE1]"
+                className="w-10 h-10 rounded-full bg-white dark:bg-[#121B16] border border-[#D9D4C7] dark:border-[#273B30] text-[#1F2A24] dark:text-[#F2F5F3] flex items-center justify-center hover:bg-[#F0ECE1] dark:hover:bg-stone-800"
               >
                 <X className="w-5 h-5" />
               </button>
