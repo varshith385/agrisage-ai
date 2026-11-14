@@ -163,14 +163,29 @@ def test_voice_api_creates_reminder(client: TestClient, reminder_test_env, db_se
         "query": "remind me to inspect for bollworms tomorrow morning",
         "language": "en"
     }
+    # Turn 1: Voice command prompts for confirmation first (does not save silently)
     res = client.post("/api/v1/voice/query", json=payload, headers=headers)
     assert res.status_code == 200
     data = res.json()
-    assert data["intent"] == "reminder"
+    assert data["intent"] == "reminder_confirm"
     assert data["action_link"] == "/reminders"
     assert "bollworm" in data["spoken_text"].lower() or "reminder" in data["spoken_text"].lower()
 
-    # Verify created in DB
+    # Turn 2: Farmer confirms with 'Yes'
+    confirm_payload = {
+        "query": "Yes",
+        "language": "en",
+        "history": [
+            {"role": "user", "content": payload["query"]},
+            {"role": "assistant", "content": data["spoken_text"]}
+        ]
+    }
+    confirm_res = client.post("/api/v1/voice/query", json=confirm_payload, headers=headers)
+    assert confirm_res.status_code == 200
+    confirm_data = confirm_res.json()
+    assert confirm_data["intent"] == "reminder_saved"
+
+    # Verify created in DB after confirmation
     saved = db_session.query(Reminder).filter(Reminder.user_id == user.id).all()
     assert len(saved) >= 1
     assert any("bollworm" in r.title.lower() for r in saved)
