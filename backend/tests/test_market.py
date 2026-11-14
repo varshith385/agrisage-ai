@@ -394,6 +394,24 @@ async def test_voice_assistant_price_intent(db: Session):
     assert res_te.action_link == "/market"
     assert res_te.structured_data.get("market_data_available") is True
 
+    # English query (what is the cotton price)
+    res_en_price = await service.process_query(
+        VoiceQueryRequest(query="what is the cotton price", language="en"), user=user, db=db
+    )
+    assert res_en_price.intent == "price"
+    assert "Enumamula" in res_en_price.spoken_text or "mandi price" in res_en_price.spoken_text.lower()
+    assert res_en_price.action_link == "/market"
+    assert res_en_price.structured_data.get("market_data_available") is True
+
+    # Hindi query (कपास का भाव क्या है)
+    res_hi_price = await service.process_query(
+        VoiceQueryRequest(query="कपास का भाव क्या है", language="hi"), user=user, db=db
+    )
+    assert res_hi_price.intent == "price"
+    assert "मंडी" in res_hi_price.spoken_text or "भाव" in res_hi_price.spoken_text
+    assert res_hi_price.action_link == "/market"
+    assert res_hi_price.structured_data.get("market_data_available") is True
+
     # English query
     res_en = await service.process_query(
         VoiceQueryRequest(query="What is the current mandi market price for cotton?", language="en"),

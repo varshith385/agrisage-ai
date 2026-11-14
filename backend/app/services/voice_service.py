@@ -540,22 +540,26 @@ class VoiceAssistantService:
         mandi_name = "Enumamula (Warangal)"
         is_demo = not bool(settings.DATA_GOV_IN_API_KEY)
 
+        demo_tag_en = " [DEMO DATA]" if is_demo else ""
+        demo_tag_te = " (డెమో సమాచారం - DEMO DATA)" if is_demo else ""
+        demo_tag_hi = " [DEMO DATA]" if is_demo else ""
+
         if lang == "te":
             spoken = (
                 f"ఎనుమాముల (వరంగల్) మార్కెట్ యార్డులో పత్తి మోడల్ ధర క్వింటాలుకు ₹{modal_price:,} "
-                f"(కనిష్ట ధర ₹{min_price:,}, గరిష్ట ధర ₹{max_price:,}). "
+                f"(కనిష్ట ధర ₹{min_price:,}, గరిష్ట ధర ₹{max_price:,}){demo_tag_te}. "
                 f"కనీస మద్దతు ధర (MSP) ధృవీకరణ వివరాలు మరియు మార్కెట్ యార్డుల నికర లాభాల కొరకు మార్కెట్ పేజీని చూడండి."
             )
         elif lang == "hi":
             spoken = (
                 f"एनुमामुल (वारंगल) मंडी में कपास का मॉडल भाव ₹{modal_price:,} प्रति क्विंटल है "
-                f"(न्यूनतम ₹{min_price:,}, अधिकतम ₹{max_price:,})। "
+                f"(न्यूनतम ₹{min_price:,}, अधिकतम ₹{max_price:,}){demo_tag_hi}। "
                 f"एमएसपी और विभिन्न मंडियों के शुद्ध लाभ के लिए मार्केट पेज देखें।"
             )
         else:
             spoken = (
                 f"Modal mandi price for Cotton at {mandi_name} APMC is ₹{modal_price:,} per quintal "
-                f"(range ₹{min_price:,} to ₹{max_price:,}). "
+                f"(range ₹{min_price:,} to ₹{max_price:,}){demo_tag_en}. "
                 f"Open the Market tab for transport-adjusted net realization rankings and MSP comparison."
             )
 
@@ -661,8 +665,15 @@ class VoiceAssistantService:
             action_link = "/disease"
             action_label = "Open Disease Scan"
 
+        detected_intent, _ = classify_intent(query)
+        final_intent = (
+            detected_intent
+            if detected_intent in ["weather", "irrigation", "disease", "cost", "scheme", "price"]
+            else "general"
+        )
+
         return VoiceQueryResponse(
-            intent="general",
+            intent=final_intent,
             confidence=0.88,
             confidence_type="model",
             spoken_text=clean_text,
@@ -767,16 +778,11 @@ class VoiceAssistantService:
         kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
 
         try:
-            # 1. Deterministic System Settings (e.g. theme, language, visual mode)
-            # Immediate zero-latency execution for device/UI toggles
+            # 1. Deterministic Navigation & Action Router (Runs strictly BEFORE LLM)
+            # Immediate zero-latency execution for explicit page navigation, device/UI toggles
             nav_res = route_navigation_or_action(request.query, lang)
-            if nav_res and nav_res.action_type and nav_res.action_type.startswith("set_"):
+            if nav_res:
                 return nav_res
-
-            # If no AI keys are configured, execute full deterministic navigation immediately
-            if not settings.GROQ_API_KEY and not settings.GEMINI_API_KEY:
-                if nav_res:
-                    return nav_res
 
             # Retrieve farm
             farm: Optional[Farm] = None
@@ -894,11 +900,10 @@ class VoiceAssistantService:
                         suggestion_chips=["Show all reminders", "What can you do?"],
                     )
 
-            # 2. If no AI keys are configured, run deterministic small talk router immediately
-            if not settings.GROQ_API_KEY and not settings.GEMINI_API_KEY:
-                smalltalk_res = route_smalltalk(request.query, lang)
-                if smalltalk_res:
-                    return smalltalk_res
+            # 2. Conversational Small Talk Router (Runs strictly BEFORE LLM)
+            smalltalk_res = route_smalltalk(request.query, lang)
+            if smalltalk_res:
+                return smalltalk_res
 
             # 2.5 Voice Command: Deterministic Reminder Confirmation Prompt (Asks for a yes before saving)
             from backend.app.services.reminder_parser import parse_reminder_voice_command
@@ -929,6 +934,11 @@ class VoiceAssistantService:
                     },
                 )
 
+            # 2.8 Deterministic Price Query Handling (Ground truth mandi data, DEMO DATA label, no MSP invention)
+            intent, confidence = classify_intent(request.query)
+            if intent == "price":
+                return self._handle_price(lang)
+
             # 3. Build Grounded Real Farm Context Packet
             context_packet = await build_farm_context_packet(user, farm, db)
 
@@ -943,16 +953,7 @@ class VoiceAssistantService:
                 if llm_res:
                     return llm_res
 
-            # Fallback for smalltalk or navigation when LLM fails or is unconfigured
-            if nav_res:
-                return nav_res
-            smalltalk_res = route_smalltalk(request.query, lang)
-            if smalltalk_res:
-                return smalltalk_res
-
             # 5. Fallback deterministic routing (mode: basic)
-            intent, confidence = classify_intent(request.query)
-
             if intent == "greeting":
                 res = self._handle_greeting(lang)
             elif intent == "about":
