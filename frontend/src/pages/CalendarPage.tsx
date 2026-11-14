@@ -114,11 +114,20 @@ export const CalendarPage: React.FC = () => {
     return evt.event_type === eventTypeFilter;
   });
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const upcomingEvents = (calendarData?.events || [])
+    .filter((evt) => {
+      const taskDate = evt.start_date || evt.end_date || '';
+      const matchesType = eventTypeFilter === 'all' || evt.event_type === eventTypeFilter;
+      return matchesType && taskDate >= todayStr;
+    })
+    .sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
+
   const activeStage = (calendarData?.lifecycle_stages || []).find((st) => st.is_active);
-  const nextEvent = filteredEvents?.[0];
+  const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null;
 
   const plainMeaning = calendarData
-    ? `Your ${cropName} crop is currently at DAS ${calendarData.days_after_sowing} in the ${activeStage?.stage_name_en || 'active growth'} stage. Next priority task is: ${nextEvent?.title || 'routine field maintenance'}.`
+    ? `Your ${cropName} crop is currently at DAS ${calendarData.days_after_sowing} in the ${activeStage?.stage_name_en || 'active growth'} stage. ${nextEvent ? `Next priority task is: ${nextEvent.title}.` : 'No upcoming tasks scheduled for this period.'}`
     : 'Generating crop lifecycle calendar...';
 
   // PICTORIAL MODE v2
@@ -198,7 +207,7 @@ export const CalendarPage: React.FC = () => {
           {/* Tile 2: Next Scheduled Task */}
           <PictorialTile
             title={language === 'te' ? 'రాబోయే ముఖ్య పని' : language === 'hi' ? 'आगामी कार्य' : 'Next Priority Task'}
-            phrase={nextEvent ? `${nextEvent.title} (${nextEvent.start_date})` : (language === 'te' ? 'షెడ్యూల్ పనులు లేవు' : language === 'hi' ? 'कोई कार्य निर्धारित नहीं' : 'Routine field checks')}
+            phrase={nextEvent ? `${translateBackendString(nextEvent.title, language)} (${nextEvent.start_date})` : (language === 'te' ? 'రాబోయే పనులు లేవు' : language === 'hi' ? 'कोई आगामी कार्य नहीं' : 'No upcoming tasks scheduled')}
             illustration={<CalendarIcon className="w-16 h-16 text-[#1565A8]" />}
             status={nextEvent ? 'warning' : 'nodata'}
             statusWord={nextEvent ? (language === 'te' ? 'తదుపరి పని' : language === 'hi' ? 'आगामी कार्य' : 'Scheduled') : (language === 'te' ? 'పనులు లేవు' : language === 'hi' ? 'कार्य नहीं' : 'No Tasks')}
@@ -405,19 +414,19 @@ export const CalendarPage: React.FC = () => {
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 nextEvent?.priority === 'high' ? 'bg-red-100 text-red-900' : 'bg-stone-200 text-stone-800'
               }`}>
-                {translateBackendString(nextEvent?.priority || 'Normal', language)}
+                {nextEvent ? translateBackendString(nextEvent.priority, language) : (language === 'te' ? 'పనులు లేవు' : language === 'hi' ? 'कोई नहीं' : 'None')}
               </span>
             </div>
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1">
               <h3 className="text-sm font-bold text-[#183D2E]">
-                {translateBackendString(nextEvent?.title || 'Foliar Nutrient Spraying', language)}
+                {nextEvent ? translateBackendString(nextEvent.title, language) : (language === 'te' ? 'రాబోయే పనులు షెడ్యూల్ కాలేదు' : language === 'hi' ? 'कोई आगामी कार्य निर्धारित नहीं है' : 'No upcoming tasks scheduled')}
               </h3>
               <p className="text-xs text-[#4E5F57] leading-relaxed">
-                {translateBackendString(nextEvent?.description || 'Inspect underside of leaves for early sucking pests and verify root zone soil moisture.', language)}
+                {nextEvent ? translateBackendString(nextEvent.description, language) : (language === 'te' ? 'ప్రస్తుత సమయానికి తదుపరి పనులు లేవు. పంట క్షేత్రాన్ని సాధారణంగా పరిశీలించండి.' : language === 'hi' ? 'वर्तमान अवधि के लिए कोई आगामी कार्य नहीं है। सामान्य खेत निरीक्षण जारी रखें।' : 'All scheduled operations for the current window are complete or none are pending.')}
               </p>
               <span className="text-[11px] text-[#7A553A] font-semibold block pt-1">
-                {t('calendar.target_window_label', { defaultValue: 'Target Window:' })} {nextEvent?.start_date ? translateBackendString(nextEvent.start_date, language) : (language === 'te' ? 'రానున్న రోజుల్లో' : language === 'hi' ? 'आगामी' : 'Upcoming')}
+                {t('calendar.target_window_label', { defaultValue: 'Target Window:' })} {nextEvent?.start_date ? translateBackendString(nextEvent.start_date, language) : (language === 'te' ? 'ఏదీ లేదు' : language === 'hi' ? 'कोई नहीं' : 'None scheduled')}
               </span>
             </div>
 

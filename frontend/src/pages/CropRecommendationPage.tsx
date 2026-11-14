@@ -43,6 +43,7 @@ export const CropRecommendationPage: React.FC = () => {
   const [humidity, setHumidity] = useState<number>(70.0);
   const [rainfall, setRainfall] = useState<number>(180.0);
   const [omitSoil, setOmitSoil] = useState<boolean>(false);
+  const [hasConfirmedInputs, setHasConfirmedInputs] = useState<boolean>(false);
 
   const [mlResult, setMlResult] = useState<CropRecommendationResponse | null>(null);
   const [loadingMl, setLoadingMl] = useState<boolean>(false);
@@ -103,9 +104,20 @@ export const CropRecommendationPage: React.FC = () => {
 
   const topCrop = mlResult?.top_crops?.[0];
   const topRotation = rotationData?.recommended_rotations?.[0];
+  const isLowConfidence = Boolean(topCrop && topCrop.probability < 0.5);
+
+  const lowConfidenceMsg = topCrop
+    ? language === 'te'
+      ? `మోడల్ యొక్క ప్రాథమిక ఊహ ${translateBackendString(topCrop.crop_name, language)}, తక్కువ విశ్వసనీయతతో (${Math.round(topCrop.probability * 100)}%)`
+      : language === 'hi'
+      ? `मॉडल का प्रारंभिक अनुमान ${translateBackendString(topCrop.crop_name, language)} है, कम विश्वास के साथ (${Math.round(topCrop.probability * 100)}%)`
+      : `The model's top guess is ${topCrop.crop_name}, with low confidence (${Math.round(topCrop.probability * 100)}%)`
+    : '';
 
   const plainMeaning = topCrop
-    ? `The most suitable crop for your soil and weather is ${topCrop.crop_name} with ${(topCrop.probability * 100).toFixed(0)}% agro-climatic alignment. Following previous ${prevCrop}, rotating with ${topRotation?.crop_name || 'legumes'} will restore soil nutrients.`
+    ? isLowConfidence
+      ? `${lowConfidenceMsg}. ${language === 'te' ? 'అన్‌కాలిబ్రేటెడ్.' : language === 'hi' ? 'अनकैलिब्रेटेड।' : 'Uncalibrated.'}`
+      : `The most suitable crop for your soil and weather is ${topCrop.crop_name} with ${(topCrop.probability * 100).toFixed(0)}% agro-climatic alignment. Following previous ${prevCrop}, rotating with ${topRotation?.crop_name || 'legumes'} will restore soil nutrients.`
     : 'Evaluating crop suitability and restorative rotation sequence...';
 
   // PICTORIAL MODE v2
@@ -133,14 +145,20 @@ export const CropRecommendationPage: React.FC = () => {
                   {language === 'te' ? 'ఉత్తమ పంట' : language === 'hi' ? 'सर्वोत्तम फसल' : 'Recommended Crop'}
                 </span>
                 <StatusBadge
-                  status={hasTopCrop ? 'success' : 'nodata'}
-                  label={hasTopCrop ? `${(topCrop!.probability * 100).toFixed(0)}% Match` : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No Data')}
+                  status={hasTopCrop ? (isLowConfidence ? 'warning' : 'success') : 'nodata'}
+                  label={hasTopCrop ? (isLowConfidence ? (language === 'te' ? 'అన్‌కాలిబ్రేటెడ్' : language === 'hi' ? 'अनकैलिब्रेटेड' : 'Uncalibrated') : `${(topCrop!.probability * 100).toFixed(0)}% Match`) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No Data')}
                   size="sm"
                 />
               </div>
               <h2 className="font-display text-[22px] sm:text-[26px] font-bold text-[#1F2A24] leading-snug">
                 {hasTopCrop
-                  ? `${topCrop!.crop_name} (${(topCrop!.probability * 100).toFixed(0)}% Match)`
+                  ? (isLowConfidence
+                      ? (language === 'te'
+                          ? `మోడల్ యొక్క ప్రాథమిక ఊహ ${translateBackendString(topCrop!.crop_name, language)}, తక్కువ విశ్వసనీయతతో (${(topCrop!.probability * 100).toFixed(0)}%)`
+                          : language === 'hi'
+                          ? `मॉडल का प्रारंभिक अनुमान ${translateBackendString(topCrop!.crop_name, language)} है, कम विश्वास के साथ (${(topCrop!.probability * 100).toFixed(0)}%)`
+                          : `The model's top guess is ${topCrop!.crop_name}, with low confidence (${(topCrop!.probability * 100).toFixed(0)}%)`)
+                      : `${translateBackendString(topCrop!.crop_name, language)} (${(topCrop!.probability * 100).toFixed(0)}% Match)`)
                   : (language === 'te' ? 'పంట సిఫార్సు ఇంకా లెక్కింపబడలేదు' : language === 'hi' ? 'फसल चयन अभी नहीं हुआ' : 'Awaiting Crop Evaluation')}
               </h2>
               <p className="text-[16px] text-[#4A5750] max-w-xl">
@@ -171,10 +189,10 @@ export const CropRecommendationPage: React.FC = () => {
           {/* Tile 1: Top Suitable Crop */}
           <PictorialTile
             title={language === 'te' ? 'అత్యంత అనుకూల పంట' : language === 'hi' ? 'उपयुक्त फसल' : 'Best Match'}
-            phrase={hasTopCrop ? `${topCrop!.crop_name} • ${(topCrop!.probability * 100).toFixed(0)}% match` : (language === 'te' ? 'పంట ఇంకా నిర్ణయించలేదు' : language === 'hi' ? 'फसल तय नहीं' : 'No crop matched yet')}
+            phrase={hasTopCrop ? (isLowConfidence ? (language === 'te' ? `తక్కువ విశ్వసనీయత (${(topCrop!.probability * 100).toFixed(0)}%) • అన్‌కాలిబ్రేటెడ్` : language === 'hi' ? `कम विश्वास (${(topCrop!.probability * 100).toFixed(0)}%) • अनकैलिब्रेटेड` : `Low confidence (${(topCrop!.probability * 100).toFixed(0)}%) • uncalibrated`) : `${translateBackendString(topCrop!.crop_name, language)} • ${(topCrop!.probability * 100).toFixed(0)}% match`) : (language === 'te' ? 'పంట ఇంకా నిర్ణయించలేదు' : language === 'hi' ? 'फसल तय नहीं' : 'No crop matched yet')}
             illustration={hasTopCrop ? <LeafScanIllustration size={80} /> : <NoDataIllustration size={80} />}
-            status={hasTopCrop ? 'success' : 'nodata'}
-            statusWord={hasTopCrop ? (language === 'te' ? 'అగ్ర ఎంపిక' : language === 'hi' ? 'शीर्ष पसंद' : 'Rank #1') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
+            status={hasTopCrop ? (isLowConfidence ? 'warning' : 'success') : 'nodata'}
+            statusWord={hasTopCrop ? (isLowConfidence ? (language === 'te' ? 'అన్‌కాలిబ్రేటెడ్' : language === 'hi' ? 'अनकैलिब्रेटेड' : 'Uncalibrated') : (language === 'te' ? 'అగ్ర ఎంపిక' : language === 'hi' ? 'शीर्ष पसंद' : 'Rank #1')) : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
             spokenText={hasTopCrop ? `Recommended crop is ${topCrop!.crop_name} with ${(topCrop!.probability * 100).toFixed(0)} percent suitability.` : 'No crop recommendation calculated yet.'}
             onOpenDetails={() => setMode('words')}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
@@ -194,12 +212,12 @@ export const CropRecommendationPage: React.FC = () => {
 
           {/* Tile 3: Soil Nutrients Evaluated */}
           <PictorialTile
-            title={language === 'te' ? 'నేల పోషకాలు' : language === 'hi' ? 'मिट्टी के पोषक तत्व' : 'Soil Nutrients'}
-            phrase={omitSoil ? 'Weather-only evaluation' : `N: ${n} • P: ${p} • K: ${k}`}
+            title={language === 'te' ? 'మూల్యాంకన ఆధారం' : language === 'hi' ? 'मूल्यांकन आधार' : 'Evaluation Basis'}
+            phrase={!hasConfirmedInputs ? (language === 'te' ? 'డిఫాల్ట్ వివరాలు (ధృవీకరించబడలేదు)' : language === 'hi' ? 'डिफ़ॉल्ट इनपुट (असत्यापित)' : 'Default inputs (unconfirmed)') : omitSoil ? 'Weather-only evaluation' : `N: ${n} • P: ${p} • K: ${k}`}
             illustration={<Sprout className="w-16 h-16 text-[#1B5E3B]" />}
-            status="info"
-            statusWord={omitSoil ? 'Weather Only' : 'Soil NPK'}
-            spokenText={omitSoil ? 'Evaluating recommendations using climate parameters only.' : `Soil nutrients evaluated: Nitrogen ${n}, Phosphorus ${p}, Potassium ${k}.`}
+            status={!hasConfirmedInputs ? 'warning' : 'info'}
+            statusWord={!hasConfirmedInputs ? (language === 'te' ? 'డిఫాల్ట్ వివరాలు' : language === 'hi' ? 'डिफ़ॉल्ट इनपुट' : 'Default inputs') : omitSoil ? 'Weather Only' : 'Soil NPK'}
+            spokenText={!hasConfirmedInputs ? 'Evaluation using default demo inputs. Confirm your soil NPK and climate values to calibrate.' : omitSoil ? 'Evaluating recommendations using climate parameters only.' : `Soil nutrients evaluated: Nitrogen ${n}, Phosphorus ${p}, Potassium ${k}.`}
             onOpenDetails={() => setMode('words')}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -224,7 +242,10 @@ export const CropRecommendationPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={fetchRecommendation}
+              onClick={() => {
+                setHasConfirmedInputs(true);
+                fetchRecommendation();
+              }}
               disabled={loadingMl}
               className="min-h-[48px] px-5 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all disabled:opacity-50 flex items-center gap-2"
             >
@@ -244,8 +265,10 @@ export const CropRecommendationPage: React.FC = () => {
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
                 {t('recommend.rank_1_title', { defaultValue: 'Rank #1 Recommendation' })}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
-                {t('recommend.ml_evaluated_badge', { defaultValue: 'ML Evaluated' })}
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                isLowConfidence ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-[#183D2E] text-white'
+              }`}>
+                {isLowConfidence ? (language === 'te' ? 'అన్‌కాలిబ్రేటెడ్' : language === 'hi' ? 'अनकैलिब्रेटेड' : 'Uncalibrated') : t('recommend.ml_evaluated_badge', { defaultValue: 'ML Evaluated' })}
               </span>
             </div>
 
@@ -257,6 +280,12 @@ export const CropRecommendationPage: React.FC = () => {
                 {topCrop ? `${(topCrop.probability * 100).toFixed(0)}%` : '85%'} {t('recommend.match_label', { defaultValue: 'match' })}
               </span>
             </div>
+
+            {isLowConfidence && (
+              <p className="text-xs font-bold text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200">
+                {lowConfidenceMsg}
+              </p>
+            )}
 
             <p className="text-xs text-[#4E5F57] leading-relaxed pt-1">
               {topCrop?.reasons?.[0] ? translateBackendString(topCrop.reasons[0], language) : (language === 'te' ? 'వేర్లు బలంగా నాటుకోవడానికి అనుకూలమైన ఉష్ణోగ్రత మరియు తేమ పరిస్థితులు.' : language === 'hi' ? 'जड़ों के अच्छे विकास के लिए अनुकूल तापमान और नमी की स्थिति।' : 'Favourable thermal and moisture conditions for root establishment.')}
@@ -319,9 +348,17 @@ export const CropRecommendationPage: React.FC = () => {
                 {t('recommend.evaluation_basis_title', { defaultValue: 'Evaluation Basis' })}
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                omitSoil ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+                !hasConfirmedInputs
+                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                  : omitSoil
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'bg-emerald-100 text-emerald-900'
               }`}>
-                {omitSoil ? t('recommend.weather_only_badge', { defaultValue: 'Weather-Only Fallback' }) : t('recommend.full_soil_weather_badge', { defaultValue: 'Full Soil + Weather' })}
+                {!hasConfirmedInputs
+                  ? (language === 'te' ? 'డిఫాల్ట్ వివరాలు' : language === 'hi' ? 'डिफ़ॉल्ट इनपुट' : 'Default inputs')
+                  : omitSoil
+                  ? (language === 'te' ? 'వాతావరణ ఆధారితం (ధృవీకరించబడింది)' : language === 'hi' ? 'केवल मौसम (पुष्ट)' : 'Weather-Only (Confirmed)')
+                  : (language === 'te' ? 'పూర్తి నేల + వాతావరణం (ధృవీకరించబడింది)' : language === 'hi' ? 'पूर्ण मिट्टी + मौसम (पुष्ट)' : 'Full Soil + Weather (Confirmed)')}
               </span>
             </div>
 
@@ -564,7 +601,10 @@ export const CropRecommendationPage: React.FC = () => {
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={fetchRecommendation}
+                  onClick={() => {
+                    setHasConfirmedInputs(true);
+                    fetchRecommendation();
+                  }}
                   disabled={loadingMl}
                   className="min-h-[48px] px-6 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all disabled:opacity-50"
                 >

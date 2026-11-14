@@ -495,8 +495,11 @@ export const IrrigationPage: React.FC = () => {
                 {plan?.litres_needed ? plan.litres_needed.toLocaleString() : '1,133,120'} L
               </span>
               <span className="text-xs text-[#4E5F57] block mt-0.5">
-                {language === 'te' ? 'స్థూల లోతు:' : language === 'hi' ? 'सकल गहराई:' : 'Gross Depth:'} <strong>{plan?.gross_depth_mm ? plan.gross_depth_mm.toFixed(1) : '140.0'} mm</strong> ({translateBackendString(plan?.irrigation_method || 'drip', language)})
+                {language === 'te' ? 'స్థూల లోతు:' : language === 'hi' ? 'సकल गहराई:' : 'Gross Depth:'} <strong>{plan?.gross_depth_mm ? plan.gross_depth_mm.toFixed(1) : '140.0'} mm</strong> ({translateBackendString(plan?.irrigation_method || 'drip', language)})
               </span>
+              <div className="text-[10px] text-[#4E5F57] bg-[#FAF8F5] p-1.5 rounded-lg border border-[#7A553A]/15 mt-1 font-mono">
+                {language === 'te' ? 'లెక్కింపు:' : language === 'hi' ? 'सूत्र:' : 'Derivation:'} {plan?.gross_depth_mm ? plan.gross_depth_mm.toFixed(1) : '140.0'} mm × 4,046.86 L/(mm·ac) × {areaAcres} ac ÷ {plan?.method_efficiency ?? 0.90}
+              </div>
             </div>
 
             {/* What this means for you */}

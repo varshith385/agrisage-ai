@@ -41,6 +41,7 @@ import { AgentActivityLog } from '../components/agents/AgentActivityLog';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { translateBackendString } from '../utils/safeTranslation';
+import { parseSafeNumber, formatCurrency } from '../utils/numberUtils';
 import {
   LeafScanIllustration,
   WateringCanIllustration,
@@ -228,7 +229,15 @@ export const DashboardPage: React.FC = () => {
 
   // Extract Plan Data
   const advisoryPlan = latestRunResult?.advisory_plan;
-  const healthBreakdown: FarmHealthScoreBreakdown | undefined = advisoryPlan?.farm_health_breakdown as FarmHealthScoreBreakdown | undefined;
+  const rawHealth = advisoryPlan?.farm_health_breakdown || (typeof advisoryPlan?.farm_health_score === 'object' ? advisoryPlan.farm_health_score : null);
+  const healthBreakdown: FarmHealthScoreBreakdown | undefined = (
+    rawHealth && typeof rawHealth === 'object'
+      ? rawHealth
+      : undefined
+  ) as FarmHealthScoreBreakdown | undefined;
+  const isInsufficientHealthData = Boolean(
+    (rawHealth as any)?.status === 'INSUFFICIENT_DATA' || (healthBreakdown?.score == null && Boolean(advisoryPlan))
+  );
   const rawPlan = advisoryPlan?.seven_day_plan;
   const planItems: SevenDayPlanItem[] = Array.isArray(rawPlan)
     ? rawPlan.filter((it): it is SevenDayPlanItem => typeof it === 'object' && it !== null && 'action' in it)
@@ -304,10 +313,9 @@ export const DashboardPage: React.FC = () => {
     const hasDiseaseData = Boolean(diseaseOutputs && diseaseOutputs.detected !== undefined);
     const hasDisease = Boolean(diseaseOutputs?.detected);
 
-    const rawProfitStr = String(economicsSummary?.combined_summary?.net_profit || '').replace(/,/g, '');
-    const parsedProfit = Number(rawProfitStr);
-    const hasEconomics = !isNaN(parsedProfit) && rawProfitStr.trim() !== '' && economicsSummary != null;
-    const estProfit = hasEconomics ? parsedProfit : 0;
+    const parsedProfit = parseSafeNumber(economicsSummary?.combined_summary?.net_profit, null);
+    const hasEconomics = parsedProfit !== null && economicsSummary != null;
+    const estProfit = parsedProfit ?? 0;
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
@@ -414,7 +422,7 @@ export const DashboardPage: React.FC = () => {
           {/* Tile 4: Farm Economics / Profit */}
           <PictorialTile
             title={language === 'te' ? 'ఖర్చులు & లాభం' : language === 'hi' ? 'खर्च और मुनाफा' : 'Farm Profit'}
-            phrase={hasEconomics ? `Net: ₹${Math.round(estProfit).toLocaleString('en-IN')}` : (language === 'te' ? 'ఆదాయం వివరాలు లేవు' : language === 'hi' ? 'मुनाफा डेटा नहीं है' : 'No profit loaded')}
+            phrase={hasEconomics ? `Net: ${formatCurrency(estProfit, 'No data yet')}` : (language === 'te' ? 'ఆదాయం వివరాలు లేవు' : language === 'hi' ? 'मुनाफा डेटा नहीं है' : 'No profit loaded')}
             illustration={hasEconomics ? <CoinStackGauge netProfit={estProfit} /> : <NoDataIllustration size={80} />}
             status={hasEconomics ? (estProfit >= 0 ? 'success' : 'danger') : 'nodata'}
             statusWord={hasEconomics ? (language === 'te' ? 'నమూనా లెక్క' : language === 'hi' ? 'मॉडल किया गया' : 'Modelled') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
@@ -433,13 +441,21 @@ export const DashboardPage: React.FC = () => {
               </h3>
               <StatusBadge
                 status={healthBreakdown?.score != null ? 'info' : 'nodata'}
-                label={healthBreakdown?.score != null ? 'Multi-Agent Evaluated' : 'Awaiting Run'}
+                label={
+                  isInsufficientHealthData
+                    ? 'INSUFFICIENT_DATA'
+                    : healthBreakdown?.score != null
+                    ? (language === 'te' ? 'బహుళ-కారక అంచనా' : language === 'hi' ? 'बहु-घटक मूल्यांकित' : 'Multi-Agent Evaluated')
+                    : (language === 'te' ? 'సలహా పెండింగ్' : language === 'hi' ? 'लंबित' : 'Awaiting Run')
+                }
                 size="sm"
               />
             </div>
             <p className="text-[16px] text-[#4A5750]">
               {healthBreakdown?.score != null
                 ? `Health Score: ${healthBreakdown.score}/100 (Advisory model)`
+                : isInsufficientHealthData
+                ? (language === 'te' ? 'డేటా చాలదు (కనీసం 3 కొలతలు అవసరం)' : language === 'hi' ? 'डेटा अपर्याप्त (न्यूनतम 3 घटक आवश्यक)' : 'INSUFFICIENT_DATA (Requires >= 3 telemetry components)')
                 : (language === 'te' ? 'సమగ్ర స్కోరు ఇంకా సిద్ధం కాలేదు (సలహాను రన్ చేయండి)' : language === 'hi' ? 'समग्र स्कोर अभी उपलब्ध नहीं (सलाह चलाएं)' : 'No score yet (Run advisory to calculate)')}
             </p>
           </div>
@@ -452,6 +468,8 @@ export const DashboardPage: React.FC = () => {
             <ReadAloudButton
               text={healthBreakdown?.score != null
                 ? `Farm health score is ${healthBreakdown.score} out of 100.`
+                : isInsufficientHealthData
+                ? 'Insufficient telemetry data to calculate farm health score. Minimum three components required.'
                 : 'Farm health score has not been evaluated yet. Run the multi-agent advisory to compute score.'}
               label={language === 'te' ? 'వినండి' : language === 'hi' ? 'सुनें' : 'Listen'}
             />
@@ -477,7 +495,7 @@ export const DashboardPage: React.FC = () => {
             {
               stepNumber: 3,
               title: language === 'te' ? 'సరిపడా నీరు ఇవ్వండి' : language === 'hi' ? 'जरूरत अनुसार पानी' : 'Irrigate if Dry',
-              desc: language === 'te' ? 'సిఫార్సు ప్రకారం తడులు ఇవ్వండి' : language === 'hi' ? 'सिफारिश के अनुसार पानी दें' : 'Apply water if depletion exceeds 15mm',
+              desc: language === 'te' ? 'సిఫార్సు ప్రకారం తడులు ఇవ్వండి' : language === 'hi' ? 'सिफारिश के अनुसार पानी दें' : 'Apply water only when irrigation model indicates root stress',
               icon: Droplets,
             },
           ]}
@@ -767,7 +785,7 @@ export const DashboardPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            {t('dashboard.tab_health', { defaultValue: 'Farm Health Score' })} ({healthBreakdown?.score ? `${healthBreakdown.score}/100` : t('common.no_data_yet', { defaultValue: 'No data yet' })})
+            {t('dashboard.tab_health', { defaultValue: 'Farm Health Score' })} ({healthBreakdown?.score != null ? `${healthBreakdown.score}/100` : isInsufficientHealthData ? 'INSUFFICIENT_DATA' : t('common.no_data_yet', { defaultValue: 'No data yet' })})
           </button>
           <button
             type="button"
@@ -905,13 +923,15 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-[#E4EDE8] rounded-2xl border border-[#183D2E]/20">
                 <div>
                   <h4 className="font-display text-lg font-bold text-[#183D2E]">
-                    {t('dashboard.tab_health', { defaultValue: 'Farm Health Score' })}: {healthBreakdown?.score ? `${healthBreakdown.score} / 100` : t('dashboard.awaiting_run', { defaultValue: 'Awaiting Run (No score yet)' })}
+                    {t('dashboard.tab_health', { defaultValue: 'Farm Health Score' })}: {healthBreakdown?.score != null ? `${healthBreakdown.score} / 100` : isInsufficientHealthData ? 'INSUFFICIENT_DATA' : t('dashboard.awaiting_run', { defaultValue: 'Awaiting Run (No score yet)' })}
                   </h4>
                   <p className="text-xs text-[#183D2E]/80">
-                    {healthBreakdown?.formula_description ? translateBackendString(healthBreakdown.formula_description, language) : (language === 'te' ? 'మోడల్ బహుళ-కారక సూచిక: నేల తేమ, వాతావరణ ఒత్తిడి, మరియు తెగుళ్ల ప్రభావం (వివరాలు ధృవీకరించాలి).' : language === 'hi' ? 'मॉडल बहु-कारक संकेतक: मिट्टी की नमी, मौसम तनाव, और कीट प्रभाव (विवरण सत्यापित करें)।' : 'Modelled multi-factor indicator: soil moisture, weather stress, and pest incidence (details to verify).')}
+                    {isInsufficientHealthData
+                      ? (language === 'te' ? 'ఆరోగ్య స్కోరు లెక్కించడానికి కనీసం 3 విభాగాలు (వాతావరణం, నీరు, తెగుళ్లు మొదలైనవి) అవసరం. ప్రస్తుతం తగినంత డేటా లేదు.' : language === 'hi' ? 'स्वास्थ्य स्कोर की गणना के लिए न्यूनतम 3 घटकों (मौसम, सिंचाई, कीट आदि) का डेटा आवश्यक है। वर्तमान में अपर्याप्त डेटा है।' : 'INSUFFICIENT_DATA: Composite farm health scoring requires telemetry from a minimum of 3 components. Insufficient telemetry received.')
+                      : healthBreakdown?.formula_description ? translateBackendString(healthBreakdown.formula_description, language) : (language === 'te' ? 'మోడల్ బహుళ-కారక సూచిక: నేల తేమ, వాతావరణ ఒత్తిడి, మరియు తెగుళ్ల ప్రభావం (వివరాలు ధృవీకరించాలి).' : language === 'hi' ? 'मॉडल बहु-कारक संकेतक: मिट्टी की नमी, मौसम तनाव, और कीट प्रभाव (विवरण सत्यापित करें)।' : 'Modelled multi-factor indicator: soil moisture, weather stress, and pest incidence (details to verify).')}
                   </p>
                 </div>
-                <StatusBadge status="WORKING" />
+                <StatusBadge status={healthBreakdown?.score != null ? 'WORKING' : 'nodata'} label={isInsufficientHealthData ? 'INSUFFICIENT_DATA' : undefined} />
               </div>
 
               {healthBreakdown?.components && (
@@ -970,8 +990,14 @@ export const DashboardPage: React.FC = () => {
                   <span className="text-xs font-black uppercase text-[#183D2E]">{t('dashboard.tool_summary_water_title', { defaultValue: 'Water & Irrigation' })}</span>
                   <StatusBadge status="WORKING" />
                 </div>
-                <div className="text-xs space-y-1">
-                  <div>{t('dashboard.litres_needed', { defaultValue: 'Litres Needed:' })} <strong className="text-[#183D2E]">{irrigationOutputs?.litres_needed ? irrigationOutputs.litres_needed.toLocaleString() : '1,133,120'} L</strong></div>
+                <div className="text-xs space-y-1.5">
+                  <div>
+                    <span>{t('dashboard.litres_needed', { defaultValue: 'Litres Needed:' })} </span>
+                    <strong className="text-[#183D2E]">{irrigationOutputs?.litres_needed ? Math.round(Number(irrigationOutputs.litres_needed)).toLocaleString() : '1,133,120'} L</strong>
+                    <div className="text-[10px] text-[#4E5F57] bg-white p-1.5 rounded-lg border border-[#7A553A]/15 mt-1 font-mono">
+                      {language === 'te' ? 'లెక్కింపు విధానం:' : language === 'hi' ? 'गणना सूत्र:' : 'Derivation:'} depth ({irrigationOutputs?.gross_depth_mm ?? irrigationOutputs?.recommended_depth_mm ?? 25} mm) × 4,046.86 L/(mm·ac) × area ({farmData?.area ?? activeFarm?.area ?? 4.5} ac) ÷ efficiency ({irrigationOutputs?.method_efficiency ?? 0.90})
+                    </div>
+                  </div>
                   <div>{t('dashboard.next_irrigation', { defaultValue: 'Next Irrigation:' })} <strong className="text-[#183D2E]">{irrigationOutputs?.next_irrigation_date ? translateBackendString(irrigationOutputs.next_irrigation_date, language) : (language === 'te' ? 'ఈరోజు' : language === 'hi' ? 'आज' : 'Today')}</strong></div>
                   <div>{t('dashboard.efficiency_label', { defaultValue: 'Efficiency:' })} <strong>{irrigationOutputs?.method_efficiency ? `${Math.round(irrigationOutputs.method_efficiency * 100)}%` : (language === 'te' ? '90% (డ్రిప్)' : language === 'hi' ? '90% (ड्रिप)' : '90% (Drip)')}</strong></div>
                 </div>
@@ -989,7 +1015,7 @@ export const DashboardPage: React.FC = () => {
                 <div className="text-xs space-y-1">
                   <div>{t('dashboard.expected_yield_label', { defaultValue: 'Expected Yield:' })} <strong className="text-[#183D2E]">{headlineYield?.headline_yield_quintals_per_acre ?? 8.0} q/ac</strong></div>
                   <div>{t('dashboard.assumed_price_label', { defaultValue: 'Assumed price (editable, demo):' })} <strong className="text-[#183D2E]">₹7,100 / q</strong> (DEMO DATA &bull; {language === 'te' ? 'వివరాలు ధృవీకరించాలి' : language === 'hi' ? 'विवरण सत्यापित करें' : 'details to verify'})</div>
-                  <div>{t('dashboard.est_net_profit_label', { defaultValue: 'Est. Net Profit:' })} <strong className="text-emerald-800 font-bold">₹{economicsSummary?.combined_summary?.net_profit ? Number(economicsSummary.combined_summary.net_profit).toLocaleString() : '65,400 (DEMO DATA)'}</strong></div>
+                  <div>{t('dashboard.est_net_profit_label', { defaultValue: 'Est. Net Profit:' })} <strong className="text-emerald-800 font-bold">{formatCurrency(economicsSummary?.combined_summary?.net_profit, '65,400 (DEMO DATA)')}</strong></div>
                 </div>
                 <Link to="/economics" className="text-xs font-bold text-[#183D2E] hover:underline block pt-2">
                   {t('dashboard.open_profit_tool', { defaultValue: 'Open What-If Profit Simulator →' })}

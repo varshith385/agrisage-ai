@@ -79,7 +79,8 @@ const ALLOWLIST = new Set([
   'fao-56', 'fao', '56', 'raw', 'taw', 'awc', 'npk', 'ph', 'ha', 'kg', 'ac', 'n', 'p', 'k', 'oc',
   'demo', 'data', 'open-meteo', 'imd', 'kvk', 'des', 'msp', 'pm-kisan', 'rythu', 'bandhu',
   'sms', 'whatsapp', 'url', 'pdf', 'csv', 'json', 'rfc', '5545', 'iso', '8601', 'cpu', 'id', 'api', 'gps',
-  'ai', 'pytorch', 'mobilenetv2', 'google', 'gemini', 'groq', 'openai', 'utc', 'ist', 'kharif', 'rabi', 'zaid'
+  'ai', 'pytorch', 'mobilenetv2', 'google', 'gemini', 'groq', 'openai', 'utc', 'ist', 'kharif', 'rabi', 'zaid',
+  'insufficient_data', 'insufficient', 'derivation', 'depth', 'area', 'efficiency', 'uncalibrated'
 ]);
 
 function inspectTextNodes(container: HTMLElement): string[] {

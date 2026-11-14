@@ -72,7 +72,7 @@ export const MarketPage: React.FC = () => {
   const [transportRate, setTransportRate] = useState<number>(2.50);
   const [marketFeePct, setMarketFeePct] = useState<number>(1.0);
   const [rankingData, setRankingData] = useState<NetRealizationRankingResponse | null>(null);
-  const [mspData, setMspData] = useState<MSPComparisonResponse | null>(null);
+  const [_mspData, setMspData] = useState<MSPComparisonResponse | null>(null);
   const [trendData, setTrendData] = useState<PriceTrendResponse | null>(null);
   const [warehouseData, setWarehouseData] = useState<WarehouseResponse | null>(null);
   const [mandiLoading, setMandiLoading] = useState<boolean>(false);
@@ -331,14 +331,14 @@ export const MarketPage: React.FC = () => {
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
 
-          {/* Tile 2: Government MSP Benchmark */}
+          {/* Tile 2: Assumed Price (Demo) */}
           <PictorialTile
-            title={language === 'te' ? 'కనీస మద్దతు ధర (MSP)' : language === 'hi' ? 'न्यूनतम समर्थन मूल्य (MSP)' : 'MSP Benchmark'}
-            phrase={language === 'te' ? 'వివరాలు ధృవీకరించండి' : language === 'hi' ? 'सत्यापन आवश्यक (विवरण जांचें)' : 'details to verify'}
+            title={language === 'te' ? 'అనుకున్న ధర (మార్చగలరు, డెమో)' : language === 'hi' ? 'अनुमानित मूल्य (संपादन योग्य, डेमो)' : 'Assumed price (editable, demo)'}
+            phrase={language === 'te' ? 'వివరాలు ధృవీకరించాలి (డెమో డేటా)' : language === 'hi' ? 'सत्यापन आवश्यक (डेमो डेटा)' : 'details to verify (DEMO DATA)'}
             illustration={<NoDataIllustration size={80} />}
             status="nodata"
             statusWord={language === 'te' ? 'ధృవీకరించండి' : language === 'hi' ? 'सत्यापन आवश्यक' : 'details to verify'}
-            spokenText="Minimum Support Price benchmark details require local verification. No unverified prices are shown."
+            spokenText="Price benchmark details require local verification. Assumed price is for demo calculation only."
             onOpenDetails={() => setMode('words')}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -475,41 +475,39 @@ export const MarketPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 2: MSP Benchmark & Price Defense */}
+        {/* Card 2: Price Benchmark (Assumed price, editable, demo) */}
         <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#DA9A4C]" />
-                MSP Benchmark (details to verify)
+                {t('dashboard.assumed_price', { defaultValue: 'Assumed price (editable, demo)' })}
               </span>
-              <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
-                Indicative Reference
+              <span className="text-[10px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-300">
+                DEMO DATA
               </span>
             </div>
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1">
               <div className="flex justify-between items-baseline">
-                <span className="text-xs text-[#7A553A]">MSP Benchmark:</span>
-                <strong className="text-base font-bold text-[#183D2E]">
-                  {mspData?.benchmark?.msp_per_quintal
-                    ? `₹${mspData.benchmark.msp_per_quintal.toLocaleString('en-IN')} / q (Indicative)`
-                    : 'Details to verify (No benchmark record)'}
+                <span className="text-xs text-[#7A553A]">{t('dashboard.assumed_price', { defaultValue: 'Assumed price (editable, demo)' })}:</span>
+                <strong className="text-sm font-bold text-[#183D2E]">
+                  {language === 'te' ? 'వివరాలు ధృవీకరించాలి (డెమో డేటా)' : language === 'hi' ? 'विवरण सत्यापित करें (डेमो डेटा)' : 'details to verify (DEMO DATA)'}
                 </strong>
               </div>
               <div className="flex justify-between items-baseline">
-                <span className="text-xs text-[#7A553A]">Market Realization:</span>
+                <span className="text-xs text-[#7A553A]">{language === 'te' ? 'మార్కెట్ విక్రయం:' : language === 'hi' ? 'मंडी प्राप्ति:' : 'Market Realization:'}</span>
                 <strong className="text-xs font-bold text-[#183D2E]">
                   {bestMandi
                     ? `₹${bestMandi.net_realization_per_q.toFixed(0)} / q ${!isLiveMandi ? '(DEMO DATA)' : ''}`
-                    : 'Awaiting APMC Prices'}
+                    : (language === 'te' ? 'మండి ధరల కోసం వేచి ఉంది' : language === 'hi' ? 'मंडी भाव की प्रतीक्षा' : 'Awaiting APMC Prices')}
                 </strong>
               </div>
             </div>
 
             <WhatThisMeans
               message={plainMeaning}
-              confidenceNote="APMC mandi prices and MSP benchmarks are modelled, indicative values (details to verify with local APMC)."
+              confidenceNote={language === 'te' ? 'ధరలు మరియు నమూనా విలువలు సూచిక మాత్రమే (స్థానిక మార్కెట్లో ధృవీకరించాలి).' : language === 'hi' ? 'मंडी भाव व मॉडल मूल्य संकेतात्मक हैं (स्थानीय स्तर पर सत्यापित करें)।' : 'APMC mandi prices and model values are indicative (details to verify with local APMC).'}
             />
           </div>
         </div>
