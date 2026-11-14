@@ -40,6 +40,7 @@ import { AgentFlowDiagram } from '../components/agents/AgentFlowDiagram';
 import { AgentActivityLog } from '../components/agents/AgentActivityLog';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { speakText, SupportedLanguage } from '../services/speech';
 import { translateBackendString } from '../utils/safeTranslation';
 import { parseSafeNumber, formatCurrency } from '../utils/numberUtils';
 import {
@@ -190,7 +191,7 @@ export const DashboardPage: React.FC = () => {
 
   // Read 7-Day Plan Aloud
   const handleReadAloudPlan = (items: SevenDayPlanItem[]) => {
-    if (!('speechSynthesis' in window)) return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     if (speechSpeaking) {
       window.speechSynthesis.cancel();
@@ -198,9 +199,7 @@ export const DashboardPage: React.FC = () => {
       return;
     }
 
-    const langCode = language === 'te' ? 'te-IN' : language === 'hi' ? 'hi-IN' : 'en-IN';
     const langPrefix = language === 'te' ? 'te' : language === 'hi' ? 'hi' : 'en';
-
     const currentVoices = voices.length > 0 ? voices : window.speechSynthesis.getVoices();
     const matchedVoice = currentVoices.find((v) =>
       v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix)
@@ -214,17 +213,16 @@ export const DashboardPage: React.FC = () => {
 
     const fullScript = `Grow2Gain Farm Advisory Plan for ${cropName}. ` + spokenLines.join('. ');
 
-    const utterance = new SpeechSynthesisUtterance(fullScript);
-    utterance.lang = langCode;
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
-    }
-    utterance.rate = 0.95;
-    utterance.onend = () => setSpeechSpeaking(false);
-    utterance.onerror = () => setSpeechSpeaking(false);
+    const speech = speakText(fullScript, language as SupportedLanguage, {
+      customVoice: matchedVoice,
+      onStart: () => setSpeechSpeaking(true),
+      onEnd: () => setSpeechSpeaking(false),
+      onError: () => setSpeechSpeaking(false),
+    });
 
-    setSpeechSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+    if (!speech.voiceFound && language !== 'en') {
+      setSpeechSpeaking(false);
+    }
   };
 
   // Extract Plan Data

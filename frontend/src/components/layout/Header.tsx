@@ -22,7 +22,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { usePictorial } from '../../context/PictorialContext';
 import { CommandPalette } from '../common/CommandPalette';
 import { Language } from '../../types/api';
-import { speakText, SupportedLanguage } from '../../services/speech';
+import { speakText, loadVoices, findVoiceForLanguage, SupportedLanguage } from '../../services/speech';
 import { getReminders } from '../../api/reminders';
 
 interface HeaderProps {
@@ -91,16 +91,29 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
     return 'Grow2Gain';
   };
 
-  const handleTestVoice = (langCode: SupportedLanguage) => {
+  const handleTestVoice = async (langCode: SupportedLanguage) => {
     const phrases: Record<SupportedLanguage, string> = {
       en: 'Grow2Gain voice test: system is ready to read agronomic advisories.',
       te: 'వ్యవసాయ సలహా ఆడియో పరీక్ష: Grow2Gain వాయిస్ సిద్ధంగా ఉంది.',
       hi: 'कृषि सलाहकार ऑडियो परीक्षण: Grow2Gain आवाज तैयार है।',
     };
-    setVoiceTestStatus(`Testing ${langCode.toUpperCase()}...`);
+    setVoiceTestStatus(`Finding ${langCode.toUpperCase()} voice...`);
+    const voices = await loadVoices();
+    const voice = findVoiceForLanguage(langCode, voices);
+    if (!voice && langCode !== 'en') {
+      const msg = langCode === 'te'
+        ? 'No Telugu voice found on device (Install in Windows Settings or try Edge)'
+        : 'No Hindi voice found on device (Install in Windows Settings or try Edge)';
+      setVoiceTestStatus(msg);
+      setTimeout(() => setVoiceTestStatus(null), 5000);
+      return;
+    }
+    const voiceLabel = voice ? voice.name : 'Default voice';
+    setVoiceTestStatus(`Found: ${voiceLabel}`);
     speakText(phrases[langCode], langCode, {
-      onStart: () => setVoiceTestStatus(`Playing ${langCode.toUpperCase()}...`),
-      onEnd: () => setVoiceTestStatus(null),
+      customVoice: voice,
+      onStart: () => setVoiceTestStatus(`Playing: ${voiceLabel}`),
+      onEnd: () => setTimeout(() => setVoiceTestStatus(null), 3500),
       onError: (err) => {
         if (String(err?.message || '').includes('NO_VOICE_FOR_LANG')) {
           setVoiceTestStatus(`No ${langCode.toUpperCase()} voice installed in browser.`);
