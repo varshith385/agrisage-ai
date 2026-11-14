@@ -22,7 +22,6 @@ import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { WateringFieldIllustration } from '../components/common/FarmerIllustrations';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
 
@@ -160,8 +159,6 @@ export const FarmRegistrationPage: React.FC = () => {
   if (isPictorial) {
     return (
       <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
-        <ModeToggleHero />
-
         <PageHeader
           icon={Tractor}
           title={language === 'te' ? 'నా పొలం వివరాలు' : language === 'hi' ? 'खेत का विवरण' : 'My Farm Holdings'}
@@ -244,7 +241,6 @@ export const FarmRegistrationPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-16 animate-fadeIn">
-      <ModeToggleHero />
       {/* PAGE HEADER */}
       <PageHeader
         icon={Tractor}

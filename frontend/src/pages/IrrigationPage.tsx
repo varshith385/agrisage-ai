@@ -45,7 +45,6 @@ import {
   WaterDropsGauge,
   NoDataIllustration,
 } from '../components/common/FarmerIllustrations';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
 
@@ -256,9 +255,6 @@ export const IrrigationPage: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        {/* Giant Mode & Language Switcher at Top */}
-        <ModeToggleHero />
-
         <PageHeader
           icon={Droplets}
           title={language === 'te' ? 'నీటి తడుల సమాచారం' : language === 'hi' ? 'सिंचाई और पानी' : 'Water & Irrigation'}
@@ -380,9 +376,6 @@ export const IrrigationPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
-      {/* Mode & Language Switcher in Words Mode */}
-      <ModeToggleHero />
-
       <PageHeader
         icon={Droplets}
         title={t('irrigation.title')}

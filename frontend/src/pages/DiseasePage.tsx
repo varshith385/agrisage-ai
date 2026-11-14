@@ -36,7 +36,6 @@ import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { LeafScanIllustration, NoDataIllustration } from '../components/common/FarmerIllustrations';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
 
@@ -203,9 +202,6 @@ export const DiseasePage: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        {/* View Mode & Language Selector */}
-        <ModeToggleHero />
-
         <PageHeader
           icon={Leaf}
           title={language === 'te' ? 'ఆకు తెగుళ్ల గుర్తింపు' : language === 'hi' ? 'पत्ती रोग की जांच' : 'Plant Disease Doctor'}
@@ -396,9 +392,6 @@ export const DiseasePage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
-      {/* View Mode & Language Selector in Words Mode */}
-      <ModeToggleHero />
-
       {/* PAGE HEADER */}
       <PageHeader
         icon={Leaf}

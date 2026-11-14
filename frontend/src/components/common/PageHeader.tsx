@@ -3,6 +3,8 @@ import { HelpCircle, X, ChevronRight } from 'lucide-react';
 import { ReadAloudButton } from './ReadAloudButton';
 import { ExplainGuideIllustration } from './FarmerIllustrations';
 import { useTranslation } from '../../context/LanguageContext';
+import { usePictorial } from '../../context/PictorialContext';
+import { PictorialLegendModal } from './PictorialLegendModal';
 
 export interface PageHeaderProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -24,7 +26,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   actions,
 }) => {
   const { t } = useTranslation();
+  const { isPictorial } = usePictorial();
   const [isOpen, setIsOpen] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
 
   // Full explanation text for read-aloud
   const explanationToRead = whatIsThis
@@ -53,6 +57,17 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 >
                   <HelpCircle className="w-3.5 h-3.5 text-[#9E5B00] dark:text-[#F2B01E]" />
                   <span>{t('common.what_is_this', { defaultValue: 'What is this?' })}</span>
+                </button>
+              )}
+              {isPictorial && (
+                <button
+                  type="button"
+                  onClick={() => setLegendOpen(true)}
+                  aria-label={t('common.how_to_read_screen', { defaultValue: 'How to read this screen' })}
+                  title={t('common.how_to_read_screen', { defaultValue: 'How to read this screen (?)' })}
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-[#18241E] text-[#1B5E3B] dark:text-[#F2B01E] border border-[#D9D4C7] dark:border-[#273B30] hover:bg-emerald-50 dark:hover:bg-emerald-950/30 flex items-center justify-center transition-all shadow-xs shrink-0 font-black text-xs"
+                >
+                  ?
                 </button>
               )}
             </div>
@@ -156,6 +171,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </div>
         </div>
       )}
+      {/* Visual Mode Picture Legend Modal */}
+      <PictorialLegendModal isOpen={legendOpen} onClose={() => setLegendOpen(false)} />
     </header>
   );
 };

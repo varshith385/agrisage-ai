@@ -49,7 +49,6 @@ import {
   FarmHealthMeter,
   NoDataIllustration,
 } from '../components/common/FarmerIllustrations';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
 
@@ -310,9 +309,6 @@ export const DashboardPage: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        {/* Giant Mode & Language Switcher at Top */}
-        <ModeToggleHero />
-
         <PageHeader
           icon={LayoutDashboard}
           title={language === 'te' ? 'రైతు డ్యాష్‌బోర్డ్' : language === 'hi' ? 'किसान डैशबोर्ड' : 'Farmer Dashboard'}
@@ -493,9 +489,6 @@ export const DashboardPage: React.FC = () => {
   // =========================================================================
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
-      {/* View Mode & Language Selector */}
-      <ModeToggleHero />
-
       <PageHeader
         icon={LayoutDashboard}
         title={t('dashboard.welcome_farmer', { name: user?.full_name || 'Farmer Ramesh' })}

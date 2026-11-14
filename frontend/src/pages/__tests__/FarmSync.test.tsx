@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../../context/AuthContext';
 import { LanguageProvider } from '../../context/LanguageContext';
 import { ActiveFarmBanner } from '../../components/common/ActiveFarmBanner';
+import { Header } from '../../components/layout/Header';
 import { farmsApi } from '../../api/farms';
 import { Farm } from '../../types/api';
 
@@ -111,6 +112,7 @@ describe('BUG 3: Global Farm State & Synchronization Suite', () => {
         <BrowserRouter>
           <LanguageProvider>
             <AuthProvider>
+              <Header />
               <ActiveFarmBanner />
             </AuthProvider>
           </LanguageProvider>
@@ -150,6 +152,7 @@ describe('BUG 3: Global Farm State & Synchronization Suite', () => {
         <BrowserRouter>
           <LanguageProvider>
             <AuthProvider>
+              <Header />
               <ActiveFarmBanner />
             </AuthProvider>
           </LanguageProvider>

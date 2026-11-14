@@ -30,7 +30,6 @@ import {
   WaterDropsGauge,
   NoDataIllustration,
 } from '../components/common/FarmerIllustrations';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
 import { useTranslation } from '../context/LanguageContext';
@@ -198,9 +197,6 @@ export const LocationWeatherPage: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        {/* Giant Mode & Language Switcher at Top */}
-        <ModeToggleHero />
-
         <PageHeader
           icon={CloudSun}
           title={language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'मौसम की जानकारी' : 'Weather'}
@@ -324,9 +320,6 @@ export const LocationWeatherPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
-      {/* Mode & Language Switcher in Words Mode */}
-      <ModeToggleHero />
-
       {/* PAGE HEADER */}
       <PageHeader
         icon={CloudSun}

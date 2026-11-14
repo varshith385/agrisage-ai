@@ -48,7 +48,6 @@ import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { MoneyProfitIllustration, CoinStackGauge, NoDataIllustration } from '../components/common/FarmerIllustrations';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
 
@@ -387,9 +386,6 @@ export const EconomicsPage: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        {/* Giant Mode & Language Switcher at Top */}
-        <ModeToggleHero />
-
         <PageHeader
           icon={DollarSign}
           title={language === 'te' ? 'ఆదాయం మరియు ఖర్చులు' : language === 'hi' ? 'खर्च और मुनाफा' : 'Money & Profit'}
@@ -505,9 +501,6 @@ export const EconomicsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn max-w-6xl mx-auto pb-16">
-      {/* Mode & Language Switcher in Words Mode */}
-      <ModeToggleHero />
-
       {/* PAGE HEADER */}
       <PageHeader
         icon={DollarSign}

@@ -21,7 +21,6 @@ import { OutbreakMapSection } from '../components/community/OutbreakMapSection';
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
 
@@ -53,9 +52,6 @@ export const CommunityPage: React.FC = () => {
   if (isPictorial) {
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        {/* Giant Mode & Language Switcher at Top */}
-        <ModeToggleHero />
-
         <PageHeader
           icon={Users}
           title={language === 'te' ? 'రైతు బృందం & యంత్రాలు' : language === 'hi' ? 'किसान समुदाय व मशीनें' : 'Community & Machinery'}

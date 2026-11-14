@@ -54,7 +54,6 @@ import { PageHeader } from '../components/common/PageHeader';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { MoneyProfitIllustration, CoinStackGauge, NoDataIllustration } from '../components/common/FarmerIllustrations';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { StepFlow } from '../components/common/StepFlow';
@@ -258,9 +257,6 @@ export const MarketPage: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        {/* Giant Mode & Language Switcher at Top */}
-        <ModeToggleHero />
-
         <PageHeader
           icon={Store}
           title={language === 'te' ? 'మార్కెట్ ధరలు' : language === 'hi' ? 'मंडी के भाव' : 'Market Prices'}

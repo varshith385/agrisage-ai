@@ -37,7 +37,6 @@ import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { WateringFieldIllustration } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { StatusBadge } from '../components/common/StatusBadge';
 
 // Quick test sample transcripts
@@ -277,8 +276,6 @@ export const SchemesPage: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-fadeIn pb-12 max-w-6xl mx-auto">
-        <ModeToggleHero />
-
         <PageHeader
           icon={FileText}
           title={language === 'te' ? 'నేల ఆరోగ్య పత్రం & పథకాలు' : language === 'hi' ? 'मृदा स्वास्थ्य व योजनाएं' : 'Soil Health & Schemes'}
@@ -400,9 +397,6 @@ export const SchemesPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-16 animate-fadeIn">
-      {/* Mode Switcher */}
-      <ModeToggleHero />
-
       {/* PAGE HEADER */}
       <PageHeader
         icon={FileText}

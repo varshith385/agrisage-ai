@@ -21,7 +21,6 @@ import {
   MoneyProfitIllustration,
 } from '../components/common/FarmerIllustrations';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
-import { ModeToggleHero } from '../components/common/ModeToggleHero';
 import { StepFlow } from '../components/common/StepFlow';
 import { usePictorial } from '../context/PictorialContext';
 
@@ -126,8 +125,6 @@ export const HowToPage: React.FC = () => {
   if (isPictorial) {
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
-        <ModeToggleHero />
-
         <PageHeader
           icon={HelpCircle}
           title={language === 'te' ? 'అగ్రిసేజ్ ఎలా వాడాలి? (చిత్రాల గైడ్)' : language === 'hi' ? 'एग्रीसेज कैसे उपयोग करें? (चित्र गाइड)' : 'How to Use AgriSage (Visual Guide)'}
@@ -194,7 +191,6 @@ export const HowToPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
-      <ModeToggleHero />
       <PageHeader
         icon={HelpCircle}
         title={language === 'te' ? 'అగ్రిసేజ్ ఎలా వాడాలి?' : language === 'hi' ? 'एग्रीसेज का उपयोग कैसे करें?' : 'How to Use AgriSage AI'}

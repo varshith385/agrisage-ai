@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search,
   Sprout,
@@ -15,7 +15,6 @@ import {
   Volume2,
   Image as ImageIcon,
   Check,
-  Plus,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../context/LanguageContext';
@@ -36,10 +35,10 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
   const { isDark, toggleTheme } = useTheme();
   const { isPictorial, togglePictorial } = usePictorial();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Dropdown states
   const [commandOpen, setCommandOpen] = useState(false);
-  const [farmDropdownOpen, setFarmDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const [voiceTestStatus, setVoiceTestStatus] = useState<string | null>(null);
@@ -51,11 +50,10 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
         .then((rems) => {
           setDueReminderCount(rems.length);
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [isAuthenticated, activeFarm?.id]);
 
-  const farmRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
 
@@ -63,9 +61,6 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
-      if (farmRef.current && !farmRef.current.contains(target)) {
-        setFarmDropdownOpen(false);
-      }
       if (langRef.current && !langRef.current.contains(target)) {
         setLangDropdownOpen(false);
       }
@@ -151,78 +146,37 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
 
             {/* 2. Active Farm Chip with Switcher */}
             {isAuthenticated && (
-              <div ref={farmRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => setFarmDropdownOpen((prev) => !prev)}
-                  aria-expanded={farmDropdownOpen}
-                  aria-label="Switch active farm"
+              <div className="relative flex items-center bg-[#14462C] dark:bg-[#18241E] rounded-xl px-2.5 py-1 border border-[#24784C]/60 dark:border-[#273B30] min-h-[38px] max-w-[180px] sm:max-w-[220px]">
+                <Sprout className="w-3.5 h-3.5 text-[#F2B01E] shrink-0 mr-1.5" />
+                <select
+                  value={activeFarmId ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '__new__') {
+                      navigate('/farms');
+                    } else {
+                      setActiveFarmId(Number(val));
+                    }
+                  }}
+                  aria-label={t('farms.switch_farm', { defaultValue: 'Switch Farm' })}
                   title="Switch active farm holding"
-                  className="min-h-[38px] max-w-[180px] sm:max-w-[220px] px-2.5 py-1.5 rounded-xl bg-[#14462C] dark:bg-[#18241E] text-white/95 hover:bg-[#24784C] dark:hover:bg-[#273B30] border border-[#24784C]/60 dark:border-[#273B30] flex items-center gap-1.5 transition-all text-xs font-bold truncate"
+                  className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer truncate max-w-[140px] sm:max-w-[170px]"
                 >
-                  <Sprout className="w-3.5 h-3.5 text-[#F2B01E] shrink-0" />
-                  <span className="truncate">
-                    {activeFarm?.name || t('farms.no_farm_selected')}
-                  </span>
-                  {activeFarm && (
-                    <span className="hidden lg:inline text-[10px] text-[#F2B01E] font-semibold">
-                      ({activeFarm.area} ac)
-                    </span>
+                  {farms.length === 0 ? (
+                    <option value="" className="text-stone-900 bg-white">
+                      {t('farms.no_farm_selected', { defaultValue: 'No farm' })}
+                    </option>
+                  ) : (
+                    farms.map((f) => (
+                      <option key={f.id} value={f.id} className="text-stone-900 bg-white">
+                        {f.name} ({f.area} ac)
+                      </option>
+                    ))
                   )}
-                  <ChevronDown className="w-3.5 h-3.5 text-white/70 shrink-0 ml-0.5" />
-                </button>
-
-                {farmDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#18241E] text-[#1F2A24] dark:text-[#F2F5F3] rounded-2xl border border-[#D9D4C7] dark:border-[#273B30] shadow-xl py-2 z-50 animate-scaleUp">
-                    <div className="px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#4A5750] dark:text-[#9EB0A5] border-b border-[#D9D4C7]/50 dark:border-[#273B30]">
-                      Your Registered Farms
-                    </div>
-                    <div className="max-h-56 overflow-y-auto py-1">
-                      {farms.length === 0 ? (
-                        <div className="px-3.5 py-2 text-xs text-[#4A5750] dark:text-[#9EB0A5]">
-                          No farms registered yet.
-                        </div>
-                      ) : (
-                        farms.map((f) => {
-                          const isCurrent = f.id === activeFarmId;
-                          return (
-                            <button
-                              key={f.id}
-                              type="button"
-                              onClick={() => {
-                                setActiveFarmId(f.id);
-                                setFarmDropdownOpen(false);
-                              }}
-                              className={`w-full px-3.5 py-2 text-left text-xs font-bold flex items-center justify-between transition-colors ${
-                                isCurrent
-                                  ? 'bg-[#1B5E3B]/10 dark:bg-[#1B5E3B]/30 text-[#1B5E3B] dark:text-[#F2B01E]'
-                                  : 'hover:bg-stone-100 dark:hover:bg-stone-800'
-                              }`}
-                            >
-                              <div className="truncate">
-                                <div className="truncate">{f.name}</div>
-                                <div className="text-[10px] text-[#4A5750] dark:text-[#9EB0A5] font-normal">
-                                  {f.area} ac &bull; {f.district || f.village || 'Telangana'}
-                                </div>
-                              </div>
-                              {isCurrent && <Check className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E] shrink-0" />}
-                            </button>
-                          );
-                        })
-                      )}
-                    </div>
-                    <div className="pt-1.5 border-t border-[#D9D4C7]/50 dark:border-[#273B30] px-2">
-                      <Link
-                        to="/farms"
-                        onClick={() => setFarmDropdownOpen(false)}
-                        className="w-full px-3 py-1.5 rounded-xl text-xs font-bold text-[#1B5E3B] dark:text-[#F2B01E] hover:bg-emerald-50 dark:hover:bg-emerald-950/40 flex items-center gap-1.5 transition-colors"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Manage / Add New Farm</span>
-                      </Link>
-                    </div>
-                  </div>
-                )}
+                  <option value="__new__" className="text-stone-900 bg-white font-bold">
+                    + {t('farms.register_new', { defaultValue: 'Register Farm' })}
+                  </option>
+                </select>
               </div>
             )}
 
@@ -257,11 +211,10 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                         setLanguage(l.code as Language);
                         setLangDropdownOpen(false);
                       }}
-                      className={`w-full px-3.5 py-2 text-left text-xs font-bold flex items-center justify-between transition-colors ${
-                        language === l.code
-                          ? 'bg-[#1B5E3B]/10 dark:bg-[#1B5E3B]/30 text-[#1B5E3B] dark:text-[#F2B01E]'
-                          : 'hover:bg-stone-100 dark:hover:bg-stone-800'
-                      }`}
+                      className={`w-full px-3.5 py-2 text-left text-xs font-bold flex items-center justify-between transition-colors ${language === l.code
+                        ? 'bg-[#1B5E3B]/10 dark:bg-[#1B5E3B]/30 text-[#1B5E3B] dark:text-[#F2B01E]'
+                        : 'hover:bg-stone-100 dark:hover:bg-stone-800'
+                        }`}
                     >
                       <div>
                         <span>{l.label}</span>
@@ -376,9 +329,8 @@ export const Header: React.FC<HeaderProps> = ({ onStartTour }) => {
                           <ImageIcon className="w-4 h-4 text-[#1B5E3B] dark:text-[#F2B01E]" />
                           <span>Pictorial Visual Mode</span>
                         </div>
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                          isPictorial ? 'bg-[#F2B01E] text-[#1F2A24]' : 'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300'
-                        }`}>
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isPictorial ? 'bg-[#F2B01E] text-[#1F2A24]' : 'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300'
+                          }`}>
                           {isPictorial ? 'ON' : 'OFF'}
                         </span>
                       </button>
