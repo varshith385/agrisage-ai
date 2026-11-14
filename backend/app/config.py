@@ -41,7 +41,11 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
 
+    GROQ_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
+    LLM_PROVIDER_ORDER: str = "groq,gemini"
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     DATA_GOV_IN_API_KEY: str = ""
     HF_TOKEN: str = ""
 

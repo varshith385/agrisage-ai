@@ -218,7 +218,7 @@ async def test_grounded_llm_with_mock(client, setup_chatbot_db, monkeypatch):
         assert res.status_code == 200
         data = res.json()
         assert data["mode"] == "ai"
-        assert data["upstream_status"] == "AI Connected"
+        assert data["upstream_status"] == "AI connected (Gemini)"
         assert "adequate" in data["spoken_text"]
         assert data["privacy_notice"] is not None
 
