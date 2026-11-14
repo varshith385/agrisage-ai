@@ -14,6 +14,7 @@ import {
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePictorial } from '../context/PictorialContext';
+import { translateBackendString } from '../utils/safeTranslation';
 import { getCropCalendar, getSeasonalAwareness } from '../api/economics';
 import {
   CropCalendarResponse,
@@ -301,7 +302,7 @@ export const CalendarPage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-3">
           {farms.length > 0 && (
             <div>
-              <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">Farm Holding</label>
+              <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">{t('calendar.farm_holding_label', { defaultValue: 'Farm Holding' })}</label>
               <select
                 value={activeFarmId || ''}
                 onChange={(e) => setActiveFarmId(Number(e.target.value))}
@@ -315,25 +316,25 @@ export const CalendarPage: React.FC = () => {
           )}
 
           <div>
-            <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">Crop</label>
+            <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">{t('calendar.crop_label', { defaultValue: 'Crop' })}</label>
             <select
               value={cropName}
               onChange={(e) => setCropName(e.target.value)}
               className="min-h-[40px] text-xs font-bold bg-[#FAF8F5] text-[#183D2E] rounded-xl px-3 py-1.5 border border-[#7A553A]/30 focus:ring-2 focus:ring-[#183D2E]"
             >
-              <option value="Cotton">Cotton (పత్తి)</option>
-              <option value="Rice">Rice (వరి)</option>
-              <option value="Wheat">Wheat (గోధుమ)</option>
-              <option value="Maize">Maize (మొక్కజొన్న)</option>
-              <option value="Chilli">Chilli (మిరప)</option>
-              <option value="Tomato">Tomato (టమాట)</option>
-              <option value="Groundnut">Groundnut (వేరుశనగ)</option>
-              <option value="Sugarcane">Sugarcane (చెరకు)</option>
+              <option value="Cotton">Cotton ({language === 'te' ? 'పత్తి' : language === 'hi' ? 'कपास' : 'Cotton'})</option>
+              <option value="Rice">Rice ({language === 'te' ? 'వరి' : language === 'hi' ? 'चावल' : 'Rice'})</option>
+              <option value="Wheat">Wheat ({language === 'te' ? 'గోధుమ' : language === 'hi' ? 'गेहूं' : 'Wheat'})</option>
+              <option value="Maize">Maize ({language === 'te' ? 'మొక్కజొన్న' : language === 'hi' ? 'मक्का' : 'Maize'})</option>
+              <option value="Chilli">Chilli ({language === 'te' ? 'మిరప' : language === 'hi' ? 'मिर्च' : 'Chilli'})</option>
+              <option value="Tomato">Tomato ({language === 'te' ? 'టమాట' : language === 'hi' ? 'टमाटर' : 'Tomato'})</option>
+              <option value="Groundnut">Groundnut ({language === 'te' ? 'వేరుశనగ' : language === 'hi' ? 'मूंगफली' : 'Groundnut'})</option>
+              <option value="Sugarcane">Sugarcane ({language === 'te' ? 'చెరకు' : language === 'hi' ? 'गन्ना' : 'Sugarcane'})</option>
             </select>
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">Planting / Sowing Date</label>
+            <label className="text-[10px] font-bold text-[#7A553A] uppercase block mb-0.5">{t('calendar.planting_date_label', { defaultValue: 'Planting / Sowing Date' })}</label>
             <input
               type="date"
               value={plantingDate}
@@ -343,7 +344,7 @@ export const CalendarPage: React.FC = () => {
           </div>
         </div>
 
-        {loading && <span className="text-xs text-[#DA9A4C] font-bold animate-pulse">Syncing Calendar...</span>}
+        {loading && <span className="text-xs text-[#DA9A4C] font-bold animate-pulse">{t('calendar.syncing_calendar', { defaultValue: 'Syncing Calendar...' })}</span>}
       </div>
 
       {notificationMsg && (
@@ -360,7 +361,7 @@ export const CalendarPage: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
-                Current Growth Stage
+                {t('calendar.current_growth_stage_title', { defaultValue: 'Current Growth Stage' })}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
                 DAS {calendarData?.days_after_sowing ?? 90}
@@ -368,15 +369,15 @@ export const CalendarPage: React.FC = () => {
             </div>
 
             <h2 className="text-[20px] sm:text-[22px] font-display font-extrabold text-[#183D2E]">
-              {activeStage?.stage_name_en || 'Mid-Season Development'}
+              {translateBackendString(activeStage?.stage_name_en || 'Mid-Season Development', language)}
             </h2>
 
             <p className="text-xs text-[#7A553A] font-semibold">
-              Duration: {calendarData?.total_duration_days ?? 160} days total &bull; Sown: {plantingDate}
+              {t('calendar.duration_label', { defaultValue: 'Duration:' })} {calendarData?.total_duration_days ?? 160} {t('calendar.days_total_label', { defaultValue: 'days total' })} &bull; {t('calendar.sown_label', { defaultValue: 'Sown:' })} {plantingDate}
             </p>
 
             <p className="text-xs text-[#4E5F57] leading-relaxed pt-1">
-              Active activities: {activeStage?.key_activities?.join(', ') || 'Weed control, vegetative scouting, and soil moisture checks.'}
+              {t('calendar.active_activities_label', { defaultValue: 'Active activities:' })} {activeStage?.key_activities?.map((a) => translateBackendString(a, language)).join(', ') || (language === 'te' ? 'కలుపు నివారణ, చేను పరిశీలన మరియు నేల తేమ తనిఖీ.' : language === 'hi' ? 'खरपतवार नियंत्रण, फसल निगरानी और मिट्टी नमी की जांच।' : 'Weed control, vegetative scouting, and soil moisture checks.')}
             </p>
           </div>
 
@@ -387,7 +388,7 @@ export const CalendarPage: React.FC = () => {
               onClick={() => setActiveTab('stages')}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
-              <span>View 7 Stages</span>
+              <span>{t('calendar.view_stages_btn', { defaultValue: 'View 7 Stages' })}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -399,30 +400,30 @@ export const CalendarPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-[#DA9A4C]" />
-                Next Priority Task
+                {t('calendar.next_priority_task_title', { defaultValue: 'Next Priority Task' })}
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 nextEvent?.priority === 'high' ? 'bg-red-100 text-red-900' : 'bg-stone-200 text-stone-800'
               }`}>
-                {nextEvent?.priority || 'Normal'} Priority
+                {translateBackendString(nextEvent?.priority || 'Normal', language)}
               </span>
             </div>
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1">
               <h3 className="text-sm font-bold text-[#183D2E]">
-                {nextEvent?.title || 'Foliar Nutrient Spraying'}
+                {translateBackendString(nextEvent?.title || 'Foliar Nutrient Spraying', language)}
               </h3>
               <p className="text-xs text-[#4E5F57] leading-relaxed">
-                {nextEvent?.description || 'Inspect underside of leaves for early sucking pests and verify root zone soil moisture.'}
+                {translateBackendString(nextEvent?.description || 'Inspect underside of leaves for early sucking pests and verify root zone soil moisture.', language)}
               </p>
               <span className="text-[11px] text-[#7A553A] font-semibold block pt-1">
-                Target Window: {nextEvent?.start_date || 'Upcoming'}
+                {t('calendar.target_window_label', { defaultValue: 'Target Window:' })} {nextEvent?.start_date ? translateBackendString(nextEvent.start_date, language) : (language === 'te' ? 'రానున్న రోజుల్లో' : language === 'hi' ? 'आगामी' : 'Upcoming')}
               </span>
             </div>
 
             <WhatThisMeans
               message={plainMeaning}
-              confidenceNote="Computed from FAO-56 stage days and local agro-meteorological guidelines."
+              confidenceNote={language === 'te' ? 'FAO-56 పంట ఎదుగుదల రోజులు మరియు వ్యవసాయ-వాతావరణ సూత్రాల ఆధారంగా లెక్కించబడింది.' : language === 'hi' ? 'FAO-56 चरण दिनों और स्थानीय कृषि-मौसम संबंधी दिशानिर्देशों से परिकलित।' : 'Computed from FAO-56 stage days and local agro-meteorological guidelines.'}
             />
           </div>
         </div>
@@ -433,10 +434,10 @@ export const CalendarPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <Sun className="w-4 h-4 text-amber-600" />
-                Regional Season
+                {t('calendar.regional_season_title', { defaultValue: 'Regional Season' })}
               </span>
               <span className="text-xs font-bold text-[#183D2E]">
-                {seasonData?.current_season || 'Kharif'}
+                {translateBackendString(seasonData?.current_season || 'Kharif', language)}
               </span>
             </div>
 
@@ -479,7 +480,7 @@ export const CalendarPage: React.FC = () => {
             }`}
           >
             <Sprout className="w-4 h-4 text-emerald-600" />
-            <span>Scheduled Field Tasks ({filteredEvents?.length || 0})</span>
+            <span>{t('calendar.tab_tasks', { defaultValue: 'Scheduled Field Tasks' })} ({filteredEvents?.length || 0})</span>
           </button>
           <button
             type="button"
@@ -491,7 +492,7 @@ export const CalendarPage: React.FC = () => {
             }`}
           >
             <Clock className="w-4 h-4 text-[#DA9A4C]" />
-            <span>7-Stage Lifecycle Timeline</span>
+            <span>{t('calendar.tab_stages', { defaultValue: '7-Stage Lifecycle Timeline' })}</span>
           </button>
           <button
             type="button"
@@ -503,7 +504,7 @@ export const CalendarPage: React.FC = () => {
             }`}
           >
             <Sun className="w-4 h-4 text-amber-600" />
-            <span>Seasonal Awareness & IMD Agromet</span>
+            <span>{t('calendar.tab_season', { defaultValue: 'Seasonal Awareness & IMD Agromet' })}</span>
           </button>
           <button
             type="button"
@@ -515,7 +516,7 @@ export const CalendarPage: React.FC = () => {
             }`}
           >
             <BookOpen className="w-4 h-4 text-[#7A553A]" />
-            <span>Methodology & Disclaimers</span>
+            <span>{t('calendar.tab_methodology', { defaultValue: 'Methodology & Disclaimers' })}</span>
           </button>
         </div>
 
@@ -526,7 +527,7 @@ export const CalendarPage: React.FC = () => {
             <div className="space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#7A553A]/15">
                 <h3 className="text-sm font-bold text-[#183D2E]">
-                  Filter Scheduled Actions:
+                  {t('calendar.filter_tasks_label', { defaultValue: 'Filter Scheduled Actions:' })}
                 </h3>
                 <div className="flex flex-wrap gap-1 bg-[#FAF8F5] p-1 rounded-xl text-xs border border-[#7A553A]/20">
                   {['all', 'sowing', 'irrigation', 'fertilizer', 'scouting', 'harvest'].map((filterKey) => (

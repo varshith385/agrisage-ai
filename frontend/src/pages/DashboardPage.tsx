@@ -40,6 +40,7 @@ import { AgentFlowDiagram } from '../components/agents/AgentFlowDiagram';
 import { AgentActivityLog } from '../components/agents/AgentActivityLog';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { translateBackendString } from '../utils/safeTranslation';
 import {
   LeafScanIllustration,
   WateringCanIllustration,
@@ -493,11 +494,32 @@ export const DashboardPage: React.FC = () => {
       <PageHeader
         icon={LayoutDashboard}
         title={t('dashboard.welcome_farmer', { name: user?.full_name || 'Farmer Ramesh' })}
-        purpose="Your daily agricultural summary: today's recommended action, village weather, and one-tap access to all tools."
+        purpose={
+          language === 'te'
+            ? 'మీ రోజువారీ వ్యవసాయ సారాంశం: నేటి సిఫార్సు చేయబడిన పని, గ్రామ వాతావరణం, మరియు అన్ని సాధనాలు.'
+            : language === 'hi'
+            ? 'आपका दैनिक कृषि सारांश: आज की अनुशंसित कार्रवाई, मौसम पूर्वानुमान, और सभी उपकरण।'
+            : "Your daily agricultural summary: today's recommended action, village weather, and one-tap access to all tools."
+        }
         whatIsThis={{
-          summary: 'The Dashboard brings together your farm holding, live weather, crop growth stage, and 7-day agronomic advice on one screen.',
-          whatToEnter: 'No inputs needed! Select your farm in the top banner and click "Run Full Advisory Scan" to refresh multi-agent models.',
-          whatYouGet: 'Today\'s priority recommendation, farm health rating (out of 100), root-zone water alerts, and live profit snapshot.',
+          summary:
+            language === 'te'
+              ? 'డ్యాష్‌బోర్డ్ మీ పొలం వివరాలు, ప్రత్యక్ష వాతావరణం, పంట ఎదుగుదల దశ మరియు 7-రోజుల వ్యవసాయ సలహాలను ఒకే చోట అందిస్తుంది.'
+              : language === 'hi'
+              ? 'डैशबोर्ड आपके खेत के विवरण, मौसम, फसल वृद्धि चरण और 7-दिवसीय कृषि सलाह को एक स्थान पर लाता है।'
+              : 'The Dashboard brings together your farm holding, live weather, crop growth stage, and 7-day agronomic advice on one screen.',
+          whatToEnter:
+            language === 'te'
+              ? 'ఎలాంటి నమోదు అవసరం లేదు! పై బ్యానర్‌లో మీ పొలాన్ని ఎంచుకుని, "పూర్తి అడ్వైజరీ స్కాన్" బటన్‌పై నొక్కండి.'
+              : language === 'hi'
+              ? 'किसी इनपुट की आवश्यकता नहीं! ऊपर बैनर में अपना खेत चुनें और "सलाहकार स्कैन चलाएं" पर क्लिक करें।'
+              : 'No inputs needed! Select your farm in the top banner and click "Run Full Advisory Scan" to refresh multi-agent models.',
+          whatYouGet:
+            language === 'te'
+              ? 'నేటి ప్రాధాన్యత సిఫార్సు, పొలం ఆరోగ్య రేటింగ్ (100 కి), నీటి హెచ్చరికలు మరియు లాభాల నమూనా.'
+              : language === 'hi'
+              ? 'आज की प्राथमिकता सिफारिश, खेत स्वास्थ्य स्कोर (100 में से), जल तनाव अलर्ट और अनुमानित लाभ।'
+              : "Today's priority recommendation, farm health rating (out of 100), root-zone water alerts, and live profit snapshot.",
         }}
         actions={
           <button
@@ -507,7 +529,7 @@ export const DashboardPage: React.FC = () => {
             className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] shadow-sm flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60"
           >
             <RefreshCw className={`w-4 h-4 ${isTriggering ? 'animate-spin' : ''}`} />
-            <span>{isTriggering ? 'Running Advisory Models...' : 'Run Advisory Scan'}</span>
+            <span>{isTriggering ? (language === 'te' ? 'మోడల్స్ నడుస్తున్నాయి...' : language === 'hi' ? 'मॉडल चल रहे हैं...' : 'Running Advisory Models...') : (language === 'te' ? 'అడ్వైజరీ స్కాన్' : language === 'hi' ? 'सलाहकार स्कैन चलाएं' : 'Run Advisory Scan')}</span>
           </button>
         }
       />
@@ -524,7 +546,7 @@ export const DashboardPage: React.FC = () => {
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                 todayActionItem && hasIrrigationBackend ? 'bg-[#DA9A4C]/20 text-[#7A553A]' : 'bg-stone-200 text-stone-700'
               }`}>
-                {todayActionItem && hasIrrigationBackend ? 'Day 1 Priority' : 'No data yet'}
+                {todayActionItem && hasIrrigationBackend ? (language === 'te' ? 'రోజు 1 ప్రాధాన్యత' : language === 'hi' ? 'दिन 1 प्राथमिकता' : 'Day 1 Priority') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'No data yet')}
               </span>
             </div>
             <h2 className="font-display text-[20px] sm:text-[22px] font-bold text-[#183D2E]">
@@ -541,7 +563,7 @@ export const DashboardPage: React.FC = () => {
               to="/irrigation"
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs sm:text-sm shadow-sm"
             >
-              <span>Act on This</span>
+              <span>{t('dashboard.act_on_this', { defaultValue: 'Act on This' })}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -552,7 +574,7 @@ export const DashboardPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
-                Today's Weather & Rain Risk
+                {t('dashboard.weather_rain_risk_title', { defaultValue: "Today's Weather & Rain Risk" })}
               </span>
               <span className="text-xs text-[#7A553A] font-semibold">
                 {farmData?.village || 'Geikonda'}
@@ -568,12 +590,12 @@ export const DashboardPage: React.FC = () => {
                     {weatherData.temperature_c}°C
                   </span>
                   <span className="text-xs text-[#4E5F57] block mt-0.5">
-                    Humidity: {weatherData.relative_humidity_pct}% &bull; Wind: {weatherData.wind_speed_kmh} km/h
+                    {t('dashboard.humidity_label', { defaultValue: 'Humidity:' })} {weatherData.relative_humidity_pct}% &bull; {t('dashboard.wind_label', { defaultValue: 'Wind:' })} {weatherData.wind_speed_kmh} km/h
                   </span>
                 </div>
                 <div className="text-right text-xs space-y-1">
-                  <div>Rain Today: <strong className="text-[#183D2E]">{weatherData.expected_rainfall_today_mm ?? 0} mm</strong></div>
-                  <div>ET0 Demand: <strong className="text-[#7A553A]">{weatherData.reference_et0_mm ?? 5.0} mm</strong></div>
+                  <div>{t('dashboard.rain_today_label', { defaultValue: 'Rain Today:' })} <strong className="text-[#183D2E]">{weatherData.expected_rainfall_today_mm ?? 0} mm</strong></div>
+                  <div>{t('dashboard.et0_demand_label', { defaultValue: 'ET0 Demand:' })} <strong className="text-[#7A553A]">{weatherData.reference_et0_mm ?? 5.0} mm</strong></div>
                 </div>
               </div>
             ) : (
@@ -583,10 +605,10 @@ export const DashboardPage: React.FC = () => {
             <WhatThisMeans
               message={
                 weatherData && (weatherData.expected_rainfall_today_mm ?? 0) > 5
-                  ? 'Rainfall expected today. Hold irrigation to conserve energy and avoid waterlogging.'
-                  : 'Atmospheric demand (ET0) is normal. Continue scheduled field irrigation.'
+                  ? (language === 'te' ? 'ఈరోజు వర్షం పడే అవకాశం ఉంది. భూగర్భ జలాలను ఆదా చేయడానికి నీటి తడిని వాయిదా వేయండి.' : language === 'hi' ? 'आज बारिश का पूर्वानुमान है। भूजल बचाने और जलभराव से बचने हेतु सिंचाई स्थगित करें।' : 'Rainfall expected today. Hold irrigation to conserve energy and avoid waterlogging.')
+                  : (language === 'te' ? 'వాతావరణ డిమాండ్ (ET0) సాధారణంగా ఉంది. షెడ్యూల్ ప్రకారం నీటి తడి అందించండి.' : language === 'hi' ? 'वायुमंडलीय मांग (ET0) सामान्य है। निर्धारित खेत सिंचाई जारी रखें।' : 'Atmospheric demand (ET0) is normal. Continue scheduled field irrigation.')
               }
-              confidenceNote="Modelled from Open-Meteo agro-meteorology"
+              confidenceNote={language === 'te' ? 'Open-Meteo ఆగ్రో-వాతావరణ నమూనా' : language === 'hi' ? 'Open-Meteo मौसम मॉडल से अनुमानित' : 'Modelled from Open-Meteo agro-meteorology'}
             />
           </div>
 
@@ -594,7 +616,7 @@ export const DashboardPage: React.FC = () => {
             to="/setup"
             className="text-xs font-bold text-[#183D2E] hover:text-[#265C46] flex items-center justify-between pt-2 border-t border-[#7A553A]/15"
           >
-            <span>View 7-Day Weather Forecast</span>
+            <span>{t('dashboard.view_forecast_link', { defaultValue: 'View 7-Day Weather Forecast' })}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -604,10 +626,10 @@ export const DashboardPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
-                Crop Phenology & Holding
+                {t('dashboard.crop_phenology_holding_title', { defaultValue: 'Crop Phenology & Holding' })}
               </span>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E4EDE8] text-[#183D2E]">
-                {farmData?.area} ac &bull; {farmData?.ownership_type}
+                {farmData?.area} ac &bull; {translateBackendString(farmData?.ownership_type, language)}
               </span>
             </div>
 
@@ -621,14 +643,14 @@ export const DashboardPage: React.FC = () => {
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#7A553A]/15 text-xs flex items-center justify-between">
-                <span className="text-[#4E5F57]">Active Growth Stage:</span>
+                <span className="text-[#4E5F57]">{t('dashboard.active_growth_stage_label', { defaultValue: 'Active Growth Stage:' })}</span>
                 <strong className="text-[#183D2E] capitalize">
-                  {growthStageData?.current_stage ?? 'Flowering / Bloom'}
+                  {translateBackendString(growthStageData?.current_stage ?? 'Flowering / Bloom', language)}
                 </strong>
               </div>
               {healthBreakdown?.score !== undefined && (
                 <div className="p-2.5 rounded-xl bg-[#E4EDE8] border border-[#183D2E]/20 text-xs flex items-center justify-between">
-                  <span className="text-[#183D2E] font-medium">Farm Health Index:</span>
+                  <span className="text-[#183D2E] font-medium">{t('dashboard.farm_health_index_label', { defaultValue: 'Farm Health Index:' })}</span>
                   <strong className="text-[#183D2E] font-black text-sm">
                     {healthBreakdown.score} / 100
                   </strong>
@@ -641,7 +663,7 @@ export const DashboardPage: React.FC = () => {
             to="/farms"
             className="text-xs font-bold text-[#183D2E] hover:text-[#265C46] flex items-center justify-between pt-2 border-t border-[#7A553A]/15"
           >
-            <span>Manage Farm & Parcel Profile</span>
+            <span>{t('dashboard.manage_farm_link', { defaultValue: 'Manage Farm & Parcel Profile' })}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -650,7 +672,7 @@ export const DashboardPage: React.FC = () => {
       {/* 2. LARGE SHORTCUT TILES TO ALL TOOLS */}
       <div>
         <h3 className="font-display text-lg font-bold text-[#183D2E] mb-3">
-          Quick Access Tools
+          {t('dashboard.quick_access_tools', { defaultValue: 'Quick Access Tools' })}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <Link
@@ -660,8 +682,8 @@ export const DashboardPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-[#E4EDE8] text-[#183D2E] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
               <Droplets className="w-6 h-6 text-[#183D2E]" />
             </div>
-            <span className="text-sm font-bold text-[#183D2E] block">Water & Irrigation</span>
-            <span className="text-[11px] text-[#4E5F57] mt-0.5">FAO-56 Budget</span>
+            <span className="text-sm font-bold text-[#183D2E] block">{t('nav.irrigation', { defaultValue: 'Water & Irrigation' })}</span>
+            <span className="text-[11px] text-[#4E5F57] mt-0.5">{language === 'te' ? 'FAO-56 బడ్జెట్' : language === 'hi' ? 'FAO-56 बजट' : 'FAO-56 Budget'}</span>
           </Link>
 
           <Link
@@ -671,8 +693,8 @@ export const DashboardPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-[#FEF6E9] text-[#DA9A4C] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
               <Leaf className="w-6 h-6 text-[#DA9A4C]" />
             </div>
-            <span className="text-sm font-bold text-[#183D2E] block">Disease Diagnosis</span>
-            <span className="text-[11px] text-[#4E5F57] mt-0.5">Scan Leaf Photo</span>
+            <span className="text-sm font-bold text-[#183D2E] block">{t('nav.disease', { defaultValue: 'Disease Diagnosis' })}</span>
+            <span className="text-[11px] text-[#4E5F57] mt-0.5">{language === 'te' ? 'ఆకు ఫోటో స్కాన్' : language === 'hi' ? 'पत्ती फोटो स्कैन' : 'Scan Leaf Photo'}</span>
           </Link>
 
           <Link
@@ -682,8 +704,8 @@ export const DashboardPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-[#EFE7DE] text-[#7A553A] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
               <Coins className="w-6 h-6 text-[#7A553A]" />
             </div>
-            <span className="text-sm font-bold text-[#183D2E] block">Economics & Profit</span>
-            <span className="text-[11px] text-[#4E5F57] mt-0.5">What-If Calculator</span>
+            <span className="text-sm font-bold text-[#183D2E] block">{t('nav.economics', { defaultValue: 'Economics & Profit' })}</span>
+            <span className="text-[11px] text-[#4E5F57] mt-0.5">{language === 'te' ? 'లాభాల కాలిక్యులేటర్' : language === 'hi' ? 'लाभ कैलकुलेटर' : 'What-If Calculator'}</span>
           </Link>
 
           <Link
@@ -693,8 +715,8 @@ export const DashboardPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-[#FAF8F5] text-[#183D2E] border border-[#7A553A]/20 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
               <Store className="w-6 h-6 text-[#183D2E]" />
             </div>
-            <span className="text-sm font-bold text-[#183D2E] block">Mandi Market</span>
-            <span className="text-[11px] text-[#4E5F57] mt-0.5">Prices & Buyers</span>
+            <span className="text-sm font-bold text-[#183D2E] block">{t('nav.market', { defaultValue: 'Mandi Market' })}</span>
+            <span className="text-[11px] text-[#4E5F57] mt-0.5">{language === 'te' ? 'ధరలు & కొనుగోలుదారులు' : language === 'hi' ? 'दाम और खरीदार' : 'Prices & Buyers'}</span>
           </Link>
 
           <Link
@@ -704,8 +726,8 @@ export const DashboardPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-[#FAF8F5] text-[#7A553A] border border-[#7A553A]/20 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
               <Calendar className="w-6 h-6 text-[#7A553A]" />
             </div>
-            <span className="text-sm font-bold text-[#183D2E] block">Crop Calendar</span>
-            <span className="text-[11px] text-[#4E5F57] mt-0.5">Operations Plan</span>
+            <span className="text-sm font-bold text-[#183D2E] block">{t('nav.calendar', { defaultValue: 'Crop Calendar' })}</span>
+            <span className="text-[11px] text-[#4E5F57] mt-0.5">{language === 'te' ? 'కార్యకలాపాల ప్రణాళిక' : language === 'hi' ? 'कार्य योजना' : 'Operations Plan'}</span>
           </Link>
 
           <Link
@@ -715,7 +737,7 @@ export const DashboardPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-[#FAF8F5] text-[#183D2E] border border-[#7A553A]/20 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
               <FileText className="w-6 h-6 text-[#183D2E]" />
             </div>
-            <span className="text-sm font-bold text-[#183D2E] block">Soil Card & Schemes</span>
+            <span className="text-sm font-bold text-[#183D2E] block">{t('nav.schemes', { defaultValue: 'Soil Card & Schemes' })}</span>
             <span className="text-[11px] text-[#4E5F57] mt-0.5">Nutrient Shifts</span>
           </Link>
         </div>
@@ -734,7 +756,7 @@ export const DashboardPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            7-Day Plan & Growth Stages
+            {t('dashboard.tab_plan', { defaultValue: '7-Day Plan & Growth Stages' })}
           </button>
           <button
             type="button"
@@ -745,7 +767,7 @@ export const DashboardPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            Farm Health Score ({healthBreakdown?.score ? `${healthBreakdown.score}/100` : 'Awaiting Run (No score yet)'})
+            {t('dashboard.tab_health', { defaultValue: 'Farm Health Score' })} ({healthBreakdown?.score ? `${healthBreakdown.score}/100` : t('common.no_data_yet', { defaultValue: 'No data yet' })})
           </button>
           <button
             type="button"
@@ -756,7 +778,7 @@ export const DashboardPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            Domain Intelligence Envelopes
+            {t('dashboard.tab_tool_summary', { defaultValue: 'Tool summary' })}
           </button>
           <button
             type="button"
@@ -767,7 +789,7 @@ export const DashboardPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            Agent Activity Logs ({historicalRuns.length})
+            {t('dashboard.tab_activity_log', { defaultValue: 'Activity log' })} ({historicalRuns.length})
           </button>
         </div>
 
@@ -782,14 +804,14 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-xs font-bold text-[#183D2E] uppercase tracking-wider block">
-                        5-Stage Cotton Phenology
+                        {t('dashboard.phenology_title', { defaultValue: '5-Stage Cotton Phenology' })}
                       </span>
                       <span className="text-sm font-extrabold text-[#183D2E]">
-                        {cropName} &bull; Stage Progress: {growthStageData.stage_progress_pct}%
+                        {cropName} &bull; {t('dashboard.stage_progress', { defaultValue: 'Stage Progress' })}: {growthStageData.stage_progress_pct}%
                       </span>
                     </div>
                     <span className="text-xs font-bold text-[#7A553A]">
-                      Planting Date: {growthStageData.planting_date}
+                      {t('dashboard.planting_date_label', { defaultValue: 'Planting Date' })}: {growthStageData.planting_date}
                     </span>
                   </div>
 
@@ -810,11 +832,11 @@ export const DashboardPage: React.FC = () => {
                     ))}
                   </div>
                   <div className="flex justify-between text-[11px] text-stone-500 font-medium">
-                    <span>Emergence</span>
-                    <span>Vegetative</span>
-                    <span>Bloom</span>
-                    <span>Fruiting</span>
-                    <span>Harvest</span>
+                    <span>{t('dashboard.stage_emergence', { defaultValue: 'Emergence' })}</span>
+                    <span>{t('dashboard.stage_vegetative', { defaultValue: 'Vegetative' })}</span>
+                    <span>{t('dashboard.stage_bloom', { defaultValue: 'Bloom' })}</span>
+                    <span>{t('dashboard.stage_fruiting', { defaultValue: 'Fruiting' })}</span>
+                    <span>{t('dashboard.stage_harvest', { defaultValue: 'Harvest' })}</span>
                   </div>
                 </div>
               )}
@@ -823,7 +845,7 @@ export const DashboardPage: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="font-display text-base font-bold text-[#183D2E]">
-                    7-Day Action Plan for {cropName}
+                    {t('dashboard.seven_day_plan_title', { defaultValue: '7-Day Action Plan' })} - {cropName}
                   </h4>
                   {planItems.length > 0 && showListen && (
                     <button
@@ -832,7 +854,7 @@ export const DashboardPage: React.FC = () => {
                       className="min-h-[40px] px-3 py-1.5 rounded-xl border border-[#7A553A]/30 text-xs font-bold text-[#183D2E] bg-white hover:bg-[#FAF8F5] flex items-center gap-1.5"
                     >
                       {speechSpeaking ? <VolumeX className="w-4 h-4 text-red-600" /> : <Volume2 className="w-4 h-4 text-[#DA9A4C]" />}
-                      <span>{speechSpeaking ? 'Stop Audio' : 'Listen to Full 7-Day Plan'}</span>
+                      <span>{speechSpeaking ? t('dashboard.stop_audio', { defaultValue: 'Stop Audio' }) : t('dashboard.read_plan_aloud', { defaultValue: 'Listen to Full 7-Day Plan' })}</span>
                     </button>
                   )}
                 </div>
@@ -846,30 +868,30 @@ export const DashboardPage: React.FC = () => {
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-black uppercase text-[#DA9A4C]">
-                            Day {item.day_number} &bull; {item.date_str}
+                            {t('dashboard.day', { defaultValue: 'Day' })} {item.day_number} &bull; {item.date_str}
                           </span>
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E4EDE8] text-[#183D2E]">
-                            Priority {item.priority ?? 'High'}
+                            {t('common.priority', { defaultValue: 'Priority' })} {translateBackendString(item.priority || 'High', language)}
                           </span>
                         </div>
                         <h5 className="font-bold text-sm text-[#183D2E]">
-                          {language === 'te' && item.action_te ? item.action_te : language === 'hi' && item.action_hi ? item.action_hi : item.action}
+                          {language === 'te' && item.action_te ? item.action_te : language === 'hi' && item.action_hi ? item.action_hi : translateBackendString(item.action, language)}
                         </h5>
                         <p className="text-xs text-[#4E5F57]">
-                          {language === 'te' && item.reason_te ? item.reason_te : language === 'hi' && item.reason_hi ? item.reason_hi : item.reason}
+                          {language === 'te' && item.reason_te ? item.reason_te : language === 'hi' && item.reason_hi ? item.reason_hi : translateBackendString(item.reason, language)}
                         </p>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="p-6 text-center bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20">
-                    <p className="text-sm text-[#4E5F57] mb-3">No 7-day plan computed for this session yet.</p>
+                    <p className="text-sm text-[#4E5F57] mb-3">{t('dashboard.no_plan_yet', { defaultValue: 'No 7-day plan computed for this session yet.' })}</p>
                     <button
                       type="button"
                       onClick={handleTriggerAgentRun}
                       className="min-h-[44px] px-5 py-2 rounded-xl text-xs font-bold bg-[#183D2E] text-white hover:bg-[#265C46]"
                     >
-                      Run Advisory Scan to Generate Plan
+                      {t('dashboard.run_advisory_scan', { defaultValue: 'Run Advisory Scan to Generate Plan' })}
                     </button>
                   </div>
                 )}
@@ -883,10 +905,10 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-[#E4EDE8] rounded-2xl border border-[#183D2E]/20">
                 <div>
                   <h4 className="font-display text-lg font-bold text-[#183D2E]">
-                    Farm Health Score: {healthBreakdown?.score ? `${healthBreakdown.score} / 100` : 'Awaiting Run (No score yet)'}
+                    {t('dashboard.tab_health', { defaultValue: 'Farm Health Score' })}: {healthBreakdown?.score ? `${healthBreakdown.score} / 100` : t('dashboard.awaiting_run', { defaultValue: 'Awaiting Run (No score yet)' })}
                   </h4>
                   <p className="text-xs text-[#183D2E]/80">
-                    {healthBreakdown?.formula_description || 'Modelled multi-factor indicator: soil moisture, weather stress, and pest incidence (details to verify).'}
+                    {healthBreakdown?.formula_description ? translateBackendString(healthBreakdown.formula_description, language) : (language === 'te' ? 'మోడల్ బహుళ-కారక సూచిక: నేల తేమ, వాతావరణ ఒత్తిడి, మరియు తెగుళ్ల ప్రభావం (వివరాలు ధృవీకరించాలి).' : language === 'hi' ? 'मॉडल बहु-कारक संकेतक: मिट्टी की नमी, मौसम तनाव, और कीट प्रभाव (विवरण सत्यापित करें)।' : 'Modelled multi-factor indicator: soil moisture, weather stress, and pest incidence (details to verify).')}
                   </p>
                 </div>
                 <StatusBadge status="WORKING" />
@@ -900,17 +922,17 @@ export const DashboardPage: React.FC = () => {
                       className="p-4 rounded-2xl bg-white border border-[#7A553A]/20 shadow-sm space-y-2 text-xs"
                     >
                       <div className="flex items-center justify-between font-bold">
-                        <span className="text-sm text-[#183D2E]">{comp.name}</span>
+                        <span className="text-sm text-[#183D2E]">{translateBackendString(comp.name, language)}</span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E4EDE8] text-[#183D2E]">
-                          {comp.status}
+                          {translateBackendString(comp.status, language)}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span>Weight: {(comp.nominal_weight * 100).toFixed(0)}%</span>
-                        <strong className="text-[#183D2E]">Score: {comp.score} / 100</strong>
+                        <span>{t('dashboard.weight_label', { defaultValue: 'Weight:' })} {(comp.nominal_weight * 100).toFixed(0)}%</span>
+                        <strong className="text-[#183D2E]">{t('dashboard.score_label', { defaultValue: 'Score:' })} {comp.score} / 100</strong>
                       </div>
-                      <p className="text-[#4E5F57]">{comp.rationale}</p>
-                      <div className="text-[10px] text-stone-400 italic">Thresholds: {comp.threshold_notes}</div>
+                      <p className="text-[#4E5F57]">{translateBackendString(comp.rationale, language)}</p>
+                      <div className="text-[10px] text-stone-400 italic">{t('dashboard.thresholds_label', { defaultValue: 'Thresholds:' })} {translateBackendString(comp.threshold_notes, language)}</div>
                     </div>
                   ))}
                 </div>
@@ -918,59 +940,59 @@ export const DashboardPage: React.FC = () => {
 
               <div className="text-xs text-[#7A553A] italic flex items-center gap-1.5 pt-2">
                 <Info className="w-4 h-4 text-[#DA9A4C] shrink-0" />
-                <span>Indicative weights calibrated for semi-arid cotton agro-ecosystems (Telangana/Maharashtra).</span>
+                <span>{t('dashboard.cotton_phenology_calibrated', { defaultValue: 'Indicative weights calibrated for semi-arid cotton agro-ecosystems (Telangana/Maharashtra).' })}</span>
               </div>
             </div>
           )}
 
-          {/* TAB 3: DOMAIN INTELLIGENCE ENVELOPES */}
+          {/* TAB 3: DOMAIN INTELLIGENCE ENVELOPES / TOOL SUMMARY */}
           {activeTab === 'domains' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Disease Envelope */}
               <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#7A553A]/20 space-y-3">
                 <div className="flex items-center justify-between border-b border-[#7A553A]/15 pb-2">
-                  <span className="text-xs font-black uppercase text-[#183D2E]">Disease Diagnostics</span>
+                  <span className="text-xs font-black uppercase text-[#183D2E]">{t('dashboard.tool_summary_disease_title', { defaultValue: 'Disease Diagnostics' })}</span>
                   <StatusBadge status="WORKING" />
                 </div>
                 <p className="text-xs text-[#4E5F57]">
                   {diseaseOutputs?.detected_disease
-                    ? `Detected: ${diseaseOutputs.detected_disease} (${Math.round((diseaseOutputs.prediction_confidence || 0.85) * 100)}% confidence)`
-                    : 'No active symptomatic scan attached. Use Disease Diagnosis to scan leaves.'}
+                    ? `${language === 'te' ? 'గుర్తించబడింది' : language === 'hi' ? 'पहचाना गया' : 'Detected'}: ${translateBackendString(diseaseOutputs.detected_disease, language)} (${Math.round((diseaseOutputs.prediction_confidence || 0.85) * 100)}% ${language === 'te' ? 'విశ్వసనీయత' : language === 'hi' ? 'विश्वसनीयता' : 'confidence'})`
+                    : t('dashboard.no_active_scan', { defaultValue: 'No active symptomatic scan attached. Use Disease Diagnosis to scan leaves.' })}
                 </p>
                 <Link to="/disease" className="text-xs font-bold text-[#183D2E] hover:underline block pt-2">
-                  Open Leaf Disease Diagnostic Tool &rarr;
+                  {t('dashboard.open_disease_tool', { defaultValue: 'Open Leaf Disease Diagnostic Tool →' })}
                 </Link>
               </div>
 
               {/* Irrigation Envelope */}
               <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#7A553A]/20 space-y-3">
                 <div className="flex items-center justify-between border-b border-[#7A553A]/15 pb-2">
-                  <span className="text-xs font-black uppercase text-[#183D2E]">Water & Irrigation</span>
+                  <span className="text-xs font-black uppercase text-[#183D2E]">{t('dashboard.tool_summary_water_title', { defaultValue: 'Water & Irrigation' })}</span>
                   <StatusBadge status="WORKING" />
                 </div>
                 <div className="text-xs space-y-1">
-                  <div>Litres Needed: <strong className="text-[#183D2E]">{irrigationOutputs?.litres_needed ? irrigationOutputs.litres_needed.toLocaleString() : '1,133,120'} L</strong></div>
-                  <div>Next Irrigation: <strong className="text-[#183D2E]">{irrigationOutputs?.next_irrigation_date || 'Today'}</strong></div>
-                  <div>Efficiency: <strong>{irrigationOutputs?.method_efficiency ? `${Math.round(irrigationOutputs.method_efficiency * 100)}%` : '90% (Drip)'}</strong></div>
+                  <div>{t('dashboard.litres_needed', { defaultValue: 'Litres Needed:' })} <strong className="text-[#183D2E]">{irrigationOutputs?.litres_needed ? irrigationOutputs.litres_needed.toLocaleString() : '1,133,120'} L</strong></div>
+                  <div>{t('dashboard.next_irrigation', { defaultValue: 'Next Irrigation:' })} <strong className="text-[#183D2E]">{irrigationOutputs?.next_irrigation_date ? translateBackendString(irrigationOutputs.next_irrigation_date, language) : (language === 'te' ? 'ఈరోజు' : language === 'hi' ? 'आज' : 'Today')}</strong></div>
+                  <div>{t('dashboard.efficiency_label', { defaultValue: 'Efficiency:' })} <strong>{irrigationOutputs?.method_efficiency ? `${Math.round(irrigationOutputs.method_efficiency * 100)}%` : (language === 'te' ? '90% (డ్రిప్)' : language === 'hi' ? '90% (ड्रिप)' : '90% (Drip)')}</strong></div>
                 </div>
                 <Link to="/irrigation" className="text-xs font-bold text-[#183D2E] hover:underline block pt-2">
-                  Open Crop Water Budget Calculator &rarr;
+                  {t('dashboard.open_water_tool', { defaultValue: 'Open Crop Water Budget Calculator →' })}
                 </Link>
               </div>
 
               {/* Yield & Economics Envelope */}
               <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#7A553A]/20 space-y-3">
                 <div className="flex items-center justify-between border-b border-[#7A553A]/15 pb-2">
-                  <span className="text-xs font-black uppercase text-[#183D2E]">Yield & Profit</span>
+                  <span className="text-xs font-black uppercase text-[#183D2E]">{t('dashboard.tool_summary_profit_title', { defaultValue: 'Yield & Profit' })}</span>
                   <StatusBadge status="WORKING" />
                 </div>
                 <div className="text-xs space-y-1">
-                  <div>Expected Yield: <strong className="text-[#183D2E]">{headlineYield?.headline_yield_quintals_per_acre ?? 8.0} q/ac</strong></div>
-                  <div>Baseline MSP: <strong className="text-[#183D2E]">₹7,100 / q</strong> (DEMO DATA &bull; details to verify)</div>
-                  <div>Est. Net Profit: <strong className="text-emerald-800 font-bold">₹{economicsSummary?.combined_summary?.net_profit ? Number(economicsSummary.combined_summary.net_profit).toLocaleString() : '65,400 (DEMO DATA)'}</strong></div>
+                  <div>{t('dashboard.expected_yield_label', { defaultValue: 'Expected Yield:' })} <strong className="text-[#183D2E]">{headlineYield?.headline_yield_quintals_per_acre ?? 8.0} q/ac</strong></div>
+                  <div>{t('dashboard.assumed_price_label', { defaultValue: 'Assumed price (editable, demo):' })} <strong className="text-[#183D2E]">₹7,100 / q</strong> (DEMO DATA &bull; {language === 'te' ? 'వివరాలు ధృవీకరించాలి' : language === 'hi' ? 'विवरण सत्यापित करें' : 'details to verify'})</div>
+                  <div>{t('dashboard.est_net_profit_label', { defaultValue: 'Est. Net Profit:' })} <strong className="text-emerald-800 font-bold">₹{economicsSummary?.combined_summary?.net_profit ? Number(economicsSummary.combined_summary.net_profit).toLocaleString() : '65,400 (DEMO DATA)'}</strong></div>
                 </div>
                 <Link to="/economics" className="text-xs font-bold text-[#183D2E] hover:underline block pt-2">
-                  Open What-If Profit Simulator &rarr;
+                  {t('dashboard.open_profit_tool', { defaultValue: 'Open What-If Profit Simulator →' })}
                 </Link>
               </div>
             </div>
@@ -981,14 +1003,14 @@ export const DashboardPage: React.FC = () => {
             <div className="space-y-6">
               <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#7A553A]/20">
                 <h4 className="text-xs font-black uppercase text-[#183D2E] tracking-wider mb-3">
-                  Multi-Agent Execution Pipeline Flow
+                  {t('dashboard.multi_agent_flow', { defaultValue: 'Multi-Agent Execution Pipeline Flow' })}
                 </h4>
                 <AgentFlowDiagram envelopes={latestRunResult?.envelopes} />
               </div>
 
               <div className="space-y-3">
                 <h4 className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
-                  Historical Agent Invocations
+                  {t('dashboard.historical_invocations', { defaultValue: 'Historical Agent Invocations' })}
                 </h4>
                 {isLoadingRuns ? (
                   <LoadingSkeleton lines={4} />

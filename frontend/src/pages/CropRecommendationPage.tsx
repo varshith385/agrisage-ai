@@ -19,6 +19,7 @@ import {
   CropRecommendationResponse,
   CropCandidate,
 } from '../types/api';
+import { translateBackendString } from '../utils/safeTranslation';
 import { ConfidenceMeter } from '../components/common/ConfidenceMeter';
 import { ExplainCard } from '../components/common/ExplainCard';
 import { PageHeader } from '../components/common/PageHeader';
@@ -241,29 +242,29 @@ export const CropRecommendationPage: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider">
-                Rank #1 Recommendation
+                {t('recommend.rank_1_title', { defaultValue: 'Rank #1 Recommendation' })}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">
-                ML Evaluated
+                {t('recommend.ml_evaluated_badge', { defaultValue: 'ML Evaluated' })}
               </span>
             </div>
 
             <div className="flex items-baseline justify-between pt-1">
               <h2 className="text-2xl sm:text-[26px] font-display font-black text-[#183D2E] capitalize">
-                {topCrop ? topCrop.crop_name : 'Cotton'}
+                {topCrop ? translateBackendString(topCrop.crop_name, language) : (language === 'te' ? 'పత్తి' : language === 'hi' ? 'कपास' : 'Cotton')}
               </h2>
               <span className="text-base font-mono font-bold text-[#183D2E]">
-                {topCrop ? `${(topCrop.probability * 100).toFixed(0)}%` : '85%'} match
+                {topCrop ? `${(topCrop.probability * 100).toFixed(0)}%` : '85%'} {t('recommend.match_label', { defaultValue: 'match' })}
               </span>
             </div>
 
             <p className="text-xs text-[#4E5F57] leading-relaxed pt-1">
-              {topCrop?.reasons?.[0] || 'Favourable thermal and moisture conditions for root establishment.'}
+              {topCrop?.reasons?.[0] ? translateBackendString(topCrop.reasons[0], language) : (language === 'te' ? 'వేర్లు బలంగా నాటుకోవడానికి అనుకూలమైన ఉష్ణోగ్రత మరియు తేమ పరిస్థితులు.' : language === 'hi' ? 'जड़ों के अच्छे विकास के लिए अनुकूल तापमान और नमी की स्थिति।' : 'Favourable thermal and moisture conditions for root establishment.')}
             </p>
 
             {topCrop?.suitability_note && (
               <p className="text-[11px] text-[#7A553A] italic">
-                {topCrop.suitability_note}
+                {translateBackendString(topCrop.suitability_note, language)}
               </p>
             )}
           </div>
@@ -275,7 +276,7 @@ export const CropRecommendationPage: React.FC = () => {
               onClick={() => setActiveTab('candidates')}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
-              <span>See Top 3</span>
+              <span>{t('recommend.see_top_3_btn', { defaultValue: 'See Top 3' })}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -287,25 +288,25 @@ export const CropRecommendationPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <RotateCcw className="w-4 h-4 text-[#DA9A4C]" />
-                Biological Pest Break
+                {t('recommend.biological_pest_break_title', { defaultValue: 'Biological Pest Break' })}
               </span>
               <span className="text-xs font-semibold text-[#7A553A]">
-                After: {prevCrop}
+                {t('recommend.after_label', { defaultValue: 'After:' })} {translateBackendString(prevCrop, language)}
               </span>
             </div>
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1">
               <span className="text-xs font-black text-[#183D2E] block">
-                Next: {topRotation ? topRotation.crop_name : 'Pulses / Redgram'}
+                {t('recommend.next_label', { defaultValue: 'Next:' })} {topRotation ? translateBackendString(topRotation.crop_name, language) : (language === 'te' ? 'కందులు / పప్పుధాన్యాలు' : language === 'hi' ? 'दालें / अरहर' : 'Pulses / Redgram')}
               </span>
               <p className="text-xs text-[#4E5F57] leading-relaxed">
-                {topRotation ? topRotation.rationale : 'Fixes atmospheric nitrogen into depleted soils and breaks pest cycles.'}
+                {topRotation ? translateBackendString(topRotation.rationale, language) : (language === 'te' ? 'నేలలో నత్రజనిని స్థిరీకరించి తెగుళ్ల చక్రాన్ని విచ్ఛిన్నం చేస్తుంది.' : language === 'hi' ? 'मिट्टी में नाइट्रोजन की आपूर्ति कर कीट चक्र को तोड़ती है।' : 'Fixes atmospheric nitrogen into depleted soils and breaks pest cycles.')}
               </p>
             </div>
 
             <WhatThisMeans
               message={plainMeaning}
-              confidenceNote="Indicative agronomic advice based on general crop rotation principles (details to verify with local extension officer)."
+              confidenceNote={language === 'te' ? 'సాధారణ పంట మార్పిడి సూత్రాల ఆధారంగా సూచిక వ్యవసాయ సలహా (స్థానిక వ్యవసాయ అధికారిని సంప్రదించండి).' : language === 'hi' ? 'सामान्य फसल चक्र सिद्धांतों पर आधारित संकेतात्मक कृषि सलाह (स्थानीय कृषि अधिकारी से पुष्टि करें)।' : 'Indicative agronomic advice based on general crop rotation principles (details to verify with local extension officer).'}
             />
           </div>
         </div>
@@ -315,32 +316,32 @@ export const CropRecommendationPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
-                Evaluation Basis
+                {t('recommend.evaluation_basis_title', { defaultValue: 'Evaluation Basis' })}
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 omitSoil ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
               }`}>
-                {omitSoil ? 'Weather-Only Fallback' : 'Full Soil + Weather'}
+                {omitSoil ? t('recommend.weather_only_badge', { defaultValue: 'Weather-Only Fallback' }) : t('recommend.full_soil_weather_badge', { defaultValue: 'Full Soil + Weather' })}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
               <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                <span className="text-[10px] text-[#7A553A] block">Temperature</span>
+                <span className="text-[10px] text-[#7A553A] block">{t('recommend.temperature_label', { defaultValue: 'Temperature' })}</span>
                 <strong className="text-sm font-bold text-[#183D2E]">{temp}°C</strong>
               </div>
               <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                <span className="text-[10px] text-[#7A553A] block">Rainfall</span>
+                <span className="text-[10px] text-[#7A553A] block">{t('recommend.rainfall_label', { defaultValue: 'Rainfall' })}</span>
                 <strong className="text-sm font-bold text-[#183D2E]">{rainfall} mm</strong>
               </div>
               {!omitSoil && (
                 <>
                   <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                    <span className="text-[10px] text-[#7A553A] block">NPK (kg/ha)</span>
+                    <span className="text-[10px] text-[#7A553A] block">{t('recommend.npk_label', { defaultValue: 'NPK (kg/ha)' })}</span>
                     <strong className="text-xs font-bold text-[#183D2E]">{n}-{p}-{k}</strong>
                   </div>
                   <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
-                    <span className="text-[10px] text-[#7A553A] block">Soil pH</span>
+                    <span className="text-[10px] text-[#7A553A] block">{t('recommend.soil_ph_label', { defaultValue: 'Soil pH' })}</span>
                     <strong className="text-xs font-bold text-[#183D2E]">{ph}</strong>
                   </div>
                 </>
@@ -349,7 +350,7 @@ export const CropRecommendationPage: React.FC = () => {
 
             {mlResult?.soil_values_missing && (
               <p className="text-[11px] text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-200">
-                Soil values omitted: Model evaluated on climate variables only with reduced confidence.
+                {language === 'te' ? 'నేల విలువలు లేవు: మోడల్ తక్కువ విశ్వసనీయతతో వాతావరణం ఆధారంగా మాత్రమే అంచనా వేసింది.' : language === 'hi' ? 'मिट्टी के मान उपलब्ध नहीं: मॉडल ने कम विश्वसनीयता के साथ केवल मौसम चरों पर मूल्यांकन किया।' : 'Soil values omitted: Model evaluated on climate variables only with reduced confidence.'}
               </p>
             )}
           </div>
@@ -361,7 +362,7 @@ export const CropRecommendationPage: React.FC = () => {
               onClick={() => setActiveTab('inputs')}
               className="font-bold text-[#183D2E] hover:underline"
             >
-              Adjust Inputs →
+              {language === 'te' ? 'ఇన్‌పుట్‌లు మార్చండి →' : language === 'hi' ? 'इनपुट बदलें →' : 'Adjust Inputs →'}
             </button>
           </div>
         </div>
@@ -381,7 +382,7 @@ export const CropRecommendationPage: React.FC = () => {
             }`}
           >
             <Sparkles className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Top Recommended Crops</span>
+            <span>{t('recommend.tab_candidates', { defaultValue: 'Top Recommended Crops' })}</span>
           </button>
           <button
             type="button"
@@ -393,7 +394,7 @@ export const CropRecommendationPage: React.FC = () => {
             }`}
           >
             <Sliders className="w-4 h-4 text-[#183D2E]" />
-            <span>Nutrient & Climate Parameters</span>
+            <span>{t('recommend.tab_inputs', { defaultValue: 'Nutrient & Climate Parameters' })}</span>
           </button>
           <button
             type="button"
@@ -405,7 +406,7 @@ export const CropRecommendationPage: React.FC = () => {
             }`}
           >
             <RotateCcw className="w-4 h-4 text-emerald-600" />
-            <span>Crop Rotation Planner</span>
+            <span>{t('recommend.tab_rotation', { defaultValue: 'Crop Rotation Planner' })}</span>
           </button>
           <button
             type="button"
@@ -417,7 +418,7 @@ export const CropRecommendationPage: React.FC = () => {
             }`}
           >
             <BookOpen className="w-4 h-4 text-[#7A553A]" />
-            <span>Methodology & Disclaimers</span>
+            <span>{t('calendar.tab_methodology', { defaultValue: 'Methodology & Disclaimers' })}</span>
           </button>
         </div>
 
@@ -436,16 +437,16 @@ export const CropRecommendationPage: React.FC = () => {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-black uppercase px-2.5 py-0.5 bg-[#DA9A4C] text-[#183D2E] rounded-full">
-                            Rank #{idx + 1}
+                            {language === 'te' ? `శ్రేణి #${idx + 1}` : language === 'hi' ? `रैंक #${idx + 1}` : `Rank #${idx + 1}`}
                           </span>
                           <span className="text-xs font-bold text-[#183D2E]">
-                            {(crop.probability * 100).toFixed(1)}% match
+                            {(crop.probability * 100).toFixed(1)}% {t('recommend.match_label', { defaultValue: 'match' })}
                           </span>
                         </div>
-                        <h4 className="font-bold text-[#183D2E] text-lg capitalize">{crop.crop_name}</h4>
-                        <p className="text-xs text-[#4E5F57] leading-relaxed">{crop.reasons.join(' ')}</p>
+                        <h4 className="font-bold text-[#183D2E] text-lg capitalize">{translateBackendString(crop.crop_name, language)}</h4>
+                        <p className="text-xs text-[#4E5F57] leading-relaxed">{crop.reasons.map((r) => translateBackendString(r, language)).join(' ')}</p>
                         {crop.suitability_note && (
-                          <p className="text-[11px] text-[#7A553A] italic">{crop.suitability_note}</p>
+                          <p className="text-[11px] text-[#7A553A] italic">{translateBackendString(crop.suitability_note, language)}</p>
                         )}
                       </div>
                       <div className="border-t border-[#7A553A]/15 pt-3">

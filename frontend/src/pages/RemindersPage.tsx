@@ -23,6 +23,7 @@ import { usePictorial } from '../context/PictorialContext';
 import { PageHeader } from '../components/common/PageHeader';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
+import { translateBackendString } from '../utils/safeTranslation';
 import {
   Reminder,
   ReminderSuggestion,
@@ -36,7 +37,7 @@ import {
 
 export const RemindersPage: React.FC = () => {
   const { activeFarm } = useAuth();
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const { isPictorial } = usePictorial();
 
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -214,25 +215,13 @@ export const RemindersPage: React.FC = () => {
       {/* Page Header */}
       <PageHeader
         icon={Bell}
-        title={
-          language === 'te'
-            ? 'వ్యవసాయ జ్ఞాపికలు & అలర్ట్‌లు'
-            : language === 'hi'
-            ? 'कृषि स्मरणपत्र एवं अलर्ट'
-            : 'Reminders & Field Alerts'
-        }
-        purpose={
-          language === 'te'
-            ? 'నీటిపారుదల, ఎరువుల సమయం మరియు వాతావరణ హెచ్చరికలను ఎప్పటికీ మర్చిపోకండి'
-            : language === 'hi'
-            ? 'सिंचाई, खाद का समय और मौसम अलर्ट कभी न भूलें'
-            : 'Track spray intervals, irrigation water days, and harvest calendar milestones'
-        }
+        title={t('reminders.title', { defaultValue: 'Reminders & Field Alerts' })}
+        purpose={t('reminders.purpose', { defaultValue: 'Track spray intervals, irrigation water days, and harvest calendar milestones' })}
         actions={
           <div className="flex items-center gap-2">
             <ReadAloudButton
               text={`Reminders overview: ${upcomingReminders.length} upcoming alerts, ${overdueReminders.length} overdue tasks, and ${suggestions.length} smart recommendations.`}
-              label="Listen"
+              label={t('reminders.listen_btn', { defaultValue: 'Listen' })}
             />
             <button
               onClick={() => {
@@ -242,7 +231,7 @@ export const RemindersPage: React.FC = () => {
               className="px-4 py-2 rounded-xl bg-[#1B5E3B] dark:bg-[#F2B01E] text-white dark:text-stone-900 font-bold text-xs flex items-center gap-1.5 shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{language === 'te' ? '+ కొత్త జ్ఞాపిక' : language === 'hi' ? '+ नया रिमाइंडर' : '+ Add Reminder'}</span>
+              <span>{t('reminders.add_reminder_btn', { defaultValue: '+ Add Reminder' })}</span>
             </button>
           </div>
         }
@@ -253,40 +242,40 @@ export const RemindersPage: React.FC = () => {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {language === 'te' ? 'చిత్రాల సంక్షిప్త సారాంశం' : language === 'hi' ? 'चित्र सारांश' : 'Visual Summary'}
+              {t('reminders.visual_summary_title', { defaultValue: 'Visual Summary' })}
             </h2>
             <ReadAloudButton
               text={`Reminders overview: ${upcomingReminders.length} upcoming alerts, ${overdueReminders.length} overdue tasks, and ${suggestions.length} smart recommendations.`}
-              label="Read Summary"
+              label={t('reminders.listen_btn', { defaultValue: 'Listen' })}
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 items-start">
             <PictorialTile
-              title={language === 'te' ? 'రానున్న పనులు' : language === 'hi' ? 'आगामी कार्य' : 'Upcoming Tasks'}
-              phrase={`${upcomingReminders.length} Scheduled`}
+              title={t('reminders.upcoming_tasks', { defaultValue: 'Upcoming Tasks' })}
+              phrase={`${upcomingReminders.length} ${translateBackendString('Scheduled', language)}`}
               status="good"
-              statusWord="Scheduled"
+              statusWord={translateBackendString('Scheduled', language)}
               illustration={<Calendar className="w-16 h-16 text-emerald-600" />}
               detailsLink="#tabs"
-              detailsLabel="View List"
+              detailsLabel={t('reminders.view_list_btn', { defaultValue: 'View List' })}
             />
             <PictorialTile
-              title={language === 'te' ? 'ఆలస్యమైన పనులు' : language === 'hi' ? 'अतिदेय कार्य' : 'Overdue Tasks'}
-              phrase={`${overdueReminders.length} Overdue`}
+              title={t('reminders.overdue_tasks', { defaultValue: 'Overdue Tasks' })}
+              phrase={`${overdueReminders.length} ${language === 'te' ? 'ఆలస్యం' : language === 'hi' ? 'अतिदेय' : 'Overdue'}`}
               status={overdueReminders.length > 0 ? 'attention' : 'good'}
-              statusWord={overdueReminders.length > 0 ? 'Action Needed' : 'On Schedule'}
+              statusWord={overdueReminders.length > 0 ? (language === 'te' ? 'చర్య అవసరం' : language === 'hi' ? 'कार्रवाई आवश्यक' : 'Action Needed') : (language === 'te' ? 'సమయానికి నడుస్తోంది' : language === 'hi' ? 'समय पर' : 'On Schedule')}
               illustration={<AlertTriangle className="w-16 h-16 text-amber-600" />}
               detailsLink="#tabs"
-              detailsLabel="Resolve"
+              detailsLabel={t('reminders.resolve_btn', { defaultValue: 'Resolve' })}
             />
             <PictorialTile
-              title={language === 'te' ? 'స్మార్ట్ సూచనలు' : language === 'hi' ? 'सुझाव' : 'Farm Suggestions'}
-              phrase={`${suggestions.length} 1-Tap Ready`}
+              title={t('reminders.farm_suggestions', { defaultValue: 'Farm Suggestions' })}
+              phrase={`${suggestions.length} ${language === 'te' ? 'సిద్ధం' : language === 'hi' ? 'तैयार' : 'Ready'}`}
               status="good"
-              statusWord="Ready"
+              statusWord={translateBackendString('Ready', language)}
               illustration={<Sparkles className="w-16 h-16 text-sky-600" />}
               detailsLink="#suggestions"
-              detailsLabel="Adopt"
+              detailsLabel={t('reminders.adopt_btn', { defaultValue: 'Adopt' })}
             />
           </div>
         </div>
@@ -297,18 +286,10 @@ export const RemindersPage: React.FC = () => {
         <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
         <div className="space-y-1">
           <p className="font-semibold text-amber-950 dark:text-amber-100">
-            {language === 'te'
-              ? 'నోటిఫికేషన్ సమాచారం (Delivery Notice)'
-              : language === 'hi'
-              ? 'अधिसूचना सूचना (Delivery Notice)'
-              : 'Delivery Limitation Notice'}
+            {t('reminders.delivery_notice_title', { defaultValue: 'Delivery Limitation Notice' })}
           </p>
           <p className="leading-relaxed">
-            {language === 'te'
-              ? 'మీరు యాప్‌ను తెరిచినప్పుడు లేదా బ్రౌజర్ నోటిఫికేషన్‌లను అనుమతించినప్పుడు ఈ జ్ఞాపికలు కనిపిస్తాయి. SMS మరియు WhatsApp అలర్ట్‌లు ప్రొడక్షన్ విడుదల కోసం ప్రణాళిక చేయబడ్డాయి. ఫోన్ క్యాలెండర్‌లో అలర్ట్ పొందడానికి "ఫోన్ క్యాలెండర్‌కు జోడించు" (.ics) బటన్‌ను ఉపయోగించండి.'
-              : language === 'hi'
-              ? 'यह रिमाइंडर ऐप खोलने पर या ब्राउज़र नोटिफिकेशन सक्षम करने पर दिखाई देते हैं। एसएमएस एवं व्हाट्सएप अलर्ट आगामी रिलीज में जोड़े जाएंगे। फोन कैलेंडर में जोड़ने के लिए .ics बटन दबाएं।'
-              : 'Reminders trigger when you open the app or enable browser notifications. Direct SMS/WhatsApp alerts are planned for production rollout. Use the "Add to phone calendar" (.ics) button to sync any reminder directly into your Android / iOS calendar.'}
+            {t('reminders.delivery_notice_text', { defaultValue: 'Reminders trigger when you open the app or enable browser notifications. Direct SMS/WhatsApp alerts are planned for production rollout. Use the "Add to phone calendar" (.ics) button to sync any reminder directly into your Android / iOS calendar.' })}
           </p>
         </div>
       </div>
@@ -320,15 +301,11 @@ export const RemindersPage: React.FC = () => {
             <div className="flex items-center space-x-2">
               <Sparkles className="w-4 h-4 text-agri-green-600 dark:text-agri-green-400" />
               <h2 className="text-sm font-bold text-stone-900 dark:text-stone-100 uppercase tracking-wider">
-                {language === 'te'
-                  ? 'మీ పొలం కోసం ఒకే-ట్యాప్ సూచనలు (Suggested for Your Farm)'
-                  : language === 'hi'
-                  ? 'आपके खेत हेतु त्वरित सुझाव (Suggested for Your Farm)'
-                  : 'Suggested for Your Farm (1-Tap Add)'}
+                {t('reminders.suggested_title', { defaultValue: 'Suggested for Your Farm (1-Tap Add)' })}
               </h2>
             </div>
             <span className="text-[11px] font-medium text-stone-500 dark:text-stone-400">
-              {language === 'te' ? 'రియల్ డేటా ద్వారా లెక్కించబడింది' : 'Derived from live telemetry'}
+              {t('reminders.derived_live_telemetry', { defaultValue: 'Derived from live telemetry' })}
             </span>
           </div>
 
@@ -385,7 +362,7 @@ export const RemindersPage: React.FC = () => {
                   : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
-              {language === 'te' ? 'రానున్నవి' : language === 'hi' ? 'आगामी' : 'Upcoming'} ({upcomingReminders.length})
+              {t('reminders.tab_upcoming', { defaultValue: 'Upcoming' })} ({upcomingReminders.length})
             </button>
             <button
               onClick={() => setActiveTab('overdue')}
@@ -395,7 +372,7 @@ export const RemindersPage: React.FC = () => {
                   : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
-              {language === 'te' ? 'ఆలస్యమైనవి' : language === 'hi' ? 'अतिदेय' : 'Overdue'} ({overdueReminders.length})
+              {t('reminders.tab_overdue', { defaultValue: 'Overdue' })} ({overdueReminders.length})
             </button>
             <button
               onClick={() => setActiveTab('done')}
@@ -405,7 +382,7 @@ export const RemindersPage: React.FC = () => {
                   : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
-              {language === 'te' ? 'పూర్తయినవి' : language === 'hi' ? 'पूर्ण' : 'Done'} ({doneReminders.length})
+              {t('reminders.tab_done', { defaultValue: 'Done' })} ({doneReminders.length})
             </button>
           </div>
 
@@ -418,7 +395,7 @@ export const RemindersPage: React.FC = () => {
           >
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
-              {language === 'te' ? 'కొత్త జ్ఞాపిక' : language === 'hi' ? 'नया रिमाइंडर' : 'New Reminder'}
+              {t('reminders.add_reminder_btn', { defaultValue: '+ Add Reminder' })}
             </span>
           </button>
         </div>
@@ -433,16 +410,10 @@ export const RemindersPage: React.FC = () => {
             </div>
             <p className="text-sm font-medium text-stone-600 dark:text-stone-300">
               {activeTab === 'upcoming'
-                ? language === 'te'
-                  ? 'రానున్న జ్ఞాపికలు లేవు'
-                  : 'No upcoming reminders scheduled'
+                ? t('reminders.no_upcoming', { defaultValue: 'No upcoming reminders scheduled' })
                 : activeTab === 'overdue'
-                ? language === 'te'
-                  ? 'ఆలస్యమైన పనులు లేవు! అద్భుతం.'
-                  : 'No overdue tasks! You are right on schedule.'
-                : language === 'te'
-                ? 'పూర్తయిన పనుల చరిత్ర లేదు'
-                : 'No completed tasks yet'}
+                ? t('reminders.no_overdue', { defaultValue: 'No overdue tasks! You are right on schedule.' })
+                : t('reminders.no_done', { defaultValue: 'No completed tasks yet' })}
             </p>
           </div>
         ) : (
@@ -456,16 +427,16 @@ export const RemindersPage: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-stone-600 dark:text-stone-400">
                       {getSourceIcon(rem.source)}
-                      <span className="capitalize">{rem.source.replace('_', ' ')}</span>
+                      <span className="capitalize">{translateBackendString(rem.source.replace('_', ' '), language)}</span>
                     </span>
                     {rem.repeat !== 'none' && (
                       <span className="text-[10px] bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300 px-2 py-0.5 rounded-full font-medium">
-                        Repeat: {rem.repeat}
+                        {t('reminders.repeat_label', { defaultValue: 'Repeat:' })} {translateBackendString(rem.repeat, language)}
                       </span>
                     )}
                     {rem.status === 'snoozed' && (
                       <span className="text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full font-medium">
-                        Snoozed
+                        {t('reminders.snoozed_badge', { defaultValue: 'Snoozed' })}
                       </span>
                     )}
                   </div>
@@ -477,18 +448,18 @@ export const RemindersPage: React.FC = () => {
                         : 'text-stone-900 dark:text-stone-100'
                     }`}
                   >
-                    {rem.title}
+                    {translateBackendString(rem.title, language)}
                   </h3>
 
                   {rem.notes && (
                     <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-                      {rem.notes}
+                      {translateBackendString(rem.notes, language)}
                     </p>
                   )}
 
                   <div className="flex items-center space-x-2 text-xs text-stone-500 dark:text-stone-400 pt-0.5">
                     <Clock className="w-3.5 h-3.5 text-stone-400" />
-                    <span>Due: {formatDueDate(rem.due_at)} (Asia/Kolkata)</span>
+                    <span>{t('reminders.due_label', { defaultValue: 'Due:' })} {formatDueDate(rem.due_at)} (Asia/Kolkata)</span>
                   </div>
                 </div>
 
@@ -502,7 +473,7 @@ export const RemindersPage: React.FC = () => {
                         title="Mark Done"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>{language === 'te' ? 'పూర్తయింది' : 'Mark Done'}</span>
+                        <span>{t('reminders.mark_done_btn', { defaultValue: 'Mark Done' })}</span>
                       </button>
 
                       <button
@@ -573,7 +544,7 @@ export const RemindersPage: React.FC = () => {
                   >
                     1
                   </span>
-                  <span className="text-xs font-medium text-stone-500">What</span>
+                  <span className="text-xs font-medium text-stone-500">{t('reminders.step_what', { defaultValue: 'What' })}</span>
                   <span className="text-stone-300">→</span>
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -582,7 +553,7 @@ export const RemindersPage: React.FC = () => {
                   >
                     2
                   </span>
-                  <span className="text-xs font-medium text-stone-500">When</span>
+                  <span className="text-xs font-medium text-stone-500">{t('reminders.step_when', { defaultValue: 'When' })}</span>
                   <span className="text-stone-300">→</span>
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -591,7 +562,7 @@ export const RemindersPage: React.FC = () => {
                   >
                     3
                   </span>
-                  <span className="text-xs font-medium text-stone-500">Repeat</span>
+                  <span className="text-xs font-medium text-stone-500">{t('reminders.step_repeat', { defaultValue: 'Repeat' })}</span>
                 </div>
               </div>
 
@@ -608,13 +579,13 @@ export const RemindersPage: React.FC = () => {
               <div className="space-y-4 animate-in slide-in-from-right duration-200">
                 <div>
                   <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1.5">
-                    {language === 'te' ? 'పని లేదా హెచ్చరిక పేరు (Title) *' : 'Task Title *'}
+                    {t('reminders.task_title_label', { defaultValue: 'Task Title *' })}
                   </label>
                   <input
                     type="text"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    placeholder="e.g. Irrigate cotton south parcel, Apply Stage 3 fertilizer"
+                    placeholder={t('reminders.task_title_placeholder', { defaultValue: 'e.g. Irrigate cotton south parcel, Apply Stage 3 fertilizer' })}
                     className="w-full px-4 py-2.5 rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-[#1B2720] text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-agri-green-600"
                     autoFocus
                   />
@@ -622,13 +593,13 @@ export const RemindersPage: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1.5">
-                    {language === 'te' ? 'సూచనలు లేదా వివరాలు (Notes)' : 'Guidance Notes (Optional)'}
+                    {t('reminders.notes_label', { defaultValue: 'Guidance Notes (Optional)' })}
                   </label>
                   <textarea
                     rows={2}
                     value={newNotes}
                     onChange={(e) => setNewNotes(e.target.value)}
-                    placeholder="e.g. Check soil moisture probe before turning on the drip line"
+                    placeholder={t('reminders.notes_placeholder', { defaultValue: 'e.g. Check soil moisture probe before turning on the drip line' })}
                     className="w-full px-4 py-2 rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-[#1B2720] text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-agri-green-600"
                   />
                 </div>
@@ -640,7 +611,7 @@ export const RemindersPage: React.FC = () => {
                     onClick={() => setWizardStep(2)}
                     className="px-5 py-2.5 bg-agri-green-700 hover:bg-agri-green-800 disabled:bg-stone-300 text-white rounded-xl text-sm font-semibold shadow-sm transition-all"
                   >
-                    Next: When →
+                    {t('reminders.next_when', { defaultValue: 'Next: When →' })}
                   </button>
                 </div>
               </div>
@@ -651,7 +622,7 @@ export const RemindersPage: React.FC = () => {
               <div className="space-y-4 animate-in slide-in-from-right duration-200">
                 <div>
                   <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1.5">
-                    {language === 'te' ? 'తేదీ (Due Date)' : 'Due Date'}
+                    {t('reminders.due_date_label', { defaultValue: 'Due Date' })}
                   </label>
                   <input
                     type="date"
@@ -663,7 +634,7 @@ export const RemindersPage: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1.5">
-                    {language === 'te' ? 'సమయం (Due Time - Asia/Kolkata)' : 'Due Time (Asia/Kolkata)'}
+                    {t('reminders.due_time_label', { defaultValue: 'Due Time (Asia/Kolkata)' })}
                   </label>
                   <input
                     type="time"
@@ -679,21 +650,21 @@ export const RemindersPage: React.FC = () => {
                       onClick={() => setNewTime('06:00')}
                       className="px-2.5 py-1 text-xs bg-stone-100 dark:bg-stone-800 hover:bg-agri-green-100 dark:hover:bg-agri-green-950 rounded-lg text-stone-700 dark:text-stone-300"
                     >
-                      Morning (6:00 AM)
+                      {t('reminders.preset_morning', { defaultValue: 'Morning (6:00 AM)' })}
                     </button>
                     <button
                       type="button"
                       onClick={() => setNewTime('14:00')}
                       className="px-2.5 py-1 text-xs bg-stone-100 dark:bg-stone-800 hover:bg-agri-green-100 dark:hover:bg-agri-green-950 rounded-lg text-stone-700 dark:text-stone-300"
                     >
-                      Afternoon (2:00 PM)
+                      {t('reminders.preset_afternoon', { defaultValue: 'Afternoon (2:00 PM)' })}
                     </button>
                     <button
                       type="button"
                       onClick={() => setNewTime('17:00')}
                       className="px-2.5 py-1 text-xs bg-stone-100 dark:bg-stone-800 hover:bg-agri-green-100 dark:hover:bg-agri-green-950 rounded-lg text-stone-700 dark:text-stone-300"
                     >
-                      Evening (5:00 PM)
+                      {t('reminders.preset_evening', { defaultValue: 'Evening (5:00 PM)' })}
                     </button>
                   </div>
                 </div>
@@ -704,14 +675,14 @@ export const RemindersPage: React.FC = () => {
                     onClick={() => setWizardStep(1)}
                     className="px-4 py-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl text-sm font-medium"
                   >
-                    ← Back
+                    {t('reminders.back_btn', { defaultValue: '← Back' })}
                   </button>
                   <button
                     type="button"
                     onClick={() => setWizardStep(3)}
                     className="px-5 py-2.5 bg-agri-green-700 hover:bg-agri-green-800 text-white rounded-xl text-sm font-semibold shadow-sm transition-all"
                   >
-                    Next: Repeat →
+                    {t('reminders.next_repeat', { defaultValue: 'Next: Repeat →' })}
                   </button>
                 </div>
               </div>
@@ -722,7 +693,7 @@ export const RemindersPage: React.FC = () => {
               <div className="space-y-4 animate-in slide-in-from-right duration-200">
                 <div>
                   <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-2">
-                    {language === 'te' ? 'పునరావృతం (Repeat Frequency)' : 'Repeat Frequency'}
+                    {t('reminders.repeat_frequency_label', { defaultValue: 'Repeat Frequency' })}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {(['none', 'daily', 'weekly'] as const).map((opt) => (
@@ -736,7 +707,7 @@ export const RemindersPage: React.FC = () => {
                             : 'border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
                         }`}
                       >
-                        <p className="text-xs capitalize font-semibold">{opt}</p>
+                        <p className="text-xs capitalize font-semibold">{t(`reminders.repeat_${opt}`, { defaultValue: opt })}</p>
                       </button>
                     ))}
                   </div>
@@ -746,7 +717,7 @@ export const RemindersPage: React.FC = () => {
                 <div className="p-3 bg-stone-50 dark:bg-[#18261F] rounded-xl border border-stone-200 dark:border-stone-800 text-xs space-y-1">
                   <p className="font-semibold text-stone-900 dark:text-stone-100">{newTitle}</p>
                   <p className="text-stone-500">
-                    Due: {newDate} at {newTime} ({newRepeat} repeat)
+                    {t('reminders.due_label', { defaultValue: 'Due:' })} {newDate} at {newTime} ({t(`reminders.repeat_${newRepeat}`, { defaultValue: newRepeat })})
                   </p>
                 </div>
 
@@ -756,7 +727,7 @@ export const RemindersPage: React.FC = () => {
                     onClick={() => setWizardStep(2)}
                     className="px-4 py-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl text-sm font-medium"
                   >
-                    ← Back
+                    {t('reminders.back_btn', { defaultValue: '← Back' })}
                   </button>
                   <button
                     type="button"
@@ -764,7 +735,7 @@ export const RemindersPage: React.FC = () => {
                     onClick={handleCreateReminderSubmit}
                     className="px-5 py-2.5 bg-agri-green-700 hover:bg-agri-green-800 active:scale-95 disabled:bg-stone-300 text-white rounded-xl text-sm font-semibold shadow-md transition-all"
                   >
-                    {isSubmitting ? 'Saving...' : 'Confirm & Schedule'}
+                    {isSubmitting ? (language === 'te' ? 'భద్రపరుస్తోంది...' : language === 'hi' ? 'सहेज रहे हैं...' : 'Saving...') : t('reminders.save_reminder_btn', { defaultValue: 'Confirm & Schedule' })}
                   </button>
                 </div>
               </div>

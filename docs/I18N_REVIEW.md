@@ -307,5 +307,68 @@ The following translations were added for the user avatar menu toggle to support
 |---|---|---|---|---|
 | **Avatar Menu Accessibility** | Always show Listen buttons | ఎల్లప్పుడూ వినండి బటన్లు చూపించు | हमेशा सुनें बटन दिखाएं | **Unverified**: Needs native-speaker review. |
 
+---
+
+## 14. Round 5 Phase 4 Multilingual Translation Additions (Unverified — Awaiting Native Review)
+
+The following agronomic, workflow, and interface strings were added in Round 5 Phase 4 to eliminate English leftovers on core farmer flows (Dashboard, Irrigation, Calendar, Crop Advisory, Reminders) and replace technical jargon. In accordance with honesty rules, these are explicitly catalogued as **not native-reviewed**:
+
+| Context | English String | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Jargon Replacement** | Tool summary | సాధనాల సారాంశం | उपकरण सारांश | **Unverified**: Not native-reviewed. |
+| **Jargon Replacement** | Activity log | కార్యకలాపాల లాగ్ | गतिविधि लॉग | **Unverified**: Not native-reviewed. |
+| **Price Honesty** | Assumed price (editable, demo) | అనుకున్న ధర (మార్చగలరు, డెమో) | अनुमानित मूल्य (संपादन योग्य, डेमो) | **Unverified**: Not native-reviewed. |
+| **Dashboard Quick Tools** | Quick Field Tools | శీఘ్ర క్షేత్ర సాధనాలు | त्वरित कृषि उपकरण | **Unverified**: Not native-reviewed. |
+| **Dashboard Quick Tools** | Direct access to diagnostic and advisory modules | సమస్యల గుర్తింపు మరియు సలహా మాడ్యూళ్లకు వేగవంతమైన ప్రవేశం | नैदानिक व सलाह मॉड्यूल के लिए सीधा प्रवेश | **Unverified**: Not native-reviewed. |
+| **Dashboard Phenology** | Crop Cycle Progress | పంట కాలం పురోగతి | फसल चक्र प्रगति | **Unverified**: Not native-reviewed. |
+| **Dashboard Phenology** | Days Elapsed | పూర్తయిన రోజులు | व्यतीत दिन | **Unverified**: Not native-reviewed. |
+| **Dashboard Health** | Farm Health Score | వ్యవసాయ క్షేత్ర ఆరోగ్య స్కోరు | कृषि स्वास्थ्य स्कोर | **Unverified**: Not native-reviewed. |
+| **Dashboard Health** | Evaluated from 3 telemetry components | 3 క్షేత్ర కొలతల ఆధారంగా అంచనా వేయబడింది | 3 टेलीमेट्री घटकों से मूल्यांकित | **Unverified**: Not native-reviewed. |
+| **Dashboard Health** | Component Breakdown | విభాగాల వారీగా వివరాలు | घटक विवरण | **Unverified**: Not native-reviewed. |
+| **Dashboard Envelopes** | Agent Coordination Status | నిపుణుల వ్యవస్థ సమన్వయ స్థితి | एजेंट समन्वय स्थिति | **Unverified**: Not native-reviewed. |
+| **Irrigation Telemetry** | Weather-Based Reference ET0 | వాతావరణ ఆధారిత నీటి ఆవిరి (ET0) | मौसम आधारित संदर्भ वाष्पोत्सर्जन (ET0) | **Unverified**: Not native-reviewed. |
+| **Irrigation Telemetry** | Forecast Rain Today | నేటి వర్ష సూచన | आज बारिश का पूर्वानुमान | **Unverified**: Not native-reviewed. |
+| **Irrigation Depths** | Net Irrigation Depth | నికర నీటి తడి లోతు | शुद्ध सिंचाई गहराई | **Unverified**: Not native-reviewed. |
+| **Irrigation Depths** | Gross Irrigation Depth | స్థూల నీటి తడి లోతు | सकल सिंचाई गहराई | **Unverified**: Not native-reviewed. |
+| **Irrigation Depths** | Water Saved Today | నేడు ఆదా అయిన నీరు | आज बचाया गया पानी | **Unverified**: Not native-reviewed. |
+| **Irrigation Telemetry** | FAO-56 Soil Water Telemetry | FAO-56 నేల తేమ కొలతలు | FAO-56 मृदा जल टेलीमेट्री | **Unverified**: Not native-reviewed. |
+| **Irrigation Schedule** | 7-Day Irrigation Schedule & Soil Balance | 7 రోజుల నీటి పారుదల మరియు నేల తేమ ప్రణాళిక | 7-दिवसीय सिंचाई एवं मृदा संतुलन अनुसूची | **Unverified**: Not native-reviewed. |
+| **Irrigation Diagnose** | Diagnose Irrigation Problem | నీటి పారుదల సమస్యను పరిశీలించండి | सिंचाई समस्या की जांच करें | **Unverified**: Not native-reviewed. |
+| **Irrigation Attributes** | Soil Type | నేల రకం | मिट्टी का प्रकार | **Unverified**: Not native-reviewed. |
+| **Irrigation Attributes** | Irrigation Method | నీటి పారుదల పద్ధతి | सिंचाई विधि | **Unverified**: Not native-reviewed. |
+| **Calendar Labels** | Farm Holding | వ్యవసాయ క్షేత్రం | कृषि जोत | **Unverified**: Not native-reviewed. |
+| **Calendar Labels** | Crop | పంట | फसल | **Unverified**: Not native-reviewed. |
+| **Calendar Labels** | Sowing Date | విత్తిన తేదీ | बुवाई तिथि | **Unverified**: Not native-reviewed. |
+| **Calendar Labels** | Current Growth Stage | ప్రస్తుత ఎదుగుదల దశ | वर्तमान विकास चरण | **Unverified**: Not native-reviewed. |
+| **Calendar Labels** | Duration | వ్యవధి | अवधि | **Unverified**: Not native-reviewed. |
+| **Calendar Labels** | Next Priority Task | తదుపరి ప్రాధాన్యత పని | अगला प्राथमिकता कार्य | **Unverified**: Not native-reviewed. |
+| **Calendar Labels** | Regional Agro-Climatic Season Status | ప్రాంతీయ వ్యవసాయ కాలం స్థితి | क्षेत्रीय कृषि-जलवायु ऋतु स्थिति | **Unverified**: Not native-reviewed. |
+| **Calendar Tabs** | Agronomic Tasks | వ్యవసాయ పనులు | कृषि कार्य | **Unverified**: Not native-reviewed. |
+| **Calendar Tabs** | Growth Stages | ఎదుగుదల దశలు | विकास चरण | **Unverified**: Not native-reviewed. |
+| **Calendar Tabs** | Seasonal Awareness | కాలం అవగాహన | मौसमी जागरूकता | **Unverified**: Not native-reviewed. |
+| **Calendar Tabs** | Methodology | గణన విధానం | कार्यप्रणाली | **Unverified**: Not native-reviewed. |
+| **Recommend Labels** | Rank | ర్యాంకు | रैंक | **Unverified**: Not native-reviewed. |
+| **Recommend Labels** | Biological Pest Break | సహజ క్రిమి నియంత్రణ విరామం | जैविक कीट चक्र विराम | **Unverified**: Not native-reviewed. |
+| **Recommend Labels** | Evaluation Basis | మూల్యాంకన ఆధారం | मूल्यांकन आधार | **Unverified**: Not native-reviewed. |
+| **Recommend Labels** | Soil Telemetry Omitted (Weather-Only) | నేల వివరాలు లేవు (వాతావరణ ఆధారితం మాత్రమే) | मृदा विवरण नहीं (केवल मौसम आधारित) | **Unverified**: Not native-reviewed. |
+| **Recommend Labels** | Complete (Soil + Weather) | పూర్తి (నేల + వాతావరణం) | पूर्ण (मिट्टी + मौसम) | **Unverified**: Not native-reviewed. |
+| **Recommend Tabs** | Top Matches | ఉత్తమ ఎంపికలు | शीर्ष फसलें | **Unverified**: Not native-reviewed. |
+| **Recommend Tabs** | Crop Rotation | పంట మార్పిడి ప్రణాళిక | फसल चक्र | **Unverified**: Not native-reviewed. |
+| **Recommend Tabs** | Soil Telemetry | నేల పోషకాల కొలతలు | मृदा टेलीमेट्री | **Unverified**: Not native-reviewed. |
+| **Recommend Tabs** | Model Card | మోడల్ వివరాలు | मॉडल विवरण | **Unverified**: Not native-reviewed. |
+| **Reminders Title** | Reminders & Field Alerts | జ్ఞాపికలు & క్షేత్ర హెచ్చరికలు | स्मरणपत्र व खेत चेतावनियाँ | **Unverified**: Not native-reviewed. |
+| **Reminders Notice** | Delivery Limitation Notice | సమాచార డెలివరీ పరిమితి గమనిక | सूचना वितरण सीमा सम्बन्धी नोटिस | **Unverified**: Not native-reviewed. |
+| **Reminders Notice** | In-app reminders trigger when app is open or browser notifications enabled | మీరు యాప్ తెరిచినప్పుడు లేదా బ్రౌజర్ నోటిఫికేషన్లు అనుమతించినప్పుడు మాత్రమే రిమైండర్లు వస్తాయి | जब आप ऐप खोलते हैं या ब्राउज़र सूचनाओं की अनुमति देते हैं तभी स्मरणपत्र आते हैं | **Unverified**: Not native-reviewed. |
+| **Reminders Suggestions** | Automated Farm Reminders | ఆటోమేటెడ్ క్షేత్ర సూచనలు | स्वचालित कृषि सुझाव | **Unverified**: Not native-reviewed. |
+| **Reminders Tabs** | Upcoming | రానున్నవి | आगामी | **Unverified**: Not native-reviewed. |
+| **Reminders Tabs** | Overdue | గడువు దాటినవి | अतिदेय | **Unverified**: Not native-reviewed. |
+| **Reminders Tabs** | Completed | పూర్తయినవి | पूर्ण | **Unverified**: Not native-reviewed. |
+| **Reminders Buttons** | + New Reminder | + కొత్త జ్ఞాపిక | + नया स्मरणपत्र | **Unverified**: Not native-reviewed. |
+| **Reminders Buttons** | Export to Phone Calendar (.ics) | ఫోన్ క్యాలెండర్‌కు ఎగుమతి (.ics) | फ़ोन कैलेंडर में निर्यात (.ics) | **Unverified**: Not native-reviewed. |
+| **Reminders Wizard** | What needs to be done? | ఏమి చేయాలి? | क्या कार्य करना है? | **Unverified**: Not native-reviewed. |
+| **Reminders Wizard** | When is it due? | ఎప్పుడు చేయాలి? | कब करना है? | **Unverified**: Not native-reviewed. |
+| **Reminders Wizard** | Does it repeat? | పునరావృతం కావాలా? | क्या यह दोहराना है? | **Unverified**: Not native-reviewed. |
+
+
 
 

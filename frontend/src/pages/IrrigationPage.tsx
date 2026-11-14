@@ -27,6 +27,7 @@ import {
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePictorial } from '../context/PictorialContext';
+import { translateBackendString } from '../utils/safeTranslation';
 import { getIrrigationPlan, diagnoseIrrigationIssue } from '../api/irrigation';
 import { validateImageFile, compressImage } from '../utils/imageCompressor';
 import {
@@ -240,10 +241,22 @@ export const IrrigationPage: React.FC = () => {
 
   // Derived plain explanation
   const plainMeaning = plan?.rain_skip_triggered
-    ? 'Rain forecast is sufficient for crop needs. You can skip irrigation today to save electricity and pump wear.'
+    ? (language === 'te'
+        ? 'వర్ష సూచన పంట అవసరాలకు సరిపోతుంది. విద్యుత్ మరియు మోటారు పనిని ఆదా చేయడానికి ఈరోజు నీటి తడిని ఆపవచ్చు.'
+        : language === 'hi'
+        ? 'बारिश का पूर्वानुमान फसल की आवश्यकता के लिए पर्याप्त है। बिजली और मोटर बचाने के लिए आज सिंचाई टाल सकते हैं।'
+        : 'Rain forecast is sufficient for crop needs. You can skip irrigation today to save electricity and pump wear.')
     : plan?.should_irrigate
-    ? `Root zone moisture has reached the stress threshold. Recommended depth is ${plan.gross_depth_mm.toFixed(0)} mm to maintain optimal crop transpiration.`
-    : `Soil water reserves are adequate for today. Next scheduled irrigation is on ${plan?.next_irrigation_date || 'upcoming dates'}.`;
+    ? (language === 'te'
+        ? `వేరు ప్రాంతంలో తేమ ఒత్తిడి స్థాయికి చేరుకుంది. పంటకు తగినంత తేమ అందడానికి సిఫార్సు చేసిన లోతు ${plan.gross_depth_mm.toFixed(0)} mm.`
+        : language === 'hi'
+        ? `जड़ क्षेत्र की नमी तनाव सीमा तक पहुंच गई है। फसल के लिए अनुशंसित गहराई ${plan.gross_depth_mm.toFixed(0)} mm है।`
+        : `Root zone moisture has reached the stress threshold. Recommended depth is ${plan.gross_depth_mm.toFixed(0)} mm to maintain optimal crop transpiration.`)
+    : (language === 'te'
+        ? `నేలలో తేమ నిల్వలు నేటికి సరిపోతాయి. తదుపరి నీటి తడి తేదీ: ${plan?.next_irrigation_date || 'రానున్న రోజులు'}.`
+        : language === 'hi'
+        ? `आज के लिए मिट्टी में नमी पर्याप्त है। अगली निर्धारित सिंचाई: ${plan?.next_irrigation_date || 'आगामी दिन'}।`
+        : `Soil water reserves are adequate for today. Next scheduled irrigation is on ${plan?.next_irrigation_date || 'upcoming dates'}.`);
 
   // PICTORIAL MODE v2
   if (isPictorial) {
@@ -381,9 +394,21 @@ export const IrrigationPage: React.FC = () => {
         title={t('irrigation.title')}
         purpose={t('irrigation.subtitle')}
         whatIsThis={{
-          summary: 'Calculates the exact water requirements of your crops based on stage, soil type, and weather using the UN FAO-56 agro-meteorological method.',
-          whatToEnter: 'Your crop name, sowing date, soil type, irrigation method (e.g. drip, sprinkler), and land area in acres.',
-          whatYouGet: 'Immediate recommendation whether to irrigate today, gross depth in millimetres, total water volume in litres, and next watering date.',
+          summary: language === 'te'
+            ? 'FAO-56 వ్యవసాయ వాతావరణ విధానాన్ని ఉపయోగించి పంట దశ, నేల రకం మరియు వాతావరణం ఆధారంగా పంటకు అవసరమైన ఖచ్చితమైన నీటిని లెక్కిస్తుంది.'
+            : language === 'hi'
+            ? 'संयुक्त राष्ट्र FAO-56 मौसम विज्ञान पद्धति का उपयोग करके फसल अवस्था, मिट्टी के प्रकार और मौसम के आधार पर सटीक पानी की आवश्यकता की गणना करता है।'
+            : 'Calculates the exact water requirements of your crops based on stage, soil type, and weather using the UN FAO-56 agro-meteorological method.',
+          whatToEnter: language === 'te'
+            ? 'మీ పంట పేరు, విత్తిన తేదీ, నేల రకం, నీటి పద్ధతి (ఉదా. డ్రిప్, స్ప్రింక్లర్), మరియు ఎకరాల విస్తీర్ణం.'
+            : language === 'hi'
+            ? 'आपकी फसल का नाम, बुवाई की तारीख, मिट्टी का प्रकार, सिंचाई विधि (जैसे ड्रिप, स्प्रिंकलर), और एकड़ में क्षेत्रफल।'
+            : 'Your crop name, sowing date, soil type, irrigation method (e.g. drip, sprinkler), and land area in acres.',
+          whatYouGet: language === 'te'
+            ? 'ఈరోజు నీరు పెట్టాలా వద్దా, మిల్లీమీటర్లలో లోతు, లీటర్లలో మొత్తం నీరు, మరియు తదుపరి నీటి తడి తేదీ.'
+            : language === 'hi'
+            ? 'आज सिंचाई करनी है या नहीं, मिलीमीटर में गहराई, लीटर में कुल पानी, और अगली सिंचाई की तारीख।'
+            : 'Immediate recommendation whether to irrigate today, gross depth in millimetres, total water volume in litres, and next watering date.',
         }}
         actions={
           <button
@@ -393,7 +418,7 @@ export const IrrigationPage: React.FC = () => {
             className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] shadow-sm flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60"
           >
             <RefreshCw className={`w-4 h-4 ${isRefetchingPlan ? 'animate-spin' : ''}`} />
-            <span>{isLoadingPlan || isRefetchingPlan ? 'Computing...' : 'Compute Crop Water Budget'}</span>
+            <span>{isLoadingPlan || isRefetchingPlan ? (language === 'te' ? 'లెక్కిస్తోంది...' : language === 'hi' ? 'गणना जारी...' : 'Computing...') : (language === 'te' ? 'పంట నీటి బడ్జెట్ లెక్కించండి' : language === 'hi' ? 'फसल जल बजट निकालें' : 'Compute Crop Water Budget')}</span>
           </button>
         }
       />
@@ -436,18 +461,18 @@ export const IrrigationPage: React.FC = () => {
             )}
 
             <p className="text-[13px] sm:text-[14px] font-semibold text-[#183D2E] leading-relaxed">
-              {plan?.recommendation_text || 'Soil water depletion has reached RAW threshold. Irrigation required today.'}
+              {translateBackendString(plan?.recommendation_text || 'Soil water depletion has reached RAW threshold. Irrigation required today.', language)}
             </p>
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between gap-3">
-            <ReadAloudButton text={`Irrigation recommendation: ${plan?.recommendation_text || 'Irrigate today'}. ${plainMeaning}`} />
+            <ReadAloudButton text={plainMeaning} />
             <button
               type="button"
               onClick={handleComputeBudget}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs sm:text-sm shadow-sm"
             >
-              <span>Compute Crop Water Budget</span>
+              <span>{language === 'te' ? 'పంట నీటి బడ్జెట్ లెక్కించండి' : language === 'hi' ? 'फसल जल बजट निकालें' : 'Compute Crop Water Budget'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -470,19 +495,19 @@ export const IrrigationPage: React.FC = () => {
                 {plan?.litres_needed ? plan.litres_needed.toLocaleString() : '1,133,120'} L
               </span>
               <span className="text-xs text-[#4E5F57] block mt-0.5">
-                Gross Depth: <strong>{plan?.gross_depth_mm ? plan.gross_depth_mm.toFixed(1) : '140.0'} mm</strong> ({plan?.irrigation_method || 'drip'} method)
+                {language === 'te' ? 'స్థూల లోతు:' : language === 'hi' ? 'सकल गहराई:' : 'Gross Depth:'} <strong>{plan?.gross_depth_mm ? plan.gross_depth_mm.toFixed(1) : '140.0'} mm</strong> ({translateBackendString(plan?.irrigation_method || 'drip', language)})
               </span>
             </div>
 
             {/* What this means for you */}
             <WhatThisMeans
               message={plainMeaning}
-              confidenceNote="Indicative FAO-56 agro-meteorological simulation based on local weather."
+              confidenceNote={language === 'te' ? 'స్థానిక వాతావరణం ఆధారంగా సూచిక FAO-56 అనుకరణ.' : language === 'hi' ? 'स्थानीय मौसम पर आधारित संकेतात्मक FAO-56 अनुकरण।' : 'Indicative FAO-56 agro-meteorological simulation based on local weather.'}
             />
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 text-xs text-[#4E5F57] flex justify-between">
-            <span>Next watering date:</span>
+            <span>{language === 'te' ? 'తదుపరి తడి తేదీ:' : language === 'hi' ? 'अगली सिंचाई तिथि:' : 'Next watering date:'}</span>
             <strong className="text-[#183D2E]">{plan?.next_irrigation_date || '2026-11-14'}</strong>
           </div>
         </div>
@@ -492,7 +517,7 @@ export const IrrigationPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
-                Soil Water Level & Telemetry
+                {t('irrigation.soil_water_level_title', { defaultValue: 'Soil Water Level & Telemetry' })}
               </span>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E4EDE8] text-[#183D2E]">
                 FAO-56
@@ -501,26 +526,26 @@ export const IrrigationPage: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
               <div className="p-2.5 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">{t('irrigation.kc_label')} (Crop factor)</span>
+                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">{t('irrigation.kc_label')} ({language === 'te' ? 'పంట కారకం' : language === 'hi' ? 'फसल कारक' : 'Crop factor'})</span>
                 <span className="text-base font-extrabold text-[#183D2E]">{plan?.kc ? plan.kc.toFixed(2) : '1.20'}</span>
               </div>
               <div className="p-2.5 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">{t('irrigation.et0_label')} (Atmospheric)</span>
+                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">{t('irrigation.et0_label')} ({language === 'te' ? 'వాతావరణం' : language === 'hi' ? 'वायुमंडलीय' : 'Atmospheric'})</span>
                 <span className="text-base font-extrabold text-[#183D2E]">{plan?.reference_et0_mm ? plan.reference_et0_mm.toFixed(1) : '5.0'} mm/day</span>
               </div>
               <div className="p-2.5 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">{t('irrigation.etc_label')} (Crop demand)</span>
+                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">{t('irrigation.etc_label')} ({language === 'te' ? 'పంట డిమాండ్' : language === 'hi' ? 'फसल मांग' : 'Crop demand'})</span>
                 <span className="text-base font-extrabold text-[#183D2E]">{plan?.etc_today_mm ? plan.etc_today_mm.toFixed(1) : '6.0'} mm/day</span>
               </div>
               <div className="p-2.5 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">Litres Saved</span>
+                <span className="text-[10px] text-[#4E5F57] block font-bold uppercase">{t('irrigation.litres_saved_card', { defaultValue: 'Litres Saved' })}</span>
                 <span className="text-base font-extrabold text-teal-800">{plan?.litres_saved ? plan.litres_saved.toLocaleString() : '0'} L</span>
               </div>
             </div>
           </div>
 
           <div className="pt-2 border-t border-[#7A553A]/15 text-xs text-[#7A553A] italic">
-            Soil: <strong>{plan?.soil_type || soilType}</strong> &bull; Raw threshold: {plan?.raw_mm || 123.5} mm
+            {language === 'te' ? 'నేల' : language === 'hi' ? 'मिट्टी' : 'Soil'}: <strong>{translateBackendString(plan?.soil_type || soilType, language)}</strong> &bull; {language === 'te' ? 'పరిమితి' : language === 'hi' ? 'सीमा' : 'Raw threshold'}: {plan?.raw_mm || 123.5} mm
           </div>
         </div>
       </div>
@@ -544,7 +569,7 @@ export const IrrigationPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            7-Day Water Balance Chart
+            {t('irrigation.tab_forecast', { defaultValue: '7-Day Water Balance Chart' })}
           </button>
           <button
             type="button"
@@ -555,7 +580,7 @@ export const IrrigationPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            Farm Calibration & Sowing Date
+            {t('irrigation.tab_params', { defaultValue: 'Farm Calibration & Sowing Date' })}
           </button>
           <button
             type="button"
@@ -566,7 +591,7 @@ export const IrrigationPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            FAO-56 Soil Water Telemetry
+            {t('irrigation.tab_telemetry', { defaultValue: 'FAO-56 Soil Water Telemetry' })}
           </button>
           <button
             type="button"
@@ -577,7 +602,7 @@ export const IrrigationPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            Irrigation Issue Diagnostic
+            {t('irrigation.tab_diagnostic', { defaultValue: 'Irrigation Issue Diagnostic' })}
           </button>
         </div>
 
@@ -589,10 +614,10 @@ export const IrrigationPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h4 className="font-display text-base font-bold text-[#183D2E]">
-                    7-Day Root Zone Moisture Balance (FAO-56)
+                    {t('irrigation.water_balance_heading', { defaultValue: '7-Day Root Zone Moisture Balance (FAO-56)' })}
                   </h4>
                   <p className="text-xs text-[#4E5F57]">
-                    Blue bars show rain, green line shows root zone depletion, red dashed line shows RAW stress limit.
+                    {t('irrigation.chart_subtitle', { defaultValue: 'Blue bars show rain, green line shows root zone depletion, red dashed line shows RAW stress limit.' })}
                   </p>
                 </div>
               </div>
@@ -606,9 +631,9 @@ export const IrrigationPage: React.FC = () => {
                       <YAxis yAxisId="left" tick={{ fontSize: 11 }} label={{ value: 'mm', angle: -90, position: 'insideLeft', fontSize: 10 }} />
                       <Tooltip />
                       <Legend wrapperStyle={{ fontSize: '11px' }} />
-                      <Bar yAxisId="left" dataKey="rain" name="Expected Rain (mm)" fill="#3B82F6" barSize={18} radius={[4, 4, 0, 0]} />
-                      <Line yAxisId="left" type="monotone" dataKey="etc" name="Crop Water Demand ETc (mm)" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
-                      <Line yAxisId="left" type="monotone" dataKey="depletion" name="Root Zone Depletion (mm)" stroke="#7A553A" strokeWidth={2.5} dot={{ r: 3 }} />
+                      <Bar yAxisId="left" dataKey="rain" name={language === 'te' ? 'అంచనా వర్షపాతం (మి.మీ)' : language === 'hi' ? 'अपेक्षित वर्षा (मिमी)' : 'Expected Rain (mm)'} fill="#3B82F6" barSize={18} radius={[4, 4, 0, 0]} />
+                      <Line yAxisId="left" type="monotone" dataKey="etc" name={language === 'te' ? 'పంట నీటి డిమాండ్ ETc (మి.మీ)' : language === 'hi' ? 'फसल जल मांग ETc (मिमी)' : 'Crop Water Demand ETc (mm)'} stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
+                      <Line yAxisId="left" type="monotone" dataKey="depletion" name={language === 'te' ? 'వేర్ల వద్ద తేమ తగ్గుదల (మి.మీ)' : language === 'hi' ? 'जड़ क्षेत्र नमी कमी (मिमी)' : 'Root Zone Depletion (mm)'} stroke="#7A553A" strokeWidth={2.5} dot={{ r: 3 }} />
                       {plan?.raw_mm && (
                         <ReferenceLine yAxisId="left" y={plan.raw_mm} stroke="#EF4444" strokeDasharray="4 4" label={{ value: 'RAW Threshold', fill: '#EF4444', fontSize: 10, position: 'top' }} />
                       )}
@@ -617,7 +642,7 @@ export const IrrigationPage: React.FC = () => {
                 </div>
               ) : (
                 <p className="text-xs text-stone-500 italic p-4 bg-[#FAF8F5] rounded-xl">
-                  Run crop water budget to display 7-day balance chart.
+                  {t('irrigation.run_budget_prompt', { defaultValue: 'Run crop water budget to display 7-day balance chart.' })}
                 </p>
               )}
             </div>
@@ -627,7 +652,7 @@ export const IrrigationPage: React.FC = () => {
           {activeTab === 'params' && (
             <div className="space-y-6">
               <h4 className="font-display text-base font-bold text-[#183D2E]">
-                Crop & Soil Calibration Settings
+                {language === 'te' ? 'పంట & నేల సర్దుబాటు వివరాలు' : language === 'hi' ? 'फसल व मिट्टी अंशांकन सेटिंग्स' : 'Crop & Soil Calibration Settings'}
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -709,7 +734,7 @@ export const IrrigationPage: React.FC = () => {
                     className="min-h-[48px] w-full px-5 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center justify-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" />
-                    <span>Apply & Recompute</span>
+                    <span>{t('irrigation.apply_recompute', { defaultValue: 'Apply & Recompute' })}</span>
                   </button>
                 </div>
               </div>
@@ -720,28 +745,28 @@ export const IrrigationPage: React.FC = () => {
           {activeTab === 'telemetry' && (
             <div className="space-y-4">
               <h4 className="font-display text-base font-bold text-[#183D2E]">
-                FAO-56 Soil Water Balance Formula Parameters
+                {t('irrigation.tab_telemetry', { defaultValue: 'FAO-56 Soil Water Balance Formula Parameters' })}
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">Total Available Water (TAW)</span>
+                  <span className="text-[10px] text-stone-500 block uppercase font-bold">{t('irrigation.taw_label', { defaultValue: 'Total Available Water (TAW)' })}</span>
                   <span className="text-base font-extrabold text-[#183D2E]">{plan?.taw_mm ? plan.taw_mm.toFixed(1) : '190.0'} mm</span>
                 </div>
                 <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">Readily Available Water (RAW)</span>
+                  <span className="text-[10px] text-stone-500 block uppercase font-bold">{t('irrigation.raw_label', { defaultValue: 'Readily Available Water (RAW)' })}</span>
                   <span className="text-base font-extrabold text-[#183D2E]">{plan?.raw_mm ? plan.raw_mm.toFixed(1) : '123.5'} mm</span>
                 </div>
                 <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">Available Water Cap. (AWC)</span>
+                  <span className="text-[10px] text-stone-500 block uppercase font-bold">{t('irrigation.awc_label', { defaultValue: 'Available Water Cap. (AWC)' })}</span>
                   <span className="text-base font-extrabold text-[#183D2E]">{plan?.awc_mm_per_m ? plan.awc_mm_per_m.toFixed(1) : '190.0'} mm/m</span>
                 </div>
                 <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15">
-                  <span className="text-[10px] text-stone-500 block uppercase font-bold">Current Depletion</span>
+                  <span className="text-[10px] text-stone-500 block uppercase font-bold">{t('irrigation.depletion_label', { defaultValue: 'Current Depletion' })}</span>
                   <span className="text-base font-extrabold text-[#7A553A]">{plan?.depletion_today_mm ? plan.depletion_today_mm.toFixed(1) : '126.0'} mm</span>
                 </div>
               </div>
               <p className="text-xs text-[#4E5F57] leading-relaxed pt-2">
-                Scientific basis: FAO Irrigation and Drainage Paper No. 56. When root zone depletion exceeds RAW, the crop experiences moisture stress and evapotranspiration drops below maximum potential ETc.
+                {t('irrigation.fao_scientific_note', { defaultValue: 'Scientific basis: FAO Irrigation and Drainage Paper No. 56. When root zone depletion exceeds RAW, the crop experiences moisture stress and evapotranspiration drops below maximum potential ETc.' })}
               </p>
             </div>
           )}
@@ -750,22 +775,22 @@ export const IrrigationPage: React.FC = () => {
           {activeTab === 'diagnostic' && (
             <div className="space-y-4">
               <h4 className="font-display text-base font-bold text-[#183D2E]">
-                Water Stress & Salinity Diagnostic Assistant
+                {t('irrigation.diagnostic_title', { defaultValue: 'Water Stress & Salinity Diagnostic Assistant' })}
               </h4>
               <p className="text-xs text-[#4E5F57]">
-                Describe foliar wilting, leaf tip burns, or upload a field photo to diagnose waterlogging or salinity issues.
+                {t('irrigation.diagnostic_desc', { defaultValue: 'Describe foliar wilting, leaf tip burns, or upload a field photo to diagnose waterlogging or salinity issues.' })}
               </p>
 
               <form onSubmit={handleDiagnose} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-[#183D2E] mb-1">
-                    Describe Visible Water or Soil Symptoms
+                    {t('irrigation.describe_symptoms_label', { defaultValue: 'Describe Visible Water or Soil Symptoms' })}
                   </label>
                   <textarea
                     rows={3}
                     value={problemText}
                     onChange={(e) => setProblemText(e.target.value)}
-                    placeholder="e.g. Cotton leaves wilting in afternoon despite furrow watering..."
+                    placeholder={language === 'te' ? 'ఉదా. కాలువ తడి ఇచ్చినప్పటికీ మధ్యాహ్నం ఆకులు వాలిపోతున్నాయి...' : language === 'hi' ? 'उदा. थाला सिंचाई के बाद भी दोपहर में पत्तियां मुरझा रही हैं...' : 'e.g. Cotton leaves wilting in afternoon despite furrow watering...'}
                     className="w-full p-3 rounded-xl border border-[#7A553A]/30 text-sm bg-white"
                   />
                 </div>
@@ -773,7 +798,7 @@ export const IrrigationPage: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <label className="min-h-[44px] px-4 py-2 rounded-xl border border-[#7A553A]/30 bg-[#FAF8F5] text-xs font-bold text-[#183D2E] hover:bg-[#EDE5DC] cursor-pointer flex items-center gap-2">
                     <Upload className="w-4 h-4 text-[#DA9A4C]" />
-                    <span>Upload Leaf / Soil Photo</span>
+                    <span>{t('irrigation.upload_leaf_soil_photo', { defaultValue: 'Upload Leaf / Soil Photo' })}</span>
                     <input type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
                   </label>
                   {photoFile && (
@@ -790,7 +815,7 @@ export const IrrigationPage: React.FC = () => {
                   disabled={diagnoseMutation.isPending || (!problemText.trim() && !photoFile)}
                   className="min-h-[48px] px-6 py-2.5 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] disabled:opacity-50"
                 >
-                  {diagnoseMutation.isPending ? 'Diagnosing...' : 'Run Diagnostic Analysis'}
+                  {diagnoseMutation.isPending ? (language === 'te' ? 'విశ్లేషిస్తోంది...' : language === 'hi' ? 'विश्लेषण जारी...' : 'Diagnosing...') : (language === 'te' ? 'సమస్యను విశ్లేషించండి' : language === 'hi' ? 'नैदानिक विश्लेषण करें' : 'Run Diagnostic Analysis')}
                 </button>
               </form>
 
