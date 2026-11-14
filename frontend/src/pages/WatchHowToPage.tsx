@@ -43,13 +43,13 @@ export const WatchHowToPage: React.FC = () => {
                 <Video className="w-8 h-8" />
               </div>
               <span className="text-xs font-black uppercase text-[#DA9A4C] tracking-wider block mb-1">
-                Official Walkthrough Slot
+                Walkthrough Slot
               </span>
               <h2 className="font-display text-2xl font-bold text-white mb-2">
                 Video Coming Soon
               </h2>
               <p className="text-sm text-[#FAF8F5]/80 max-w-md mx-auto mb-6 leading-relaxed">
-                The screen-recorded walkthrough video is currently being recorded by the field agronomy team. Please follow the written steps below or read the complete recording script in <code className="text-[#DA9A4C] bg-white/10 px-1.5 py-0.5 rounded">docs/VIDEO_SCRIPT.md</code>.
+                Video coming soon. Please follow the written steps below.
               </p>
               <Link
                 to="/how-to"

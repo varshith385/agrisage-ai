@@ -14,7 +14,6 @@ import {
   Lock,
   Layers,
   RefreshCw,
-  ExternalLink,
   ArrowRight,
   BookOpen,
 } from 'lucide-react';
@@ -273,7 +272,7 @@ export const SchemesPage: React.FC = () => {
         <PageHeader
           icon={FileText}
           title={language === 'te' ? 'నేల ఆరోగ్య పత్రం' : language === 'hi' ? 'मृदा स्वास्थ्य कार्ड' : 'Soil Health Card'}
-          purpose={language === 'te' ? 'నేల పరీక్ష ఫలితాలు మరియు ఎరువుల మోతాదు' : language === 'hi' ? 'मिट्टी की जांच और उर्वरक की मात्रा' : 'Visual soil nutrients and official welfare schemes.'}
+          purpose={language === 'te' ? 'నేల పరీక్ష ఫలితాలు మరియు ఎరువుల మోతాదు' : language === 'hi' ? 'मिट्टी की जांच और उर्वरक की मात्रा' : 'Visual soil nutrients and welfare schemes (planned, details to verify).'}
         />
 
         <div className="bg-gradient-to-br from-[#FEF6E9] to-[#FAF8F5] rounded-3xl border-2 border-[#DA9A4C] p-6 text-center max-w-xl mx-auto shadow-sm space-y-4">
@@ -325,8 +324,8 @@ export const SchemesPage: React.FC = () => {
       {/* PAGE HEADER */}
       <PageHeader
         icon={FileText}
-        title={t('soilcard.title', { defaultValue: 'Soil Health Card & Government Schemes' })}
-        purpose={t('soilcard.subtitle', { defaultValue: 'Upload official Soil Health Cards to calibrate agronomic recommendations with real N-P-K nutrient data.' })}
+        title={t('soilcard.title', { defaultValue: 'Soil Health Card & Schemes (Planned)' })}
+        purpose={t('soilcard.subtitle', { defaultValue: 'Upload Soil Health Cards to calibrate agronomic recommendations with real N-P-K nutrient data. Welfare schemes directory is planned.' })}
         whatIsThis={{
           summary: language === 'te'
             ? 'ప్రభుత్వ నేల ఆరోగ్య పత్రం (Soil Health Card) ఫోటో లేదా సమాచారాన్ని నమోదు చేసి, మీ పొలంలో నత్రజని, భాస్వరం, పొటాష్ మోతాదులను తెలుసుకోవచ్చు.'
@@ -444,42 +443,43 @@ export const SchemesPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 3: Government Schemes Notice */}
+        {/* Card 3: Welfare Schemes (Planned, details to verify) */}
         <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-[#DA9A4C]" />
-                Official Schemes & Grants
+                Welfare Schemes
               </span>
-              <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
-                Details to Verify
+              <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                Planned &bull; Details to verify
               </span>
             </div>
 
-            <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1.5 text-xs">
+            <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-2 text-xs">
               <p className="font-semibold text-[#183D2E]">
-                Central & State Welfare Subsidies:
+                Scheme Directory Notice:
               </p>
-              <ul className="space-y-1 text-[#4E5F57] text-[11px]">
-                <li>&bull; PM-KISAN: ₹6,000/yr direct income support</li>
-                <li>&bull; Soil Health Card Mission: Free testing & kits</li>
-                <li>&bull; PM Krishi Sinchayee: Drip irrigation subsidy up to 55%</li>
-              </ul>
+              <p className="text-[#4E5F57] leading-relaxed">
+                Central and State welfare schemes are planned for a future integration and are not available on this version.
+              </p>
+              <p className="text-[11px] text-[#7A553A] italic">
+                Guidelines, criteria, and subsidy amounts change periodically.
+              </p>
             </div>
 
             <p className="text-[11px] text-[#7A553A]">
-              Indicative scheme information. AgriSage does not process government funds; apply directly on official state portals.
+              AgriSage AI does not disburse government subsidies. Verify rules with your local Mandal Agriculture Officer (MAO).
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setActiveTab('schemes')}
-            className="w-full min-h-[44px] py-2 px-3 rounded-xl border border-[#DA9A4C] bg-[#FEF6E9] hover:bg-[#FAF8F5] font-bold text-xs text-[#183D2E] flex items-center justify-center gap-2 transition-all shadow-sm"
+            className="w-full min-h-[44px] py-2 px-3 rounded-xl border border-[#7A553A]/25 bg-[#FAF8F5] hover:bg-stone-100 font-bold text-xs text-[#183D2E] flex items-center justify-center gap-2 transition-all shadow-sm"
           >
-            <BookOpen className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Browse Welfare Schemes</span>
+            <BookOpen className="w-4 h-4 text-[#7A553A]" />
+            <span>View Advisory Notice</span>
           </button>
         </div>
       </div>
@@ -523,7 +523,7 @@ export const SchemesPage: React.FC = () => {
             }`}
           >
             <BookOpen className="w-4 h-4 text-[#DA9A4C]" />
-            <span>Government Welfare Schemes</span>
+            <span>Welfare Schemes (Planned)</span>
           </button>
 
           <button
@@ -1102,117 +1102,47 @@ export const SchemesPage: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 3: GOVERNMENT WELFARE SCHEMES */}
+          {/* TAB 3: WELFARE SCHEMES (PLANNED, DETAILS TO VERIFY) */}
           {activeTab === 'schemes' && (
             <div className="space-y-6">
-              <div className="p-4 bg-[#FEF6E9] border border-[#DA9A4C] rounded-2xl flex items-start gap-3 text-xs text-[#183D2E]">
-                <Layers className="w-5 h-5 text-[#DA9A4C] shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <h4 className="font-bold">
-                    Official Agricultural Welfare Schemes & Subsidies
-                  </h4>
-                  <p className="text-[#7A553A] leading-relaxed">
-                    AgriSage AI is an independent advisory tool and does not process government funds. All applications must be submitted directly through official government portals. Details below are indicative; verify eligibility criteria locally.
+              <div className="p-5 bg-amber-50/80 border border-amber-300 rounded-2xl flex items-start gap-3.5 text-xs text-amber-950">
+                <Info className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-sm text-[#183D2E]">
+                      Welfare Schemes Directory (Planned Feature)
+                    </h4>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900 border border-amber-300">
+                      Details to Verify
+                    </span>
+                  </div>
+                  <p className="text-[#4E5F57] leading-relaxed">
+                    Agricultural schemes and subsidy registries were not merged into this branch and are not listed as an active feature. AgriSage AI is an independent decision-support tool. It does not provide financial grants, disburse government funds, or certify scheme eligibility.
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Scheme 1 */}
-                <div className="p-5 bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="text-base font-bold text-[#183D2E]">PM Kisan Samman Nidhi</h4>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">Central</span>
+              <div className="bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 p-6 space-y-4">
+                <h4 className="font-display text-base font-bold text-[#183D2E]">
+                  How to Verify Agricultural Schemes & Subsidies
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div className="bg-white p-4 rounded-xl border border-[#7A553A]/15 space-y-1.5">
+                    <span className="font-bold text-[#183D2E] block">1. Local Krishi Vigyan Kendra (KVK)</span>
+                    <p className="text-[#4E5F57] leading-relaxed">
+                      Visit your district KVK or Agriculture Extension Center for current operational guidelines on input subsidies, seeds, and soil testing.
+                    </p>
                   </div>
-                  <p className="text-xs text-[#4E5F57]">
-                    Provides direct financial support of ₹6,000 per year in three equal instalments of ₹2,000 directly into bank accounts of eligible farmer families.
-                  </p>
-                  <div className="text-[11px] text-[#7A553A] space-y-1 bg-white p-3 rounded-xl border border-[#7A553A]/15">
-                    <div>Eligibility: <strong>All smallholder and marginal landowning farmers</strong></div>
-                    <div>Required: <strong>Aadhaar, Land Holding Records, Bank Account</strong></div>
+                  <div className="bg-white p-4 rounded-xl border border-[#7A553A]/15 space-y-1.5">
+                    <span className="font-bold text-[#183D2E] block">2. Mandal Agriculture Officer (MAO)</span>
+                    <p className="text-[#4E5F57] leading-relaxed">
+                      Consult your local MAO or Village Revenue Officer for land-holding eligibility requirements and official application windows.
+                    </p>
                   </div>
-                  <a
-                    href="https://pmkisan.gov.in"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#183D2E] hover:underline pt-1"
-                  >
-                    <span>Visit pmkisan.gov.in (External Portal)</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
                 </div>
-
-                {/* Scheme 2 */}
-                <div className="p-5 bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="text-base font-bold text-[#183D2E]">Soil Health Card Scheme</h4>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">Central</span>
-                  </div>
-                  <p className="text-xs text-[#4E5F57]">
-                    Government issues Soil Health Cards every two years to all farmers containing status of 12 nutrients and dosage recommendations to stop fertilizer overuse.
-                  </p>
-                  <div className="text-[11px] text-[#7A553A] space-y-1 bg-white p-3 rounded-xl border border-[#7A553A]/15">
-                    <div>Cost: <strong>100% Free Government Testing & Issuance</strong></div>
-                    <div>Where: <strong>Local Krishi Vigyan Kendra (KVK) / Block Agri Officer</strong></div>
-                  </div>
-                  <a
-                    href="https://soilhealth.dac.gov.in"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#183D2E] hover:underline pt-1"
-                  >
-                    <span>Visit soilhealth.dac.gov.in (External Portal)</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-
-                {/* Scheme 3 */}
-                <div className="p-5 bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="text-base font-bold text-[#183D2E]">PM Krishi Sinchayee Yojana (Micro-Irrigation)</h4>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#DA9A4C] text-[#183D2E]">Subsidy</span>
-                  </div>
-                  <p className="text-xs text-[#4E5F57]">
-                    Financial assistance up to 55% for small and marginal farmers (45% for other farmers) for installing drip and sprinkler irrigation systems.
-                  </p>
-                  <div className="text-[11px] text-[#7A553A] space-y-1 bg-white p-3 rounded-xl border border-[#7A553A]/15">
-                    <div>Water Savings: <strong>30% to 50% reduced irrigation volume</strong></div>
-                    <div>Where: <strong>State Horticulture / Agriculture Department</strong></div>
-                  </div>
-                  <a
-                    href="https://pmksy.gov.in"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#183D2E] hover:underline pt-1"
-                  >
-                    <span>Visit pmksy.gov.in (External Portal)</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-
-                {/* Scheme 4 */}
-                <div className="p-5 bg-[#FAF8F5] rounded-2xl border border-[#7A553A]/20 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="text-base font-bold text-[#183D2E]">PM Fasal Bima Yojana (Crop Insurance)</h4>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#183D2E] text-white">Central</span>
-                  </div>
-                  <p className="text-xs text-[#4E5F57]">
-                    Comprehensive risk insurance covering yield losses due to non-preventable natural risks (drought, flood, pests) at low farmer premium (1.5% - 2%).
-                  </p>
-                  <div className="text-[11px] text-[#7A553A] space-y-1 bg-white p-3 rounded-xl border border-[#7A553A]/15">
-                    <div>Kharif Premium: <strong>2% maximum farmer share</strong></div>
-                    <div>Where: <strong>Common Service Centre (CSC) or Bank Branch</strong></div>
-                  </div>
-                  <a
-                    href="https://pmfby.gov.in"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#183D2E] hover:underline pt-1"
-                  >
-                    <span>Visit pmfby.gov.in (External Portal)</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
+                <p className="text-[11px] text-[#7A553A] italic pt-2 border-t border-[#7A553A]/15">
+                  Notice: Specific scheme amounts, subsidy percentages, and portal links are omitted until officially validated by backend services.
+                </p>
               </div>
             </div>
           )}

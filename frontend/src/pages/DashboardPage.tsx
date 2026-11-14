@@ -617,7 +617,7 @@ export const DashboardPage: React.FC = () => {
                 : 'text-[#4E5F57] hover:text-[#183D2E]'
             }`}
           >
-            Farm Health Score ({healthBreakdown?.score ?? '88'}/100)
+            Farm Health Score ({healthBreakdown?.score ? `${healthBreakdown.score}/100` : 'Indicative: 88/100 (DEMO DATA)'})
           </button>
           <button
             type="button"
@@ -755,10 +755,10 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-[#E4EDE8] rounded-2xl border border-[#183D2E]/20">
                 <div>
                   <h4 className="font-display text-lg font-bold text-[#183D2E]">
-                    Farm Health Score: {healthBreakdown?.score ?? 88} / 100
+                    Farm Health Score: {healthBreakdown?.score ? `${healthBreakdown.score} / 100` : '88 / 100 (DEMO DATA • details to verify)'}
                   </h4>
                   <p className="text-xs text-[#183D2E]/80">
-                    {healthBreakdown?.formula_description || 'Weighted multi-factor score: soil moisture, weather stress, and pest incidence.'}
+                    {healthBreakdown?.formula_description || 'Modelled multi-factor indicator: soil moisture, weather stress, and pest incidence (details to verify).'}
                   </p>
                 </div>
                 <StatusBadge status="WORKING" />
@@ -838,8 +838,8 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <div className="text-xs space-y-1">
                   <div>Expected Yield: <strong className="text-[#183D2E]">{headlineYield?.headline_yield_quintals_per_acre ?? 8.0} q/ac</strong></div>
-                  <div>Baseline MSP: <strong className="text-[#183D2E]">₹7,100 / q</strong></div>
-                  <div>Est. Net Profit: <strong className="text-emerald-800 font-bold">₹{economicsSummary?.combined_summary?.net_profit ? Number(economicsSummary.combined_summary.net_profit).toLocaleString() : '65,400'}</strong></div>
+                  <div>Baseline MSP: <strong className="text-[#183D2E]">₹7,100 / q</strong> (DEMO DATA &bull; details to verify)</div>
+                  <div>Est. Net Profit: <strong className="text-emerald-800 font-bold">₹{economicsSummary?.combined_summary?.net_profit ? Number(economicsSummary.combined_summary.net_profit).toLocaleString() : '65,400 (DEMO DATA)'}</strong></div>
                 </div>
                 <Link to="/economics" className="text-xs font-bold text-[#183D2E] hover:underline block pt-2">
                   Open What-If Profit Simulator &rarr;

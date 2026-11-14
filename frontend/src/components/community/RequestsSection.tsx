@@ -38,7 +38,7 @@ export const RequestsSection: React.FC<{ onOpenCalculator?: () => void }> = ({ o
   const [distanceKm, setDistanceKm] = useState<number>(28);
 
   // Input fields
-  const [itemName, setItemName] = useState<string>('Certified Bt-Cotton Seed & Neem Urea');
+  const [itemName, setItemName] = useState<string>('Bt-Cotton Seed & Neem Urea');
   const [targetQty, setTargetQty] = useState<number>(50);
   const [bulkPrice, setBulkPrice] = useState<number>(780);
   const [retailPrice, setRetailPrice] = useState<number>(890);

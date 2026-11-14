@@ -45,7 +45,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onStartTour }) => {
     { to: '/market', label: t('nav.market', { defaultValue: 'Mandi Market' }), icon: Store, desc: 'Mandi arrivals, prices & buyer inquiries' },
     { to: '/calendar', label: t('nav.calendar', { defaultValue: 'Crop Calendar' }), icon: Calendar, desc: 'Crop schedule & field activity tracking' },
     { to: '/recommend', label: t('nav.recommend', { defaultValue: 'Crop Advisory' }), icon: Sprout, desc: 'AI soil & agro-climatic crop matching' },
-    { to: '/schemes', label: t('nav.schemes', { defaultValue: 'Soil Card & Schemes' }), icon: FileText, desc: 'Nutrient shift analysis & eligible programs' },
+    { to: '/schemes', label: t('nav.schemes', { defaultValue: 'Soil Card & Schemes' }), icon: FileText, desc: 'Soil nutrient calibration & advisory notices' },
     { to: '/farms', label: t('nav.farms', { defaultValue: 'My Farms' }), icon: Layers, desc: 'Parcel registration & mixed land tenure' },
     { to: '/community', label: t('nav.community', { defaultValue: 'Community & Map' }), icon: Users, desc: 'Farmer forum, machinery rental & pest outbreaks' },
     { to: '/how-to', label: 'How to Use AgriSage', icon: HelpCircle, desc: 'Illustrated step-by-step guidance' },

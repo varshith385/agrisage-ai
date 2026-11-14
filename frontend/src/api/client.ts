@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8020';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export class ApiError extends Error {
   status: number;
@@ -45,7 +45,7 @@ export async function apiRequest<T>(
   } catch (err: unknown) {
     throw new ApiError(
       0,
-      'Network request failed. Please check internet connection or verify backend is running on 127.0.0.1:8020.',
+      'Network request failed. Please check internet connection or verify backend is running on 127.0.0.1:8000.',
       'NETWORK_FAILURE'
     );
   }

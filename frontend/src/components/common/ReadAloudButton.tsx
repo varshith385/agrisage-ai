@@ -44,7 +44,7 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
 
     if (!voice && language !== 'en') {
       const langName = language === 'te' ? 'Telugu' : 'Hindi';
-      setWarning(`Voice pack for ${langName} is not installed on your device. Audio cannot be read in the wrong language.`);
+      setWarning(`Browser voice pack for ${langName} is not available in your browser. Audio cannot be read in the wrong language.`);
       setTimeout(() => setWarning(null), 5000);
       return;
     }
@@ -69,8 +69,8 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({
       <button
         type="button"
         onClick={handleSpeak}
-        aria-label={isPlaying ? 'Stop read-aloud' : (label || 'Read aloud in current language')}
-        title={isPlaying ? 'Stop read-aloud' : (label || 'Listen to this explanation')}
+        aria-label={isPlaying ? 'Stop browser voice read-aloud' : (label || 'Read aloud using browser voice in current language')}
+        title={isPlaying ? 'Stop browser voice' : (label || 'Listen to this explanation using browser voice')}
         className={`min-h-[44px] min-w-[44px] p-2.5 rounded-xl border flex items-center justify-center gap-1.5 transition-all text-xs font-semibold ${
           isPlaying
             ? 'bg-[#DA9A4C] text-[#0E241B] border-[#DA9A4C] animate-pulse'

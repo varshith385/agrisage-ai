@@ -379,31 +379,31 @@ export const MarketPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#DA9A4C]" />
-                Official MSP Benchmark
+                MSP Benchmark (details to verify)
               </span>
               <span className="text-[10px] font-bold text-[#7A553A] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#7A553A]/20">
-                2026-27 Season
+                Indicative Reference
               </span>
             </div>
 
             <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#7A553A]/15 space-y-1">
               <div className="flex justify-between items-baseline">
-                <span className="text-xs text-[#7A553A]">Government MSP:</span>
+                <span className="text-xs text-[#7A553A]">MSP Benchmark:</span>
                 <strong className="text-base font-bold text-[#183D2E]">
-                  ₹{mspData?.benchmark?.msp_per_quintal ? mspData.benchmark.msp_per_quintal.toLocaleString('en-IN') : '7,121'} / q
+                  ₹{mspData?.benchmark?.msp_per_quintal ? mspData.benchmark.msp_per_quintal.toLocaleString('en-IN') : '7,121 (DEMO DATA)'} / q
                 </strong>
               </div>
               <div className="flex justify-between items-baseline">
                 <span className="text-xs text-[#7A553A]">Market Realization:</span>
                 <strong className="text-xs font-bold text-[#183D2E]">
-                  ₹{bestMandi ? bestMandi.net_realization_per_q.toFixed(0) : '7,050'} / q
+                  ₹{bestMandi ? bestMandi.net_realization_per_q.toFixed(0) : '7,050 (DEMO DATA)'} / q
                 </strong>
               </div>
             </div>
 
             <WhatThisMeans
               message={plainMeaning}
-              confidenceNote="APMC mandi prices and government MSP benchmarks (modelled, indicative data to verify)."
+              confidenceNote="APMC mandi prices and MSP benchmarks are modelled, indicative values (details to verify with local APMC)."
             />
           </div>
         </div>
