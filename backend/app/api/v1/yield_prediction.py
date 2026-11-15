@@ -53,13 +53,13 @@ async def predict_yield(
         district = farm.district or district
         area_acres = farm.area or area_acres
 
-        # Look up active crop cycle if crop_name was left default or empty
+        # Look up active crop cycle only if crop_name was left empty or None
         active_crop = (
             db.query(CurrentCropCycle)
             .filter(CurrentCropCycle.farm_id == farm.id, CurrentCropCycle.is_active == True)
             .first()
         )
-        if active_crop and payload.crop_name == "Rice":
+        if active_crop and not payload.crop_name:
             crop_name = active_crop.crop_name
 
     result = yield_model_engine.predict_yield(

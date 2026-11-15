@@ -81,6 +81,10 @@ def main():
         w = weather_data[city]
         t, h, r = w["temp"], w["humidity"], w["rainfall_monthly"]
 
+        w_start = w.get("window_start_date", "2025-11-15")
+        w_end = w.get("window_end_date", "2026-11-14")
+        w_dates = f"{w_start} to {w_end}"
+
         res = crop_recommender_engine.recommend(
             n=FIXED_SOIL["N"],
             p=FIXED_SOIL["P"],
@@ -94,7 +98,7 @@ def main():
             season="Kharif",
             weather_source="Measured (Open-Meteo 12mo archive)",
             soil_source="Entered (dataset median)",
-            window_dates="2025-11-10 to 2026-11-10",
+            window_dates=w_dates,
         )
 
         status = res["decision_status"]
@@ -122,7 +126,7 @@ def main():
 
         print(f"\nLocation: {city} ({state}) | Lat/Lon: {lat}, {lon}")
         print(f"  Input Vector   : {record['vector']}")
-        print(f"  Sources        : Soil: Entered (dataset median) | Weather: Measured (Open-Meteo 12mo archive, 2025-11-10 to 2026-11-10)")
+        print(f"  Sources        : Soil: Entered (dataset median) | Weather: Measured (Open-Meteo 12mo archive, {w_dates})")
         print(f"  Decision Status: {status} ({res['confidence_label']} confidence)")
         print(f"  Top-3 Crops    : {top3_str}")
         print(f"  Primary Reason : {reasons_summary}")
@@ -139,6 +143,9 @@ def main():
     for city, state, lat, lon in LOCATIONS:
         w = weather_data[city]
         t, h, r = w["temp"], w["humidity"], w["rainfall_monthly"]
+        w_start = w.get("window_start_date", "2025-11-15")
+        w_end = w.get("window_end_date", "2026-11-14")
+        w_dates = f"{w_start} to {w_end}"
 
         res = crop_recommender_engine.recommend(
             n=None,
@@ -153,7 +160,7 @@ def main():
             season="Kharif",
             weather_source="Measured (Open-Meteo 12mo archive)",
             soil_source="Not provided",
-            window_dates="2025-11-10 to 2026-11-10",
+            window_dates=w_dates,
         )
 
         status = res["decision_status"]

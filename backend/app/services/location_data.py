@@ -1,113 +1,190 @@
 """
-Static dataset of Indian States, Districts, and Sample Villages with approximate centroid coordinates.
-Covers Telangana, Andhra Pradesh, Karnataka, and Maharashtra.
-NOTE: Village list is a representative sample and is explicitly partial.
+Grow2Gain — Location Hierarchy & Geocoding Service (Round 7c)
+Implements:
+- Strict cascading hierarchy: State -> District -> Village/Mandal
+- Official 33 Telangana and 26 Andhra Pradesh districts
+- 1,659 verified Mandal/Sub-District headquarters with Point coordinates from datta07/INDIAN-SHAPEFILES (MIT License)
+- District Centre fallback marked 'approximate district centre' when village unlisted
+- Strict validation rejecting mismatched child entries (422)
 """
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from typing import Dict, List, Optional
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+FRONTEND_DATA_DIR = Path(__file__).resolve().parent.parent.parent.parent / "frontend" / "src" / "data"
 
-INDIAN_LOCATIONS: Dict[str, Dict[str, List[Dict[str, float]]]] = {
-    "Telangana": {
-        "Warangal": [
-            {"village": "Geikonda", "lat": 17.9689, "lon": 79.5941},
-            {"village": "Dharmasagar", "lat": 17.9944, "lon": 79.4589},
-            {"village": "Atmakur", "lat": 18.0833, "lon": 79.7167},
-            {"village": "Wardhannapet", "lat": 17.7667, "lon": 79.6000},
-            {"village": "Parkal", "lat": 18.2000, "lon": 79.7167},
-        ],
-        "Karimnagar": [
-            {"village": "Choppadandi", "lat": 18.5833, "lon": 79.1667},
-            {"village": "Manakondur", "lat": 18.4000, "lon": 79.1833},
-            {"village": "Huzurabad", "lat": 18.1833, "lon": 79.3833},
-            {"village": "Jammikunta", "lat": 18.3000, "lon": 79.4667},
-        ],
-        "Nalgonda": [
-            {"village": "Miryalaguda", "lat": 16.8667, "lon": 79.5667},
-            {"village": "Devarakonda", "lat": 16.7000, "lon": 78.9167},
-            {"village": "Nakrekal", "lat": 17.1667, "lon": 79.4167},
-        ],
-        "Nizamabad": [
-            {"village": "Armoor", "lat": 18.7833, "lon": 78.2833},
-            {"village": "Bodhan", "lat": 18.6667, "lon": 77.9000},
-            {"village": "Bheemgal", "lat": 18.7167, "lon": 78.4333},
-        ],
-    },
-    "Andhra Pradesh": {
-        "Guntur": [
-            {"village": "Tenali", "lat": 16.2430, "lon": 80.6400},
-            {"village": "Mangalagiri", "lat": 16.4300, "lon": 80.5700},
-            {"village": "Sattenapalle", "lat": 16.4000, "lon": 80.1800},
-        ],
-        "Krishna": [
-            {"village": "Gudivada", "lat": 16.4300, "lon": 80.9900},
-            {"village": "Machilipatnam", "lat": 16.1800, "lon": 81.1300},
-            {"village": "Nuzvid", "lat": 16.7800, "lon": 80.8500},
-        ],
-        "Kurnool": [
-            {"village": "Nandyal", "lat": 15.4800, "lon": 78.4800},
-            {"village": "Adoni", "lat": 15.6300, "lon": 77.2800},
-            {"village": "Yemmiganur", "lat": 15.7300, "lon": 77.4800},
-        ],
-    },
-    "Karnataka": {
-        "Dharwad": [
-            {"village": "Hubballi Rural", "lat": 15.3647, "lon": 75.1240},
-            {"village": "Navalgund", "lat": 15.5667, "lon": 75.3667},
-            {"village": "Kalghatgi", "lat": 15.1833, "lon": 74.9667},
-        ],
-        "Belagavi": [
-            {"village": "Gokak", "lat": 16.1667, "lon": 74.8333},
-            {"village": "Chikkodi", "lat": 16.4333, "lon": 74.6000},
-            {"village": "Athani", "lat": 16.7333, "lon": 75.0667},
-        ],
-    },
-    "Maharashtra": {
-        "Nagpur": [
-            {"village": "Katol", "lat": 21.2667, "lon": 78.5833},
-            {"village": "Umred", "lat": 20.8500, "lon": 79.3333},
-            {"village": "Saoner", "lat": 21.3833, "lon": 78.9167},
-        ],
-        "Yavatmal": [
-            {"village": "Pusad", "lat": 19.9000, "lon": 77.5833},
-            {"village": "Darwha", "lat": 20.3167, "lon": 77.7667},
-            {"village": "Wani", "lat": 20.0667, "lon": 78.9500},
-        ],
-    },
-}
+SUBDISTRICTS_FILE = DATA_DIR / "subdistricts_villages.json"
+if not SUBDISTRICTS_FILE.exists():
+    SUBDISTRICTS_FILE = FRONTEND_DATA_DIR / "subdistricts_villages.json"
+
+DISTRICTS_FILE = FRONTEND_DATA_DIR / "india_districts.json"
+
+_VILLAGE_CACHE: Optional[Dict[str, Any]] = None
+_DISTRICTS_CACHE: Optional[Dict[str, Any]] = None
+
+# Backward compatibility alias
+INDIAN_LOCATIONS: Dict[str, Any] = {}
+
+
+def _load_data():
+    global _VILLAGE_CACHE, _DISTRICTS_CACHE, INDIAN_LOCATIONS
+    if _VILLAGE_CACHE is None and SUBDISTRICTS_FILE.exists():
+        with open(SUBDISTRICTS_FILE, "r", encoding="utf-8") as f:
+            _VILLAGE_CACHE = json.load(f).get("states", {})
+            INDIAN_LOCATIONS.update(_VILLAGE_CACHE)
+
+    if _DISTRICTS_CACHE is None and DISTRICTS_FILE.exists():
+        with open(DISTRICTS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            _DISTRICTS_CACHE = {}
+            for s in data.get("states", []):
+                s_name = s.get("state")
+                d_list = s.get("districts", [])
+                _DISTRICTS_CACHE[s_name] = {
+                    "latitude": s.get("latitude", 20.5937),
+                    "longitude": s.get("longitude", 78.9629),
+                    "districts": {
+                        d.get("name"): {
+                            "latitude": d.get("latitude", s.get("latitude", 20.5937)),
+                            "longitude": d.get("longitude", s.get("longitude", 78.9629)),
+                        }
+                        for d in d_list
+                    },
+                }
 
 
 def get_states() -> List[str]:
-    return list(INDIAN_LOCATIONS.keys())
+    _load_data()
+    preferred_order = ["Telangana", "Andhra Pradesh", "Karnataka", "Maharashtra"]
+    all_states = list(_DISTRICTS_CACHE.keys()) if _DISTRICTS_CACHE else preferred_order
+    res = [s for s in preferred_order if s in all_states]
+    res.extend([s for s in all_states if s not in res])
+    return res
 
 
 def get_districts(state: str) -> List[str]:
-    state_data = INDIAN_LOCATIONS.get(state)
-    if not state_data:
+    _load_data()
+    if not _DISTRICTS_CACHE or state not in _DISTRICTS_CACHE:
+        # Fallback to village cache if available
+        if _VILLAGE_CACHE and state in _VILLAGE_CACHE:
+            return list(_VILLAGE_CACHE[state].keys())
         return []
-    return list(state_data.keys())
+    return list(_DISTRICTS_CACHE[state]["districts"].keys())
 
 
-def get_villages(state: str, district: str) -> List[Dict[str, float]]:
-    state_data = INDIAN_LOCATIONS.get(state)
-    if not state_data:
-        return []
-    return state_data.get(district, [])
+def get_district_centroid(state: str, district: str) -> Dict[str, float]:
+    _load_data()
+    if _DISTRICTS_CACHE and state in _DISTRICTS_CACHE:
+        dists = _DISTRICTS_CACHE[state]["districts"]
+        if district in dists:
+            return dists[district]
+        return {
+            "latitude": _DISTRICTS_CACHE[state]["latitude"],
+            "longitude": _DISTRICTS_CACHE[state]["longitude"],
+        }
+    return {"latitude": 17.9689, "longitude": 79.5941}
+
+
+def get_villages(state: str, district: str) -> List[Dict[str, Any]]:
+    _load_data()
+    centroid = get_district_centroid(state, district)
+    dist_centre_entry = {
+        "village": "District Centre",
+        "lat": centroid["latitude"],
+        "lon": centroid["longitude"],
+        "precision": "approximate district centre",
+        "is_district_centre": True,
+    }
+
+    villages: List[Dict[str, Any]] = [dist_centre_entry]
+
+    if _VILLAGE_CACHE and state in _VILLAGE_CACHE:
+        state_mandals = _VILLAGE_CACHE[state]
+        # Match district case-insensitively
+        matched_dist = next((d for d in state_mandals if d.lower() == district.lower()), None)
+        if matched_dist:
+            for m in state_mandals[matched_dist]:
+                villages.append({
+                    "village": m["name"],
+                    "lat": m["latitude"],
+                    "lon": m["longitude"],
+                    "precision": "village",
+                    "is_district_centre": False,
+                })
+
+    return villages
+
+
+def validate_location_hierarchy(
+    state: Optional[str],
+    district: Optional[str],
+    village: Optional[str],
+) -> Tuple[bool, Optional[str], Optional[str]]:
+    """
+    Validates State -> District -> Village hierarchy.
+    Returns (is_valid, invalid_field_name, error_message).
+    """
+    _load_data()
+    if not state:
+        return True, None, None
+
+    valid_states = get_states()
+    matched_state = next((s for s in valid_states if s.lower() == state.lower()), None)
+    if not matched_state:
+        return False, "state", f"State '{state}' is not recognized in location directory."
+
+    if not district:
+        return True, None, None
+
+    valid_districts = get_districts(matched_state)
+    matched_district = next((d for d in valid_districts if d.lower() == district.lower()), None)
+    if not matched_district:
+        return (
+            False,
+            "district",
+            f"District '{district}' is not valid for state '{matched_state}'.",
+        )
+
+    if not village:
+        return True, None, None
+
+    # Check village validity
+    v_clean = village.strip().lower()
+    # Accept district centre variants
+    if v_clean in ("district centre", "approximate district centre", "district centre (approximate district centre)"):
+        return True, None, None
+
+    allowed_villages = get_villages(matched_state, matched_district)
+    # Check if village name matches any entry
+    matched_v = next((v for v in allowed_villages if v["village"].strip().lower() == v_clean), None)
+    if not matched_v:
+        # Check if it was in any other district of the state (to give explicit error)
+        other_dist = None
+        if _VILLAGE_CACHE and matched_state in _VILLAGE_CACHE:
+            for d_name, m_list in _VILLAGE_CACHE[matched_state].items():
+                if d_name.lower() != matched_district.lower():
+                    if any(m["name"].strip().lower() == v_clean for m in m_list):
+                        other_dist = d_name
+                        break
+
+        detail_msg = f"Village '{village}' is not in chosen district '{matched_district}'."
+        if other_dist:
+            detail_msg += f" (Note: '{village}' belongs to district '{other_dist}')."
+
+        return False, "village", detail_msg
+
+    return True, None, None
 
 
 def find_approx_centroid(query: str) -> Optional[Dict[str, float]]:
+    _load_data()
     q = query.strip().lower()
-    for state, districts in INDIAN_LOCATIONS.items():
-        if q in state.lower():
-            # Return first district's first village
-            first_dist = list(districts.keys())[0]
-            v = districts[first_dist][0]
-            return {"name": state, "lat": v["lat"], "lon": v["lon"]}
-        for district, villages in districts.items():
-            if q in district.lower():
-                v = villages[0]
-                return {"name": f"{district}, {state}", "lat": v["lat"], "lon": v["lon"]}
-            for v in villages:
-                if q in v["village"].lower():
-                    return {"name": f"{v['village']}, {district}, {state}", "lat": v["lat"], "lon": v["lon"]}
+    if _DISTRICTS_CACHE:
+        for s_name, s_data in _DISTRICTS_CACHE.items():
+            if q == s_name.lower():
+                return {"name": s_name, "lat": s_data["latitude"], "lon": s_data["longitude"]}
+            for d_name, d_coords in s_data["districts"].items():
+                if q == d_name.lower() or d_name.lower() in q:
+                    return {"name": f"{d_name}, {s_name}", "lat": d_coords["latitude"], "lon": d_coords["longitude"]}
     return None
-

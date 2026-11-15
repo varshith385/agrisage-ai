@@ -31,6 +31,7 @@ import {
   getIndianStates,
   getDistrictsForState,
   getDistrictCoordinates,
+  getVillagesForDistrict,
   getLocalizedStateName,
   getLocalizedDistrictName,
 } from '../utils/indiaGeo';
@@ -69,6 +70,7 @@ export const FarmRegistrationPage: React.FC = () => {
   const [latitude, setLatitude] = useState<number>(17.9689);
   const [longitude, setLongitude] = useState<number>(79.5941);
   const [isCoordFallback, setIsCoordFallback] = useState<boolean>(false);
+  const [precisionLevel, setPrecisionLevel] = useState<'village' | 'approximate district centre'>('approximate district centre');
 
   // Edit Farm State
   const [editingFarm, setEditingFarm] = useState<Farm | null>(null);
@@ -76,10 +78,11 @@ export const FarmRegistrationPage: React.FC = () => {
   const [editArea, setEditArea] = useState<number>(0);
   const [editState, setEditState] = useState<string>('Telangana');
   const [editDistrict, setEditDistrict] = useState<string>('Warangal');
-  const [editVillage, setEditVillage] = useState<string>('');
+  const [editVillage, setEditVillage] = useState<string>('Dharmasagar');
   const [editLatitude, setEditLatitude] = useState<number>(17.9689);
   const [editLongitude, setEditLongitude] = useState<number>(79.5941);
   const [editIsFallback, setEditIsFallback] = useState<boolean>(false);
+  const [editPrecisionLevel, setEditPrecisionLevel] = useState<'village' | 'approximate district centre'>('approximate district centre');
   const [isSavingEdit, setIsSavingEdit] = useState<boolean>(false);
   const [editError, setEditError] = useState<string | null>(null);
 
@@ -89,35 +92,57 @@ export const FarmRegistrationPage: React.FC = () => {
     if (districts.length > 0) {
       const firstDistrict = districts[0];
       setDistrict(firstDistrict.name);
-      setLatitude(firstDistrict.latitude);
-      setLongitude(firstDistrict.longitude);
+      const villages = getVillagesForDistrict(newState, firstDistrict.name);
+      const defaultVillage = villages[0];
+      setVillage(defaultVillage.village);
+      setLatitude(defaultVillage.latitude);
+      setLongitude(defaultVillage.longitude);
+      setPrecisionLevel(defaultVillage.precision);
       setIsCoordFallback(Boolean(firstDistrict.is_fallback));
     } else {
       setDistrict('');
+      setVillage('');
       const coords = getDistrictCoordinates(newState, '');
       setLatitude(coords.latitude);
       setLongitude(coords.longitude);
+      setPrecisionLevel('approximate district centre');
       setIsCoordFallback(true);
     }
   };
 
   const handleDistrictChange = (newDistrict: string) => {
     setDistrict(newDistrict);
+    const villages = getVillagesForDistrict(state, newDistrict);
+    const defaultVillage = villages[0];
+    setVillage(defaultVillage.village);
+    setLatitude(defaultVillage.latitude);
+    setLongitude(defaultVillage.longitude);
+    setPrecisionLevel(defaultVillage.precision);
     const coords = getDistrictCoordinates(state, newDistrict);
-    setLatitude(coords.latitude);
-    setLongitude(coords.longitude);
     setIsCoordFallback(coords.isFallback);
+  };
+
+  const handleVillageChange = (newVillage: string) => {
+    setVillage(newVillage);
+    const villages = getVillagesForDistrict(state, district);
+    const found = villages.find((v) => v.village.toLowerCase() === newVillage.toLowerCase());
+    if (found) {
+      setLatitude(found.latitude);
+      setLongitude(found.longitude);
+      setPrecisionLevel(found.precision);
+    }
   };
 
   const startEditFarm = (f: Farm) => {
     setEditingFarm(f);
     setEditName(f.name);
     setEditArea(f.area);
-    setEditVillage(f.village || '');
+    setEditVillage(f.village || 'District Centre');
     setEditState(f.state);
     setEditDistrict(f.district);
     setEditLatitude(f.latitude);
     setEditLongitude(f.longitude);
+    setEditPrecisionLevel(f.village && f.village !== 'District Centre' ? 'village' : 'approximate district centre');
     setEditIsFallback(false);
     setEditError(null);
   };
@@ -128,24 +153,45 @@ export const FarmRegistrationPage: React.FC = () => {
     if (districts.length > 0) {
       const firstDistrict = districts[0];
       setEditDistrict(firstDistrict.name);
-      setEditLatitude(firstDistrict.latitude);
-      setEditLongitude(firstDistrict.longitude);
+      const villages = getVillagesForDistrict(newState, firstDistrict.name);
+      const defaultVillage = villages[0];
+      setEditVillage(defaultVillage.village);
+      setEditLatitude(defaultVillage.latitude);
+      setEditLongitude(defaultVillage.longitude);
+      setEditPrecisionLevel(defaultVillage.precision);
       setEditIsFallback(Boolean(firstDistrict.is_fallback));
     } else {
       setEditDistrict('');
+      setEditVillage('');
       const coords = getDistrictCoordinates(newState, '');
       setEditLatitude(coords.latitude);
       setEditLongitude(coords.longitude);
+      setEditPrecisionLevel('approximate district centre');
       setEditIsFallback(true);
     }
   };
 
   const handleEditDistrictChange = (newDistrict: string) => {
     setEditDistrict(newDistrict);
+    const villages = getVillagesForDistrict(editState, newDistrict);
+    const defaultVillage = villages[0];
+    setEditVillage(defaultVillage.village);
+    setEditLatitude(defaultVillage.latitude);
+    setEditLongitude(defaultVillage.longitude);
+    setEditPrecisionLevel(defaultVillage.precision);
     const coords = getDistrictCoordinates(editState, newDistrict);
-    setEditLatitude(coords.latitude);
-    setEditLongitude(coords.longitude);
     setEditIsFallback(coords.isFallback);
+  };
+
+  const handleEditVillageChange = (newVillage: string) => {
+    setEditVillage(newVillage);
+    const villages = getVillagesForDistrict(editState, editDistrict);
+    const found = villages.find((v) => v.village.toLowerCase() === newVillage.toLowerCase());
+    if (found) {
+      setEditLatitude(found.latitude);
+      setEditLongitude(found.longitude);
+      setEditPrecisionLevel(found.precision);
+    }
   };
 
   const handleSaveEdit = async (e: React.FormEvent) => {
@@ -857,17 +903,21 @@ export const FarmRegistrationPage: React.FC = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="farm-village-input">
-                          {t('farms.village_label', { defaultValue: 'Village' })}
+                        <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="farm-village-select">
+                          {t('farms.village_label', { defaultValue: 'Village / Mandal' })}
                         </label>
-                        <input
-                          id="farm-village-input"
-                          type="text"
+                        <select
+                          id="farm-village-select"
                           value={village}
-                          onChange={(e) => setVillage(e.target.value)}
-                          placeholder="Village or Mandal"
-                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
-                        />
+                          onChange={(e) => handleVillageChange(e.target.value)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs bg-white text-[#183D2E] font-medium"
+                        >
+                          {getVillagesForDistrict(state, district).map((v) => (
+                            <option key={v.village} value={v.village}>
+                              {v.village} {v.is_district_centre ? '(District Centre)' : ''}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
@@ -877,8 +927,12 @@ export const FarmRegistrationPage: React.FC = () => {
                           <label className="block text-xs font-bold text-[#183D2E]" htmlFor="farm-latitude-input">
                             {t('farms.latitude_label', { defaultValue: 'Latitude' })}
                           </label>
-                          <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                            approximate district centre
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
+                            precisionLevel === 'village'
+                              ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
+                              : 'text-[#7A553A] bg-amber-50 border border-amber-200'
+                          }`}>
+                            {precisionLevel}
                           </span>
                         </div>
                         <input
@@ -895,8 +949,12 @@ export const FarmRegistrationPage: React.FC = () => {
                           <label className="block text-xs font-bold text-[#183D2E]" htmlFor="farm-longitude-input">
                             {t('farms.longitude_label', { defaultValue: 'Longitude' })}
                           </label>
-                          <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                            approximate district centre
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
+                            precisionLevel === 'village'
+                              ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
+                              : 'text-[#7A553A] bg-amber-50 border border-amber-200'
+                          }`}>
+                            {precisionLevel}
                           </span>
                         </div>
                         <input
@@ -1150,16 +1208,21 @@ export const FarmRegistrationPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#183D2E] mb-1">
-                  {t('farms.village_label', { defaultValue: 'Village' })}
+                <label className="block text-xs font-bold text-[#183D2E] mb-1" htmlFor="edit-farm-village-select">
+                  {t('farms.village_label', { defaultValue: 'Village / Mandal' })}
                 </label>
-                <input
-                  type="text"
+                <select
+                  id="edit-farm-village-select"
                   value={editVillage}
-                  onChange={(e) => setEditVillage(e.target.value)}
-                  placeholder="Village or Mandal"
-                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs"
-                />
+                  onChange={(e) => handleEditVillageChange(e.target.value)}
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#7A553A]/30 text-xs bg-white text-[#183D2E] font-medium"
+                >
+                  {getVillagesForDistrict(editState, editDistrict).map((v) => (
+                    <option key={v.village} value={v.village}>
+                      {v.village} {v.is_district_centre ? '(District Centre)' : ''}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -1168,8 +1231,12 @@ export const FarmRegistrationPage: React.FC = () => {
                     <label className="block text-xs font-bold text-[#183D2E]">
                       {t('farms.latitude_label', { defaultValue: 'Latitude' })}
                     </label>
-                    <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                      approximate district centre
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
+                      editPrecisionLevel === 'village'
+                        ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
+                        : 'text-[#7A553A] bg-amber-50 border border-amber-200'
+                    }`}>
+                      {editPrecisionLevel}
                     </span>
                   </div>
                   <input
@@ -1185,8 +1252,12 @@ export const FarmRegistrationPage: React.FC = () => {
                     <label className="block text-xs font-bold text-[#183D2E]">
                       {t('farms.longitude_label', { defaultValue: 'Longitude' })}
                     </label>
-                    <span className="text-[10px] text-[#7A553A] font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                      approximate district centre
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
+                      editPrecisionLevel === 'village'
+                        ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
+                        : 'text-[#7A553A] bg-amber-50 border border-amber-200'
+                    }`}>
+                      {editPrecisionLevel}
                     </span>
                   </div>
                   <input

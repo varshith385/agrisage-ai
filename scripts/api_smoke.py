@@ -35,6 +35,7 @@ def run_smoke_tests():
             "status": status_code,
             "summary": summary,
             "passed": is_pass,
+            "expected_status": expected_status,
         })
         status_marker = "PASS" if is_pass else "FAIL"
         print(f"[{status_marker}] {status_code} {method:<4} {path} — {summary}")
@@ -97,7 +98,9 @@ def run_smoke_tests():
 
     # 12. Weather Suitability
     r = client.get("/api/v1/weather/suitability?crop=cotton&lat=17.9689&lon=79.5941")
-    record("GET", "/api/v1/weather/suitability?crop=cotton&lat=17.9689&lon=79.5941", r.status_code, f"Suitability: {r.json().get('suitability_score')}%")
+    suit_val = r.json().get("value")
+    suit_conf = r.json().get("confidence")
+    record("GET", "/api/v1/weather/suitability?crop=cotton&lat=17.9689&lon=79.5941", r.status_code, f"Suitability: {suit_val} (Conf: {suit_conf})")
 
     # 13. Irrigation Plan (POST)
     irr_payload = {
@@ -127,7 +130,10 @@ def run_smoke_tests():
             files = {"file": ("Tomato___Early_blight_sample.jpg", f, "image/jpeg")}
             data = {"crop_hint": "Tomato", "farm_id": str(farm_id)}
             r = client.post("/api/v1/disease/predict", files=files, data=data)
-            record("POST", "/api/v1/disease/predict", r.status_code, f"Disease: {r.json().get('disease_name')}, Conf: {r.json().get('confidence')}")
+            dis_res = r.json()
+            dis_name = dis_res.get("predicted_disease") or dis_res.get("disease_name")
+            dis_conf = dis_res.get("prediction_confidence") or dis_res.get("confidence")
+            record("POST", "/api/v1/disease/predict", r.status_code, f"Disease: {dis_name}, Conf: {dis_conf}")
     else:
         record("POST", "/api/v1/disease/predict", 0, "Sample image not found on disk")
 
@@ -145,6 +151,7 @@ def run_smoke_tests():
         "season": "Kharif",
         "farm_id": farm_id,
     }
+    print(f"\n[INFO] Sending POST /api/v1/recommend/crop with payload: {crop_payload}")
     r = client.post("/api/v1/recommend/crop", json=crop_payload)
     recs = [c["crop_name"] for c in r.json().get("top_crops", [])] if r.status_code == 200 else []
     record("POST", "/api/v1/recommend/crop", r.status_code, f"Top-3: {', '.join(recs)}")
@@ -159,7 +166,9 @@ def run_smoke_tests():
         "farm_id": farm_id,
     }
     r = client.post("/api/v1/yield/predict", json=yield_payload)
-    record("POST", "/api/v1/yield/predict", r.status_code, f"Predicted: {r.json().get('predicted_yield_q_per_acre')} q/acre")
+    y_res = r.json()
+    exp_yield = y_res.get("expected_yield_quintals_per_acre") or y_res.get("predicted_yield_q_per_acre")
+    record("POST", "/api/v1/yield/predict", r.status_code, f"Expected: {exp_yield} q/acre")
 
     # 19. Advisory Stage
     r = client.get("/api/v1/advisory/stage?crop=cotton&planting_date=2026-08-15")
@@ -171,7 +180,9 @@ def run_smoke_tests():
 
     # 21. Advisory Plan (POST)
     r = client.post("/api/v1/advisory/plan", json={"farm_id": farm_id})
-    record("POST", "/api/v1/advisory/plan", r.status_code, f"Score: {r.json().get('farm_health_score')}/100, Plan: {len(r.json().get('plan_days', []))} days")
+    score_obj = r.json().get("farm_health_score") or {}
+    score_val = score_obj.get("score") if isinstance(score_obj, dict) else score_obj
+    record("POST", "/api/v1/advisory/plan", r.status_code, f"Score: {score_val}/100, Plan: {len(r.json().get('plan_days', []))} days")
 
     # 22. Economics Templates
     r = client.get("/api/v1/economics/templates")
@@ -210,15 +221,20 @@ def run_smoke_tests():
 
     # 26. Rotation Recommend
     r = client.get("/api/v1/rotation/recommend?previous_crop=Cotton")
-    record("GET", "/api/v1/rotation/recommend?previous_crop=Cotton", r.status_code, f"{len(r.json().get('recommended_successors', []))} successor options")
+    rot_list = r.json().get("recommended_rotations") or r.json().get("recommended_successors") or []
+    record("GET", "/api/v1/rotation/recommend?previous_crop=Cotton", r.status_code, f"{len(rot_list)} rotation option(s)")
 
     # 27. Calendar Season
     r = client.get("/api/v1/calendar/season?month=11&lat=17.9689&lon=79.5941")
-    record("GET", "/api/v1/calendar/season", r.status_code, f"Season: {r.json().get('season_name')}")
+    season_name = r.json().get("current_season") or r.json().get("season_name")
+    record("GET", "/api/v1/calendar/season", r.status_code, f"Season: {season_name}")
 
     # 28. Calendar Events
     r = client.get("/api/v1/calendar/events?crop_name=Cotton")
-    record("GET", "/api/v1/calendar/events?crop_name=Cotton", r.status_code, f"{len(r.json().get('milestones', []))} lifecycle milestones")
+    cal_data = r.json()
+    stages = cal_data.get("lifecycle_stages") or cal_data.get("milestones") or []
+    events = cal_data.get("events") or []
+    record("GET", "/api/v1/calendar/events?crop_name=Cotton", r.status_code, f"{len(stages)} stage(s), {len(events)} event(s)")
 
     # 29. Calendar ICS Export
     r = client.get("/api/v1/calendar/export.ics?crop_name=Cotton")
@@ -226,7 +242,11 @@ def run_smoke_tests():
 
     # 30. Market Prices
     r = client.get("/api/v1/market/prices?crop=Cotton")
-    record("GET", "/api/v1/market/prices?crop=Cotton", r.status_code, f"Modal price: ₹{r.json().get('modal_price')}")
+    prices_data = r.json()
+    modal_price = prices_data.get("modal_price")
+    if modal_price is None and "prices" in prices_data and len(prices_data["prices"]) > 0:
+        modal_price = prices_data["prices"][0].get("modal_price")
+    record("GET", "/api/v1/market/prices?crop=Cotton", r.status_code, f"Modal price: ₹{modal_price}")
 
     # 31. Market Ranking
     r = client.get("/api/v1/market/ranking?crop=Cotton&quantity=10&lat=17.9689&lon=79.5941")
@@ -234,7 +254,8 @@ def run_smoke_tests():
 
     # 32. Market MSP
     r = client.get("/api/v1/market/msp?crop=Cotton&expected_price=7100")
-    record("GET", "/api/v1/market/msp?crop=Cotton", r.status_code, f"MSP: ₹{r.json().get('msp_benchmark')}")
+    msp_lbl = r.json().get("status_label") or r.json().get("status")
+    record("GET", "/api/v1/market/msp?crop=Cotton", r.status_code, f"Status: {msp_lbl} (verified: {r.json().get('msp_verified')})")
 
     # 33. Market Trends
     r = client.get("/api/v1/market/trends?crop=Cotton")
@@ -307,7 +328,8 @@ def run_smoke_tests():
         expert_token = expert_login.json()["access_token"]
         expert_headers = {"Authorization": f"Bearer {expert_token}"}
         r = client.get("/api/v1/outbreaks/district-summary?district=Warangal&state=Telangana", headers=expert_headers)
-        record("GET", "/api/v1/outbreaks/district-summary (Expert)", r.status_code, f"Alert Level: {r.json().get('alert_level')}")
+        total_cases = r.json().get("total_cases_in_district", 0)
+        record("GET", "/api/v1/outbreaks/district-summary (Expert)", r.status_code, f"Cases in district: {total_cases}")
     else:
         record("GET", "/api/v1/outbreaks/district-summary (Expert)", expert_login.status_code, "Expert login failed")
 
@@ -345,13 +367,30 @@ def run_smoke_tests():
 
     # 55. Agent Run Trigger (POST)
     r = client.post("/api/v1/agents/run", json={"farm_id": farm_id})
-    record("POST", "/api/v1/agents/run", r.status_code, f"Status: {r.json().get('status')}, Agents: {len(r.json().get('agent_runs', []))}")
+    agents_res = r.json()
+    env_count = len(agents_res.get("envelopes", [])) or len(agents_res.get("agent_runs", []))
+    record("POST", "/api/v1/agents/run", r.status_code, f"Status: {agents_res.get('status')}, Agents: {env_count} run")
 
-    # Print summary table
+    # Separate standard endpoints and expected RBAC 403 guard endpoints
+    std_endpoints = [r for r in results if 403 not in r.get("expected_status", (200,))]
+    rbac_endpoints = [r for r in results if 403 in r.get("expected_status", (200,))]
+
     print("\n" + "=" * 95)
-    print(f"{'Method':<6} | {'Endpoint':<45} | {'Status':<6} | {'Result Summary':<32}")
+    print("STANDARD API ENDPOINTS (EXPECTED 200/201/204)")
     print("=" * 95)
-    for item in results:
+    print(f"{'Method':<6} | {'Endpoint':<45} | {'Status':<6} | {'Result Summary':<32}")
+    print("-" * 95)
+    for item in std_endpoints:
+        status_str = str(item["status"])
+        assert "None" not in item["summary"], f"Summary for {item['path']} contains unexpected None: {item['summary']}"
+        print(f"{item['method']:<6} | {item['path'][:45]:<45} | {status_str:<6} | {item['summary'][:32]:<32}")
+
+    print("\n" + "=" * 95)
+    print("ROLE-BASED ACCESS CONTROL (RBAC) GUARDS (EXPECTED 403 FORBIDDEN)")
+    print("=" * 95)
+    print(f"{'Method':<6} | {'Endpoint':<45} | {'Status':<6} | {'Result Summary':<32}")
+    print("-" * 95)
+    for item in rbac_endpoints:
         status_str = str(item["status"])
         print(f"{item['method']:<6} | {item['path'][:45]:<45} | {status_str:<6} | {item['summary'][:32]:<32}")
     print("=" * 95)
@@ -361,7 +400,7 @@ def run_smoke_tests():
         print(f"\nFAILURE COUNT: {len(failures)} endpoint(s) failed!")
         sys.exit(1)
     else:
-        print(f"\nSUCCESS: All {len(results)} tested endpoints passed verification!")
+        print(f"\nSUCCESS: All {len(results)} tested endpoints passed verification ({len(std_endpoints)} standard + {len(rbac_endpoints)} RBAC guards)!")
 
 
 if __name__ == "__main__":

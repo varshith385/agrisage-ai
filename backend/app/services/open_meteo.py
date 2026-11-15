@@ -241,8 +241,10 @@ async def get_climate_normals(lat: float, lon: float) -> Dict[str, Any]:
     lat_bin = round(lat, 2)
     lon_bin = round(lon, 2)
     now_utc = datetime.now(timezone.utc)
-    current_month = now_utc.strftime("%Y-%m")
-    cache_key = f"{lat_bin}_{lon_bin}_{current_month}"
+    # Trailing 365 complete days window
+    end_date = (now_utc - timedelta(days=1)).strftime("%Y-%m-%d")
+    start_date = (now_utc - timedelta(days=365)).strftime("%Y-%m-%d")
+    cache_key = f"{lat_bin}_{lon_bin}_{start_date}_{end_date}"
 
     if cache_key in CLIMATE_NORMALS_CACHE:
         return CLIMATE_NORMALS_CACHE[cache_key]
@@ -256,6 +258,8 @@ async def get_climate_normals(lat: float, lon: float) -> Dict[str, Any]:
                 pre_data = json.load(f)
                 for loc_name, loc_info in pre_data.items():
                     if abs(loc_info["lat"] - lat) < 0.20 and abs(loc_info["lon"] - lon) < 0.20:
+                        w_start = loc_info.get("window_start_date", start_date)
+                        w_end = loc_info.get("window_end_date", end_date)
                         result = {
                             "latitude": lat_bin,
                             "longitude": lon_bin,
@@ -264,9 +268,9 @@ async def get_climate_normals(lat: float, lon: float) -> Dict[str, Any]:
                             "mean_relative_humidity_pct": float(loc_info["humidity"]),
                             "mean_monthly_rainfall_mm": float(loc_info["rainfall_monthly"]),
                             "annual_rainfall_mm": float(loc_info["rainfall_annual"]),
-                            "window_start_date": "2025-11-10",
-                            "window_end_date": "2026-11-10",
-                            "window_days": int(loc_info.get("days", 366)),
+                            "window_start_date": w_start,
+                            "window_end_date": w_end,
+                            "window_days": int(loc_info.get("days", 365)),
                             "source": "Open-Meteo Historical Archive API (trailing 12 months)",
                             "formula_note": "mean monthly rainfall = 12-month total precipitation / 12.0",
                         }

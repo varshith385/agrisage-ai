@@ -221,3 +221,86 @@ def test_trained_artifacts_exist_non_empty_and_loadable():
     model_weather = joblib.load(ARTIFACTS_DIR / "crop_recommender_weather_only.joblib")
     assert hasattr(model_weather, "predict") or hasattr(model_weather, "predict_proba") or "model" in model_weather
 
+
+def test_probability_55_percent_is_not_confident():
+    """
+    Round 7c Test: Verifies that a top-1 probability of 0.55 (p < 0.70) is NEVER
+    labeled as CONFIDENT under the unified threshold rule (p >= 0.70 and gap >= 0.30).
+    It must be categorized as LOW_CONFIDENCE with Medium confidence level.
+    """
+    from unittest.mock import MagicMock
+    import numpy as np
+
+    # Test via engine with mock model returning p=0.55
+    orig_model = crop_recommender_engine.full_bundle["model"]
+    try:
+        mock_model = MagicMock()
+        # Mock 22 class probabilities where top1 = 0.55, top2 = 0.25 (gap = 0.30, but p < 0.70)
+        n_classes = len(crop_recommender_engine.full_bundle["classes"])
+        probs = np.zeros((1, n_classes))
+        probs[0, 0] = 0.55
+        probs[0, 1] = 0.25
+        remaining = 1.0 - 0.55 - 0.25
+        probs[0, 2:] = remaining / (n_classes - 2)
+        mock_model.predict_proba.return_value = probs
+
+        crop_recommender_engine.full_bundle["model"] = mock_model
+
+        res = crop_recommender_engine.recommend(
+            n=50.0, p=50.0, k=50.0, ph=6.5, temperature=26.0, humidity=70.0, rainfall=120.0
+        )
+        assert res["decision_status"] != "CONFIDENT", f"Expected LOW_CONFIDENCE for p=0.55, got {res['decision_status']}"
+        assert res["decision_status"] == "LOW_CONFIDENCE"
+        assert res["confidence_label"] == "Medium"
+    finally:
+        crop_recommender_engine.full_bundle["model"] = orig_model
+
+
+def test_missing_model_files_returns_model_unavailable_status():
+    """
+    Round 7c Test: If model files are missing or unreadable, return status MODEL_UNAVAILABLE
+    with no crop recommendations.
+    """
+    from backend.app.ml.crop_recommender import CropRecommenderEngine
+
+    engine = CropRecommenderEngine()
+    engine.is_loaded = False
+    engine.full_bundle = None
+    engine.weather_bundle = None
+    engine.load_error = "Model artifacts missing in model_artifacts directory."
+
+    res = engine.recommend(
+        n=50.0, p=50.0, k=50.0, ph=6.5, temperature=25.0, humidity=70.0, rainfall=100.0
+    )
+    assert res["status"] == "MODEL_UNAVAILABLE"
+    assert res["decision_status"] == "MODEL_UNAVAILABLE"
+    assert len(res["top_crops"]) == 0
+    assert res["confidence"] == 0.0
+
+
+def test_no_hardcoded_confidence_fallback_in_crop_recommender():
+    """
+    Round 7c Test: Verifies that no hard-coded confidence assignments (0.50, 0.5, 0.88, max(0.88))
+    exist in crop_recommender.py.
+    """
+    import re
+    project_root = Path(__file__).resolve().parent.parent.parent
+    recommender_path = project_root / "backend" / "app" / "ml" / "crop_recommender.py"
+    with open(recommender_path, "r", encoding="utf-8") as f:
+        code = f.read()
+
+    # Pattern checking for assignments to confidence or confidence_score
+    forbidden_patterns = [
+        r"confidence_score\s*=\s*0\.50",
+        r"confidence_score\s*=\s*0\.5\b",
+        r"confidence_score\s*=\s*0\.88",
+        r"max\(\s*0\.88",
+        r"confidence\s*=\s*0\.50\b",
+        r"confidence\s*=\s*0\.88\b",
+    ]
+
+    for pat in forbidden_patterns:
+        match = re.search(pat, code)
+        assert match is None, f"Found forbidden hard-coded confidence pattern '{pat}' in crop_recommender.py: {match}"
+
+

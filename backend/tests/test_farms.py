@@ -95,3 +95,44 @@ def test_list_and_get_farms(client: TestClient, farmer_headers: dict):
     assert get_res.status_code == 200
     assert get_res.json()["name"] == "Sunrise Farm"
 
+
+def test_create_farm_rejects_village_not_in_district(client: TestClient, farmer_headers: dict):
+    # Khammam district with Dharmasagar (which belongs to Warangal) -> MUST be rejected (422)
+    bad_payload = {
+        "name": "Mismatched Village Farm",
+        "area": 5.0,
+        "ownership_type": "owned",
+        "state": "Telangana",
+        "district": "Khammam",
+        "village": "Dharmasagar",
+        "latitude": 17.9944,
+        "longitude": 79.4589,
+    }
+    res = client.post("/api/v1/farms", json=bad_payload, headers=farmer_headers)
+    assert res.status_code == 422
+    data = res.json()
+    assert "detail" in data
+    assert data["detail"]["field"] == "village"
+    assert "Khammam" in data["detail"]["message"]
+
+
+def test_create_farm_rejects_district_not_in_state(client: TestClient, farmer_headers: dict):
+    # Telangana state with Jaipur (which belongs to Rajasthan) -> MUST be rejected (422)
+    bad_payload = {
+        "name": "Mismatched District Farm",
+        "area": 5.0,
+        "ownership_type": "owned",
+        "state": "Telangana",
+        "district": "Jaipur",
+        "village": "District Centre",
+        "latitude": 26.91,
+        "longitude": 75.79,
+    }
+    res = client.post("/api/v1/farms", json=bad_payload, headers=farmer_headers)
+    assert res.status_code == 422
+    data = res.json()
+    assert "detail" in data
+    assert data["detail"]["field"] == "district"
+    assert "Jaipur" in data["detail"]["message"]
+
+

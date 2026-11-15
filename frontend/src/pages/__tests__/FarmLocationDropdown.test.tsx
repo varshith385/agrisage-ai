@@ -193,4 +193,40 @@ describe('Phase 5: State & District Cascading Dropdowns with Verified Coordinate
       }));
     });
   });
+
+  it('chains State -> District -> Village/Mandal dropdowns and updates precision level to village', async () => {
+    renderWithProviders();
+
+    // Jump to Step 3
+    fireEvent.click(await screen.findByRole('button', { name: /3\. Location & GPS/i }));
+
+    const stateSelect = screen.getByLabelText(/state/i) as HTMLSelectElement;
+    const districtSelect = screen.getByLabelText(/district/i) as HTMLSelectElement;
+    const villageSelect = screen.getByLabelText(/village/i) as HTMLSelectElement;
+
+    expect(stateSelect.value).toBe('Telangana');
+    expect(districtSelect.value).toBe('Warangal');
+
+    // Village dropdown options for Warangal include Dharmasagar, Narsampet, etc.
+    const options = Array.from(villageSelect.options).map((o) => o.value);
+    expect(options).toContain('Dharmasagar');
+    expect(options).toContain('Wardhannapet');
+    expect(options).not.toContain('Madhira'); // Madhira is in Khammam!
+
+    // Select Wardhannapet
+    fireEvent.change(villageSelect, { target: { value: 'Wardhannapet' } });
+    expect(villageSelect.value).toBe('Wardhannapet');
+
+    // Precision badge should display village
+    expect(screen.getAllByText('village').length).toBeGreaterThanOrEqual(1);
+
+    // Change district to Khammam
+    fireEvent.change(districtSelect, { target: { value: 'Khammam' } });
+    expect(districtSelect.value).toBe('Khammam');
+
+    // Village options for Khammam now contain Madhira, but not Wardhannapet
+    const khammamOptions = Array.from(villageSelect.options).map((o) => o.value);
+    expect(khammamOptions).toContain('Madhira');
+    expect(khammamOptions).not.toContain('Wardhannapet');
+  });
 });

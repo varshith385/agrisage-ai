@@ -6,6 +6,7 @@ from backend.app.models.user import User
 from backend.app.models.farm import Farm
 from backend.app.schemas.farm import FarmCreate, FarmUpdate, FarmResponse
 from backend.app.security.auth import get_current_user
+from backend.app.services.location_data import validate_location_hierarchy
 
 router = APIRouter(prefix="/farms", tags=["Farms"])
 
@@ -25,6 +26,19 @@ def create_farm(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    # Enforce strict hierarchy: State -> District -> Village
+    is_valid, err_field, err_msg = validate_location_hierarchy(
+        state=farm_in.state, district=farm_in.district, village=farm_in.village
+    )
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "field": err_field,
+                "message": err_msg,
+            },
+        )
+
     farm = Farm(
         user_id=current_user.id,
         name=farm_in.name,
@@ -79,6 +93,22 @@ def update_farm(
         )
 
     update_data = farm_in.model_dump(exclude_unset=True)
+
+    # Validate location hierarchy on update if any location field is modified
+    new_state = update_data.get("state", farm.state)
+    new_district = update_data.get("district", farm.district)
+    new_village = update_data.get("village", farm.village)
+    is_valid, err_field, err_msg = validate_location_hierarchy(
+        state=new_state, district=new_district, village=new_village
+    )
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "field": err_field,
+                "message": err_msg,
+            },
+        )
 
     # Validate ownership consistency on update
     new_area = update_data.get("area", farm.area)

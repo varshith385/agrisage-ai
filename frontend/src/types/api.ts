@@ -3,7 +3,7 @@ export type Language = 'en' | 'te' | 'hi';
 export type OwnershipType = 'owned' | 'leased' | 'mixed';
 export type IrrigationMethod = 'flood' | 'furrow' | 'sprinkler' | 'drip';
 export type CropStage = 'germination' | 'vegetative' | 'flowering' | 'fruiting' | 'maturity';
-export type FeatureStatus = 'WORKING' | 'PARTIAL' | 'DEMO' | 'NOT STARTED';
+export type FeatureStatus = 'WORKING' | 'PARTIAL' | 'DEMO' | 'NOT STARTED' | 'MODEL_UNAVAILABLE';
 
 export interface User {
   id: number;
@@ -611,7 +611,7 @@ export interface CropRecommendationResponse {
   ood_warning?: string | null;
   explanation: ExplainabilitySchema;
   status: FeatureStatus;
-  decision_status?: 'CONFIDENT' | 'LOW_CONFIDENCE' | 'UNUSUAL' | 'INVALID';
+  decision_status?: 'CONFIDENT' | 'LOW_CONFIDENCE' | 'UNUSUAL' | 'INVALID' | 'MODEL_UNAVAILABLE';
   decision_reasons?: string[];
   confidence_label?: 'High' | 'Medium' | 'Low' | 'None';
   model_name?: string;

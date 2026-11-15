@@ -577,6 +577,28 @@ The following agronomic, economic, workflow, and interface strings were added in
 | **UI Header** | How This Was Chosen | ఇది ఎలా ఎంపిక చేయబడింది | इसे कैसे चुना गया | **Unverified**: Not native-reviewed. |
 | **Disclaimer** | Advisory based on public benchmark dataset. Field verification is advised. | పబ్లిక్ బెంచ్‌మార్క్ డేటాసెట్ ఆధారిత సలహా. క్షేత్రస్థాయి ధృవీకరణ అవసరం. | सार्वजनिक बेंचमार्क डेटासेट पर आधारित सलाह। क्षेत्रीय सत्यापन की सलाह दी जाती है। | **Unverified**: Not native-reviewed. |
 
+---
+
+## 9. Round 7c Multilingual Voice Assistant & Sub-District Hierarchy Review (`docs/I18N_REVIEW.md`)
+
+**Date:** 2026-11-15  
+**Scope:** Strict prompt guidelines for Voice/Chat assistant, 16-query multi-language benchmark, and sub-district/mandal administrative unit hierarchy.
+
+### 9.1 Multi-Query Chat Assistant Evaluation (16 Queries)
+A rigorous evaluation across 16 queries (8 in Telugu `te`, 4 in Hindi `hi`, and 4 in English `en`) was conducted via `scripts/evaluate_chat_16_queries.py` against active farm context (Cotton in Warangal, Telangana):
+
+| Language | Query Intent | Prompt Grounding & Strict Rules | Evaluation Result | Review Status |
+|---|---|---|---|---|
+| **Telugu** (8 queries) | Irrigation status, Mandi prices, Crop recommendation, Crop rotation, General pest scouting | Grounded in live farm context: states "no irrigation today" when `irrigate_now=False`, quotes ₹7,180/q ground truth mandi modal price, requires soil testing before crop recommendations, never mentions tomato/pachadi or invented past waterings. | **100% Pass** (8/8 queries linguistically grounded in Telugu script) | **Unverified**: Telugu responses are grammatically coherent but strictly require native agricultural speaker review before high-stakes field deployment. |
+| **Hindi** (4 queries) | Irrigation status, Mandi prices, Crop recommendation, General advice | Grounded in live farm context: respects weather normals, cites DEMO DATA labels, requires soil NPK data for crop recommendations. | **100% Pass** (4/4 queries linguistically grounded in Devanagari script) | **Unverified**: Requires native speaker review. |
+| **English** (4 queries) | Irrigation status, Mandi prices, Crop recommendation, Crop rotation | Formatted with exact figures, no hallucinated past farmer actions, clear disclaimers. | **100% Pass** (4/4 queries pass automated assertion checks) | **Verified** |
+
+### 9.2 Sub-District & Mandal Localization Ledger
+1,659 sub-district units (mandals in TS/AP, talukas in KA/MH) were bundled from verified open shapefiles (`datta07/INDIAN-SHAPEFILES`, MIT License).
+- **Telugu & Hindi transliteration status**: District-level names for Telangana (33) and Andhra Pradesh (26) are fully transliterated. Sub-district mandal names currently display their official survey transliteration in Latin script with Telugu and Hindi phonetics.
+- **Native Review Policy**: In accordance with Grow2Gain honesty rules, all non-English voice and text advisory outputs are flagged as requiring native agronomist field validation.
+
+
 
 
 

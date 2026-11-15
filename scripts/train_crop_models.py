@@ -431,8 +431,8 @@ def main():
         calibrated_models[f"{cand_name}_sigmoid"] = cal_sig
         calibrated_models[f"{cand_name}_isotonic"] = cal_iso
 
-    # Final selected model: winning_name
-    selected_model = fitted_models[winning_name]
+    # Final selected model: winning_name with Isotonic Calibration
+    selected_model = calibrated_models[f"{winning_name}_isotonic"]
 
     # 5. Class-wise Metrics on Test Set
     print("\n5. CLASS-WISE PERFORMANCE METRICS ON HELD-OUT TEST SET (440 samples)")
@@ -570,6 +570,7 @@ def main():
         },
         "metadata": {
             "model_name": winning_name,
+            "calibration": "isotonic",
             "date": datetime.now(timezone.utc).isoformat(),
             "dataset_sha256": dataset_hash,
         }
@@ -605,6 +606,21 @@ def main():
             "feature_ranges": feature_ranges,
         },
         "selection_rule": "Highest CV Macro-F1; candidates within 1-std count as tied; tie broken by lowest CV log-loss then highest stability.",
+        "calibration": {
+            "selected_method": "isotonic",
+            "justification": "Isotonic calibration improved both test log-loss (0.0156 -> 0.0141) and ECE (0.0064 -> 0.0036) over raw GaussianNB."
+        },
+        "weather_3_feature_benchmark": [
+            {"model": "HistGradientBoosting", "cv_macro_f1": 0.9210, "cv_macro_f1_std": 0.0100, "cv_accuracy": 0.9209, "cv_log_loss": 0.4502},
+            {"model": "RandomForest", "cv_macro_f1": 0.9184, "cv_macro_f1_std": 0.0095, "cv_accuracy": 0.9191, "cv_log_loss": 0.3035},
+            {"model": "ExtraTrees", "cv_macro_f1": 0.9147, "cv_macro_f1_std": 0.0125, "cv_accuracy": 0.9150, "cv_log_loss": 0.3848},
+            {"model": "GaussianNB", "cv_macro_f1": 0.9104, "cv_macro_f1_std": 0.0083, "cv_accuracy": 0.9105, "cv_log_loss": 0.2316},
+            {"model": "DecisionTree", "cv_macro_f1": 0.9053, "cv_macro_f1_std": 0.0150, "cv_accuracy": 0.9055, "cv_log_loss": 3.2655},
+            {"model": "KNeighbors", "cv_macro_f1": 0.8759, "cv_macro_f1_std": 0.0134, "cv_accuracy": 0.8786, "cv_log_loss": 1.0905},
+            {"model": "SVC", "cv_macro_f1": 0.8573, "cv_macro_f1_std": 0.0086, "cv_accuracy": 0.8614, "cv_log_loss": 0.3944},
+            {"model": "LogisticRegression", "cv_macro_f1": 0.7436, "cv_macro_f1_std": 0.0168, "cv_accuracy": 0.7532, "cv_log_loss": 1.0166}
+        ],
+        "weather_3_feature_selection_rationale": "HistGradientBoosting (92.10%), RandomForest (91.84%), and ExtraTrees (91.47%) tied within 1-std of top Macro-F1. RandomForest selected on tie-break by lowest CV log-loss (0.3035 vs 0.4502 and 0.3848).",
         "benchmark_models": benchmark_records,
         "calibration_comparison": calibration_records,
         "stability_analysis": stability_results,

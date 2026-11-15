@@ -57,17 +57,17 @@ async def build_farm_context_packet(
     }
     daily_forecast_list: List[Dict[str, Any]] = []
     try:
-        w_res = await get_weather_forecast(lat=lat, lon=lon)
-        if w_res:
-            weather_info["temperature_c"] = round(w_res.temperature_c, 1)
-            weather_info["rainfall_today_mm"] = round(w_res.expected_rainfall_today_mm, 1)
-            weather_info["reference_et0_mm"] = round(w_res.reference_et0_mm, 1)
+        w_res = await get_weather_forecast(lat=lat, lon=lon, db=db)
+        if w_res and w_res.current:
+            weather_info["temperature_c"] = round(w_res.current.temperature_c, 1)
+            weather_info["rainfall_today_mm"] = round(w_res.current.expected_rainfall_today_mm, 1)
+            weather_info["reference_et0_mm"] = round(w_res.current.reference_et0_mm, 1)
             if hasattr(w_res, "daily") and w_res.daily:
                 for d in w_res.daily[:7]:
                     daily_forecast_list.append({
                         "date": d.date,
                         "reference_et0_mm": d.reference_et0_mm,
-                        "precipitation_sum_mm": d.precipitation_sum,
+                        "precipitation_sum_mm": d.precipitation_sum_mm,
                     })
     except Exception:
         pass

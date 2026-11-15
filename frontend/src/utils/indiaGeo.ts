@@ -1,4 +1,5 @@
 import indiaData from '../data/india_districts.json';
+import subdistrictsData from '../data/subdistricts_villages.json';
 
 export interface DistrictInfo {
   name: string;
@@ -7,6 +8,14 @@ export interface DistrictInfo {
   is_fallback: boolean;
   te?: string;
   hi?: string;
+}
+
+export interface VillageInfo {
+  village: string;
+  latitude: number;
+  longitude: number;
+  precision: 'village' | 'approximate district centre';
+  is_district_centre: boolean;
 }
 
 export interface StateInfo {
@@ -56,6 +65,37 @@ export const getDistrictCoordinates = (
     longitude: foundState.longitude,
     isFallback: true,
   };
+};
+
+export const getVillagesForDistrict = (stateName: string, districtName: string): VillageInfo[] => {
+  const coords = getDistrictCoordinates(stateName, districtName);
+  const distCentre: VillageInfo = {
+    village: 'District Centre',
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+    precision: 'approximate district centre',
+    is_district_centre: true,
+  };
+
+  const stData = (subdistrictsData.states as Record<string, Record<string, Array<{ name: string; latitude: number; longitude: number }>>>)[stateName];
+  if (!stData) {
+    return [distCentre];
+  }
+
+  const dKey = Object.keys(stData).find((k) => k.toLowerCase() === districtName.toLowerCase());
+  if (!dKey || !stData[dKey] || stData[dKey].length === 0) {
+    return [distCentre];
+  }
+
+  const mandals: VillageInfo[] = stData[dKey].map((m) => ({
+    village: m.name,
+    latitude: m.latitude,
+    longitude: m.longitude,
+    precision: 'village',
+    is_district_centre: false,
+  }));
+
+  return [distCentre, ...mandals];
 };
 
 export const getLocalizedStateName = (stateName: string, lang: string): string => {

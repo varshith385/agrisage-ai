@@ -11,8 +11,8 @@
 
 | Data Source | Intended Usage | License Status | Dataset Details (Rows / Terms) | Fallback Mechanism | Verification Status |
 |---|---|---|---|---|---|
-| **Open-Meteo Weather API** (`api.open-meteo.com`) | Live hourly/daily weather, precipitation probability, wind speed, reference evapotranspiration ($ET_0$). | Open Database License (ODbL) / Non-commercial terms *[to verify]* | Free tier API access limits and attribution terms *[to verify]* | `weather_cache` table (30-min TTL); stale cache returned if network unavailable; clear error if no cache exists. | **Partially Verified** (Endpoint connectivity verified; license/terms *to verify*) |
-| **Open-Meteo Geocoding API** (`geocoding-api.open-meteo.com`) | Village / district search and coordinates resolution (lat/lon). | Open Database License (ODbL) *[to verify]* | Global geographic database *[to verify]* | Static internal dictionary of Indian states, districts, and sample villages for Telangana, AP, Maharashtra, and Karnataka. | **To verify** |
+| **Open-Meteo Weather API** (`api.open-meteo.com`) | Live hourly/daily weather, precipitation probability, wind speed, reference evapotranspiration ($ET_0$), and historical climate normals via the Historical Archive API (`archive-api.open-meteo.com`). | Open Database License (ODbL) / Non-commercial terms *[to verify]* | Free tier API access limits and attribution terms *[to verify]*. Trailing 365 complete days window (e.g. `2025-11-15` to `2026-11-14` dynamically derived from current date) used for trailing 12-month climate normals. | `weather_cache` table (30-min TTL); cache keyed by rounded lat/lon and window dates. If API fails, returns clear error; never returns synthetic defaults or old values. | **Partially Verified** (Endpoint connectivity and historical archive verified; license/terms *to verify*) |
+| **Open-Meteo Geocoding API** (`geocoding-api.open-meteo.com`) | Village / district search and coordinates resolution (lat/lon). | Open Database License (ODbL) *[to verify]* | Global geographic database *[to verify]* | Static internal dictionary of Indian states, districts, and bundled sub-districts/mandals dataset. | **To verify** |
 | **data.gov.in AGMARKNET Mandi Arrivals & Prices** | Real-time and historical commodity arrival volumes and modal prices across agricultural markets. | Government Open Data License - India (GODL) *[to verify]* | Requires user API key (`DATA_GOV_IN_API_KEY`); row counts and frequency *[to verify]* | Local offline dataset `datasets/demo/mandi_prices.csv`, visibly badged as `DEMO DATA` in API and UI. | **To verify** |
 | **PlantVillage Dataset & Pretrained CV Weights** | Leaf image classification across healthy and diseased plant classes on CPU (`neghani/plantvillage-mobilenetv2`). | Apache-2.0 on HuggingFace; upstream dataset CC BY-SA 4.0 *[to verify]* | MobileNetV2 architecture, 38 classes across 14 crops (Apple, Blueberry, Cherry, Corn, Grape, Orange, Peach, Bell Pepper, Potato, Raspberry, Soybean, Squash, Strawberry, Tomato; does NOT cover Cotton, Chilli, Rice, Wheat). Weights: `model.safetensors` (9.26 MB, SHA256: `f1a98e77629c36b5fe90a0fbed7ba56f097ce419c6dad8456bd135f36ea8d426`). Evaluation sample is small (exact sample size n = 3). PlantVillage images may overlap with the model's training data (so results are optimistic). The results are not a measure of real-world field accuracy. The dataset licence is 'to verify' unless you open the licence page. No accuracy number is shown in the app UI as the model's accuracy. | Input quality gate rejects dark/blurry/non-leaf images; crop mismatch/unsupported warnings emitted; low confidence fallback prompts KVK consultation. | **Verified** (Model downloaded, SHA256 matched, run on CPU; upstream dataset terms *to verify*) |
 | **OpenAI CLIP Zero-Shot Domain Gate** (`openai/clip-vit-base-patch32`) | Authoritative image gate for Disease and Irrigation uploads: verifies field/crop/soil/water vs non-agricultural patterns (code screenshots, documents, portraits, cars, rooms, cartoons) on CPU. | MIT License | Vision Transformer (ViT-B/32) multi-modal zero-shot classifier. Download size: ~605 MB (`model.safetensors` + config/processor). Adds a model-download step on first run if weights are not pre-cached in `~/.cache/huggingface/hub`. | Deterministic Stage 1 heuristics (colour variety + foliar/soil pixel share); graceful fallback to heuristics if offline or unloaded. Rejects non-crop images with HTTP 422. | **Verified** (Weights cached and verified on CPU; MIT license confirmed) |
@@ -53,8 +53,32 @@
 - **Andhra Pradesh Official 26 Districts**: Alluri Sitharama Raju, Anakapalli, Ananthapuramu, Annamayya, Bapatla, Chittoor, Dr. B.R. Ambedkar Konaseema, East Godavari, Eluru, Guntur, Kakinada, Krishna, Kurnool, Nandyal, NTR, Palnadu, Parvathipuram Manyam, Prakasam, Sri Potti Sriramulu Nellore, Sri Sathya Sai, Srikakulam, Tirupati, Visakhapatnam, Vizianagaram, West Godavari, YSR Kadapa.
 - **Localizations**: Both Telangana and Andhra Pradesh districts carry official Telugu (`te`) and Hindi (`hi`) transliterations. Other Indian states carry English names with `[EN]` indicators in multilingual mode.
 
+---
 
-Before moving to Phase 3 and Phase 5 implementations:
+## 5. Sub-Districts, Mandals, and Village Coordinates (`backend/app/data/subdistricts_villages.json`, `frontend/src/data/subdistricts_villages.json`)
+
+**Retrieved Date**: 2026-11-15  
+**Source Repository**: [`datta07/INDIAN-SHAPEFILES`](https://github.com/datta07/INDIAN-SHAPEFILES)  
+**License**: MIT License (Copyright (c) 2020 Datta Prasad)  
+**Total Bundled Sub-Districts / Mandals**: **1,659 verified administrative units** across 4 key agricultural states:
+
+| State | Districts Covered | Sub-Districts / Mandals Count | Administrative Unit Type | Coordinates Source |
+|---|---|---|---|---|
+| **Telangana** | 33 districts | **459 mandals** | Mandals | Measured polygon centroids from shapefile |
+| **Andhra Pradesh** | 26 districts | **669 mandals** | Mandals | Measured polygon centroids from shapefile |
+| **Karnataka** | 30 districts | **176 talukas** | Talukas | Measured polygon centroids from shapefile |
+| **Maharashtra** | 34 districts | **355 talukas** | Talukas | Measured polygon centroids from shapefile |
+| **Total** | **123 districts** | **1,659 units** | Sub-district level | **100% Real Centroid Coordinates** |
+
+### Integrity & Hierarchy Rules
+1. **Cascading Dropdowns**: In the UI (`FarmRegistrationPage.tsx`), State $\to$ District $\to$ Village/Mandal are strictly chained. Selecting a state filters the districts; selecting a district filters the mandals/villages. Changing a parent immediately resets the child selection.
+2. **Read-Only Coordinate Transparency**: Selecting a village displays its exact latitude and longitude with a read-only badge indicating `precision: "village"`.
+3. **District-Centre Fallback**: If a district has no sub-district entry (or for states outside the bundled 4 states), the selector offers the district headquarters centroid with a read-only badge indicating `precision: "district"` ("approximate district centre"). Coordinates are never invented or guessed.
+4. **Backend Hierarchy Enforcement**: Backend endpoints (`POST /api/v1/farms/` and `PUT /api/v1/farms/{id}`) validate that the submitted village belongs to the chosen district, and the district belongs to the chosen state. Any mismatch is strictly rejected with HTTP 422 naming the invalid field, preventing client bypass.
+
+---
+
+## 6. Pre-Implementation Checklist:
 1. **Model Weights & Class Labels**:
    - Locate the exact Hugging Face or PyTorch Hub model repository for PlantVillage.
    - Record its exact license file URL, commit SHA, and class list in `docs/DECISIONS.md`.

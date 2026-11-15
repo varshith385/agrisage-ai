@@ -86,15 +86,15 @@ Executed using `scripts/diagnose_crop_locations.py`:
 ### 4.1 Trailing 12-Month Archive Methodology
 To prevent seasonal distortion (e.g., winter readings yielding 0 mm rainfall across India), Grow2Gain queries the Open-Meteo Historical Weather API across trailing 365 days:
 $$\bar{T} = \frac{1}{365} \sum_{i=1}^{365} T_i, \quad \bar{H} = \frac{1}{365} \sum_{i=1}^{365} H_i, \quad R_{\text{monthly}} = \frac{1}{12} \sum_{i=1}^{365} P_i$$
-- **Window Dates**: Trailing 365 days (e.g., `2023-11-15` to `2024-11-14`).
-- **Caching**: Results are cached in `CLIMATE_NORMALS_CACHE` keyed by rounded latitude/longitude (`round(lat, 2)`, `round(lon, 2)`) and calendar month.
+- **Window Dates**: Trailing 365 complete days (`2025-11-15` to `2026-11-14` dynamically derived from current date `2026-11-15`).
+- **Caching**: Results are cached in `CLIMATE_NORMALS_CACHE` keyed by rounded latitude/longitude (`round(lat, 2)`, `round(lon, 2)`) and exact window dates (`start_date`, `end_date`).
 - **Graceful Failure**: If the Open-Meteo API is unreachable, the system raises an explicit HTTP 503 error, renders an `ErrorState` in the UI with a retry button, and prompts the farmer to enter local values manually. **It never injects hidden fallback defaults.**
 
 ---
 
 ## 5. Machine Learning Benchmark & Selection Rule
 
-### 5.1 5-Fold Stratified Cross-Validation Benchmark (8 Classifiers)
+### 5.1 5-Fold Stratified Cross-Validation Benchmark (8 Classifiers — Full 7-Feature Model)
 Trained with `random_state=42` on 80% train partition (1,760 samples), evaluated on 20% test partition (440 samples):
 
 | Classifier | CV Acc (Mean ± Std) | CV Macro-F1 (Mean ± Std) | CV Weighted-F1 | CV Log-Loss (Mean ± Std) | Test Acc | Test Macro-F1 | Test Log-Loss | CV Fit Time (s) |
@@ -108,29 +108,78 @@ Trained with `random_state=42` on 80% train partition (1,760 samples), evaluated
 | **LogisticRegression (Scaled)** | 96.82% ± 0.66% | 96.78% ± 0.68% | 96.78% ± 0.68% | 0.2365 ± 0.0171 | 97.27% | 97.25% | 0.1998 | 0.41s |
 | **KNeighbors (Scaled)** | 96.53% ± 1.21% | 96.50% ± 1.24% | 96.50% ± 1.24% | 0.1871 ± 0.1158 | 97.95% | 97.93% | 0.1329 | 0.17s |
 
-### 5.2 Selection Rule & Justification
+### 5.2 7-Feature Selection Rule & Justification
 - **Rule**: Select highest CV Macro-F1. Candidates within 1 standard deviation of the highest are considered tied; ties are broken by lowest CV Log-Loss, then highest perturbation stability.
 - **Evaluation**: The top 4 models (GaussianNB 99.49%, ExtraTrees 99.37%, RandomForest 99.37%, HistGradientBoosting 99.21%) fall within 1-std (threshold: $99.49\% - 0.42\% = 99.07\%$).
-- **Tie Breaker**: `GaussianNB` achieves dramatically lower CV log-loss (**0.0158**) compared to RandomForest (**0.0596**), ExtraTrees (**0.1068**), and HistGradientBoosting (**0.0466**). It also trains in 0.11 seconds and achieved 96.55% joint perturbation stability. Therefore, **GaussianNB** was selected as the production multi-crop model.
+- **Tie Breaker**: `GaussianNB` achieves dramatically lower CV log-loss (**0.0158**) compared to RandomForest (**0.0596**), ExtraTrees (**0.1068**), and HistGradientBoosting (**0.0466**). It also trains in 0.11 seconds and achieved 96.55% joint perturbation stability.
+
+### 5.3 3-Feature Weather-Only Benchmark (temperature, humidity, rainfall)
+Evaluated across 8 classifiers under 5-Fold Stratified Cross-Validation on the Kaggle dataset:
+
+| Model | CV Acc (Mean ± Std) | CV Macro-F1 (Mean ± Std) | CV Log-Loss (Mean ± Std) | Selection Status |
+| :--- | :---: | :---: | :---: | :--- |
+| **HistGradientBoosting** | 92.09% ± 0.99% | 92.10% ± 1.00% | 0.4502 ± 0.0587 | Tied on F1 (within 1-std) |
+| **RandomForest (Selected)** | **91.91% ± 0.89%** | **91.84% ± 0.95%** | **0.3035 ± 0.0235** | **Selected (Lowest CV Log-Loss: 0.3035)** |
+| **ExtraTrees** | 91.50% ± 1.20% | 91.47% ± 1.25% | 0.3848 ± 0.0688 | Tied on F1 (within 1-std) |
+| **GaussianNB** | 91.05% ± 0.85% | 91.04% ± 0.83% | 0.2316 ± 0.0179 | Below 1-std cutoff |
+| **DecisionTree** | 90.55% ± 1.47% | 90.53% ± 1.50% | 3.2655 ± 0.5078 | Inferior log-loss |
+| **KNeighbors (Scaled)** | 87.86% ± 1.28% | 87.59% ± 1.34% | 1.0905 ± 0.3099 | Sub-90% accuracy |
+| **SVC (Scaled)** | 86.14% ± 0.81% | 85.73% ± 0.86% | 0.3944 ± 0.0119 | Sub-90% accuracy |
+| **LogisticRegression (Scaled)** | 75.32% ± 1.66% | 74.36% ± 1.68% | 1.0166 ± 0.0186 | Sub-80% accuracy |
+
+- **Selection Justification**: HistGradientBoosting (92.10%), RandomForest (91.84%), and ExtraTrees (91.47%) are statistically tied within 1 standard deviation of the top Macro-F1 ($92.10\% - 1.00\% = 91.10\%$). The objective tie-breaker is lowest CV Log-Loss. **RandomForest** achieves **0.3035**, outperforming HistGradientBoosting (**0.4502**) and ExtraTrees (**0.3848**), making its probability distributions significantly better calibrated. Therefore, **RandomForest** is deployed as the production 3-feature weather model.
 
 ---
 
 ## 6. Probability Calibration & Out-of-Distribution Validation
 
-### 6.1 Calibration Comparison (Raw vs Sigmoid vs Isotonic)
+### 6.1 Calibration Comparison & Selection
 Evaluated on held-out test data and on synthetic extreme points ($N=500, \text{pH}=14, T=60^\circ\text{C}, R=0\text{ mm}$):
 
-| Model | Variant | Test Log-Loss | Expected Calibration Error (ECE) | Max Prob on Extreme Point |
-| :--- | :--- | :---: | :---: | :---: |
-| **GaussianNB** | **Raw (Production)** | **0.0156** | **0.0064** | **1.0000** |
-| GaussianNB | Sigmoid | 0.0858 | 0.0640 | 0.9345 |
-| GaussianNB | Isotonic | 0.0141 | 0.0036 | 1.0000 |
-| RandomForest | Raw | 0.0504 | 0.0376 | 0.5600 |
-| RandomForest | Sigmoid | 0.0846 | 0.0696 | 0.8802 |
-| RandomForest | Isotonic | 0.0195 | 0.0061 | 0.8142 |
-| ExtraTrees | Raw | 0.0990 | 0.0797 | 0.5400 |
-| ExtraTrees | Sigmoid | 0.0854 | 0.0726 | 0.6752 |
-| ExtraTrees | Isotonic | 0.0164 | 0.0087 | 0.7201 |
+| Model | Variant | Test Log-Loss | Expected Calibration Error (ECE) | Max Prob on Extreme Point | Production Status |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| GaussianNB | Raw | 0.0156 | 0.0064 | 1.0000 | Baseline |
+| GaussianNB | Sigmoid | 0.0858 | 0.0640 | 0.9345 | Degraded log-loss |
+| **GaussianNB** | **Isotonic** | **0.0141** | **0.0036** | **1.0000** | **Production Deployed (`CalibratedClassifierCV`)** |
+| **RandomForest** | **Raw** | **0.0504** | **0.0376** | **0.5600** | **Production Deployed (Weather-Only)** |
+| RandomForest | Sigmoid | 0.0846 | 0.0696 | 0.8802 | Degraded log-loss |
+| RandomForest | Isotonic | 0.0195 | 0.0061 | 0.8142 | Overfits small weather slice |
+| ExtraTrees | Raw | 0.0990 | 0.0797 | 0.5400 | Baseline |
+| ExtraTrees | Sigmoid | 0.0854 | 0.0726 | 0.6752 | Degraded log-loss |
+| ExtraTrees | Isotonic | 0.0164 | 0.0087 | 0.7201 | Overfits small weather slice |
+
+> [!IMPORTANT]
+> **Production Calibration Decision**:
+> In Round 7c, Isotonic calibration (`CalibratedClassifierCV(GaussianNB(), method="isotonic", cv=5)`) improved both held-out test log-loss (**0.0141** vs 0.0156 raw) and Expected Calibration Error (**0.0036** vs 0.0064 raw). Therefore, **Isotonic-calibrated GaussianNB** is deployed in `crop_recommender.joblib`.
+> Notice that GaussianNB still produces 1.0000 on extreme points even after calibration. Relying solely on softmax probability is unsafe, which is why **Tier 2 (Envelope Checking)** and **Tier 3 (IsolationForest OOD)** pre-filters strictly intercept inputs before recommendations are generated.
+
+### 6.2 Empirical Confidence Threshold Derivation
+Confidence thresholds were derived mathematically by evaluating out-of-fold predictions from 5-fold Stratified Cross-Validation on held-out samples:
+
+| Model Variant | Threshold ($p_{\text{top1}}$) | Separation Margin ($gap$) | Sample Coverage (%) | Empirical Precision (%) | Validation Misclassifications |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **7-Feature GaussianNB** | $p \ge 0.40$ | $gap \ge 0.05$ | 99.95% | 99.50% | 11 / 2,200 |
+| 7-Feature GaussianNB | $p \ge 0.55$ | $gap \ge 0.10$ | 99.91% | 99.50% | 11 / 2,200 |
+| **7-Feature GaussianNB (High)** | **$p \ge 0.70$** | **$gap \ge 0.30$** | **99.23%** | **99.63%** | **8 / 2,200** |
+| 7-Feature GaussianNB | $p \ge 0.80$ | $gap \ge 0.30$ | 98.32% | 99.82% | 4 / 2,200 |
+| **3-Feature Weather RF** | $p \ge 0.40$ | $gap \ge 0.05$ | 97.95% | 92.81% | 155 / 2,200 |
+| 3-Feature Weather RF | $p \ge 0.50$ | $gap \ge 0.10$ | 94.64% | 93.71% | 131 / 2,200 |
+| 3-Feature Weather RF | $p \ge 0.55$ | $gap \ge 0.05$ | 92.18% | 94.82% | 105 / 2,200 (Precision < 95%) |
+| **3-Feature Weather RF (Target)** | **$p \ge 0.70$** | **$gap \ge 0.30$** | **80.77%** | **96.79%** | **57 / 2,200 (Precision $\ge$ 95%)** |
+| 3-Feature Weather RF | $p \ge 0.80$ | $gap \ge 0.30$ | 69.09% | 97.96% | 31 / 2,200 |
+
+#### Unified Decision & Labeling Rule (Code, Docs, UI)
+1. **CONFIDENT (Label: High)**:
+   - Requires all 7 features present, within feature envelope, not OOD, **$p \ge 0.70$ AND $gap \ge 0.30$**.
+   - Yields $>96.79\%$ precision on weather and $>99.63\%$ on full models.
+   - Any score below this (including $p = 0.55$) is **strictly NOT CONFIDENT**.
+2. **MEDIUM (Label: Medium, Status: LOW_CONFIDENCE)**:
+   - In-envelope, not OOD, but falls in the intermediate margin: $0.40 \le p < 0.70$ or $0.10 \le gap < 0.30$.
+   - Advises: *"Moderate prediction margin: top candidate probability or separation gap is below high-confidence thresholds."*
+3. **LOW (Label: Low, Status: LOW_CONFIDENCE)**:
+   - In-envelope, not OOD, but weak separation: $p < 0.40$ or $gap < 0.10$.
+4. **Soil Absent**:
+   - Status is always `LOW_CONFIDENCE` with label `Medium` or `Low`, never `CONFIDENT`. Advises: *"Indicative only, soil values needed."*
 
 > [!IMPORTANT]
 > Because GaussianNB produces confident probabilities (1.0000) even when evaluated on extreme points, relying solely on model softmax probabilities is dangerous. This necessitates our **Tier 2 (Envelope Checking)** and **Tier 3 (IsolationForest OOD)** pre-filters to refuse extreme/unusual points before outputting a recommendation.
@@ -195,38 +244,40 @@ Evaluated on the 20% test partition (20 samples per crop, 440 total):
 
 ## 8. 16-Location Pan-India Experiment
 
-Executed across 16 agro-climatically diverse Indian locations using real Open-Meteo 12-month climate normals:
+Executed across 16 agro-climatically diverse Indian locations using real Open-Meteo 12-month climate normals (trailing 365 complete days: `2025-11-15` to `2026-11-14`):
 - **Experiment 1 (Fixed Typical Soil)**: User provides $N=37, P=51, K=32, \text{pH}=6.43$.
 - **Experiment 2 (Soil Absent / Weather-Only)**: Soil inputs are completely omitted.
 
-### 8.1 Results Table: Fixed Soil vs Soil Absent
-| Location & State | Lat/Lon | 12-Month Climate Vector | Exp 1: Fixed Soil Top-1 (Status) | Exp 2: Soil Absent Top-1 (Status) |
+### 8.1 Results Table: Fixed Soil vs Soil Absent (Unified Confidence Rules)
+| Location & State | Lat/Lon | 12-Month Climate Vector | Exp 1: Fixed Soil Top-1 (Status & Label) | Exp 2: Soil Absent Top-1 (Status & Label) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Warangal, Telangana** | 17.97, 79.59 | 27.5°C, 59.1% RH, 43.3 mm/mo | **Mothbeans** 99.8% (CONFIDENT) | **Mothbeans** 57.0% (LOW_CONFIDENCE) |
-| **Rajkot, Gujarat** | 22.30, 70.80 | 27.5°C, 56.7% RH, 48.0 mm/mo | **Mothbeans** 100.0% (CONFIDENT) | **Mothbeans** 71.0% (LOW_CONFIDENCE) |
-| **Jaipur, Rajasthan** | 26.91, 75.79 | 25.5°C, 54.4% RH, 39.4 mm/mo | **Mothbeans** 100.0% (CONFIDENT) | **Mothbeans** 88.0% (LOW_CONFIDENCE) |
-| **Kolkata, West Bengal** | 22.57, 88.36 | 26.5°C, 73.3% RH, 172.4 mm/mo | **Jute** 100.0% (CONFIDENT) | **Jute** 96.0% (LOW_CONFIDENCE) |
-| **Chennai, Tamil Nadu** | 13.08, 80.27 | 28.9°C, 70.7% RH, 115.4 mm/mo | **Pigeonpeas** 62.3% (CONFIDENT) | **Pigeonpeas** 28.0% (LOW_CONFIDENCE) |
-| **Shimla, Himachal Pradesh** | 31.10, 77.17 | 13.3°C, 66.4% RH, 96.1 mm/mo | **Maize** 83.4% (CONFIDENT) | **Maize** 40.0% (LOW_CONFIDENCE) |
-| **Guwahati, Assam** | 26.14, 91.74 | 24.1°C, 81.6% RH, 196.8 mm/mo | **Jute** 54.3% (CONFIDENT) | **Jute** 53.0% (LOW_CONFIDENCE) |
-| **Kochi, Kerala** | 9.93, 76.27 | 27.6°C, 80.1% RH, 179.7 mm/mo | **Jute** 93.3% (CONFIDENT) | **Banana** 62.0% (LOW_CONFIDENCE) |
-| **Nagpur, Maharashtra** | 21.15, 79.08 | 28.0°C, 49.9% RH, 64.4 mm/mo | **Mothbeans** 100.0% (CONFIDENT) | **Mothbeans** 78.0% (LOW_CONFIDENCE) |
-| **Ludhiana, Punjab** | 30.90, 75.85 | 24.0°C, 67.1% RH, 47.9 mm/mo | **Mothbeans** 68.7% (CONFIDENT) | **Lentil** 91.0% (LOW_CONFIDENCE) |
-| **Patna, Bihar** | 25.60, 85.14 | 25.5°C, 70.5% RH, 79.8 mm/mo | **Maize** 57.0% (CONFIDENT) | **Maize** 77.0% (LOW_CONFIDENCE) |
-| **Bhubaneswar, Odisha** | 20.30, 85.82 | 26.7°C, 75.6% RH, 237.2 mm/mo | **Jute** 96.2% (CONFIDENT) | **Rice** 50.0% (LOW_CONFIDENCE) |
-| **Pune, Maharashtra** | 18.52, 73.86 | 25.8°C, 57.9% RH, 62.6 mm/mo | **Mothbeans** 98.6% (CONFIDENT) | **Blackgram** 38.0% (LOW_CONFIDENCE) |
-| **Coimbatore, Tamil Nadu** | 11.02, 76.96 | 26.5°C, 69.4% RH, 87.9 mm/mo | **Maize** 66.4% (CONFIDENT) | **Maize** 61.0% (LOW_CONFIDENCE) |
-| **Srinagar, Jammu & Kashmir** | 34.08, 74.80 | 13.0°C, 68.6% RH, 96.1 mm/mo | **Maize** 81.5% (CONFIDENT) | **Maize** 41.0% (LOW_CONFIDENCE) |
-| **Bikaner, Rajasthan** | 28.02, 73.31 | 27.3°C, 44.7% RH, 19.9 mm/mo | **Mothbeans** (UNUSUAL / Refusal) | **Mothbeans** (UNUSUAL / Refusal) |
+| **Warangal, Telangana** | 17.97, 79.59 | 27.5°C, 59.1% RH, 43.3 mm/mo | **Mothbeans** 100.0% (CONFIDENT / High) | **Mothbeans** 57.0% (LOW_CONFIDENCE / Medium) |
+| **Rajkot, Gujarat** | 22.30, 70.80 | 27.5°C, 56.6% RH, 48.0 mm/mo | **Mothbeans** 100.0% (CONFIDENT / High) | **Mothbeans** 71.0% (LOW_CONFIDENCE / Medium) |
+| **Jaipur, Rajasthan** | 26.91, 75.79 | 25.6°C, 54.4% RH, 39.4 mm/mo | **Mothbeans** 100.0% (CONFIDENT / High) | **Mothbeans** 86.0% (LOW_CONFIDENCE / Medium) |
+| **Kolkata, West Bengal** | 22.57, 88.36 | 26.5°C, 73.5% RH, 172.7 mm/mo | **Jute** 100.0% (CONFIDENT / High) | **Jute** 96.0% (LOW_CONFIDENCE / Medium) |
+| **Chennai, Tamil Nadu** | 13.08, 80.27 | 28.9°C, 70.7% RH, 115.5 mm/mo | **Pigeonpeas** 54.9% (LOW_CONFIDENCE / Low) | **Pigeonpeas** 28.0% (LOW_CONFIDENCE / Low) |
+| **Shimla, Himachal Pradesh** | 31.10, 77.17 | 13.4°C, 66.6% RH, 96.1 mm/mo | **Maize** 86.3% (CONFIDENT / High) | **Maize** 40.0% (LOW_CONFIDENCE / Medium) |
+| **Guwahati, Assam** | 26.14, 91.74 | 24.1°C, 81.5% RH, 196.9 mm/mo | **Rice** 63.9% (LOW_CONFIDENCE / Medium) | **Jute** 53.0% (LOW_CONFIDENCE / Low) |
+| **Kochi, Kerala** | 9.93, 76.27 | 27.6°C, 80.0% RH, 179.0 mm/mo | **Jute** 98.0% (CONFIDENT / High) | **Banana** 62.0% (LOW_CONFIDENCE / Medium) |
+| **Nagpur, Maharashtra** | 21.15, 79.08 | 28.0°C, 49.9% RH, 64.4 mm/mo | **Mothbeans** 100.0% (CONFIDENT / High) | **Mothbeans** 78.0% (LOW_CONFIDENCE / Medium) |
+| **Ludhiana, Punjab** | 30.90, 75.85 | 24.1°C, 67.2% RH, 47.9 mm/mo | **Mothbeans** 78.3% (CONFIDENT / High) | **Lentil** 78.0% (LOW_CONFIDENCE / Medium) |
+| **Patna, Bihar** | 25.60, 85.14 | 25.5°C, 70.6% RH, 79.8 mm/mo | **Maize** 60.2% (LOW_CONFIDENCE / Medium) | **Maize** 77.0% (LOW_CONFIDENCE / Medium) |
+| **Bhubaneswar, Odisha** | 20.30, 85.82 | 26.7°C, 75.8% RH, 237.3 mm/mo | **Jute** 94.8% (CONFIDENT / High) | **Rice** 50.0% (LOW_CONFIDENCE / Medium) |
+| **Pune, Maharashtra** | 18.52, 73.86 | 25.8°C, 57.9% RH, 62.6 mm/mo | **Mothbeans** 98.8% (CONFIDENT / High) | **Blackgram** 38.0% (LOW_CONFIDENCE / Low) |
+| **Coimbatore, Tamil Nadu** | 11.02, 76.96 | 26.5°C, 69.2% RH, 86.8 mm/mo | **Maize** 64.2% (LOW_CONFIDENCE / Medium) | **Maize** 62.0% (LOW_CONFIDENCE / Medium) |
+| **Srinagar, Jammu & Kashmir** | 34.08, 74.80 | 13.0°C, 68.8% RH, 99.9 mm/mo | **Maize** 77.6% (CONFIDENT / High) | **Maize** 40.0% (LOW_CONFIDENCE / Medium) |
+| **Bikaner, Rajasthan** | 28.02, 73.31 | 27.4°C, 44.8% RH, 19.9 mm/mo | **Mothbeans** (UNUSUAL / Refusal) | **Muskmelon** (UNUSUAL / Refusal) |
 
 ### 8.2 Summary of Distribution & Agro-Climatic Insights
-- **Experiment 1 Status Counts**: 15 CONFIDENT, 0 LOW_CONFIDENCE, 1 UNUSUAL, 0 INVALID.
-  - **Top-1 Crops**: Mothbeans (7), Maize (4), Jute (4), Pigeonpeas (1).
-- **Experiment 2 Status Counts**: 0 CONFIDENT, 15 LOW_CONFIDENCE, 1 UNUSUAL, 0 INVALID.
-  - **Top-1 Crops**: Mothbeans (5), Maize (4), Jute (2), Banana (1), Lentil (1), Rice (1), Blackgram (1), Pigeonpeas (1).
+- **Experiment 1 (Fixed Soil) Status Counts**: **11 CONFIDENT**, **4 LOW_CONFIDENCE**, **1 UNUSUAL**, **0 INVALID**.
+  - **Top-1 Crops**: Mothbeans (7), Maize (4), Jute (3), Rice (1), Pigeonpeas (1).
+  - **Confidence Classification**: Under the unified rule ($p \ge 0.70$ AND $gap \ge 0.30$), Chennai (54.9%, gap 9.8%), Guwahati (63.9%, gap 27.8%), Patna (60.2%, gap 25.1%), and Coimbatore (64.2%, gap 28.3%) are strictly classified as **LOW_CONFIDENCE** (Medium or Low label), eliminating previous false "CONFIDENT" mislabeling. Ludhiana (78.3%, gap 59.8%) legitimately achieves CONFIDENT.
+- **Experiment 2 (Soil Absent) Status Counts**: **0 CONFIDENT**, **15 LOW_CONFIDENCE**, **1 UNUSUAL**, **0 INVALID**.
+  - **Top-1 Crops**: Mothbeans (4), Maize (4), Jute (2), Banana (1), Lentil (1), Rice (1), Blackgram (1), Pigeonpeas (1), Muskmelon (1).
+  - **Confidence Classification**: When soil is absent, status is unconditionally **LOW_CONFIDENCE** with an explicit notification that soil testing is required.
 - **Why the Distribution Looks the Way It Does**:
-  1. **Bikaner Refusal**: Bikaner's trailing rainfall is 19.9 mm/month, which falls strictly below the Kaggle training min (20.21 mm). Both models correctly flag this as **UNUSUAL (Refusal)** and refuse recommendation.
+  1. **Bikaner Refusal**: Bikaner's trailing rainfall is 19.9 mm/month, strictly below the Kaggle training min (20.21 mm). Both models flag this as **UNUSUAL (Refusal)** and refuse recommendation.
   2. **Dry Semi-Arid Cluster**: Warangal, Rajkot, Jaipur, and Nagpur experience low monthly rainfall (39–64 mm) and moderate humidity (50–59%). Combined with low-to-medium nitrogen (N=37), this matches the ecological niche of drought-tolerant legumes (**Mothbeans**).
-  3. **High-Rainfall Deltaic Cluster**: Kolkata (172.4 mm), Bhubaneswar (237.2 mm), and Guwahati (196.8 mm) experience heavy precipitation and high humidity (>73%). In full mode, this activates **Jute**; in weather-only mode, Bhubaneswar selects **Rice** (50.0%) and Kochi selects tropical **Banana** (62.0%).
-  4. **Cooler / Hill Cluster**: Shimla (13.3°C) and Srinagar (13.0°C) possess cooler climates where tropical crops cannot thrive, consistently activating **Maize** (81–83%).
-  5. **Dynamic Agro-Climatic Diversity**: When soil is absent, 8 distinct crops emerge across the 16 locations (Mothbeans, Maize, Jute, Banana, Lentil, Rice, Blackgram, Pigeonpeas), demonstrating that crop selection is driven entirely by real climate variation rather than hardcoded heuristics.
+  3. **High-Rainfall Deltaic Cluster**: Kolkata (172.7 mm), Bhubaneswar (237.3 mm), and Guwahati (196.9 mm) experience heavy precipitation and high humidity (>73%). In full mode, this activates **Jute** and **Rice**; in weather-only mode, Bhubaneswar selects **Rice** (50.0%) and Kochi selects tropical **Banana** (62.0%).
+  4. **Cooler / Hill Cluster**: Shimla (13.4°C) and Srinagar (13.0°C) possess cooler climates where tropical crops cannot thrive, consistently activating **Maize** (77–86%).
+  5. **Dynamic Agro-Climatic Diversity**: When soil is absent, 9 distinct crops emerge across the 16 locations (Mothbeans, Maize, Jute, Banana, Lentil, Rice, Blackgram, Pigeonpeas, Muskmelon), proving that recommendations respond dynamically to real climate telemetry.

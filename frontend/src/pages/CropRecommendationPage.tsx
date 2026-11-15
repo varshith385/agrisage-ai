@@ -237,10 +237,11 @@ export const CropRecommendationPage: React.FC = () => {
   const topCrop = mlResult?.top_crops?.[0];
   const topRotation = rotationData?.recommended_rotations?.[0];
 
-  // Derive decision status (CONFIDENT | LOW_CONFIDENCE | UNUSUAL | INVALID)
-  const decisionStatus: 'CONFIDENT' | 'LOW_CONFIDENCE' | 'UNUSUAL' | 'INVALID' =
+  // Derive decision status (CONFIDENT | LOW_CONFIDENCE | UNUSUAL | INVALID | MODEL_UNAVAILABLE)
+  const isModelUnavailable = mlResult?.status === 'MODEL_UNAVAILABLE' || mlResult?.decision_status === 'MODEL_UNAVAILABLE';
+  const decisionStatus: 'CONFIDENT' | 'LOW_CONFIDENCE' | 'UNUSUAL' | 'INVALID' | 'MODEL_UNAVAILABLE' =
     mlResult?.decision_status ||
-    (mlResult?.soil_values_missing ? 'LOW_CONFIDENCE' : (mlResult?.is_out_of_distribution ? 'UNUSUAL' : 'CONFIDENT'));
+    (isModelUnavailable ? 'MODEL_UNAVAILABLE' : (mlResult?.soil_values_missing ? 'LOW_CONFIDENCE' : (mlResult?.is_out_of_distribution ? 'UNUSUAL' : 'CONFIDENT')));
 
   const isLowConfidence = decisionStatus === 'LOW_CONFIDENCE' || Boolean(topCrop && topCrop.probability < 0.5);
   const isUnusual = decisionStatus === 'UNUSUAL';
@@ -591,10 +592,10 @@ export const CropRecommendationPage: React.FC = () => {
         />
       )}
 
-      {errorMl && (
+      {(errorMl || isModelUnavailable) && (
         <ErrorState
-          title={language === 'te' ? 'సిఫార్సులను లోడ్ చేయడం సాధ్యం కాలేదు' : language === 'hi' ? 'सिफारिश लोड नहीं हो सकी' : 'Could not load recommendation'}
-          message={errorMl}
+          title={language === 'te' ? 'సిఫార్సు మోడల్ అందుబాటులో లేదు' : language === 'hi' ? 'सिफारिश मॉडल उपलब्ध नहीं है' : 'Crop Recommendation Model Unavailable'}
+          message={errorMl || (mlResult?.decision_reasons?.[0] || 'Model artifacts are not loaded on this server. Please contact your administrator.')}
           onRetry={fetchRecommendation}
         />
       )}
@@ -622,7 +623,8 @@ export const CropRecommendationPage: React.FC = () => {
       )}
 
       {/* LEAD SUMMARY SECTION (Card 1: Refusal / Indicative / Confident + Card 2: Rotation + Card 3: Evaluation Basis) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
+      {!isModelUnavailable && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
         {/* Card 1: Top Recommended Crop or Explicit Refusal */}
         <div className={`rounded-2xl border-2 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5 ${
           isUnusual
@@ -889,6 +891,7 @@ export const CropRecommendationPage: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* 7 INPUT CHIPS: VALUE, UNIT, SOURCE ATTRIBUTION & ENVELOPE STATUS */}
       <div className="bg-white rounded-2xl border border-[#7A553A]/20 p-4 sm:p-5 shadow-sm space-y-3">
