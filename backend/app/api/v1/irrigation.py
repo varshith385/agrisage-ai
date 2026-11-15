@@ -15,7 +15,7 @@ from backend.app.schemas.irrigation import (
     IrrigationPlanResponse,
 )
 from backend.app.security.auth import get_current_user
-from backend.app.services.open_meteo import get_weather_forecast
+from backend.app.services.open_meteo import get_weather_forecast, get_farm_weather
 
 router = APIRouter(prefix="/irrigation", tags=["irrigation"])
 
@@ -96,20 +96,23 @@ async def generate_irrigation_plan(
 
     if lat is not None and lon is not None:
         try:
-            weather_data = await get_weather_forecast(lat, lon, db)
+            if farm is not None:
+                weather_data = await get_farm_weather(farm, db)
+            else:
+                weather_data = await get_weather_forecast(lat, lon, db)
             if weather_data.daily and len(weather_data.daily) > 0:
                 day0 = weather_data.daily[0]
                 ref_et0 = day0.reference_et0_mm if payload.reference_et0_mm is None else payload.reference_et0_mm
-                rain_24h = day0.precipitation_sum if payload.rain_forecast_24h_mm is None else payload.rain_forecast_24h_mm
+                rain_24h = day0.precipitation_sum_mm if payload.rain_forecast_24h_mm is None else payload.rain_forecast_24h_mm
                 if len(weather_data.daily) > 1 and payload.rain_forecast_48h_mm is None:
-                    rain_48h = day0.precipitation_sum + weather_data.daily[1].precipitation_sum
+                    rain_48h = day0.precipitation_sum_mm + weather_data.daily[1].precipitation_sum_mm
 
                 # Build 7-day daily forecast list
                 for d in weather_data.daily[:7]:
                     daily_forecast_list.append({
                         "date": d.date,
                         "reference_et0_mm": d.reference_et0_mm,
-                        "precipitation_sum_mm": d.precipitation_sum,
+                        "precipitation_sum_mm": d.precipitation_sum_mm,
                     })
         except Exception:
             # Fall back to payload or nominal parameters

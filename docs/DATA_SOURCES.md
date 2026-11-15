@@ -55,26 +55,34 @@
 
 ---
 
-## 5. Sub-Districts, Mandals, and Village Coordinates (`backend/app/data/subdistricts_villages.json`, `frontend/src/data/subdistricts_villages.json`)
+## 5. Sub-Districts, Mandals, and Taluk Coordinates (`backend/app/data/subdistricts_villages.json`, `frontend/src/data/subdistricts_villages.json`)
 
 **Retrieved Date**: 2026-11-15  
 **Source Repository**: [`datta07/INDIAN-SHAPEFILES`](https://github.com/datta07/INDIAN-SHAPEFILES)  
-**License**: MIT License (Copyright (c) 2020 Datta Prasad)  
-**Total Bundled Sub-Districts / Mandals**: **1,659 verified administrative units** across 4 key agricultural states:
+**Repository License**: MIT License (Copyright (c) 2020 Datta Prasad)  
+**Underlying Data Provenance & License**:
+- The boundary features carry Census of India 2011 administrative codes (`STCODE11`, `DTCODE11`, `SDTCODE11`, `NAME11`).
+- The repository does NOT include a license declaration for the underlying government survey data. In strict accordance with honesty rules, **no claim of "official government portal" or "Government Open Data License (GODL)" is made**.
+- **Mandal/Taluk Level**: This dataset contains sub-district (mandal/taluk) headquarters centroid coordinates, **not village-level cadastral survey boundaries**.
 
-| State | Districts Covered | Sub-Districts / Mandals Count | Administrative Unit Type | Coordinates Source |
+### Counts, Assignment Methodology, and Official Discrepancy Ledger
+
+| State | Districts Covered | Sub-Districts / Mandals Count | Administrative Unit Type | Assignment Method & Discrepancy Disclosures |
 |---|---|---|---|---|
-| **Telangana** | 33 districts | **459 mandals** | Mandals | Measured polygon centroids from shapefile |
-| **Andhra Pradesh** | 26 districts | **669 mandals** | Mandals | Measured polygon centroids from shapefile |
-| **Karnataka** | 30 districts | **176 talukas** | Talukas | Measured polygon centroids from shapefile |
-| **Maharashtra** | 34 districts | **355 talukas** | Talukas | Measured polygon centroids from shapefile |
-| **Total** | **123 districts** | **1,659 units** | Sub-district level | **100% Real Centroid Coordinates** |
+| **Telangana** | 33 districts | **459 mandals** | Mandals | **Mandal Assignment**: Feature `dtname` mapped to 33 districts using alias normalization (`Warangal Rural` $\to$ `Warangal`, `Warangal Urban` $\to$ `Hanumakonda`, `Ranga Reddy` $\to$ `Rangareddy`, etc.).<br>**Discrepancy Disclosure**: Official Telangana state records list **612 mandals** across 33 districts. The bundled dataset contains **459 mandals**, leaving an official mismatch of 153 mandals formed during post-2016 re-divisions. Mandals not in the dataset fall back to district centre. |
+| **Andhra Pradesh** | 13 legacy / 26 modern | **669 mandals** | Mandals | **Mandal Assignment**: Feature `dtname` groups 669 mandals under the **13 pre-2022 undivided districts** (Anantapur, Chittoor, East Godavari, Guntur, Krishna, Kurnool, Prakasam, SPSR Nellore, Srikakulam, Visakhapatnam, Vizianagaram, West Godavari, YSR Kadapa).<br>**Discrepancy Disclosure**: Andhra Pradesh reorganized into 26 districts in April 2022. Mandals created or reassigned in 2022 that lack direct sub-district entries fall back to district headquarters coordinates. |
+| **Karnataka** | 30 districts | **176 talukas** | Talukas | Mapped directly from `dtname` polygon centroids. |
+| **Maharashtra** | 34 districts | **355 talukas** | Talukas | Mapped directly from `dtname` polygon centroids. |
+| **Total** | **123 districts** | **1,659 units** | Sub-district level | **Verified Centroid Coordinates** |
+
+### Khammam District Mandals List (20 Bundled Mandals)
+`Madhira`, `Yerrupalem`, `Kusumanchi`, `Nelakondapalle`, `Kallur`, `Tallada`, `Khammam (Rural)`, `Bonakal`, `Chinthakani`, `Enkuru`, `Kamepalle`, `Konijerla`, `Mudigonda`, `Penuballi`, `Sathupalle`, `Singareni`, `Thirumalayapalem`, `Vemsoor`, `Wyra`, `Khammam (Urban)`.
 
 ### Integrity & Hierarchy Rules
-1. **Cascading Dropdowns**: In the UI (`FarmRegistrationPage.tsx`), State $\to$ District $\to$ Village/Mandal are strictly chained. Selecting a state filters the districts; selecting a district filters the mandals/villages. Changing a parent immediately resets the child selection.
-2. **Read-Only Coordinate Transparency**: Selecting a village displays its exact latitude and longitude with a read-only badge indicating `precision: "village"`.
+1. **Cascading Dropdowns**: In the UI (`FarmRegistrationPage.tsx`), State $\to$ District $\to$ Mandal/Taluk are strictly chained. Selecting a state filters the districts; selecting a district filters the mandals/taluks. Changing a parent immediately resets the child selection.
+2. **Read-Only Coordinate Transparency**: Selecting a mandal displays its exact latitude and longitude with a read-only badge indicating precision level.
 3. **District-Centre Fallback**: If a district has no sub-district entry (or for states outside the bundled 4 states), the selector offers the district headquarters centroid with a read-only badge indicating `precision: "district"` ("approximate district centre"). Coordinates are never invented or guessed.
-4. **Backend Hierarchy Enforcement**: Backend endpoints (`POST /api/v1/farms/` and `PUT /api/v1/farms/{id}`) validate that the submitted village belongs to the chosen district, and the district belongs to the chosen state. Any mismatch is strictly rejected with HTTP 422 naming the invalid field, preventing client bypass.
+4. **Backend Hierarchy Enforcement**: Backend endpoints (`POST /api/v1/farms/` and `PUT /api/v1/farms/{id}`) validate that the submitted village/mandal belongs to the chosen district, and the district belongs to the chosen state. Any mismatch is strictly rejected with HTTP 422 naming the invalid field, preventing client bypass.
 
 ---
 

@@ -2,12 +2,28 @@ import { apiRequest } from './client';
 import { CurrentWeather, WeatherForecast, CropSuitabilityResponse } from '../types/api';
 
 export const weatherApi = {
-  getCurrentWeather: async (lat: number, lon: number): Promise<CurrentWeather> => {
-    return apiRequest<CurrentWeather>(`/api/v1/weather/current?lat=${lat}&lon=${lon}`);
+  getCurrentWeather: async (lat?: number, lon?: number, farmId?: number): Promise<CurrentWeather> => {
+    let url = '/api/v1/weather/current';
+    if (farmId != null) {
+      url += `?farm_id=${farmId}`;
+    } else if (lat != null && lon != null) {
+      url += `?lat=${lat}&lon=${lon}`;
+    }
+    return apiRequest<CurrentWeather>(url);
   },
 
-  getForecast: async (lat: number, lon: number): Promise<WeatherForecast> => {
-    return apiRequest<WeatherForecast>(`/api/v1/weather/forecast?lat=${lat}&lon=${lon}`);
+  getForecast: async (lat?: number, lon?: number, farmId?: number): Promise<WeatherForecast> => {
+    let url = '/api/v1/weather/forecast';
+    if (farmId != null) {
+      url += `?farm_id=${farmId}`;
+    } else if (lat != null && lon != null) {
+      url += `?lat=${lat}&lon=${lon}`;
+    }
+    return apiRequest<WeatherForecast>(url);
+  },
+
+  getFarmWeather: async (farmId: number): Promise<WeatherForecast> => {
+    return apiRequest<WeatherForecast>(`/api/v1/weather/farm/${farmId}`);
   },
 
   getCropSuitability: async (crop: string, lat: number, lon: number): Promise<CropSuitabilityResponse> => {

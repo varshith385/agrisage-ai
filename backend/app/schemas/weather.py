@@ -12,8 +12,12 @@ class CurrentWeatherResponse(BaseModel):
     reference_et0_mm: float
     stale: bool = False
     fetched_at: datetime
-    source: str = "Open-Meteo Global Meteorological Forecast"
+    source: str = "Open-Meteo"
     village_coordinates_note: str = "Coordinates represent approximate village/farm centroid. Precision is indicative."
+    place_name: Optional[str] = None
+    grid_disclaimer: str = "model grid value for this location, not a village sensor"
+    stale_age_seconds: Optional[int] = None
+    stale_label: Optional[str] = None
 
 
 class DailyForecastItem(BaseModel):
@@ -32,8 +36,12 @@ class WeatherForecastResponse(BaseModel):
     daily: List[DailyForecastItem]
     stale: bool = False
     fetched_at: datetime
-    source: str = "Open-Meteo Global Meteorological Forecast"
+    source: str = "Open-Meteo"
     village_coordinates_note: str = "Coordinates represent approximate village centroid."
+    place_name: Optional[str] = None
+    grid_disclaimer: str = "model grid value for this location, not a village sensor"
+    stale_age_seconds: Optional[int] = None
+    stale_label: Optional[str] = None
 
 
 class CropSuitabilityResponse(BaseModel):

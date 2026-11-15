@@ -15,7 +15,7 @@ class FarmBase(BaseModel):
     water_source: Optional[str] = Field(default="Borewell", max_length=50)
     irrigation_method: IrrigationMethod = IrrigationMethod.FLOOD
     budget: float = Field(default=0.0, ge=0)
-    village: str = Field(min_length=2, max_length=100)
+    village: str = Field(min_length=2, max_length=100, description="Mandal or Taluk headquarters name (retains legacy village JSON key for backward compatibility)")
     district: str = Field(min_length=2, max_length=100)
     state: str = Field(min_length=2, max_length=100)
     latitude: float = Field(ge=-90.0, le=90.0)

@@ -79,6 +79,12 @@ PRICE_KEYWORDS = [
     "commodity", "auction", "yard"
 ]
 
+CROP_ADVISORY_KEYWORDS = [
+    "crop advice", "which crop", "what crop", "recommend crop", "crop recommendation",
+    "suggest crop", "what to grow", "which crop should i grow", "crop suggestion",
+    "suitable crop", "crop selection"
+]
+
 SUGGESTION_CHIPS = [
     "Will it rain today?",
     "Should I irrigate today?",

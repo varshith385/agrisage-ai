@@ -116,6 +116,26 @@ def test_create_farm_rejects_village_not_in_district(client: TestClient, farmer_
     assert "Khammam" in data["detail"]["message"]
 
 
+def test_create_farm_rejects_khammam_with_mandal_from_another_district(client: TestClient, farmer_headers: dict):
+    # Round 7d test: Khammam district with Geesugonda (from Warangal) -> rejected with 422 naming village field
+    bad_payload = {
+        "name": "Khammam Holding Invalid",
+        "area": 3.0,
+        "ownership_type": "owned",
+        "state": "Telangana",
+        "district": "Khammam",
+        "village": "Geesugonda",
+        "latitude": 17.9689,
+        "longitude": 79.5941,
+    }
+    res = client.post("/api/v1/farms", json=bad_payload, headers=farmer_headers)
+    assert res.status_code == 422
+    data = res.json()
+    assert "detail" in data
+    assert data["detail"]["field"] == "village"
+    assert "Khammam" in data["detail"]["message"]
+
+
 def test_create_farm_rejects_district_not_in_state(client: TestClient, farmer_headers: dict):
     # Telangana state with Jaipur (which belongs to Rajasthan) -> MUST be rejected (422)
     bad_payload = {

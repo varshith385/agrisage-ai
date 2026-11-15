@@ -383,8 +383,16 @@ export const LocationWeatherPage: React.FC = () => {
               </div>
 
               <p className="text-xs text-[#4E5F57] leading-relaxed">
-                Open-Meteo live feed &bull; Coordinates: {currentLat.toFixed(2)}°N, {currentLon.toFixed(2)}°E
+                Source: {weatherData.source || 'Open-Meteo'} &bull; Coordinates: {currentLat.toFixed(2)}°N, {currentLon.toFixed(2)}°E &bull; Fetched: {new Date(weatherData.fetched_at).toLocaleTimeString()}
               </p>
+              <p className="text-[11px] text-stone-400 italic">
+                {weatherData.grid_disclaimer || 'model grid value for this location, not a village sensor'}
+              </p>
+              {weatherData.stale && (
+                <div className="text-xs text-amber-700 font-semibold bg-amber-50 p-1.5 rounded-lg border border-amber-200">
+                  {weatherData.stale_label || 'Stale cache'}
+                </div>
+              )}
             </div>
 
             <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">

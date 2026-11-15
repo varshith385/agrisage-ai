@@ -25,7 +25,7 @@ from backend.app.schemas.reminder import (
     KOLKATA_TZ,
 )
 from backend.app.security.auth import get_current_user
-from backend.app.services.open_meteo import get_weather_forecast
+from backend.app.services.open_meteo import get_weather_forecast, get_farm_weather
 
 router = APIRouter(prefix="/reminders", tags=["Reminders"])
 
@@ -192,18 +192,15 @@ async def get_reminder_suggestions(
     # A. Weather-Derived Spray Window Alert
     if farm:
         try:
-            forecast = await get_weather_forecast(farm.latitude, farm.longitude)
-            daily = forecast.get("daily", {})
-            times = daily.get("time", [])
-            rain_sums = daily.get("precipitation_sum", [])
-            rain_probs = daily.get("precipitation_probability_max", [])
-
+            forecast = await get_farm_weather(farm, db)
+            daily = forecast.daily or []
             # Check upcoming 3-day forecast for rain
-            for i in range(min(4, len(times))):
-                rain_val = rain_sums[i] if i < len(rain_sums) else 0.0
-                prob_val = rain_probs[i] if i < len(rain_probs) else 0
+            for i in range(min(4, len(daily))):
+                d = daily[i]
+                rain_val = d.precipitation_sum_mm
+                prob_val = d.precipitation_probability_pct
                 if rain_val >= 4.0 or prob_val >= 60:
-                    day_str = times[i]
+                    day_str = d.date
                     target_dt = datetime.strptime(day_str, "%Y-%m-%d").replace(
                         hour=7, minute=0, tzinfo=KOLKATA_TZ
                     )
@@ -212,7 +209,7 @@ async def get_reminder_suggestions(
                             id=f"sugg-rain-{i}",
                             farm_id=target_farm_id,
                             title=f"Avoid spraying on {target_dt.strftime('%A')} (rain forecast)",
-                            notes=f"Forecast shows {rain_val:.1f} mm rain ({prob_val}% probability). Foliar sprays may wash off.",
+                            notes=f"Forecast shows {rain_val:.1f} mm rain ({prob_val:.0f}% probability). Foliar sprays may wash off.",
                             due_at=target_dt.astimezone(timezone.utc).replace(tzinfo=None),
                             source="weather_alert",
                             reason="7-Day Live Open-Meteo Rain Telemetry",

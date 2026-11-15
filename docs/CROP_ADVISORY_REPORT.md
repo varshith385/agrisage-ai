@@ -168,6 +168,11 @@ Confidence thresholds were derived mathematically by evaluating out-of-fold pred
 | **3-Feature Weather RF (Target)** | **$p \ge 0.70$** | **$gap \ge 0.30$** | **80.77%** | **96.79%** | **57 / 2,200 (Precision $\ge$ 95%)** |
 | 3-Feature Weather RF | $p \ge 0.80$ | $gap \ge 0.30$ | 69.09% | 97.96% | 31 / 2,200 |
 
+> [!NOTE]
+> **Threshold Honesty & Agronomic Rationale**:
+> - For the **7-feature GaussianNB model**, precision is exceptionally high across almost the entire spectrum (>99.50% precision even at $p \ge 0.40$ and $gap \ge 0.05$). The strict threshold $p \ge 0.70$ and $gap \ge 0.30$ is **not required purely for statistical precision**, but is chosen deliberately as a **conservative agronomic safety buffer** to refuse marginal or ambiguous recommendations in critical farming operations.
+> - Conversely, the mathematical finding that **$p = 0.55$ drops below 95% precision** (achieving only 94.82% precision with 105 misclassifications) applies **strictly to the 3-feature weather model**, where the absence of soil chemical parameters creates genuine class boundary overlap.
+
 #### Unified Decision & Labeling Rule (Code, Docs, UI)
 1. **CONFIDENT (Label: High)**:
    - Requires all 7 features present, within feature envelope, not OOD, **$p \ge 0.70$ AND $gap \ge 0.30$**.
@@ -245,8 +250,14 @@ Evaluated on the 20% test partition (20 samples per crop, 440 total):
 ## 8. 16-Location Pan-India Experiment
 
 Executed across 16 agro-climatically diverse Indian locations using real Open-Meteo 12-month climate normals (trailing 365 complete days: `2025-11-15` to `2026-11-14`):
-- **Experiment 1 (Fixed Typical Soil)**: User provides $N=37, P=51, K=32, \text{pH}=6.43$.
+- **Experiment 1 (Fixed Typical Soil)**: User provides $N=37, P=51, K=32, \text{pH}=6.43$ (the dataset-wide median, used strictly as an algorithmic benchmark and stress test to evaluate spatial weather discrimination across identical soil chemistry, not agronomic advice).
 - **Experiment 2 (Soil Absent / Weather-Only)**: Soil inputs are completely omitted.
+
+> [!NOTE]
+> **Open-Meteo Archive Lag & Weather Window Consistency**:
+> - The Open-Meteo Historical / Archive API relies on ECMWF ERA5 reanalysis data, which operates with a **5-day processing lag** (trailing 5 days return 0.0 or provisional forecast data).
+> - To avoid partial windows, our climate window dynamically queries `end_date = today - 5 days` and `start_date = end_date - 364 days`, providing a complete 365-day dataset.
+> - **Reconciliation with Round 7b**: In Round 7b, `weather_16_locations.json` had already fetched the 2025-2026 window, but the report documentation copy-pasted a "2023-11-15 to 2024-11-14" label. A direct side-by-side comparison verified that actual 2023-2024 precipitation was vastly different (e.g., Warangal was 129.7 mm/mo in 2023-2024 vs 43.3 mm/mo in 2025-2026; Rajkot was 116.6 mm/mo vs 48.0 mm/mo). All caches and reports are now unified and verified on the actual dates.
 
 ### 8.1 Results Table: Fixed Soil vs Soil Absent (Unified Confidence Rules)
 | Location & State | Lat/Lon | 12-Month Climate Vector | Exp 1: Fixed Soil Top-1 (Status & Label) | Exp 2: Soil Absent Top-1 (Status & Label) |

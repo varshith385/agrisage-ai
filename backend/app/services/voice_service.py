@@ -28,7 +28,8 @@ from backend.app.models.user import User
 from backend.app.schemas.economics import EconomicsCalculationRequest
 from backend.app.schemas.voice import VoiceQueryRequest, VoiceQueryResponse
 from backend.app.services.economics import calculate_economics
-from backend.app.services.open_meteo import get_weather_forecast
+from backend.app.services.open_meteo import get_weather_forecast, get_farm_weather
+from backend.app.services.market_service import get_mandi_prices
 from backend.app.services.intent_router import route_navigation_or_action, route_smalltalk
 from backend.app.services.context_packet import build_farm_context_packet, format_context_for_prompt
 from backend.app.services.llm_client import generate_chat_completion, log_llm_startup_status
@@ -87,6 +88,11 @@ INTENT_KEYWORDS: Dict[str, Dict[str, List[str]]] = {
         "en": kw_en.PRICE_KEYWORDS,
         "te": kw_te.PRICE_KEYWORDS,
         "hi": kw_hi.PRICE_KEYWORDS,
+    },
+    "crop_advisory": {
+        "en": getattr(kw_en, "CROP_ADVISORY_KEYWORDS", []),
+        "te": getattr(kw_te, "CROP_ADVISORY_KEYWORDS", []),
+        "hi": getattr(kw_hi, "CROP_ADVISORY_KEYWORDS", []),
     },
 }
 
@@ -322,41 +328,70 @@ class VoiceAssistantService:
         location_name = farm.village if farm else self.default_village
 
         upstream_status = "Live Open-Meteo"
+        weather_failed = False
         try:
-            forecast = await get_weather_forecast(lat, lon, db)
-            temp = round(forecast.current.temperature_2m, 1)
-            rain_today = round(forecast.current.precipitation, 1)
+            if farm:
+                forecast = await get_farm_weather(farm, db)
+            else:
+                forecast = await get_weather_forecast(lat, lon, db)
+            temp = round(forecast.current.temperature_c, 1)
+            rain_today = round(forecast.current.expected_rainfall_today_mm, 1)
             is_stale = getattr(forecast, "stale", False) or getattr(forecast.current, "stale", False)
             if is_stale:
-                upstream_status = "Cached/Offline Open-Meteo"
+                age_min = (forecast.current.stale_age_seconds // 60) if forecast.current.stale_age_seconds else 1
+                upstream_status = f"Cached/Stale Open-Meteo ({age_min} min old)"
         except Exception:
-            temp = 28.5
-            rain_today = 0.0
-            upstream_status = "Offline Fallback Demo Data"
+            weather_failed = True
+
+        if weather_failed:
+            if lang == "te":
+                spoken = "ఓపెన్-మెటియో వాతావరణ సమాచారం ప్రస్తుతం తాత్కాలికంగా అందుబాటులో లేదు. దయచేసి కాసేపటి తర్వాత ప్రయత్నించండి."
+            elif lang == "hi":
+                spoken = "ओपन-मेटियो मौसम सेवा वर्तमान में अनुपलब्ध है। कृपया थोड़ी देर बाद पुनः प्रयास करें।"
+            else:
+                spoken = "Live Open-Meteo weather telemetry is currently unavailable. Please try again shortly."
+
+            action_label = {
+                "te": "వాతావరణం పేజీ తెరవండి",
+                "hi": "मौसम पेज खोलें",
+                "en": "Open Weather",
+            }.get(lang, "Open Weather")
+
+            return VoiceQueryResponse(
+                intent="weather",
+                confidence=0.5,
+                confidence_type="heuristic",
+                spoken_text=sanitize_agronomic_speech(spoken, lang=lang),
+                status="UNAVAILABLE",
+                sources=["Open-Meteo API"],
+                action_link="/weather",
+                action_label=action_label,
+                suggestion_chips=kw.SUGGESTION_CHIPS,
+                upstream_status="Weather Service Unavailable",
+            )
 
         stale_note = ""
-        if "Cached" in upstream_status or "Offline" in upstream_status:
+        if "Cached" in upstream_status or "Stale" in upstream_status:
             if lang == "te":
-                stale_note = " [డెమో/నిల్వ డేటా (DEMO DATA)]"
+                stale_note = f" [నిల్వ డేటా: {upstream_status}]"
             elif lang == "hi":
-                stale_note = " [डेमो/संचित डेटा (DEMO DATA)]"
+                stale_note = f" [संचित डेटा: {upstream_status}]"
             else:
-                stale_note = " [DEMO DATA / Cached Estimate]"
+                stale_note = f" [{upstream_status}]"
 
         if lang == "te":
             spoken = (
                 f"ప్రస్తుతం {location_name}లో ఉష్ణోగ్రత {temp}°C గా ఉంది. "
-                f"ఈరోజు వర్షం సూచన {rain_today} మి.మీ. రాబోయే 24 గంటల్లో భారీ వర్ష సూచన లేదు.{stale_note}"
+                f"ఈరోజు వర్షం సూచన {rain_today} మి.మీ (ఓపెన్-మెటియో గ్రిడ్ మోడల్ విలువ).{stale_note}"
             )
         elif lang == "hi":
             spoken = (
                 f"वर्तमान में {location_name} में तापमान {temp}°C है। "
-                f"आज {rain_today} मिमी बारिश का अनुमान है। अगले 24 घंटों में भारी बारिश की संभावना नहीं है।{stale_note}"
+                f"आज {rain_today} मिमी बारिश का अनुमान है (ओपन-मेटियो ग्रिड मॉडल मान)।{stale_note}"
             )
         else:
             spoken = (
-                f"Currently in {location_name}, it is {temp}°C with {rain_today} mm expected rainfall today. "
-                f"No severe storm is expected in the next 24 hours.{stale_note}"
+                f"Currently in {location_name}, it is {temp}°C with {rain_today} mm expected rainfall today (Open-Meteo grid model value).{stale_note}"
             )
 
         action_label = {
@@ -622,13 +657,36 @@ class VoiceAssistantService:
             upstream_status="Schemes Directory Not Built (details to verify)",
         )
 
-    def _handle_price(self, lang: str) -> VoiceQueryResponse:
+    async def _handle_price(
+        self, lang: str, user: Optional[User] = None, farm: Optional[Farm] = None, db: Optional[Session] = None
+    ) -> VoiceQueryResponse:
         kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
+        crop_name = "Cotton"
+        district = farm.district if farm else "Warangal"
+        state = farm.state if farm else "Telangana"
+        if farm and farm.current_crop_cycles:
+            active_cycle = next((c for c in farm.current_crop_cycles if c.is_active), farm.current_crop_cycles[0])
+            if active_cycle and active_cycle.crop_name:
+                crop_name = active_cycle.crop_name
+
         modal_price = 7180
         min_price = 6850
         max_price = 7450
         mandi_name = "Enumamula (Warangal)"
         is_demo = not bool(settings.DATA_GOV_IN_API_KEY)
+
+        if db:
+            try:
+                mkt_res = await get_mandi_prices(crop=crop_name, district=district, state=state, db=db)
+                if mkt_res and mkt_res.prices:
+                    top_rec = mkt_res.prices[0]
+                    modal_price = int(top_rec.modal_price)
+                    min_price = int(top_rec.min_price)
+                    max_price = int(top_rec.max_price)
+                    mandi_name = top_rec.market
+                    is_demo = mkt_res.demo
+            except Exception:
+                pass
 
         demo_tag_en = " [DEMO DATA]" if is_demo else ""
         demo_tag_te = " [డెమో డేటా (DEMO DATA)]" if is_demo else ""
@@ -636,19 +694,19 @@ class VoiceAssistantService:
 
         if lang == "te":
             spoken = (
-                f"ఎనుమాముల (వరంగల్) మార్కెట్ యార్డులో పత్తి మోడల్ ధర క్వింటాలుకు ₹{modal_price:,} "
+                f"{mandi_name} మార్కెట్ యార్డులో {crop_name} మోడల్ ధర క్వింటాలుకు ₹{modal_price:,} "
                 f"(కనిష్ట ధర ₹{min_price:,}, గరిష్ట ధర ₹{max_price:,}){demo_tag_te}. "
                 f"కనీస మద్దతు ధర (MSP) ధృవీకరణ వివరాలు మరియు మార్కెట్ యార్డుల నికర లాభాల కొరకు మార్కెట్ పేజీని చూడండి."
             )
         elif lang == "hi":
             spoken = (
-                f"एनुमामुल (वारंगल) मंडी में कपास का मॉडल भाव ₹{modal_price:,} प्रति क्विंटल है "
+                f"{mandi_name} मंडी में {crop_name} का मॉडल भाव ₹{modal_price:,} प्रति क्विंटल है "
                 f"(न्यूनतम ₹{min_price:,}, अधिकतम ₹{max_price:,}){demo_tag_hi}। "
                 f"एमएसपी और विभिन्न मंडियों के शुद्ध लाभ के लिए मार्केट पेज देखें।"
             )
         else:
             spoken = (
-                f"Modal mandi price for Cotton at {mandi_name} APMC is ₹{modal_price:,} per quintal "
+                f"Modal mandi price for {crop_name} at {mandi_name} is ₹{modal_price:,} per quintal "
                 f"(range ₹{min_price:,} to ₹{max_price:,}){demo_tag_en}. "
                 f"Open the Market tab for transport-adjusted net realization rankings and MSP comparison."
             )
@@ -679,7 +737,7 @@ class VoiceAssistantService:
             action_label=action_label,
             suggestion_chips=kw.SUGGESTION_CHIPS,
             structured_data={
-                "crop": "Cotton",
+                "crop": crop_name,
                 "mandi": mandi_name,
                 "modal_price": modal_price,
                 "min_price": min_price,
@@ -691,7 +749,81 @@ class VoiceAssistantService:
                 "Mandi prices reflect modal market arrivals; lot prices vary by moisture and staple grade.",
                 "MSP applies to FAQ (Fair Average Quality) produce procured at designated state agencies.",
             ],
-            upstream_status="Market Service Ready",
+            upstream_status="AGMARKNET / Market Service Query",
+        )
+
+    async def _handle_crop_advice(
+        self, user: User, farm: Optional[Farm], lang: str, db: Session
+    ) -> VoiceQueryResponse:
+        kw = KEYWORDS_BY_LANG.get(lang, KEYWORDS_BY_LANG["en"])
+        context_packet = await build_farm_context_packet(user, farm, db)
+        ca = context_packet.get("crop_advisory", {})
+        decision_status = ca.get("decision_status", "LOW_CONFIDENCE")
+        top_crop = ca.get("top_crop", "Cotton")
+        prob = ca.get("probability_pct", 0.0)
+        soil_missing = ca.get("soil_missing", True)
+
+        if decision_status == "MODEL_UNAVAILABLE":
+            if lang == "te":
+                spoken = "పంట సిఫార్సు మోడల్ ప్రస్తుతం అందుబాటులో లేదు (MODEL_UNAVAILABLE). దయచేసి కాసేపటి తర్వాత ప్రయత్నించండి."
+            elif lang == "hi":
+                spoken = "फसल अनुशंसा मॉडल वर्तमान में अनुपलब्ध है (MODEL_UNAVAILABLE)। कृपया बाद में प्रयास करें।"
+            else:
+                spoken = "Crop recommendation model is currently unavailable on this server (MODEL_UNAVAILABLE). Please try again later."
+        elif soil_missing:
+            if lang == "te":
+                spoken = (
+                    f"గ్రో2గెయిన్ పంట సలహాదారు వాతావరణం ఆధారంగా {top_crop} ను సూచిస్తున్నారు (నిర్ణయ స్థితి: {decision_status}). "
+                    f"ఖచ్చితమైన సిఫార్సు కోసం దయచేసి మీ నేల పరీక్ష విలువలను (N, P, K, pH) నమోదు చేయండి."
+                )
+            elif lang == "hi":
+                spoken = (
+                    f"Grow2Gain फसल सलाहकार मौसम के आधार पर {top_crop} का सुझाव देता है (निर्णय स्थिति: {decision_status})। "
+                    f"सटीक अनुशंसा के लिए कृपया अपनी मिट्टी के पोषक तत्व मान (N, P, K, pH) दर्ज करें।"
+                )
+            else:
+                spoken = (
+                    f"Grow2Gain Crop Advisory suggests {top_crop} based on local climate normals (decision status: {decision_status}). "
+                    f"For a confirmed recommendation, please provide your soil test values (N, P, K, pH)."
+                )
+        else:
+            if lang == "te":
+                spoken = (
+                    f"గ్రో2గెయిన్ పంట సలహాదారు మీ నేల మరియు వాతావరణం ఆధారంగా {top_crop} పంటను సిఫార్సు చేస్తున్నారు "
+                    f"(నిర్ణయ స్థితి: {decision_status}, మోడల్ సంభావ్యత: {prob}%)."
+                )
+            elif lang == "hi":
+                spoken = (
+                    f"Grow2Gain फसल सलाहकार आपके खेत की मिट्टी और मौसम के आधार पर {top_crop} की सिफारिश करता है "
+                    f"(निर्णय स्थिति: {decision_status}, मॉडल संभावना: {prob}%)।"
+                )
+            else:
+                spoken = (
+                    f"Grow2Gain Crop Advisory recommends {top_crop} for your field "
+                    f"(decision status: {decision_status}, model probability: {prob}%)."
+                )
+
+        action_label = {
+            "te": "పంట సిఫార్సు తెరవండి",
+            "hi": "फसल सिफारिश खोलें",
+            "en": "Open Crop Advisory",
+        }.get(lang, "Open Crop Advisory")
+
+        return VoiceQueryResponse(
+            intent="crop_advisory",
+            confidence=0.92,
+            confidence_type="model",
+            spoken_text=sanitize_agronomic_speech(spoken, lang=lang),
+            status="WORKING" if decision_status != "MODEL_UNAVAILABLE" else "UNAVAILABLE",
+            sources=[
+                "Grow2Gain Crop Advisory ML Classifier",
+                "Open-Meteo Historical Archive API (12mo)",
+            ],
+            action_link="/recommend/crop",
+            action_label=action_label,
+            suggestion_chips=kw.SUGGESTION_CHIPS,
+            structured_data=ca,
+            upstream_status="Crop Advisory ML Model Active",
         )
 
     async def _handle_grounded_llm(
@@ -1126,7 +1258,9 @@ class VoiceAssistantService:
             # 2.8 Deterministic Price Query Handling (Ground truth mandi data, DEMO DATA label, no MSP invention)
             intent, confidence = classify_intent(request.query)
             if intent == "price":
-                return self._handle_price(lang)
+                return await self._handle_price(lang, user, farm, db)
+            if intent == "crop_advisory":
+                return await self._handle_crop_advice(user, farm, lang, db)
 
             # 3. Build Grounded Real Farm Context Packet
             context_packet = await build_farm_context_packet(user, farm, db)
@@ -1162,7 +1296,9 @@ class VoiceAssistantService:
             elif intent == "scheme":
                 res = self._handle_scheme(lang)
             elif intent == "price":
-                res = self._handle_price(lang)
+                res = await self._handle_price(lang, user, farm, db)
+            elif intent == "crop_advisory":
+                res = await self._handle_crop_advice(user, farm, lang, db)
             else:
                 res = await self._handle_general_llm_or_fallback(request.query, lang)
 

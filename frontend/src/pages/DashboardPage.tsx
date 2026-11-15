@@ -37,6 +37,7 @@ import {
 import { PageHeader } from '../components/common/PageHeader';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
+import { ErrorState } from '../components/common/ErrorState';
 import { AgentFlowDiagram } from '../components/agents/AgentFlowDiagram';
 import { AgentActivityLog } from '../components/agents/AgentActivityLog';
 import { WhatThisMeans } from '../components/common/WhatThisMeans';
@@ -152,17 +153,23 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
+  const [weatherError, setWeatherError] = useState<string | null>(null);
+
   // Weather Coordinates
   const lat = farmData?.latitude || activeFarm?.latitude || 17.9689;
   const lon = farmData?.longitude || activeFarm?.longitude || 79.5941;
+  const farmId = farmData?.id || activeFarm?.id;
 
   const fetchWeather = async (l1: number, l2: number) => {
     setIsLoadingWeather(true);
+    setWeatherError(null);
     try {
-      const data = await weatherApi.getCurrentWeather(l1, l2);
+      const data = await weatherApi.getCurrentWeather(l1, l2, farmId);
       setWeatherData(data);
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error('Failed to fetch weather', err);
+      setWeatherError(err?.message || 'Open-Meteo weather service unreachable.');
+      setWeatherData(null);
     } finally {
       setIsLoadingWeather(false);
     }
@@ -170,7 +177,7 @@ export const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     fetchWeather(lat, lon);
-  }, [lat, lon]);
+  }, [lat, lon, farmId]);
 
   // Crop Cycle Information
   const activeCycle = farmData?.current_crop_cycles && farmData.current_crop_cycles.length > 0
@@ -646,26 +653,49 @@ export const DashboardPage: React.FC = () => {
               <span className="text-xs font-black uppercase text-[#183D2E] tracking-wider">
                 {t('dashboard.weather_rain_risk_title', { defaultValue: "Today's Weather & Rain Risk" })}
               </span>
-              <span className="text-xs text-[#7A553A] font-semibold">
-                {farmData?.village || 'Geikonda'}
+              <span className="text-xs text-[#7A553A] font-semibold truncate max-w-[200px]" title={weatherData?.place_name || farmData?.village || 'Warangal'}>
+                {weatherData?.place_name || farmData?.village || 'Warangal'}
               </span>
             </div>
 
             {isLoadingWeather ? (
               <div className="h-20 bg-[#EDE5DC]/40 animate-pulse rounded-xl" />
+            ) : weatherError ? (
+              <ErrorState
+                title={language === 'te' ? 'వాతావరణం లోడ్ కాలేదు' : language === 'hi' ? 'मौसम लोड नहीं हुआ' : 'Weather Unavailable'}
+                message={weatherError}
+                onRetry={() => fetchWeather(lat, lon)}
+              />
             ) : weatherData ? (
-              <div className="flex items-center justify-between py-1">
-                <div>
-                  <span className="text-2xl sm:text-[26px] font-display font-extrabold text-[#183D2E]">
-                    {weatherData.temperature_c}°C
-                  </span>
-                  <span className="text-xs text-[#4E5F57] block mt-0.5">
-                    {t('dashboard.humidity_label', { defaultValue: 'Humidity:' })} {weatherData.relative_humidity_pct}% &bull; {t('dashboard.wind_label', { defaultValue: 'Wind:' })} {weatherData.wind_speed_kmh} km/h
-                  </span>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between py-1">
+                  <div>
+                    <span className="text-2xl sm:text-[26px] font-display font-extrabold text-[#183D2E]">
+                      {weatherData.temperature_c}°C
+                    </span>
+                    <span className="text-xs text-[#4E5F57] block mt-0.5">
+                      {t('dashboard.humidity_label', { defaultValue: 'Humidity:' })} {weatherData.relative_humidity_pct}% &bull; {t('dashboard.wind_label', { defaultValue: 'Wind:' })} {weatherData.wind_speed_kmh} km/h
+                    </span>
+                  </div>
+                  <div className="text-right text-xs space-y-1">
+                    <div>{t('dashboard.rain_today_label', { defaultValue: 'Rain Today:' })} <strong className="text-[#183D2E]">{weatherData.expected_rainfall_today_mm} mm</strong></div>
+                    <div>{t('dashboard.et0_demand_label', { defaultValue: 'ET0 Demand:' })} <strong className="text-[#7A553A]">{weatherData.reference_et0_mm} mm</strong></div>
+                  </div>
                 </div>
-                <div className="text-right text-xs space-y-1">
-                  <div>{t('dashboard.rain_today_label', { defaultValue: 'Rain Today:' })} <strong className="text-[#183D2E]">{weatherData.expected_rainfall_today_mm ?? 0} mm</strong></div>
-                  <div>{t('dashboard.et0_demand_label', { defaultValue: 'ET0 Demand:' })} <strong className="text-[#7A553A]">{weatherData.reference_et0_mm ?? 5.0} mm</strong></div>
+
+                <div className="text-[11px] text-stone-500 bg-[#FAF8F5] p-2 rounded-xl border border-[#7A553A]/10 flex flex-col gap-0.5">
+                  <div className="flex items-center justify-between">
+                    <span>Source: {weatherData.source || 'Open-Meteo'} ({lat.toFixed(2)}°N, {lon.toFixed(2)}°E)</span>
+                    <span>{new Date(weatherData.fetched_at).toLocaleTimeString()}</span>
+                  </div>
+                  <div className="italic text-[10px] text-stone-400">
+                    {weatherData.grid_disclaimer || 'model grid value for this location, not a village sensor'}
+                  </div>
+                  {weatherData.stale && (
+                    <div className="text-amber-700 font-semibold text-[10px]">
+                      {weatherData.stale_label || 'Stale cache'}
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (

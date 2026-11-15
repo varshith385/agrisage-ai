@@ -26,7 +26,7 @@ export const CurrentWeatherCard: React.FC<CurrentWeatherCardProps> = ({ weather,
               {t('location.current_weather_heading')}
             </h3>
             <p className="text-[11px] text-stone-500 font-medium">
-              {weather.source}
+              {weather.place_name ? `${weather.place_name} • ` : ''}Source: {weather.source || 'Open-Meteo'} &bull; Fetched: {new Date(weather.fetched_at).toLocaleTimeString()}
             </p>
           </div>
         </div>
@@ -36,15 +36,21 @@ export const CurrentWeatherCard: React.FC<CurrentWeatherCardProps> = ({ weather,
           <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-300 rounded-xl text-amber-800 text-xs font-semibold">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
             <span>
-              {t('location.stale_badge')}: {new Date(weather.fetched_at).toLocaleTimeString()}
+              {weather.stale_label || `${t('location.stale_badge')}: ${new Date(weather.fetched_at).toLocaleTimeString()}`}
             </span>
           </div>
         )}
       </div>
 
+      {/* Grid Disclaimer Note */}
+      <div className="text-[11px] text-stone-500 bg-stone-50 px-3 py-1.5 rounded-lg border border-stone-200/60 flex items-center justify-between">
+        <span>{weather.grid_disclaimer || 'model grid value for this location, not a village sensor'}</span>
+        <span className="text-stone-400">Fetched: {new Date(weather.fetched_at).toLocaleString()}</span>
+      </div>
+
       {weather.stale && (
         <p className="text-xs text-amber-700 bg-amber-50/70 p-2.5 rounded-xl border border-amber-200">
-          {t('location.stale_explanation')}{' '}
+          {weather.stale_label || t('location.stale_explanation')}{' '}
           <span className="font-bold">{new Date(weather.fetched_at).toLocaleString()}</span>
         </p>
       )}

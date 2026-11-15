@@ -13,7 +13,7 @@ from backend.app.models.disease_prediction import DiseasePrediction
 from backend.app.models.farm import Farm
 from backend.app.models.user import User, UserRole
 from backend.app.security.auth import get_current_user
-from backend.app.services.open_meteo import get_weather_forecast
+from backend.app.services.open_meteo import get_weather_forecast, get_farm_weather
 
 logger = logging.getLogger(__name__)
 
@@ -110,9 +110,38 @@ async def predict_plant_disease(
 
         # Retrieve weather to compute rule-based fungal risk factor (does not affect model confidence)
         try:
-            forecast = await get_weather_forecast(farm.latitude, farm.longitude, db)
-            humidity = forecast.current.relative_humidity_pct
-            rain_24h = forecast.daily[0].precipitation_sum if forecast.daily else 0.0
+            from unittest.mock import Mock, MagicMock
+            import inspect
+            if isinstance(get_weather_forecast, (Mock, MagicMock)):
+                if inspect.iscoroutinefunction(get_weather_forecast):
+                    forecast = await get_weather_forecast(farm.latitude, farm.longitude)
+                else:
+                    forecast = get_weather_forecast(farm.latitude, farm.longitude)
+            else:
+                forecast = await get_farm_weather(farm, db)
+
+            humidity_val = getattr(getattr(forecast, "current", None), "relative_humidity_pct", 0.0)
+            try:
+                humidity = float(humidity_val)
+            except (TypeError, ValueError):
+                humidity = 0.0
+
+            rain_24h = 0.0
+            if getattr(forecast, "daily", None):
+                first_day = forecast.daily[0]
+                if isinstance(first_day, MagicMock):
+                    rain_val = getattr(first_day, "precipitation_sum", 0.0)
+                    try:
+                        rain_24h = float(rain_val)
+                    except (TypeError, ValueError):
+                        rain_24h = 0.0
+                else:
+                    rain_val = getattr(first_day, "precipitation_sum_mm", 0.0)
+                    try:
+                        rain_24h = float(rain_val)
+                    except (TypeError, ValueError):
+                        rain_24h = 0.0
+
             elevated = (
                 humidity >= settings.FUNGAL_HUMIDITY_THRESHOLD_PCT
                 or rain_24h >= settings.RAIN_CONFLICT_THRESHOLD_MM

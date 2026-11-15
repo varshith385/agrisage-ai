@@ -120,6 +120,10 @@ export interface CurrentWeather {
   fetched_at: string;
   source: string;
   village_coordinates_note?: string;
+  place_name?: string;
+  grid_disclaimer?: string;
+  stale_age_seconds?: number;
+  stale_label?: string;
 }
 
 export interface DailyForecastItem {
@@ -140,6 +144,10 @@ export interface WeatherForecast {
   fetched_at: string;
   source: string;
   village_coordinates_note?: string;
+  place_name?: string;
+  grid_disclaimer?: string;
+  stale_age_seconds?: number;
+  stale_label?: string;
 }
 
 export interface ExplainabilitySchema {

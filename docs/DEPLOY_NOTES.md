@@ -64,3 +64,42 @@ This test suite explicitly verifies:
 - `test_tier1_negative_value_handled_as_invalid`: Confirms negative inputs are rejected with 422 errors.
 - `test_tier2_n500_handled_as_unusual` & `test_rare_in_range_combination_flagged_by_ood`: Confirms out-of-distribution inputs refuse recommendations with status `UNUSUAL`.
 - `test_real_training_row_is_confident_or_low_confidence_never_unusual`: Confirms in-envelope real data is never rejected.
+
+---
+
+## 4. Production Asset Deployment & Copy Inventory
+
+When deploying `feat/round7` to the production host, ensure that all required non-git or binary assets are synchronized alongside the application codebase:
+
+### 4.1 Asset Inventory Table
+
+| Asset Path | Location / Category | Committed in Git? | Description |
+| :--- | :--- | :---: | :--- |
+| `model_artifacts/crop_recommender.joblib` | Machine Learning Models | No (`.gitignore`) | Isotonic-calibrated GaussianNB + IsolationForest (7 features) |
+| `model_artifacts/crop_recommender_weather_only.joblib` | Machine Learning Models | No (`.gitignore`) | 3-Feature Weather-Only RandomForest + IsolationForest |
+| `model_artifacts/crop_recommender_metadata.json` | Model Metadata | Yes | Calibration scores, candidate benchmarks, OOD metrics |
+| `model_artifacts/weather_16_locations.json` | Telemetry Cache | Yes | 12-month climate normals for 16 test locations |
+| `datasets/crop_recommendation.csv` | Dataset | Yes | 2,200 rows Kaggle crop dataset used for training/validation |
+| `backend/app/data/subdistricts_villages.json` | Location Registry | Yes | Census 2011 Mandals/Taluks hierarchy for Telangana & AP |
+| `frontend/src/data/india_districts.json` | Location Hierarchy | Yes | Pan-India State -> District mapping (en/te/hi) |
+| `frontend/src/data/subdistricts_villages.json` | Location Hierarchy | Yes | Frontend clone of subdistricts/villages hierarchy |
+
+### 4.2 Production Server File Copy Steps
+
+If deploying to a fresh production container or server where binary model weights are not checked into Git:
+
+```bash
+# 1. Option A: Copy pre-trained artifacts from staging worktree
+cp -r C:/work/agri-r7/model_artifacts/* /path/to/production/model_artifacts/
+
+# 2. Option B: Retrain deterministically on the production server from datasets/
+python scripts/train_crop_models.py
+
+# 3. Verify all required location JSON files exist in their expected paths
+ls -l backend/app/data/subdistricts_villages.json
+ls -l frontend/src/data/india_districts.json
+ls -l frontend/src/data/subdistricts_villages.json
+
+# 4. Confirm backend tests pass and missing-artifact guard works
+python -m pytest backend/tests/test_crop_advisory_round7b.py -q
+```

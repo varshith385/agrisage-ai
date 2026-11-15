@@ -578,7 +578,7 @@ export const CropRecommendationPage: React.FC = () => {
             <span>
               {weatherLoading
                 ? 'Loading Open-Meteo climate normals...'
-                : `${temp.toFixed(1)}°C • ${humidity.toFixed(1)}% RH • ${rainfall.toFixed(1)} mm/mo rain (${userEditedWeather ? 'User edited' : 'Open-Meteo 12mo archive'})`}
+                : `12-month average (${windowDates || 'trailing 365 days'}): ${temp.toFixed(1)}°C • ${humidity.toFixed(1)}% RH • ${rainfall.toFixed(1)} mm/mo rain ${userEditedWeather ? '(User edited)' : '(Open-Meteo archive)'}`}
             </span>
           </div>
         </div>

@@ -41,7 +41,7 @@ async def fetch_open_meteo_raw(lat: float, lon: float) -> Dict[str, Any]:
         return response.json()
 
 
-async def get_weather_forecast(lat: float, lon: float, db: Session) -> WeatherForecastResponse:
+async def get_weather_forecast(lat: float, lon: float, db: Session, place_name: Optional[str] = None) -> WeatherForecastResponse:
     lat_bin = round(lat, 2)
     lon_bin = round(lon, 2)
     now = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -60,7 +60,12 @@ async def get_weather_forecast(lat: float, lon: float, db: Session) -> WeatherFo
     if cached and cached.expires_at > now:
         cached_data = json.loads(cached.forecast_json)
         cached_data["stale"] = False
-        cached_data["current"]["stale"] = False
+        if place_name:
+            cached_data["place_name"] = place_name
+        if "current" in cached_data:
+            cached_data["current"]["stale"] = False
+            if place_name:
+                cached_data["current"]["place_name"] = place_name
         return WeatherForecastResponse(**cached_data)
 
     # 2. Attempt live fetch with retry
@@ -111,6 +116,7 @@ async def get_weather_forecast(lat: float, lon: float, db: Session) -> WeatherFo
             reference_et0_mm=today_et0,
             stale=False,
             fetched_at=now,
+            place_name=place_name,
         )
 
         forecast_resp = WeatherForecastResponse(
@@ -120,6 +126,7 @@ async def get_weather_forecast(lat: float, lon: float, db: Session) -> WeatherFo
             daily=daily_items,
             stale=False,
             fetched_at=now,
+            place_name=place_name,
         )
 
         # Store in cache
@@ -137,11 +144,25 @@ async def get_weather_forecast(lat: float, lon: float, db: Session) -> WeatherFo
     # 4. Handle live fetch failure: check for fallback cache
     if cached:
         cached_data = json.loads(cached.forecast_json)
+        cached_time = cached.fetched_at
+        age_secs = max(0, int((now - cached_time).total_seconds()))
+        age_mins = max(1, age_secs // 60)
+        stale_lbl = f"Stale cache ({age_mins} min old): live Open-Meteo unreachable"
+
         cached_data["stale"] = True
-        cached_data["current"]["stale"] = True
-        cached_data["current"]["village_coordinates_note"] = (
-            f"STALE FORECAST WARNING: Weather service unreachable. Showing cached data from {cached.fetched_at} UTC."
-        )
+        cached_data["stale_age_seconds"] = age_secs
+        cached_data["stale_label"] = stale_lbl
+        if place_name:
+            cached_data["place_name"] = place_name
+        if "current" in cached_data:
+            cached_data["current"]["stale"] = True
+            cached_data["current"]["stale_age_seconds"] = age_secs
+            cached_data["current"]["stale_label"] = stale_lbl
+            if place_name:
+                cached_data["current"]["place_name"] = place_name
+            cached_data["current"]["village_coordinates_note"] = (
+                f"STALE FORECAST WARNING: Weather service unreachable. Showing cached data from {cached.fetched_at} UTC ({age_mins} min ago)."
+            )
         return WeatherForecastResponse(**cached_data)
 
     # 5. No cache exists and API failed
@@ -152,6 +173,39 @@ async def get_weather_forecast(lat: float, lon: float, db: Session) -> WeatherFo
             f"for coordinates ({lat}, {lon}). Error: {fetch_error}"
         ),
     )
+
+
+async def get_farm_weather(farm: Any, db: Session) -> WeatherForecastResponse:
+    """
+    Unified farm weather fetcher keyed by farm's saved lat/lon.
+    Attaches place name, coordinates, Open-Meteo source, grid disclaimer,
+    and stale age metadata.
+    """
+    if farm is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Farm holding required to fetch farm weather.",
+        )
+    lat = getattr(farm, "latitude", None)
+    lon = getattr(farm, "longitude", None)
+    if lat is None or lon is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Farm holding has no saved latitude/longitude coordinates.",
+        )
+
+    name = getattr(farm, "name", "Farm")
+    village = getattr(farm, "village", "")
+    district = getattr(farm, "district", "")
+    state = getattr(farm, "state", "")
+    loc_parts = [p for p in [village, district, state] if p]
+    loc_str = ", ".join(loc_parts)
+    place_name = f"{name} ({loc_str})" if loc_str else name
+
+    forecast = await get_weather_forecast(float(lat), float(lon), db, place_name=place_name)
+    forecast.place_name = place_name
+    forecast.current.place_name = place_name
+    return forecast
 
 
 def evaluate_crop_suitability(crop: str, forecast: WeatherForecastResponse) -> CropSuitabilityResponse:
@@ -241,9 +295,9 @@ async def get_climate_normals(lat: float, lon: float) -> Dict[str, Any]:
     lat_bin = round(lat, 2)
     lon_bin = round(lon, 2)
     now_utc = datetime.now(timezone.utc)
-    # Trailing 365 complete days window
-    end_date = (now_utc - timedelta(days=1)).strftime("%Y-%m-%d")
-    start_date = (now_utc - timedelta(days=365)).strftime("%Y-%m-%d")
+    # Trailing 365 complete days window (accounting for 5-day ERA5 archive lag)
+    end_date = (now_utc - timedelta(days=5)).strftime("%Y-%m-%d")
+    start_date = (now_utc - timedelta(days=369)).strftime("%Y-%m-%d")
     cache_key = f"{lat_bin}_{lon_bin}_{start_date}_{end_date}"
 
     if cache_key in CLIMATE_NORMALS_CACHE:

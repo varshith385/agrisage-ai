@@ -11,6 +11,7 @@ from typing import Any, Dict, Optional
 from sqlalchemy.orm import Session
 
 from backend.app.ml.irrigation import FAO56IrrigationEngine
+from backend.app.ml.crop_recommender import crop_recommender_engine
 from backend.app.models.disease_prediction import DiseasePrediction
 from backend.app.models.farm import Farm
 from backend.app.models.soil_card import SoilHealthCard
@@ -18,7 +19,8 @@ from backend.app.models.user import User
 from backend.app.schemas.economics import EconomicsCalculationRequest
 from backend.app.services.economics import calculate_economics
 from backend.app.services.growth_stage import GrowthStageService
-from backend.app.services.open_meteo import get_weather_forecast
+from backend.app.services.open_meteo import get_weather_forecast, get_farm_weather, get_climate_normals
+from backend.app.services.market_service import get_mandi_prices
 from backend.app.services.outbreak_service import get_outbreak_map_data
 
 
@@ -47,21 +49,36 @@ async def build_farm_context_packet(
         if active_cycle and active_cycle.crop_name:
             active_crop = active_cycle.crop_name.lower()
 
-    # 1. Weather Telemetry (LIVE from Open-Meteo or fallback cache)
+    # 1. Weather Telemetry (LIVE from Open-Meteo or fallback cache via shared get_farm_weather)
     weather_info: Dict[str, Any] = {
         "status": "LIVE",
-        "temperature_c": 28.5,
-        "rainfall_today_mm": 0.0,
-        "reference_et0_mm": 4.5,
-        "weather_code_meaning": "Clear / Mild",
+        "temperature_c": None,
+        "rainfall_today_mm": None,
+        "reference_et0_mm": None,
+        "relative_humidity_pct": None,
+        "stale": False,
+        "place_name": f"{village}, {district}, {state}",
+        "latitude": lat,
+        "longitude": lon,
+        "source": "Open-Meteo",
+        "grid_disclaimer": "model grid value for this location, not a village sensor",
     }
     daily_forecast_list: List[Dict[str, Any]] = []
     try:
-        w_res = await get_weather_forecast(lat=lat, lon=lon, db=db)
+        if farm:
+            w_res = await get_farm_weather(farm=farm, db=db)
+        else:
+            w_res = await get_weather_forecast(lat=lat, lon=lon, db=db)
         if w_res and w_res.current:
+            weather_info["status"] = "STALE" if w_res.current.stale else "LIVE"
+            weather_info["stale"] = w_res.current.stale
+            weather_info["stale_label"] = w_res.current.stale_label
             weather_info["temperature_c"] = round(w_res.current.temperature_c, 1)
             weather_info["rainfall_today_mm"] = round(w_res.current.expected_rainfall_today_mm, 1)
             weather_info["reference_et0_mm"] = round(w_res.current.reference_et0_mm, 1)
+            weather_info["relative_humidity_pct"] = round(w_res.current.relative_humidity_pct, 1)
+            weather_info["fetched_at"] = str(w_res.current.fetched_at)
+            weather_info["place_name"] = w_res.place_name or weather_info["place_name"]
             if hasattr(w_res, "daily") and w_res.daily:
                 for d in w_res.daily[:7]:
                     daily_forecast_list.append({
@@ -69,8 +86,9 @@ async def build_farm_context_packet(
                         "reference_et0_mm": d.reference_et0_mm,
                         "precipitation_sum_mm": d.precipitation_sum_mm,
                     })
-    except Exception:
-        pass
+    except Exception as exc:
+        weather_info["status"] = "UNAVAILABLE"
+        weather_info["error"] = str(exc)
 
     # 2. Irrigation Budget (LIVE via FAO-56 dual crop coefficient)
     irrigation_info: Dict[str, Any] = {
@@ -198,20 +216,37 @@ async def build_farm_context_packet(
     except Exception:
         pass
 
-    # 7. Mandi Market Prices (Explicitly DEMO DATA unless live API configured)
+    # 7. Mandi Market Prices (LIVE or DEMO DATA from get_mandi_prices)
     market_info: Dict[str, Any] = {
         "status": "DEMO DATA",
         "crop": active_crop.title(),
         "top_mandi": f"{district} APMC",
-        "modal_price_rs_per_q": 7120,
+        "modal_price_rs_per_q": 7180,
+        "min_price_rs_per_q": 6850,
+        "max_price_rs_per_q": 7450,
         "note": "Modal prices are DEMO DATA unless real DATA_GOV_IN_API_KEY is active. No unverified MSP numbers.",
     }
+    try:
+        mkt_res = await get_mandi_prices(crop=active_crop.title(), district=district, state=state, db=db)
+        if mkt_res and mkt_res.prices:
+            top_rec = mkt_res.prices[0]
+            market_info["status"] = "DEMO DATA" if mkt_res.demo else "LIVE"
+            market_info["top_mandi"] = top_rec.market
+            market_info["modal_price_rs_per_q"] = int(top_rec.modal_price)
+            market_info["min_price_rs_per_q"] = int(top_rec.min_price)
+            market_info["max_price_rs_per_q"] = int(top_rec.max_price)
+    except Exception:
+        pass
 
     # 8. Soil Health Card (LIVE if uploaded, else UNVERIFIED)
     soil_info: Dict[str, Any] = {
         "status": "UNVERIFIED",
         "has_confirmed_card": False,
         "npk": "Standard baseline values",
+        "n_val": None,
+        "p_val": None,
+        "k_val": None,
+        "ph_val": None,
     }
     try:
         if farm:
@@ -219,9 +254,51 @@ async def build_farm_context_packet(
             if sc and sc.is_confirmed:
                 soil_info["status"] = "LIVE"
                 soil_info["has_confirmed_card"] = True
-                soil_info["npk"] = f"N: {sc.nitrogen_kg_ha} kg/ha, P: {sc.phosphorus_kg_ha} kg/ha, K: {sc.potassium_kg_ha} kg/ha"
+                soil_info["npk"] = f"N: {sc.nitrogen_kg_ha} kg/ha, P: {sc.phosphorus_kg_ha} kg/ha, K: {sc.potassium_kg_ha} kg/ha, pH: {sc.ph_value or 6.5}"
+                soil_info["n_val"] = sc.nitrogen_kg_ha
+                soil_info["p_val"] = sc.phosphorus_kg_ha
+                soil_info["k_val"] = sc.potassium_kg_ha
+                soil_info["ph_val"] = sc.ph_value
     except Exception:
         pass
+
+    # 9. Crop Advisory Classifier (Runs classifier for active farm)
+    crop_advisory_info: Dict[str, Any] = {
+        "status": "WORKING",
+        "decision_status": "LOW_CONFIDENCE",
+        "top_crop": "None",
+        "probability_pct": 0.0,
+        "soil_missing": True,
+        "soil_note": "Soil test values (N, P, K, pH) not provided; indicative climate match only.",
+        "decision_reasons": ["Soil testing required for confirmed recommendation."],
+    }
+    try:
+        normals = await get_climate_normals(lat, lon)
+        rec = crop_recommender_engine.recommend(
+            n=soil_info.get("n_val"),
+            p=soil_info.get("p_val"),
+            k=soil_info.get("k_val"),
+            ph=soil_info.get("ph_val"),
+            temperature=normals.get("mean_temperature_c"),
+            humidity=normals.get("mean_relative_humidity_pct"),
+            rainfall=normals.get("mean_monthly_rainfall_mm"),
+            state=state,
+            district=district,
+            soil_source="Soil Card" if soil_info.get("has_confirmed_card") else None,
+            weather_source="Open-Meteo 12mo archive",
+        )
+        crop_advisory_info["decision_status"] = rec.get("decision_status", "LOW_CONFIDENCE")
+        crop_advisory_info["soil_missing"] = rec.get("soil_values_missing", True)
+        if rec.get("top_crops"):
+            crop_advisory_info["top_crop"] = rec["top_crops"][0]["crop_name"]
+            crop_advisory_info["probability_pct"] = round(rec["top_crops"][0]["probability"] * 100, 1)
+        if rec.get("decision_reasons"):
+            crop_advisory_info["decision_reasons"] = rec["decision_reasons"]
+        if soil_info.get("has_confirmed_card"):
+            crop_advisory_info["soil_note"] = f"Using confirmed soil card ({soil_info.get('npk')})."
+    except Exception as exc:
+        crop_advisory_info["decision_status"] = "MODEL_UNAVAILABLE"
+        crop_advisory_info["decision_reasons"] = [str(exc)]
 
     return {
         "farm_profile": {
@@ -243,6 +320,7 @@ async def build_farm_context_packet(
         "outbreaks": outbreak_info,
         "market": market_info,
         "soil_health_card": soil_info,
+        "crop_advisory": crop_advisory_info,
     }
 
 
@@ -257,16 +335,31 @@ def format_context_for_prompt(context: Dict[str, Any]) -> str:
     outbrk = context.get("outbreaks", {})
     mkt = context.get("market", {})
     soil = context.get("soil_health_card", {})
+    ca = context.get("crop_advisory", {})
+
+    w_str = (
+        f"Place: {w.get('place_name')}, Coordinates: ({w.get('latitude')}, {w.get('longitude')}), "
+        f"Source: Open-Meteo ({w.get('grid_disclaimer')}), Fetched: {w.get('fetched_at')}. "
+        f"Temp: {w.get('temperature_c')}°C, Rain today: {w.get('rainfall_today_mm')} mm, Reference ET0: {w.get('reference_et0_mm')} mm"
+        if w.get("status") in ("LIVE", "STALE") and w.get("temperature_c") is not None
+        else f"Weather unavailable ({w.get('error', 'Service unreachable')}). Do not invent weather numbers."
+    )
+
+    ca_str = (
+        f"Decision Status: {ca.get('decision_status')}, Top Crop: {ca.get('top_crop')} ({ca.get('probability_pct')}%), "
+        f"Reasons: {'; '.join(ca.get('decision_reasons', []))}. Note: {ca.get('soil_note')}"
+    )
 
     return f"""=== REAL FARM CONTEXT PACKET (GROUND TRUTH) ===
 - Farm Profile [LIVE]: {fp.get('name')} in {fp.get('village')}, {fp.get('district')}, {fp.get('state')}.
   Area: {fp.get('area_acres')} acres | Soil: {fp.get('soil_type')} | Irrigation: {fp.get('irrigation_method')} | Crop: {fp.get('crop')}
-- Weather [LIVE]: Temp {w.get('temperature_c')}°C, Rain today: {w.get('rainfall_today_mm')} mm, Reference ET0: {w.get('reference_et0_mm')} mm
+- Weather [{w.get('status')}]: {w_str}
 - Irrigation [LIVE]: Irrigate Now: {irr.get('irrigate_now')} | Gross Depth Needed: {irr.get('gross_depth_mm', 0.0)} mm | Litres Needed: {irr.get('litres_needed', 0)} L | Next Scheduled Irrigation: {irr.get('next_irrigation_date')} | Root Zone Depletion: {irr.get('root_zone_depletion_mm')} mm
 - Growth Stage [LIVE]: Stage: {cal.get('stage_name')} (Day {cal.get('days_after_sowing')} after sowing)
 - Disease Diagnosis [LIVE]: {dis.get('predicted_disease')} (Scanned: {dis.get('has_recent_scan')}) | Note: {dis.get('treatment_note')}
 - Farm Economics [LIVE]: Net Profit: ₹{econ.get('estimated_net_profit_rs')} | Revenue: ₹{econ.get('gross_revenue_rs')} | Cost: ₹{econ.get('total_cost_rs')}
 - Pest Outbreaks [LIVE]: {outbrk.get('nearby_outbreaks_count')} active in {fp.get('district')} ({', '.join(outbrk.get('active_outbreaks', [])) or 'None reported'})
-- Market Prices [DEMO DATA]: Indicative Mandi Modal: ₹{mkt.get('modal_price_rs_per_q')}/q at {mkt.get('top_mandi')}. Note: DEMO DATA, MSP details to verify locally.
+- Market Prices [{mkt.get('status')}]: Modal Price: ₹{mkt.get('modal_price_rs_per_q')}/q (Range ₹{mkt.get('min_price_rs_per_q')}–₹{mkt.get('max_price_rs_per_q')}/q) at {mkt.get('top_mandi')}. Note: {mkt.get('status')}, details to verify locally.
 - Soil Health [STATUS: {soil.get('status')}]: {soil.get('npk')}
+- Crop Advisory Classifier [STATUS: {ca.get('decision_status')}]: {ca_str}
 === END CONTEXT PACKET ==="""

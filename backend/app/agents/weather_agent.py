@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from backend.app.agents.base import BaseAgent
 from backend.app.agents.schemas import WeatherReport
 from backend.app.schemas.envelope import AgentEnvelope
-from backend.app.services.open_meteo import get_weather_forecast
+from backend.app.services.open_meteo import get_weather_forecast, get_farm_weather
 
 
 class WeatherAgent(BaseAgent):
@@ -30,8 +30,12 @@ class WeatherAgent(BaseAgent):
                 warnings=["Coordinates required for Open-Meteo meteorological query."],
             )
 
+        farm = context.get("farm")
         try:
-            forecast = await get_weather_forecast(float(lat), float(lon), db)
+            if farm is not None:
+                forecast = await get_farm_weather(farm, db)
+            else:
+                forecast = await get_weather_forecast(float(lat), float(lon), db)
         except Exception as exc:
             return AgentEnvelope(
                 agent_name=self.name,

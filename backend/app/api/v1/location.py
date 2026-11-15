@@ -32,7 +32,7 @@ def list_villages(
         "state": state,
         "district": district,
         "is_partial": True,
-        "note": "Village list is a representative sample for hackathon demonstration. Additional villages can be geocoded.",
+        "note": "Mandal / Taluk headquarters list from bundled shapefiles dataset. Additional locations can be geocoded.",
         "villages": villages,
     }
 
