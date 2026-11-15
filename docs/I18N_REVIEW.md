@@ -670,6 +670,43 @@ In Round 8 Phase 2, the "Export Calendar" (.ics export) button and all user-faci
 | **calendar.subtitle** | Stage-by-stage agronomic timeline tied to your sowing date. | విత్తిన తేదీ ఆధారంగా దశలవారీ వ్యవసాయ ప్రణాళిక. | बुवाई की तिथि से जुड़े चरणबद्ध कृषि कार्य। | **NOT native-reviewed** |
 | **calendar.explain_title** | Calendar Logic & Agronomic Principles | క్యాలెండర్ విధానం & వ్యవసాయ సూత్రాలు | कैलेंडर तर्क एवं कृषि सिद्धांत | **NOT native-reviewed** |
 
+---
+
+## 12. Round 8 Phase 4 & Phase 5 Soil Card Flow & Crop Advisory (Unreviewed Strings)
+
+In Round 8 Phases 4 and 5, full Gemini Vision Soil Health Card extraction, farm-scoped persistence, and Crop Advisory 7-feature integration were implemented. The following keys were introduced across `en`, `te`, and `hi` locale catalogs and are catalogued here as **NOT native-reviewed**:
+
+| UI Key / Location | English (`en`) | Telugu (`te`) | Hindi (`hi`) | Review Status |
+|---|---|---|---|---|
+| **soilcard.read_from_card** | Read from your card | మీ కార్డ్ నుండి గుర్తించబడింది | आपके कार्ड से पहचाना गया | **NOT native-reviewed** |
+| **soilcard.read_from_card_conf** | Read from your card ({{conf}}%) | మీ కార్డ్ నుండి గుర్తించబడింది ({{conf}}%) | आपके कार्ड से पहचाना गया ({{conf}}%) | **NOT native-reviewed** |
+| **soilcard.field_unreadable** | Not detected — enter manually | గుర్తించబడలేదు — నేరుగా నమోదు చేయండి | पहचाना नहीं गया — कृपया दर्ज करें | **NOT native-reviewed** |
+| **soilcard.confirm_save_farm** | Confirm and save to this farm | నిర్ధారించి ఈ పొలానికి భద్రపరచండి | पुष्टि करें और इस खेत में सहेजें | **NOT native-reviewed** |
+| **soilcard.go_to_crop_advisory** | Go to Crop Advisory | పంట సలహాకు వెళ్లండి | फसल परामर्श पर जाएं | **NOT native-reviewed** |
+| **soilcard.back_to_crop_advisory** | Back to Crop Advisory | తిరిగి పంట సలహాకు వెళ్లండి | फसल परामर्श पर वापस जाएं | **NOT native-reviewed** |
+| **soilcard.replace_or_remove_btn** | Replace card / Remove saved values | కార్డ్ మార్చండి / భద్రపరిచిన విలువలను తొలగించండి | कार्ड बदलें / सहेजे गए मान हटाएं | **NOT native-reviewed** |
+| **soilcard.replace_card_btn** | Replace card | కార్డ్ మార్చండి | कार्ड बदलें | **NOT native-reviewed** |
+| **soilcard.remove_card_btn** | Remove saved values | విలువలను తొలగించండి | मान हटाएं | **NOT native-reviewed** |
+| **soilcard.remove_confirm_msg** | Are you sure you want to remove the saved soil values for this farm? | ఈ పొలం కోసం భద్రపరిచిన నేల వివరాలను ఖచ్చితంగా తొలగించాలనుకుంటున్నారా? | क्या आप इस खेत के लिए सहेजे गए मृदा मान हटाना चाहते हैं? | **NOT native-reviewed** |
+| **soilcard.removing** | Removing saved values... | తొలగిస్తున్నాము... | हटाया जा रहा है... | **NOT native-reviewed** |
+| **soilcard.card_removed_success** | Saved soil values removed successfully. | భద్రపరిచిన నేల వివరాలు విజయవంతంగా తొలగించబడ్డాయి. | सहेजे गए मृदा मान सफलतापूर्वक हटा दिए गए। | **NOT native-reviewed** |
+| **soilcard.ai_provider_notice** | Photo is sent to an AI provider (Google Gemini) to read values. | విలువలను గుర్తించడానికి ఫోటో AI ప్రొవైడర్ (Google Gemini) కు పంపబడుతుంది. | मान पढ़ने के लिए फोटो AI प्रदाता (Google Gemini) को भेजा जाता है। | **NOT native-reviewed** |
+| **soilcard.saved_values_active** | Saved soil values active for this farm | ఈ పొలానికి నేల వివరాలు భద్రపరచబడి ఉన్నాయి | इस खेत के लिए मृदा परीक्षण मान सक्रिय हैं | **NOT native-reviewed** |
+| **soilcard.source_label** | Source | మూలం | स्रोत | **NOT native-reviewed** |
+| **soilcard.test_date_label** | Test Date | పరీక్ష తేదీ | परीक्षण तिथि | **NOT native-reviewed** |
+| **soilcard.source_ai** | Photo read by AI | AI ద్వారా ఫోటో నుండి గుర్తించబడింది | AI द्वारा फोटो से पढ़ा गया | **NOT native-reviewed** |
+| **soilcard.source_manual** | Typed by farmer | రైతు ద్వారా నమోదు చేయబడింది | किसान द्वारा दर्ज किया गया | **NOT native-reviewed** |
+| **soilcard.extracting_vision** | Reading soil values with AI vision... | AI విజన్ ద్వారా నేల వివరాలను గుర్తిస్తున్నాము... | AI विज़न द्वारा मृदा मान पढ़े जा रहे हैं... | **NOT native-reviewed** |
+| **soilcard.take_photo_camera** | Choose photo or capture with camera | ఫోటో ఎంచుకోండి లేదా కెమెరాతో తీయండి | फोटो चुनें या कैमरे से खींचें | **NOT native-reviewed** |
+| **soilcard.manual_entry_note** | Or fill in values directly below without uploading a card | లేదా కార్డ్ అప్‌లోడ్ చేయకుండా నేరుగా క్రింద నమోదు చేయండి | या कार्ड अपलोड किए बिना नीचे सीधे विवरण दर्ज करें | **NOT native-reviewed** |
+| **soilcard.reset_form_btn** | Clear Form | ఫారమ్ ఖాళీ చేయండి | फॉर्म रीसेट करें | **NOT native-reviewed** |
+| **recommend.soil_values_missing** | Soil values missing. Add them from your Soil Card for the best crop recommendation | నేల పరీక్ష వివరాలు లేవు. ఉత్తమ పంట సలహా కోసం మీ సాయిల్ హెల్త్ కార్డ్ నుండి జోడించండి | मृदा मान अनुपलब्ध हैं। सर्वोत्तम फसल सलाह के लिए अपने सॉइल कार्ड से जोड़ें | **NOT native-reviewed** |
+| **recommend.save_to_farm** | Save to farm | పొలానికి భద్రపరచండి | खेत में सहेजें | **NOT native-reviewed** |
+| **recommend.not_saved_notice** | Not saved to farm profile | పొలం ప్రొఫైల్‌లో ఇంకా భద్రపరచబడలేదు | खेत प्रोफाइल में सहेजा नहीं गया है | **NOT native-reviewed** |
+| **recommend.source_soil_card_tested** | Soil card, tested {{date}} | సాయిల్ కార్డ్, పరీక్షించిన తేదీ {{date}} | सॉइल कार्ड, परीक्षण तिथि {{date}} | **NOT native-reviewed** |
+| **recommend.source_typed_farmer** | Typed by farmer | రైతు ద్వారా నమోదు చేయబడింది | किसान द्वारा दर्ज किया गया | **NOT native-reviewed** |
+
+
 
 
 

@@ -23,11 +23,15 @@ export interface SoilCardExtractionResponse {
   ph: SoilCardFieldConfidence;
   organic_carbon: SoilCardFieldConfidence;
   electrical_conductivity: SoilCardFieldConfidence;
+  soil_texture?: string | null;
   overall_confidence: number;
   preview_image_base64?: string | null;
   raw_text?: string | null;
   language: string;
-  status: 'WORKING' | 'PARTIAL' | 'MANUAL_ONLY';
+  status: 'WORKING' | 'PARTIAL' | 'MANUAL_ONLY' | 'REJECTED';
+  is_soil_health_card?: boolean;
+  test_date?: string | null;
+  rejection_reason?: string | null;
   notes: string[];
 }
 
@@ -40,10 +44,29 @@ export interface SoilCardConfirmRequest {
   organic_carbon_pct?: number | null;
   electrical_conductivity_ds_m?: number | null;
   soil_texture?: string | null;
-  store_image_opt_in: boolean;
+  store_image_opt_in?: boolean;
   image_base64?: string | null;
   extraction_method?: string;
+  source?: string;
+  test_date?: string | null;
   field_confidences?: Record<string, number>;
+}
+
+export interface SoilCardRecord {
+  id: number;
+  farm_id: number;
+  nitrogen_kg_ha: number | null;
+  phosphorus_kg_ha: number | null;
+  potassium_kg_ha: number | null;
+  ph: number | null;
+  organic_carbon_pct: number | null;
+  electrical_conductivity_ds_m: number | null;
+  soil_texture: string | null;
+  source?: string | null;
+  test_date?: string | null;
+  is_confirmed: boolean;
+  created_at?: string;
+  image_thumbnail_base64?: string | null;
 }
 
 export interface SoilCardConfirmResponse {
@@ -108,10 +131,19 @@ export async function confirmSoilCard(payload: SoilCardConfirmRequest): Promise<
 
 export async function getLatestSoilCard(farmId: number): Promise<{
   has_card: boolean;
-  card?: any;
+  card?: SoilCardRecord | null;
   message?: string;
 }> {
   return apiRequest(`/api/v1/soil-card/latest?farm_id=${farmId}`);
+}
+
+export async function deleteSoilCard(farmId: number): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  return apiRequest(`/api/v1/soil-card?farm_id=${farmId}`, {
+    method: 'DELETE',
+  });
 }
 
 export async function getSoilImpact(farmId: number, cropName?: string): Promise<SoilImpactAnalysisResponse> {
