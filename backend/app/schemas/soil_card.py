@@ -29,8 +29,13 @@ class SoilCardExtractionResponse(BaseModel):
     preview_image_base64: Optional[str] = Field(None, description="Base64 encoded thumbnail preview for verification UI")
     raw_text: Optional[str] = Field(None, description="Complete OCR transcript text")
     language: str = Field("en", description="Card language detected or requested")
-    status: str = Field("WORKING", description="WORKING, PARTIAL (indic languages), or MANUAL_ONLY")
+    status: str = Field("WORKING", description="WORKING, PARTIAL (indic languages), MANUAL_ONLY, or REJECTED_NOT_SOIL_CARD")
     notes: List[str] = Field(default_factory=list)
+    is_soil_health_card: bool = Field(True, description="True if image is a recognized Soil Health Card")
+    test_date: Optional[str] = Field(None, description="Date of soil test if printed on card")
+    soil_texture: Optional[str] = Field(None, description="Soil texture type if detected")
+    rejection_reason: Optional[str] = Field(None, description="Reason if image is rejected as not a soil card")
+    source: Optional[str] = Field(None, description="Source provenance: 'photo read by AI' or 'typed by farmer'")
 
 
 class SoilCardConfirmRequest(BaseModel):
@@ -38,13 +43,15 @@ class SoilCardConfirmRequest(BaseModel):
     nitrogen_kg_ha: Optional[float] = Field(None, ge=0.0, le=2000.0, description="Available N in kg/ha")
     phosphorus_kg_ha: Optional[float] = Field(None, ge=0.0, le=1000.0, description="Available P in kg/ha")
     potassium_kg_ha: Optional[float] = Field(None, ge=0.0, le=2000.0, description="Available K in kg/ha")
-    ph: Optional[float] = Field(None, ge=1.0, le=14.0, description="Soil pH reaction")
+    ph: Optional[float] = Field(None, ge=0.0, le=14.0, description="Soil pH reaction")
     organic_carbon_pct: Optional[float] = Field(None, ge=0.0, le=10.0, description="Organic Carbon in %")
     electrical_conductivity_ds_m: Optional[float] = Field(None, ge=0.0, le=20.0, description="EC in dS/m")
     soil_texture: Optional[str] = Field(None, description="Confirmed soil texture (e.g. Sandy Loam, Clay)")
     store_image_opt_in: bool = Field(False, description="Explicit privacy consent to store card image on server")
     image_base64: Optional[str] = Field(None, description="Image payload if user opted in to storage")
     extraction_method: str = Field("manual", description="Method used: manual, easyocr, tesseract, gemini_vision")
+    source: Optional[str] = Field(None, description="Provenance: 'photo read by AI' or 'typed by farmer'")
+    test_date: Optional[str] = Field(None, description="Date of soil test if known")
     field_confidences: Optional[Dict[str, float]] = Field(default_factory=dict)
 
 
@@ -55,6 +62,8 @@ class SoilCardConfirmResponse(BaseModel):
     farm_id: int
     confirmed_values: Dict[str, Any]
     created_at: str
+    source: Optional[str] = None
+    test_date: Optional[str] = None
 
 
 class SoilImpactAnalysisRequest(BaseModel):

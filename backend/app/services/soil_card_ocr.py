@@ -14,11 +14,16 @@ Pluggable OCR architecture:
 import base64
 import importlib.util
 import io
+import json
+import logging
 import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
+import httpx
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 from backend.app.config import settings
 from backend.app.ml.crop_recommender import crop_recommender_engine
@@ -64,14 +69,14 @@ def detect_ocr_engines() -> Tuple[Optional[str], List[str], Dict[str, str]]:
     if gemini_key and len(gemini_key.strip()) > 10:
         available.append("gemini_vision")
 
-    # Determine preferred active engine
+    # Determine preferred active engine: Gemini Vision (preferred if key configured), then EasyOCR, then Tesseract
     active_engine: Optional[str] = None
-    if "easyocr" in available:
+    if "gemini_vision" in available:
+        active_engine = "gemini_vision"
+    elif "easyocr" in available:
         active_engine = "easyocr"
     elif "tesseract" in available:
         active_engine = "tesseract"
-    elif "gemini_vision" in available:
-        active_engine = "gemini_vision"
 
     # Missing engines instructions
     missing_instructions = {
@@ -243,6 +248,476 @@ def generate_image_thumbnail_base64(image_bytes: bytes, max_dim: int = 800) -> O
         return None
 
 
+def convert_nutrient_unit(value: Optional[float], unit: Optional[str]) -> Tuple[Optional[float], str, bool]:
+    """
+    Converts nutrient measurement to kg/ha if unit is known and standard.
+    Returns: (converted_value, target_unit, is_confirmed_standard_unit)
+    """
+    if value is None:
+        return None, "kg/ha", True
+    if not unit or not str(unit).strip():
+        return value, "unspecified", False
+
+    u = str(unit).strip().lower()
+    clean_u = re.sub(r"[\s\-_/]+", "", u)
+
+    if clean_u in ("kgha", "kgh", "kgperha", "kgha1", "kgha-1"):
+        return round(float(value), 2), "kg/ha", True
+    if clean_u in ("kgacre", "kgperacre", "kgac", "kgperac"):
+        # 1 ha = 2.47105 acres -> 1 kg/acre = 2.47105 kg/ha
+        return round(float(value) * 2.47105, 2), "kg/ha", True
+    if clean_u in ("ppm", "mgkg", "mgperkg"):
+        # Topsoil furrow slice: 1 ppm = 2.24 kg/ha
+        return round(float(value) * 2.24, 2), "kg/ha", True
+    if clean_u in ("lbacre", "lbsacre", "lbac", "lbsac"):
+        return round(float(value) * 1.12085, 2), "kg/ha", True
+    if clean_u in ("qha", "qperha", "quintalha", "quintalsperha"):
+        return round(float(value) * 100.0, 2), "kg/ha", True
+
+    return value, str(unit).strip(), False
+
+
+def validate_soil_metric(
+    field_name: str,
+    raw_val: Optional[float],
+    unit: Optional[str],
+    confidence: float = 0.0,
+    raw_match: Optional[str] = None,
+) -> Tuple[SoilCardFieldConfidence, List[str]]:
+    """
+    Validates extracted metric against physical limits (pH 0-14, no negatives)
+    and agronomic ceilings (warnings, no clamping).
+    """
+    warnings: List[str] = []
+    default_unit = (
+        "kg/ha" if field_name in ("nitrogen", "phosphorus", "potassium")
+        else ("pH" if field_name == "ph" else ("%" if field_name == "organic_carbon" else "dS/m"))
+    )
+
+    if raw_val is None:
+        return (
+            SoilCardFieldConfidence(
+                value=None,
+                confidence=0.0,
+                unit=unit or default_unit,
+                status="UNAVAILABLE",
+                raw_match=raw_match,
+            ),
+            warnings,
+        )
+
+    # Physical limits
+    if raw_val < 0.0:
+        warnings.append(f"{field_name.capitalize()} cannot be negative ({raw_val}). Discarded as physically invalid.")
+        return (
+            SoilCardFieldConfidence(
+                value=None,
+                confidence=0.0,
+                unit=unit or default_unit,
+                status="LOW",
+                raw_match=f"{raw_match} (invalid negative)" if raw_match else "invalid negative",
+            ),
+            warnings,
+        )
+
+    if field_name == "ph":
+        if raw_val < 0.0 or raw_val > 14.0:
+            warnings.append(f"pH value {raw_val} is physically impossible (must be between 0.0 and 14.0). Discarded.")
+            return (
+                SoilCardFieldConfidence(
+                    value=None,
+                    confidence=0.0,
+                    unit="pH",
+                    status="LOW",
+                    raw_match=f"{raw_match} (out of 0-14 physical scale)" if raw_match else "out of 0-14 scale",
+                ),
+                warnings,
+            )
+        if raw_val < 4.5 or raw_val > 9.5:
+            warnings.append(f"Soil pH {raw_val} is outside typical arable range (4.5 to 9.5). Soil may be strongly acidic or alkaline.")
+
+        status = "HIGH" if confidence >= 0.85 else ("MEDIUM" if confidence >= 0.60 else "LOW")
+        return (
+            SoilCardFieldConfidence(
+                value=round(raw_val, 2),
+                confidence=confidence,
+                unit="pH",
+                status=status,
+                raw_match=raw_match,
+            ),
+            warnings,
+        )
+
+    if field_name in ("nitrogen", "phosphorus", "potassium"):
+        conv_val, target_unit, is_std = convert_nutrient_unit(raw_val, unit)
+        if not is_std:
+            warnings.append(f"{field_name.capitalize()} printed unit '{unit}' is non-standard or unconfirmed. Stored without silent conversion.")
+            return (
+                SoilCardFieldConfidence(
+                    value=conv_val,
+                    confidence=min(confidence, 0.50),
+                    unit=target_unit,
+                    status="LOW",
+                    raw_match=f"{raw_match} (unconfirmed unit '{unit}')" if raw_match else f"unconfirmed unit '{unit}'",
+                ),
+                warnings,
+            )
+
+        ceilings = {"nitrogen": 600.0, "phosphorus": 150.0, "potassium": 600.0}
+        max_ceil = ceilings.get(field_name, 600.0)
+        if conv_val is not None and conv_val > max_ceil:
+            warnings.append(f"{field_name.capitalize()} value ({conv_val} kg/ha) exceeds typical agronomic ceiling ({max_ceil} kg/ha). Please review carefully.")
+
+        status = "HIGH" if confidence >= 0.85 else ("MEDIUM" if confidence >= 0.60 else "LOW")
+        return (
+            SoilCardFieldConfidence(
+                value=conv_val,
+                confidence=confidence,
+                unit="kg/ha",
+                status=status,
+                raw_match=raw_match,
+            ),
+            warnings,
+        )
+
+    status = "HIGH" if confidence >= 0.85 else ("MEDIUM" if confidence >= 0.60 else "LOW")
+    return (
+        SoilCardFieldConfidence(
+            value=round(raw_val, 2),
+            confidence=confidence,
+            unit=unit or default_unit,
+            status=status,
+            raw_match=raw_match,
+        ),
+        warnings,
+    )
+
+
+def call_gemini_vision(
+    image_bytes: bytes,
+    mime_type: str = "image/jpeg",
+    lang: str = "en",
+    timeout: float = 8.0,
+) -> Tuple[Optional[Dict[str, Any]], Optional[str], Optional[str]]:
+    """
+    Sends soil health card photo to Gemini Vision API for structured JSON extraction.
+    Returns: (extracted_json_dict, error_message, error_code)
+    """
+    gemini_key = getattr(settings, "GEMINI_API_KEY", None) or os.environ.get("GEMINI_API_KEY")
+    if not gemini_key or len(gemini_key.strip()) <= 10:
+        return None, "Gemini API key is not configured.", "NO_API_KEY"
+
+    model = os.environ.get("GEMINI_VISION_MODEL") or getattr(settings, "GEMINI_VISION_MODEL", None) or "gemini-3.1-flash-lite"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={gemini_key.strip()}"
+
+    system_prompt = (
+        "You are an expert agricultural document parser specializing in Indian Soil Health Cards (SHC) issued by the Ministry of Agriculture & Farmers Welfare, State Agriculture Departments, or certified agricultural testing laboratories.\n"
+        "Analyze the provided image and extract soil test parameters into the following strict JSON schema:\n"
+        "{\n"
+        '  "is_soil_health_card": boolean,\n'
+        '  "rejection_reason": string or null,\n'
+        '  "test_date": string or null,\n'
+        '  "soil_texture": string or null,\n'
+        '  "nitrogen": {"value": float or null, "unit": string or null, "confidence": float},\n'
+        '  "phosphorus": {"value": float or null, "unit": string or null, "confidence": float},\n'
+        '  "potassium": {"value": float or null, "unit": string or null, "confidence": float},\n'
+        '  "ph": {"value": float or null, "unit": "pH" or null, "confidence": float},\n'
+        '  "organic_carbon": {"value": float or null, "unit": string or null, "confidence": float},\n'
+        '  "electrical_conductivity": {"value": float or null, "unit": string or null, "confidence": float}\n'
+        "}\n\n"
+        "CRITICAL RULES:\n"
+        "- If the image is NOT a Soil Health Card, laboratory soil analysis report, or agricultural soil test document, set is_soil_health_card: false, rejection_reason: 'The uploaded image does not appear to be an official Soil Health Card or laboratory soil test report.', and set all nutrient values to null.\n"
+        "- Extract only values clearly visible on the card.\n"
+        "- If a value or unit is unreadable, blurred, or missing, return null. NEVER guess, synthesize, or invent numbers.\n"
+        "- For confidence, provide a number between 0.0 and 1.0 based on readability and visual clarity.\n"
+        "- Return strictly valid JSON."
+    )
+
+    b64_image = base64.b64encode(image_bytes).decode("utf-8")
+    payload = {
+        "contents": [{
+            "role": "user",
+            "parts": [
+                {"text": system_prompt},
+                {"inline_data": {
+                    "mime_type": mime_type,
+                    "data": b64_image,
+                }}
+            ]
+        }],
+        "generationConfig": {
+            "response_mime_type": "application/json",
+            "temperature": 0.1,
+        }
+    }
+
+    try:
+        with httpx.Client(timeout=timeout) as client:
+            resp = client.post(url, json=payload)
+            if resp.status_code == 429:
+                logger.warning("Gemini vision rate limit hit: status=429")
+                return None, "Gemini vision service rate limit reached (HTTP 429). Please enter values manually or retry shortly.", "RATE_LIMIT"
+            if resp.status_code >= 500:
+                logger.warning("Gemini vision server error: status=%s", resp.status_code)
+                return None, f"Gemini vision service temporarily unavailable (HTTP {resp.status_code}). Please enter values manually.", "SERVER_ERROR"
+            if resp.status_code != 200:
+                logger.warning("Gemini vision request failed: status=%s", resp.status_code)
+                return None, f"Gemini vision service error (HTTP {resp.status_code}). Please enter values manually.", "HTTP_ERROR"
+
+            data = resp.json()
+            candidates = data.get("candidates", [])
+            if not candidates:
+                logger.warning("Gemini vision returned empty candidates")
+                return None, "Gemini vision returned an empty reply. Please enter values manually.", "EMPTY_REPLY"
+
+            raw_reply = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            if not raw_reply or not raw_reply.strip():
+                logger.warning("Gemini vision returned blank text content")
+                return None, "Gemini vision returned blank response. Please enter values manually.", "EMPTY_REPLY"
+
+            cleaned = raw_reply.strip()
+            if cleaned.startswith("```"):
+                cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+                cleaned = re.sub(r"\s*```$", "", cleaned)
+
+            parsed = json.loads(cleaned)
+            return parsed, None, None
+
+    except httpx.TimeoutException:
+        logger.warning("Gemini vision request timed out: timeout=%ss", timeout)
+        return None, f"Gemini vision request timed out after {timeout:.0f} seconds. Please enter values manually or try again.", "TIMEOUT"
+    except json.JSONDecodeError as jde:
+        logger.warning("Gemini vision invalid JSON response: exception=%s", type(jde).__name__)
+        return None, "Could not parse AI vision response as valid JSON. Please enter values manually.", "BAD_JSON"
+    except Exception as exc:
+        logger.warning("Gemini vision request failed: exception=%s", type(exc).__name__)
+        return None, f"Gemini vision request failed ({type(exc).__name__}). Please enter values manually.", "ERROR"
+
+
+def extract_soil_card_from_image(
+    image_bytes: bytes,
+    filename: Optional[str] = None,
+    lang: str = "en",
+) -> SoilCardExtractionResponse:
+    """
+    Complete Soil Health Card extraction pipeline:
+    - Validates file size (<= 10MB)
+    - Validates file format (rejects phone HEIC with clear message)
+    - Validates image integrity via Pillow
+    - Generates preview thumbnail base64
+    - Executes preferred engine in order: gemini_vision -> easyocr -> tesseract -> manual
+    - Normalizes units to kg/ha with standard conversion factors
+    - Applies physical validity checks (pH 0-14, non-negative nutrients)
+    - Emits agronomic envelope ceiling warnings (no clamping)
+    - Returns structured response with provenance
+    """
+    active_engine, available_engines, install_instructions = detect_ocr_engines()
+    notes: List[str] = []
+
+    # 1. File size check (max 10MB)
+    if len(image_bytes) > 10 * 1024 * 1024:
+        return SoilCardExtractionResponse(
+            engine_detected=active_engine,
+            available_engines=available_engines,
+            install_instructions=install_instructions,
+            nitrogen=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            phosphorus=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            potassium=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            ph=SoilCardFieldConfidence(value=None, confidence=0.0, unit="pH", status="UNAVAILABLE"),
+            organic_carbon=SoilCardFieldConfidence(value=None, confidence=0.0, unit="%", status="UNAVAILABLE"),
+            electrical_conductivity=SoilCardFieldConfidence(value=None, confidence=0.0, unit="dS/m", status="UNAVAILABLE"),
+            overall_confidence=0.0,
+            status="MANUAL_ONLY",
+            notes=["File size exceeds 10 MB limit. Please compress photo before uploading or enter values manually."],
+        )
+
+    # 2. HEIC / HEIF phone format check
+    is_heic = False
+    if filename:
+        ext = os.path.splitext(filename)[1].lower()
+        if ext in (".heic", ".heif"):
+            is_heic = True
+    if len(image_bytes) >= 12:
+        magic = image_bytes[4:12].lower()
+        if b"ftypheic" in magic or b"ftypmif1" in magic or b"ftypheif" in magic:
+            is_heic = True
+
+    if is_heic:
+        return SoilCardExtractionResponse(
+            engine_detected=active_engine,
+            available_engines=available_engines,
+            install_instructions=install_instructions,
+            nitrogen=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            phosphorus=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            potassium=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            ph=SoilCardFieldConfidence(value=None, confidence=0.0, unit="pH", status="UNAVAILABLE"),
+            organic_carbon=SoilCardFieldConfidence(value=None, confidence=0.0, unit="%", status="UNAVAILABLE"),
+            electrical_conductivity=SoilCardFieldConfidence(value=None, confidence=0.0, unit="dS/m", status="UNAVAILABLE"),
+            overall_confidence=0.0,
+            status="MANUAL_ONLY",
+            notes=["HEIC format from mobile phones is not supported. Please convert or take photo in JPEG or PNG format, or enter values manually."],
+        )
+
+    # 3. Image integrity check
+    try:
+        test_img = Image.open(io.BytesIO(image_bytes))
+        test_img.verify()
+    except Exception:
+        return SoilCardExtractionResponse(
+            engine_detected=active_engine,
+            available_engines=available_engines,
+            install_instructions=install_instructions,
+            nitrogen=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            phosphorus=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            potassium=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+            ph=SoilCardFieldConfidence(value=None, confidence=0.0, unit="pH", status="UNAVAILABLE"),
+            organic_carbon=SoilCardFieldConfidence(value=None, confidence=0.0, unit="%", status="UNAVAILABLE"),
+            electrical_conductivity=SoilCardFieldConfidence(value=None, confidence=0.0, unit="dS/m", status="UNAVAILABLE"),
+            overall_confidence=0.0,
+            status="MANUAL_ONLY",
+            notes=["Uploaded file appears to be damaged or not a valid image. Please enter values manually or try uploading another photo."],
+        )
+
+    preview_b64 = generate_image_thumbnail_base64(image_bytes)
+
+    # Determine MIME type
+    mime_type = "image/jpeg"
+    if filename:
+        ext = os.path.splitext(filename)[1].lower()
+        if ext in (".png",):
+            mime_type = "image/png"
+        elif ext in (".webp",):
+            mime_type = "image/webp"
+
+    # 4. Engine execution: Gemini Vision preferred
+    if active_engine == "gemini_vision":
+        gemini_dict, err_msg, err_code = call_gemini_vision(image_bytes, mime_type=mime_type, lang=lang)
+        if gemini_dict is not None:
+            # Check if rejected as non-soil-card
+            if not gemini_dict.get("is_soil_health_card", True):
+                rejection = gemini_dict.get("rejection_reason") or "Uploaded photo does not appear to be an official Soil Health Card or laboratory soil test report."
+                return SoilCardExtractionResponse(
+                    engine_detected="gemini_vision",
+                    available_engines=available_engines,
+                    install_instructions=install_instructions,
+                    nitrogen=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+                    phosphorus=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+                    potassium=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+                    ph=SoilCardFieldConfidence(value=None, confidence=0.0, unit="pH", status="UNAVAILABLE"),
+                    organic_carbon=SoilCardFieldConfidence(value=None, confidence=0.0, unit="%", status="UNAVAILABLE"),
+                    electrical_conductivity=SoilCardFieldConfidence(value=None, confidence=0.0, unit="dS/m", status="UNAVAILABLE"),
+                    overall_confidence=0.0,
+                    preview_image_base64=preview_b64,
+                    status="REJECTED_NOT_SOIL_CARD",
+                    is_soil_health_card=False,
+                    rejection_reason=rejection,
+                    source="photo read by AI",
+                    notes=[rejection, "Please upload a clear photo of an official Soil Health Card or enter your soil values manually."],
+                )
+
+            # Parse each field from Gemini JSON
+            extracted_fields = {}
+            confidences = []
+
+            for field_name in ["nitrogen", "phosphorus", "potassium", "ph", "organic_carbon", "electrical_conductivity"]:
+                item = gemini_dict.get(field_name)
+                val = None
+                unit = None
+                conf = 0.0
+                if isinstance(item, dict):
+                    val = item.get("value")
+                    unit = item.get("unit")
+                    conf = float(item.get("confidence") or 0.0)
+                elif isinstance(item, (int, float)):
+                    val = float(item)
+                    conf = 0.85
+
+                metric, field_warns = validate_soil_metric(
+                    field_name=field_name,
+                    raw_val=val,
+                    unit=unit,
+                    confidence=conf,
+                    raw_match=f"{field_name}: {val} {unit}" if val is not None else None,
+                )
+                extracted_fields[field_name] = metric
+                notes.extend(field_warns)
+                if metric.confidence > 0:
+                    confidences.append(metric.confidence)
+
+            overall_conf = round(sum(confidences) / len(confidences), 2) if confidences else 0.0
+            test_date = gemini_dict.get("test_date")
+            soil_texture = gemini_dict.get("soil_texture")
+
+            notes.append("Photo read by AI vision. Values are suggestions — verify each before confirming.")
+            notes.append("Nothing is saved to your farm profile until you review and click Confirm.")
+
+            return SoilCardExtractionResponse(
+                engine_detected="gemini_vision",
+                available_engines=available_engines,
+                install_instructions=install_instructions,
+                nitrogen=extracted_fields["nitrogen"],
+                phosphorus=extracted_fields["phosphorus"],
+                potassium=extracted_fields["potassium"],
+                ph=extracted_fields["ph"],
+                organic_carbon=extracted_fields["organic_carbon"],
+                electrical_conductivity=extracted_fields["electrical_conductivity"],
+                overall_confidence=overall_conf,
+                preview_image_base64=preview_b64,
+                raw_text=json.dumps(gemini_dict),
+                language=lang,
+                status="WORKING" if overall_conf >= 0.60 else "PARTIAL",
+                notes=notes,
+                is_soil_health_card=True,
+                test_date=test_date,
+                soil_texture=soil_texture,
+                source="photo read by AI",
+            )
+        else:
+            # Gemini call failed -> note error and attempt fallback or manual
+            notes.append(err_msg or "AI vision call failed. Falling back to local OCR or manual entry.")
+            # Fall back to local OCR if installed
+            if "easyocr" in available_engines or "tesseract" in available_engines:
+                fallback_text = execute_pluggable_ocr(image_bytes, lang=lang)
+                if fallback_text and not fallback_text.startswith("["):
+                    parsed_fallback = parse_soil_card_text(fallback_text, requested_lang=lang)
+                    parsed_fallback.preview_image_base64 = preview_b64
+                    parsed_fallback.notes = notes + parsed_fallback.notes
+                    return parsed_fallback
+
+            # Manual entry fallback
+            return SoilCardExtractionResponse(
+                engine_detected="gemini_vision",
+                available_engines=available_engines,
+                install_instructions=install_instructions,
+                nitrogen=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+                phosphorus=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+                potassium=SoilCardFieldConfidence(value=None, confidence=0.0, unit="kg/ha", status="UNAVAILABLE"),
+                ph=SoilCardFieldConfidence(value=None, confidence=0.0, unit="pH", status="UNAVAILABLE"),
+                organic_carbon=SoilCardFieldConfidence(value=None, confidence=0.0, unit="%", status="UNAVAILABLE"),
+                electrical_conductivity=SoilCardFieldConfidence(value=None, confidence=0.0, unit="dS/m", status="UNAVAILABLE"),
+                overall_confidence=0.0,
+                preview_image_base64=preview_b64,
+                status="MANUAL_ONLY",
+                notes=notes + ["Please fill your soil metrics manually."],
+                source="typed by farmer",
+            )
+
+    # If local OCR (easyocr/tesseract) is active
+    if active_engine in ("easyocr", "tesseract"):
+        ocr_text = execute_pluggable_ocr(image_bytes, lang=lang)
+        res = parse_soil_card_text(ocr_text, requested_lang=lang)
+        res.preview_image_base64 = preview_b64
+        res.source = "photo read by OCR"
+        return res
+
+    # No automated engine available
+    res = parse_soil_card_text("", requested_lang=lang)
+    res.preview_image_base64 = preview_b64
+    res.status = "MANUAL_ONLY"
+    res.source = "typed by farmer"
+    return res
+
+
 def execute_pluggable_ocr(image_bytes: bytes, lang: str = "en") -> str:
     """
     Attempts to execute optical character recognition using available engine.
@@ -250,7 +725,20 @@ def execute_pluggable_ocr(image_bytes: bytes, lang: str = "en") -> str:
     """
     active_engine, _, _ = detect_ocr_engines()
 
-    if active_engine == "easyocr":
+    if active_engine == "gemini_vision":
+        parsed, err, _ = call_gemini_vision(image_bytes, lang=lang)
+        if parsed:
+            lines = []
+            if parsed.get("test_date"):
+                lines.append(f"Test Date: {parsed['test_date']}")
+            for k in ["nitrogen", "phosphorus", "potassium", "ph", "organic_carbon", "electrical_conductivity"]:
+                item = parsed.get(k)
+                if isinstance(item, dict) and item.get("value") is not None:
+                    lines.append(f"{k.capitalize()}: {item['value']} {item.get('unit') or ''}")
+            return "\n".join(lines) if lines else "[Gemini Vision: No parameters readable on card]"
+        return f"[Gemini Vision extraction failed: {err or 'unknown error'}]"
+
+    elif active_engine == "easyocr":
         try:
             import easyocr
             langs = ["en"]

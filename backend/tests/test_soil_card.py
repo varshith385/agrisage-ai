@@ -416,3 +416,383 @@ def test_impact_api_endpoint(client: TestClient, farmer_headers: dict, test_farm
     assert "integration_scope_note" in data
     assert "comparison screen" in data["integration_scope_note"]
 
+
+# ---------------------------------------------------------
+# 6. Round 8 Phase 3 Gemini Vision & Extended Validation Tests
+# ---------------------------------------------------------
+
+from backend.app.models.user import User, UserRole
+from backend.app.security.auth import create_access_token, hash_password
+from backend.app.services.soil_card_ocr import (
+    call_gemini_vision,
+    convert_nutrient_unit,
+    extract_soil_card_from_image,
+    validate_soil_metric,
+)
+
+
+def _make_dummy_image_bytes(format: str = "JPEG") -> bytes:
+    img = Image.new("RGB", (256, 256), color=(240, 245, 235))
+    buf = io.BytesIO()
+    img.save(buf, format=format)
+    return buf.getvalue()
+
+
+def test_gemini_vision_success_mocked(client: TestClient, monkeypatch):
+    """Test 1: Mocked Gemini Vision extraction of valid Soil Health Card"""
+    mock_payload = {
+        "is_soil_health_card": True,
+        "rejection_reason": None,
+        "test_date": "2026-04-10",
+        "soil_texture": "Sandy Clay Loam",
+        "nitrogen": {"value": 285.0, "unit": "kg/ha", "confidence": 0.95},
+        "phosphorus": {"value": 19.5, "unit": "kg/ha", "confidence": 0.92},
+        "potassium": {"value": 315.0, "unit": "kg/ha", "confidence": 0.94},
+        "ph": {"value": 7.3, "unit": "pH", "confidence": 0.98},
+        "organic_carbon": {"value": 0.58, "unit": "%", "confidence": 0.90},
+        "electrical_conductivity": {"value": 0.40, "unit": "dS/m", "confidence": 0.88},
+    }
+
+    monkeypatch.setattr(
+        "backend.app.services.soil_card_ocr.call_gemini_vision",
+        lambda *args, **kwargs: (mock_payload, None, None),
+    )
+
+    img_bytes = _make_dummy_image_bytes()
+    files = {"file": ("soil_card.jpg", io.BytesIO(img_bytes), "image/jpeg")}
+    res = client.post("/api/v1/soil-card/ocr", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["is_soil_health_card"] is True
+    assert data["status"] == "WORKING"
+    assert data["nitrogen"]["value"] == 285.0
+    assert data["ph"]["value"] == 7.3
+    assert data["test_date"] == "2026-04-10"
+    assert data["source"] == "photo read by AI"
+    assert data["overall_confidence"] >= 0.90
+
+
+def test_gemini_vision_partial_read_some_nulls(client: TestClient, monkeypatch):
+    """Test 2: Partial read with null/unreadable values (never guesses)"""
+    mock_payload = {
+        "is_soil_health_card": True,
+        "rejection_reason": None,
+        "test_date": None,
+        "soil_texture": None,
+        "nitrogen": {"value": 240.0, "unit": "kg/ha", "confidence": 0.85},
+        "phosphorus": {"value": None, "unit": None, "confidence": 0.0},
+        "potassium": {"value": None, "unit": None, "confidence": 0.0},
+        "ph": {"value": 6.8, "unit": "pH", "confidence": 0.90},
+        "organic_carbon": {"value": None, "unit": None, "confidence": 0.0},
+        "electrical_conductivity": {"value": None, "unit": None, "confidence": 0.0},
+    }
+
+    monkeypatch.setattr(
+        "backend.app.services.soil_card_ocr.call_gemini_vision",
+        lambda *args, **kwargs: (mock_payload, None, None),
+    )
+
+    img_bytes = _make_dummy_image_bytes()
+    files = {"file": ("soil_card_partial.jpg", io.BytesIO(img_bytes), "image/jpeg")}
+    res = client.post("/api/v1/soil-card/ocr", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["nitrogen"]["value"] == 240.0
+    assert data["ph"]["value"] == 6.8
+    assert data["phosphorus"]["value"] is None
+    assert data["phosphorus"]["status"] == "UNAVAILABLE"
+    assert data["potassium"]["value"] is None
+
+
+def test_gemini_vision_non_soil_card_rejected(client: TestClient, monkeypatch):
+    """Test 3: Non-soil-card image is rejected with a clear message"""
+    mock_payload = {
+        "is_soil_health_card": False,
+        "rejection_reason": "The uploaded photo depicts machinery, not a Soil Health Card.",
+        "test_date": None,
+        "nitrogen": None,
+        "ph": None,
+    }
+
+    monkeypatch.setattr(
+        "backend.app.services.soil_card_ocr.call_gemini_vision",
+        lambda *args, **kwargs: (mock_payload, None, None),
+    )
+
+    img_bytes = _make_dummy_image_bytes()
+    files = {"file": ("tractor.jpg", io.BytesIO(img_bytes), "image/jpeg")}
+    res = client.post("/api/v1/soil-card/ocr", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "REJECTED_NOT_SOIL_CARD"
+    assert data["is_soil_health_card"] is False
+    assert data["overall_confidence"] == 0.0
+    assert data["nitrogen"]["value"] is None
+    assert any("not a Soil Health Card" in n for n in data["notes"])
+
+
+def test_gemini_vision_429_rate_limit(client: TestClient, monkeypatch):
+    """Test 4: HTTP 429 returns graceful status and manual entry note"""
+    monkeypatch.setattr(
+        "backend.app.services.soil_card_ocr.call_gemini_vision",
+        lambda *args, **kwargs: (None, "Gemini vision rate limit reached (HTTP 429).", "RATE_LIMIT"),
+    )
+
+    img_bytes = _make_dummy_image_bytes()
+    files = {"file": ("card.jpg", io.BytesIO(img_bytes), "image/jpeg")}
+    res = client.post("/api/v1/soil-card/ocr", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "MANUAL_ONLY"
+    assert any("rate limit" in n.lower() for n in data["notes"])
+
+
+def test_gemini_vision_timeout_handling(client: TestClient, monkeypatch):
+    """Test 5: Request timeout (8s) returns graceful timeout note"""
+    monkeypatch.setattr(
+        "backend.app.services.soil_card_ocr.call_gemini_vision",
+        lambda *args, **kwargs: (None, "Gemini vision request timed out after 8 seconds.", "TIMEOUT"),
+    )
+
+    img_bytes = _make_dummy_image_bytes()
+    files = {"file": ("card.jpg", io.BytesIO(img_bytes), "image/jpeg")}
+    res = client.post("/api/v1/soil-card/ocr", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "MANUAL_ONLY"
+    assert any("timed out" in n.lower() for n in data["notes"])
+
+
+def test_gemini_vision_bad_json_handling(client: TestClient, monkeypatch):
+    """Test 6: Malformed/bad JSON returns graceful parse error note"""
+    monkeypatch.setattr(
+        "backend.app.services.soil_card_ocr.call_gemini_vision",
+        lambda *args, **kwargs: (None, "Could not parse AI vision response as valid JSON.", "BAD_JSON"),
+    )
+
+    img_bytes = _make_dummy_image_bytes()
+    files = {"file": ("card.jpg", io.BytesIO(img_bytes), "image/jpeg")}
+    res = client.post("/api/v1/soil-card/ocr", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "MANUAL_ONLY"
+    assert any("valid json" in n.lower() for n in data["notes"])
+
+
+def test_unit_conversion_standard_and_unconfirmed():
+    """Test 7: Standard unit conversions to kg/ha and unconfirmed handling"""
+    # kg/ha -> standard 1.0
+    val, unit, is_std = convert_nutrient_unit(280.0, "kg/ha")
+    assert val == 280.0
+    assert unit == "kg/ha"
+    assert is_std is True
+
+    # kg/acre -> converts by 2.47105
+    val, unit, is_std = convert_nutrient_unit(100.0, "kg/acre")
+    assert abs(val - 247.105) < 0.1
+    assert unit == "kg/ha"
+    assert is_std is True
+
+    # ppm -> converts by 2.24
+    val, unit, is_std = convert_nutrient_unit(50.0, "ppm")
+    assert val == 112.0
+    assert unit == "kg/ha"
+    assert is_std is True
+
+    # lb/acre -> converts by 1.12085
+    val, unit, is_std = convert_nutrient_unit(100.0, "lb/ac")
+    assert abs(val - 112.085) < 0.05
+    assert unit == "kg/ha"
+    assert is_std is True
+
+    # q/ha -> converts by 100
+    val, unit, is_std = convert_nutrient_unit(2.5, "q/ha")
+    assert val == 250.0
+    assert unit == "kg/ha"
+    assert is_std is True
+
+    # Non-standard / unconfirmed unit -> preserves raw value, flagged as not standard
+    val, unit, is_std = convert_nutrient_unit(15.0, "bags/plot")
+    assert val == 15.0
+    assert unit == "bags/plot"
+    assert is_std is False
+
+    # Unspecified unit -> flagged as not standard
+    val, unit, is_std = convert_nutrient_unit(300.0, None)
+    assert val == 300.0
+    assert is_std is False
+
+
+def test_physical_limits_and_out_of_range_ph():
+    """Test 8: Physical limits discard negative values and pH outside 0-14"""
+    # Physical pH: outside 0-14 must be discarded (None)
+    metric, warns = validate_soil_metric("ph", 16.5, "pH", 0.90)
+    assert metric.value is None
+    assert metric.status == "LOW"
+    assert any("physically impossible" in w for w in warns)
+
+    metric, warns = validate_soil_metric("ph", -0.5, "pH", 0.90)
+    assert metric.value is None
+
+    # Negative nutrient discarded
+    metric, warns = validate_soil_metric("nitrogen", -20.0, "kg/ha", 0.90)
+    assert metric.value is None
+    assert any("cannot be negative" in w for w in warns)
+
+    # Extreme arable pH emits warning ceiling but keeps value
+    metric, warns = validate_soil_metric("ph", 10.5, "pH", 0.90)
+    assert metric.value == 10.5
+    assert any("outside typical arable range" in w for w in warns)
+
+
+def test_ownership_403_enforcement(client: TestClient, db_session: Session, demo_farmer: User, farmer_headers: dict):
+    """Test 9: Enforce ownership: 403 Forbidden when accessing another farmer's card"""
+    # Create a second farmer
+    other_user = User(
+        email="suresh@agrisage.demo",
+        hashed_password=hash_password("FarmerSuresh@2026"),
+        full_name="Suresh Patel",
+        role=UserRole.FARMER,
+    )
+    db_session.add(other_user)
+    db_session.commit()
+    db_session.refresh(other_user)
+
+    # Create a farm owned by the second farmer
+    other_farm = Farm(
+        user_id=other_user.id,
+        name="Suresh Parcel",
+        area=5.0,
+        ownership_type="owned",
+        owned_area=5.0,
+        leased_area=0.0,
+        village="Warangal",
+        district="Warangal",
+        state="Telangana",
+        latitude=17.9689,
+        longitude=79.5941,
+    )
+    db_session.add(other_farm)
+    db_session.commit()
+    db_session.refresh(other_farm)
+
+    # Ramesh (demo_farmer) tries to access Suresh's farm
+    # 1. GET /latest -> 403
+    res_get = client.get(f"/api/v1/soil-card/latest?farm_id={other_farm.id}", headers=farmer_headers)
+    assert res_get.status_code == 403
+
+    # 2. POST /confirm -> 403
+    res_post = client.post(
+        "/api/v1/soil-card/confirm",
+        json={"farm_id": other_farm.id, "nitrogen_kg_ha": 250.0, "ph": 7.0},
+        headers=farmer_headers,
+    )
+    assert res_post.status_code == 403
+
+    # 3. DELETE -> 403
+    res_del = client.delete(f"/api/v1/soil-card?farm_id={other_farm.id}", headers=farmer_headers)
+    assert res_del.status_code == 403
+
+    # 4. POST /impact -> 403
+    res_imp = client.post(
+        "/api/v1/soil-card/impact",
+        json={"farm_id": other_farm.id, "crop_name": "Rice"},
+        headers=farmer_headers,
+    )
+    assert res_imp.status_code == 403
+
+
+def test_per_farm_separation(client: TestClient, db_session: Session, demo_farmer: User, farmer_headers: dict):
+    """Test 10: Farm A card never appears when querying Farm B"""
+    farm_a = Farm(user_id=demo_farmer.id, name="Farm Alpha", area=2.0, ownership_type="owned", owned_area=2.0, leased_area=0.0, village="Geesugonda", state="Telangana", district="Warangal", latitude=17.9689, longitude=79.5941)
+    farm_b = Farm(user_id=demo_farmer.id, name="Farm Beta", area=3.0, ownership_type="owned", owned_area=3.0, leased_area=0.0, village="Geesugonda", state="Telangana", district="Warangal", latitude=17.9689, longitude=79.5941)
+    db_session.add_all([farm_a, farm_b])
+    db_session.commit()
+    db_session.refresh(farm_a)
+    db_session.refresh(farm_b)
+
+    # Save confirmed card for Farm A with N=320.0
+    client.post(
+        "/api/v1/soil-card/confirm",
+        json={"farm_id": farm_a.id, "nitrogen_kg_ha": 320.0, "ph": 7.1, "source": "photo read by AI"},
+        headers=farmer_headers,
+    )
+
+    # Save confirmed card for Farm B with N=180.0
+    client.post(
+        "/api/v1/soil-card/confirm",
+        json={"farm_id": farm_b.id, "nitrogen_kg_ha": 180.0, "ph": 6.5, "source": "typed by farmer"},
+        headers=farmer_headers,
+    )
+
+    # Query Farm A
+    res_a = client.get(f"/api/v1/soil-card/latest?farm_id={farm_a.id}", headers=farmer_headers)
+    assert res_a.status_code == 200
+    assert res_a.json()["card"]["nitrogen_kg_ha"] == 320.0
+    assert res_a.json()["card"]["farm_id"] == farm_a.id
+
+    # Query Farm B
+    res_b = client.get(f"/api/v1/soil-card/latest?farm_id={farm_b.id}", headers=farmer_headers)
+    assert res_b.status_code == 200
+    assert res_b.json()["card"]["nitrogen_kg_ha"] == 180.0
+    assert res_b.json()["card"]["farm_id"] == farm_b.id
+
+
+def test_latest_confirmed_selection(client: TestClient, db_session: Session, farmer_headers: dict, test_farm: Farm):
+    """Test 11: GET /latest returns the most recent CONFIRMED card, ignoring unconfirmed cards"""
+    from datetime import datetime, timezone, timedelta
+    # Card 1: older confirmed card
+    card1 = SoilHealthCard(
+        farm_id=test_farm.id,
+        nitrogen_kg_ha=200.0,
+        ph=6.5,
+        is_confirmed=True,
+        created_at=datetime.now(timezone.utc) - timedelta(days=5),
+    )
+    # Card 2: unconfirmed card with higher values
+    card2 = SoilHealthCard(
+        farm_id=test_farm.id,
+        nitrogen_kg_ha=999.0,
+        ph=8.0,
+        is_confirmed=False,
+        created_at=datetime.now(timezone.utc) - timedelta(days=2),
+    )
+    db_session.add_all([card1, card2])
+    db_session.commit()
+
+    # Card 3: latest confirmed card committed via confirm endpoint
+    client.post(
+        "/api/v1/soil-card/confirm",
+        json={"farm_id": test_farm.id, "nitrogen_kg_ha": 290.0, "ph": 7.3, "test_date": "2026-05-01"},
+        headers=farmer_headers,
+    )
+
+    res = client.get(f"/api/v1/soil-card/latest?farm_id={test_farm.id}", headers=farmer_headers)
+    assert res.status_code == 200
+    card_data = res.json()["card"]
+    assert card_data["nitrogen_kg_ha"] == 290.0
+    assert card_data["test_date"] == "2026-05-01"
+
+
+def test_delete_soil_card_for_farm(client: TestClient, farmer_headers: dict, test_farm: Farm):
+    """Test 12: DELETE /soil-card?farm_id=X removes saved soil values for a farm"""
+    # Confirm a card first
+    client.post(
+        "/api/v1/soil-card/confirm",
+        json={"farm_id": test_farm.id, "nitrogen_kg_ha": 270.0, "ph": 7.0},
+        headers=farmer_headers,
+    )
+    res_before = client.get(f"/api/v1/soil-card/latest?farm_id={test_farm.id}", headers=farmer_headers)
+    assert res_before.json()["has_card"] is True
+
+    # Delete soil values for test_farm
+    del_res = client.delete(f"/api/v1/soil-card?farm_id={test_farm.id}", headers=farmer_headers)
+    assert del_res.status_code == 200
+    assert del_res.json()["success"] is True
+
+    # Query latest -> has_card is now False
+    res_after = client.get(f"/api/v1/soil-card/latest?farm_id={test_farm.id}", headers=farmer_headers)
+    assert res_after.status_code == 200
+    assert res_after.json()["has_card"] is False
+    assert res_after.json()["card"] is None
+

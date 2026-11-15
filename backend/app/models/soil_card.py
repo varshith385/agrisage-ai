@@ -25,6 +25,8 @@ class SoilHealthCard(Base):
 
     # Metadata & Provenance
     extraction_method = Column(String(50), default="manual", nullable=False) # manual, easyocr, tesseract, gemini_vision
+    source = Column(String(100), nullable=True)            # "photo read by AI" or "typed by farmer"
+    test_date = Column(String(50), nullable=True)          # Date when soil test was conducted (e.g. YYYY-MM-DD)
     overall_confidence = Column(Float, default=1.0, nullable=False)
     field_confidences_json = Column(Text, nullable=True)   # JSON string of per-field confidences
     is_confirmed = Column(Boolean, default=True, nullable=False) # Explicit confirmation guard
