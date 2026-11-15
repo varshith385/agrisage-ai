@@ -6,7 +6,7 @@ describe('scrollToSection shared utility', () => {
 
   beforeEach(() => {
     mockScrollIntoView = vi.fn();
-    window.HTMLElement.prototype.scrollIntoView = mockScrollIntoView as any;
+    window.HTMLElement.prototype.scrollIntoView = mockScrollIntoView as unknown as typeof Element.prototype.scrollIntoView;
     window.matchMedia = ((query: string) => ({
       matches: false,
       media: query,

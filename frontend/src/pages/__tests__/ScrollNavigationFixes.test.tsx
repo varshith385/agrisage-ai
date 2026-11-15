@@ -44,20 +44,24 @@ const { mockFarm } = vi.hoisted(() => {
   return { mockFarm: farm };
 });
 
-vi.mock('../../context/PictorialContext', () => ({
-  usePictorial: () => ({
-    isPictorial: false,
-    mode: 'words',
-    setMode: vi.fn(),
-    setPictorial: vi.fn(),
-    alwaysShowListen: false,
-    setAlwaysShowListen: vi.fn(),
-    togglePictorial: vi.fn(),
-    toggleAlwaysShowListen: vi.fn(),
-  }),
-  useShowListen: () => false,
-  PictorialProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+vi.mock('../../context/PictorialContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../context/PictorialContext')>();
+  return {
+    ...actual,
+    usePictorial: () => ({
+      isPictorial: false,
+      mode: 'words',
+      setMode: vi.fn(),
+      setPictorial: vi.fn(),
+      alwaysShowListen: false,
+      setAlwaysShowListen: vi.fn(),
+      togglePictorial: vi.fn(),
+      toggleAlwaysShowListen: vi.fn(),
+    }),
+    useShowListen: () => false,
+    PictorialProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
 
 // Mock auth & external APIs
 vi.mock('../../context/AuthContext', () => ({
@@ -101,33 +105,58 @@ vi.mock('../../api/location', () => ({
 }));
 
 vi.mock('../../api/economics', () => ({
+  calculateEconomics: vi.fn().mockResolvedValue({
+    combined_summary: {
+      margin_pct: 37.5,
+      net_profit: 45000,
+      gross_revenue: 120000,
+      total_cost: 75000,
+      break_even_price_per_q: 5200,
+      break_even_yield_q_per_acre: 6.5,
+    },
+    scenarios: [],
+  }),
+  compareCrops: vi.fn().mockResolvedValue({
+    comparison_table: [],
+    best_crop: 'Cotton',
+  }),
+  simulateWhatIf: vi.fn().mockResolvedValue({
+    net_profit: 45000,
+    margin_pct: 37.5,
+    break_even_price_per_q: 5200,
+  }),
   getRotationRecommendations: vi.fn().mockResolvedValue({
     previous_crop: 'Cotton',
     recommended_rotations: [{ crop_name: 'Pulses', rationale: 'Nitrogen fixation' }],
     avoid_crops: ['Cotton'],
   }),
-  getEconomicsCalculation: vi.fn().mockResolvedValue({
-    net_profit: 45000,
-    gross_revenue: 120000,
-    total_cost: 75000,
-    break_even_price: 5200,
-    break_even_yield: 6.5,
-    margin_pct: 37.5,
-  }),
-  getWhatIfSimulation: vi.fn().mockResolvedValue({
-    net_profit: 45000,
-    margin_pct: 37.5,
-  }),
   getCropCalendar: vi.fn().mockResolvedValue({
     crop_name: 'Cotton',
     current_stage: { stage_name_en: 'Vegetative' },
     events: [],
-    lifecycle_stages: [],
+    lifecycle_stages: [
+      {
+        stage_id: 1,
+        stage_name: 'Vegetative',
+        start_das: 1,
+        end_das: 30,
+        start_date: '2026-08-15',
+        end_date: '2026-09-15',
+        is_active: true,
+        kc_value: 0.7,
+        water_sensitivity: 'medium',
+        key_activities: ['Weeding', 'Scouting'],
+      },
+    ],
   }),
   getSeasonalAwareness: vi.fn().mockResolvedValue({
     current_season: 'Kharif',
     season_period: 'June to October',
-    climate_expectations: { temperature: '25-35°C', rainfall: 'Moderate', humidity: '60-70%' },
+    climate_expectations: {
+      temperature: '25-35°C',
+      rainfall: 'Moderate',
+      humidity: '60-70%',
+    },
     typical_crops: ['Cotton', 'Groundnut'],
     primary_risks: ['Pest outbreak during flowering'],
   }),
@@ -135,7 +164,6 @@ vi.mock('../../api/economics', () => ({
     cotton: { items: { seeds: 2000, fertilizer: 5000 } },
   }),
   getMultiCropComparison: vi.fn().mockResolvedValue([]),
-  compareCrops: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock('../../api/weather', () => ({
@@ -149,6 +177,8 @@ vi.mock('../../api/weather', () => ({
       source: 'Open-Meteo climate normals (trailing 12mo)',
     }),
     getForecast: vi.fn().mockResolvedValue({
+      latitude: 17.98,
+      longitude: 79.6,
       current: {
         temperature_c: 28,
         relative_humidity_pct: 60,
@@ -160,9 +190,25 @@ vi.mock('../../api/weather', () => ({
         fetched_at: '2026-11-15T10:00:00Z',
         source: 'Open-Meteo',
       },
-      daily: [{ date: '2026-11-15', temp_max_c: 32, temp_min_c: 20, precipitation_sum_mm: 5 }],
+      daily: [
+        {
+          date: '2026-11-15',
+          temp_max_c: 32,
+          temp_min_c: 20,
+          relative_humidity_pct: 60,
+          precipitation_sum_mm: 5,
+          reference_et0_mm: 4.8,
+          wind_speed_kmh: 12,
+          weather_condition: 'partly_cloudy',
+        },
+      ],
+      stale: false,
+      fetched_at: '2026-11-15T10:00:00Z',
+      source: 'Open-Meteo',
     }),
     getFarmWeather: vi.fn().mockResolvedValue({
+      latitude: 17.98,
+      longitude: 79.6,
       current: {
         temperature_c: 28,
         relative_humidity_pct: 60,
@@ -174,15 +220,29 @@ vi.mock('../../api/weather', () => ({
         fetched_at: '2026-11-15T10:00:00Z',
         source: 'Open-Meteo',
       },
-      daily: [{ date: '2026-11-15', temp_max_c: 32, temp_min_c: 20, precipitation_sum_mm: 5 }],
+      daily: [
+        {
+          date: '2026-11-15',
+          temp_max_c: 32,
+          temp_min_c: 20,
+          relative_humidity_pct: 60,
+          precipitation_sum_mm: 5,
+          reference_et0_mm: 4.8,
+          wind_speed_kmh: 12,
+          weather_condition: 'partly_cloudy',
+        },
+      ],
+      stale: false,
+      fetched_at: '2026-11-15T10:00:00Z',
+      source: 'Open-Meteo',
     }),
     getCurrentWeather: vi.fn().mockResolvedValue({
       temperature_c: 28,
       relative_humidity_pct: 60,
-      precipitation_mm: 0,
       wind_speed_kmh: 12,
-      expected_rainfall_today_mm: 0,
       reference_et0_mm: 4.8,
+      expected_rainfall_today_mm: 0,
+      precipitation_mm: 0,
       stale: false,
       fetched_at: '2026-11-15T10:00:00Z',
       source: 'Open-Meteo',
@@ -190,6 +250,14 @@ vi.mock('../../api/weather', () => ({
     getHistoricalNormals: vi.fn().mockResolvedValue({}),
     getCropSuitability: vi.fn().mockResolvedValue({}),
   },
+  getCurrentWeather: vi.fn().mockResolvedValue({
+    temperature_c: 28,
+    relative_humidity_pct: 60,
+    wind_speed_kmh: 12,
+    reference_et0_mm: 4.8,
+  }),
+  getDailyForecast: vi.fn().mockResolvedValue({ daily: [] }),
+  getCropSuitability: vi.fn().mockResolvedValue({}),
 }));
 
 vi.mock('../../api/client', () => ({
@@ -419,10 +487,10 @@ describe('Phase 1: In-Page Navigation Scroll Fixes', () => {
     it('Change Village switches to location tab and scrolls to weather tabs section', async () => {
       renderPage(<LocationWeatherPage />);
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Change (Village|Mandal)/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Change (Mandal|Village|Taluk)/i })).toBeInTheDocument();
       });
 
-      const changeVillageBtn = screen.getByRole('button', { name: /Change (Village|Mandal)/i });
+      const changeVillageBtn = screen.getByRole('button', { name: /Change (Mandal|Village|Taluk)/i });
       fireEvent.click(changeVillageBtn);
 
       expect(scrollToSectionSpy).toHaveBeenCalledWith('weather-tabs-section');
@@ -485,10 +553,10 @@ describe('Phase 1: In-Page Navigation Scroll Fixes', () => {
     it('View Advisory Notice switches to schemes tab and scrolls to soil card section', async () => {
       renderPage(<SchemesPage />);
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /^View Advisory Notice$/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /View Advisory Notice/i })).toBeInTheDocument();
       });
 
-      const noticeBtn = screen.getByRole('button', { name: /^View Advisory Notice$/i });
+      const noticeBtn = screen.getByRole('button', { name: /View Advisory Notice/i });
       fireEvent.click(noticeBtn);
 
       expect(scrollToSectionSpy).toHaveBeenCalledWith('soil-card-upload');

@@ -30,7 +30,8 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
-def init_db() -> None:
+def init_db(bind=None) -> None:
+    target_engine = bind or engine
     # Import all models so metadata discovers them
     import backend.app.models.user
     import backend.app.models.farm
@@ -43,4 +44,7 @@ def init_db() -> None:
     import backend.app.models.market
     import backend.app.models.reminder
 
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=target_engine)
+
+    from backend.app.database.migrations import run_soil_card_migrations
+    run_soil_card_migrations(bind=target_engine)

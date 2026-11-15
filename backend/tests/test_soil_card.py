@@ -593,17 +593,17 @@ def test_unit_conversion_standard_and_unconfirmed():
     assert unit == "kg/ha"
     assert is_std is True
 
-    # ppm -> converts by 2.24
+    # ppm -> cannot be justified without arbitrary soil density/depth assumptions -> unconfirmed
     val, unit, is_std = convert_nutrient_unit(50.0, "ppm")
-    assert val == 112.0
-    assert unit == "kg/ha"
-    assert is_std is True
+    assert val == 50.0
+    assert unit == "ppm"
+    assert is_std is False
 
-    # lb/acre -> converts by 1.12085
+    # lb/acre -> non-standard imperial unit -> unconfirmed
     val, unit, is_std = convert_nutrient_unit(100.0, "lb/ac")
-    assert abs(val - 112.085) < 0.05
-    assert unit == "kg/ha"
-    assert is_std is True
+    assert val == 100.0
+    assert unit == "lb/ac"
+    assert is_std is False
 
     # q/ha -> converts by 100
     val, unit, is_std = convert_nutrient_unit(2.5, "q/ha")

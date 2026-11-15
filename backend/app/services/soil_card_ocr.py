@@ -252,6 +252,26 @@ def convert_nutrient_unit(value: Optional[float], unit: Optional[str]) -> Tuple[
     """
     Converts nutrient measurement to kg/ha if unit is known and standard.
     Returns: (converted_value, target_unit, is_confirmed_standard_unit)
+
+    Agronomic Unit Conversion Standards:
+    - kg/ha (metric standard for Indian Soil Health Cards & crop recommendation models): 1:1, confirmed.
+    - q/ha (quintals per hectare): 1 quintal = 100 kg, confirmed.
+    - kg/acre: 1 ha = 2.47105 acres -> 1 kg/acre = 2.47105 kg/ha, confirmed.
+
+    Unconfirmed Non-Standard Units:
+    - ppm (parts per million) / mg/kg:
+        Conversion factor 1 ppm = 2.24 kg/ha assumes:
+        * Furrow slice / plow layer depth = 15 cm (0.15 m, or ~6 inches)
+        * Soil bulk density = ~1.47 - 1.493 g/cm^3
+        giving ~2.24 x 10^6 kg soil/ha (equivalent to US 2,000,000 lbs/acre furrow slice).
+        Because Indian soils (Vertisols 1.1-1.3 g/cm^3 vs Alfisols/Inceptisols 1.4-1.7 g/cm^3)
+        vary significantly in bulk density and sampling depth varies (15 cm vs 30 cm),
+        this conversion cannot be agronomically justified from a universal stated standard.
+        Therefore, it is treated as UNCONFIRMED, retaining the printed unit and requiring farmer confirmation.
+    - lbs/acre:
+        Conversion factor 1 lb/acre = 1.12085 kg/ha (1 lb = 0.453592 kg, 1 acre = 0.404686 ha).
+        Because Imperial units are non-standard on Indian Soil Health Cards and carry regional ambiguity,
+        it is treated as UNCONFIRMED, retaining the printed unit and requiring farmer confirmation.
     """
     if value is None:
         return None, "kg/ha", True
@@ -266,14 +286,11 @@ def convert_nutrient_unit(value: Optional[float], unit: Optional[str]) -> Tuple[
     if clean_u in ("kgacre", "kgperacre", "kgac", "kgperac"):
         # 1 ha = 2.47105 acres -> 1 kg/acre = 2.47105 kg/ha
         return round(float(value) * 2.47105, 2), "kg/ha", True
-    if clean_u in ("ppm", "mgkg", "mgperkg"):
-        # Topsoil furrow slice: 1 ppm = 2.24 kg/ha
-        return round(float(value) * 2.24, 2), "kg/ha", True
-    if clean_u in ("lbacre", "lbsacre", "lbac", "lbsac"):
-        return round(float(value) * 1.12085, 2), "kg/ha", True
     if clean_u in ("qha", "qperha", "quintalha", "quintalsperha"):
         return round(float(value) * 100.0, 2), "kg/ha", True
 
+    # ppm, mg/kg, and lbs/acre cannot be justified without arbitrary soil density/depth assumptions:
+    # return original value with printed unit as unconfirmed
     return value, str(unit).strip(), False
 
 
