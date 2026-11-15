@@ -93,6 +93,9 @@ async def generate_irrigation_plan(
     rain_24h = payload.rain_forecast_24h_mm or 0.0
     rain_48h = payload.rain_forecast_48h_mm or 0.0
     daily_forecast_list: List[Dict[str, Any]] = []
+    w_fetched_at = None
+    w_temp_c = None
+    w_hum = None
 
     if lat is not None and lon is not None:
         try:
@@ -100,6 +103,11 @@ async def generate_irrigation_plan(
                 weather_data = await get_farm_weather(farm, db)
             else:
                 weather_data = await get_weather_forecast(lat, lon, db)
+            w_fetched_at = getattr(getattr(weather_data, "current", None), "fetched_at", None)
+            if hasattr(w_fetched_at, "isoformat"):
+                w_fetched_at = w_fetched_at.isoformat()
+            w_temp_c = getattr(getattr(weather_data, "current", None), "temperature_c", None)
+            w_hum = getattr(getattr(weather_data, "current", None), "relative_humidity_pct", None)
             if weather_data.daily and len(weather_data.daily) > 0:
                 day0 = weather_data.daily[0]
                 ref_et0 = day0.reference_et0_mm if payload.reference_et0_mm is None else payload.reference_et0_mm
@@ -157,6 +165,9 @@ async def generate_irrigation_plan(
         daily_forecast_balance=calc_res["daily_forecast_balance"],
         recommendation_text=calc_res["recommendation_text"],
         explanation=calc_res["explanation"],
+        weather_fetched_at=w_fetched_at,
+        weather_temperature_c=w_temp_c,
+        weather_relative_humidity_pct=w_hum,
         status="WORKING",
     )
 

@@ -71,35 +71,53 @@ This test suite explicitly verifies:
 
 When deploying `feat/round7` to the production host, ensure that all required non-git or binary assets are synchronized alongside the application codebase:
 
-### 4.1 Asset Inventory Table
+### 4.1 Complete Runtime File Inventory Table
 
-| Asset Path | Location / Category | Committed in Git? | Description |
+| Asset Path | Category | Committed in Git? | Runtime Consumers & Purpose |
 | :--- | :--- | :---: | :--- |
-| `model_artifacts/crop_recommender.joblib` | Machine Learning Models | No (`.gitignore`) | Isotonic-calibrated GaussianNB + IsolationForest (7 features) |
-| `model_artifacts/crop_recommender_weather_only.joblib` | Machine Learning Models | No (`.gitignore`) | 3-Feature Weather-Only RandomForest + IsolationForest |
-| `model_artifacts/crop_recommender_metadata.json` | Model Metadata | Yes | Calibration scores, candidate benchmarks, OOD metrics |
-| `model_artifacts/weather_16_locations.json` | Telemetry Cache | Yes | 12-month climate normals for 16 test locations |
-| `datasets/crop_recommendation.csv` | Dataset | Yes | 2,200 rows Kaggle crop dataset used for training/validation |
-| `backend/app/data/subdistricts_villages.json` | Location Registry | Yes | Census 2011 Mandals/Taluks hierarchy for Telangana & AP |
-| `frontend/src/data/india_districts.json` | Location Hierarchy | Yes | Pan-India State -> District mapping (en/te/hi) |
-| `frontend/src/data/subdistricts_villages.json` | Location Hierarchy | Yes | Frontend clone of subdistricts/villages hierarchy |
+| `model_artifacts/crop_recommender.joblib` | Model Weights | No (`.gitignore`) | `backend.app.ml.crop_recommender`: 7-feature Calibrated GaussianNB & IsolationForest |
+| `model_artifacts/crop_recommender_weather_only.joblib` | Model Weights | No (`.gitignore`) | `backend.app.ml.crop_recommender`: 3-feature Weather-Only RandomForest & IsolationForest |
+| `model_artifacts/crop_recommender_metadata.json` | Model Metadata | Yes | `backend.app.ml.crop_recommender`: Candidate CV benchmarks, decision thresholds, feature envelopes |
+| `model_artifacts/weather_16_locations.json` | Telemetry Cache | Yes | `backend.app.services.open_meteo`: 365-day climate normals for 16 benchmark Indian locations |
+| `model_artifacts/yield_model.joblib` | Model Weights | No (`.gitignore`) | `backend.app.ml.yield_model`: GradientBoostingRegressor crop yield predictor |
+| `model_artifacts/yield_metrics.json` | Model Metadata | Yes | `backend.app.ml.yield_model`: Yield model validation metrics |
+| `datasets/crop_recommendation.csv` | Dataset | Yes | `scripts.train_crop_models`: 2,200 rows Kaggle crop dataset used for training and empirical bounds |
+| `datasets/demo/mandi_prices.csv` | Dataset | Yes | `backend.app.services.market_service`: Fallback demo mandi prices when API key missing or offline |
+| `datasets/demo/warehouses.csv` | Dataset | Yes | `backend.app.services.market_service`: Demo warehouse and cold storage facility listings |
+| `datasets/demo/historical_prices.csv` | Dataset | Yes | `backend.app.services.market_service`: Demo 13-day price trend history |
+| `datasets/msp.csv` | Dataset | Yes | `backend.app.services.market_service`: Government of India MSP benchmarks and verification dates |
+| `datasets/demo/crop_yield_telangana.csv` | Dataset | Yes | `backend.app.ml.yield_model`: Telangana historical yield data |
+| `backend/app/data/subdistricts_villages.json` | Location Registry | Yes | `backend.app.services.location_data`: Census 2011 Mandals & Taluks coordinates |
+| `frontend/src/data/subdistricts_villages.json` | Location Hierarchy | Yes | `frontend.src.utils.indiaGeo`: Frontend copy of subdistricts hierarchy |
+| `frontend/src/data/india_districts.json` | Location Hierarchy | Yes | `backend.app.services.location_data`, `frontend.src.utils.indiaGeo`: Pan-India 36 states and 750+ districts |
+| `backend/app/data/cost_templates.json` | Business Logic | Yes | `backend.app.services.economics`: Crop-wise cost of cultivation baseline templates |
+| `backend/app/localization/advisory_dict.json` | Localization | Yes | `backend.app.agents.advisory_agent`, `backend.app.services.growth_stage`: Multilingual advisory terms |
+| `backend/app/ml/disease_kb.json` | Knowledge Base | Yes | `backend.app.ml.disease_model`: Plant disease symptoms, treatments, and prevention rules |
+| `backend/app/ml/fao56_crop_coefficients.json` | Agro-Physics Data | Yes | `backend.app.ml.irrigation`, `backend.app.services.growth_stage`: FAO-56 Kc values and stage lengths |
 
 ### 4.2 Production Server File Copy Steps
 
 If deploying to a fresh production container or server where binary model weights are not checked into Git:
 
 ```bash
-# 1. Option A: Copy pre-trained artifacts from staging worktree
+# 1. Option A: Copy pre-trained artifacts from staging/build worktree
 cp -r C:/work/agri-r7/model_artifacts/* /path/to/production/model_artifacts/
 
 # 2. Option B: Retrain deterministically on the production server from datasets/
 python scripts/train_crop_models.py
+python scripts/train_yield_model.py
 
-# 3. Verify all required location JSON files exist in their expected paths
+# 3. Verify all required JSON and CSV assets exist in their expected paths
 ls -l backend/app/data/subdistricts_villages.json
 ls -l frontend/src/data/india_districts.json
 ls -l frontend/src/data/subdistricts_villages.json
+ls -l backend/app/data/cost_templates.json
+ls -l backend/app/localization/advisory_dict.json
+ls -l backend/app/ml/disease_kb.json
+ls -l backend/app/ml/fao56_crop_coefficients.json
+ls -l datasets/demo/mandi_prices.csv
+ls -l datasets/msp.csv
 
 # 4. Confirm backend tests pass and missing-artifact guard works
-python -m pytest backend/tests/test_crop_advisory_round7b.py -q
+python -m pytest backend/tests/test_crop_advisory_round7b.py -k test_model_unavailable_when_artifacts_missing -v
 ```

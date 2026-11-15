@@ -189,10 +189,15 @@ async def get_reminder_suggestions(
 
     target_farm_id = farm.id if farm else None
 
+    farm_weather_fetched_at = None
+
     # A. Weather-Derived Spray Window Alert
     if farm:
         try:
             forecast = await get_farm_weather(farm, db)
+            farm_weather_fetched_at = getattr(getattr(forecast, "current", None), "fetched_at", None)
+            if hasattr(farm_weather_fetched_at, "isoformat"):
+                farm_weather_fetched_at = farm_weather_fetched_at.isoformat()
             daily = forecast.daily or []
             # Check upcoming 3-day forecast for rain
             for i in range(min(4, len(daily))):
@@ -214,6 +219,7 @@ async def get_reminder_suggestions(
                             source="weather_alert",
                             reason="7-Day Live Open-Meteo Rain Telemetry",
                             badge_label="Weather Advisory",
+                            weather_fetched_at=farm_weather_fetched_at,
                         )
                     )
                     break
@@ -232,6 +238,7 @@ async def get_reminder_suggestions(
             source="irrigation_plan",
             reason="FAO-56 Soil Moisture Balance",
             badge_label="Irrigation Plan",
+            weather_fetched_at=farm_weather_fetched_at,
         )
     )
 

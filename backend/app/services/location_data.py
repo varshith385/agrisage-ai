@@ -95,9 +95,18 @@ def get_villages(state: str, district: str) -> List[Dict[str, Any]]:
         "lon": centroid["longitude"],
         "precision": "approximate district centre",
         "is_district_centre": True,
+        "type": "district_centre",
     }
 
     villages: List[Dict[str, Any]] = [dist_centre_entry]
+
+    # For Andhra Pradesh:
+    # All 26 modern districts changed boundaries during the April 2022 reorganization (all 13 old districts were split).
+    # None of the 26 modern districts matches unsplit 2011 Census boundaries.
+    # Therefore, all 26 modern districts fall back to 'approximate district centre'.
+    # Census 2011 subdistricts are preserved strictly under '(pre-2022 district)' keys.
+    if state == "Andhra Pradesh" and not district.endswith("(pre-2022 district)"):
+        return villages
 
     if _VILLAGE_CACHE and state in _VILLAGE_CACHE:
         state_mandals = _VILLAGE_CACHE[state]
@@ -111,6 +120,7 @@ def get_villages(state: str, district: str) -> List[Dict[str, Any]]:
                     "lon": m["longitude"],
                     "precision": "village",
                     "is_district_centre": False,
+                    "type": m.get("type", "mandal"),
                 })
 
     return villages

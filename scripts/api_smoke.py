@@ -82,8 +82,10 @@ def run_smoke_tests():
 
     # 8. Location: Villages / Mandals
     r = client.get("/api/v1/location/villages?state=Telangana&district=Warangal")
-    v_count = len(r.json().get("villages", []))
-    record("GET", "/api/v1/location/villages?state=Telangana&district=Warangal", r.status_code, f"{v_count} mandals in Warangal")
+    v_list = r.json().get("villages", [])
+    m_count = sum(1 for v in v_list if v.get("type") == "mandal")
+    s_count = sum(1 for v in v_list if v.get("type") == "sample_village")
+    record("GET", "/api/v1/location/villages?state=Telangana&district=Warangal", r.status_code, f"{m_count} mandals (+ {s_count} sample villages, 1 District Centre)")
 
     # 9. Location: Geocode
     r = client.get("/api/v1/location/geocode?query=Warangal")

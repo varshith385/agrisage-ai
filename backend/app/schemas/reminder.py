@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional, List
+from typing import Optional, List, Union
 from pydantic import BaseModel, Field
 
 KOLKATA_OFFSET = timedelta(hours=5, minutes=30)
@@ -55,3 +55,4 @@ class ReminderSuggestion(BaseModel):
     source: str
     reason: str
     badge_label: str
+    weather_fetched_at: Optional[Union[datetime, str]] = None

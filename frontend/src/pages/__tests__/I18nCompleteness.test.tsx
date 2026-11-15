@@ -289,21 +289,36 @@ describe('Phase 2: Complete Multilingual Translation Coverage Across All 15 Page
     (farmsApi.farmsApi.getFarmById as any) = vi.fn().mockResolvedValue(mockFarm);
 
     // Mock weather APIs
-    (weatherApiModule.weatherApi.getCurrentWeather as any) = vi.fn().mockResolvedValue({
+    const mockCurrentWeather = {
       temperature_c: 31.5,
       relative_humidity_pct: 65,
+      humidity: 65,
       wind_speed_kmh: 12,
       condition_text: 'Sunny',
       rainfall_mm_today: 0,
       expected_rainfall_today_mm: 0,
       reference_et0_mm: 5.2,
+      weather_code: 0,
+      is_day: 1,
+      place_name: 'Warangal Centroid',
+      grid_disclaimer: 'model grid value for this location, not a village sensor',
       timestamp: '2026-11-14T12:00:00Z',
-    });
-
-    (weatherApiModule.weatherApi.getForecast as any) = vi.fn().mockResolvedValue({
+      fetched_at: '2026-11-15T07:00:00Z',
+      source: 'Open-Meteo',
+    };
+    const mockForecastData = {
+      latitude: 17.9689,
+      longitude: 79.5941,
+      current: mockCurrentWeather,
       daily: [],
-    });
-
+      place_name: 'Warangal Centroid',
+      grid_disclaimer: 'model grid value for this location, not a village sensor',
+      fetched_at: '2026-11-15T07:00:00Z',
+      source: 'Open-Meteo',
+    };
+    (weatherApiModule.weatherApi.getCurrentWeather as any) = vi.fn().mockResolvedValue(mockCurrentWeather);
+    (weatherApiModule.weatherApi.getForecast as any) = vi.fn().mockResolvedValue(mockForecastData);
+    (weatherApiModule.weatherApi.getFarmWeather as any) = vi.fn().mockResolvedValue(mockForecastData);
     (weatherApiModule.weatherApi.getCropSuitability as any) = vi.fn().mockResolvedValue({
       crop: 'Cotton',
       suitability_score: 85,

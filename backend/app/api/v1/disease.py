@@ -146,10 +146,18 @@ async def predict_plant_disease(
                 humidity >= settings.FUNGAL_HUMIDITY_THRESHOLD_PCT
                 or rain_24h >= settings.RAIN_CONFLICT_THRESHOLD_MM
             )
+            w_cur = getattr(forecast, "current", None)
+            w_fetched = getattr(w_cur, "fetched_at", None)
+            if hasattr(w_fetched, "isoformat"):
+                w_fetched = w_fetched.isoformat()
+            w_temp = getattr(w_cur, "temperature_c", None)
+
             weather_fungal_risk = {
                 "elevated": elevated,
                 "relative_humidity_pct": humidity,
+                "temperature_c": w_temp,
                 "rain_24h_mm": rain_24h,
+                "fetched_at": w_fetched,
                 "explanation": (
                     f"Microclimate relative humidity is {humidity:.1f}% (heuristic threshold: {settings.FUNGAL_HUMIDITY_THRESHOLD_PCT}%) "
                     f"with {rain_24h:.1f} mm rain forecast in 24h. Prolonged foliar wetness increases fungal sporulation risk."

@@ -16,6 +16,7 @@ export interface VillageInfo {
   longitude: number;
   precision: 'village' | 'approximate district centre';
   is_district_centre: boolean;
+  type?: 'district_centre' | 'mandal' | 'sample_village';
 }
 
 export interface StateInfo {
@@ -75,9 +76,17 @@ export const getVillagesForDistrict = (stateName: string, districtName: string):
     longitude: coords.longitude,
     precision: 'approximate district centre',
     is_district_centre: true,
+    type: 'district_centre',
   };
 
-  const stData = (subdistrictsData.states as Record<string, Record<string, Array<{ name: string; latitude: number; longitude: number }>>>)[stateName];
+  // For Andhra Pradesh: All 26 districts changed boundaries during the April 2022 reorganization.
+  // None of the 13 Census 2011 districts remained unsplit.
+  // Modern districts fall back to verified district headquarters centroids.
+  if (stateName.toLowerCase() === 'andhra pradesh' && !districtName.includes('(pre-2022 district)')) {
+    return [distCentre];
+  }
+
+  const stData = (subdistrictsData.states as Record<string, Record<string, Array<{ name: string; latitude: number; longitude: number; type?: string }>>>)[stateName];
   if (!stData) {
     return [distCentre];
   }
@@ -93,6 +102,7 @@ export const getVillagesForDistrict = (stateName: string, districtName: string):
     longitude: m.longitude,
     precision: 'village',
     is_district_centre: false,
+    type: (m.type as any) || 'mandal',
   }));
 
   return [distCentre, ...mandals];

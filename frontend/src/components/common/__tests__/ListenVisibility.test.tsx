@@ -67,18 +67,48 @@ vi.mock('../../../context/AuthContext', () => ({
   }),
 }));
 
-vi.mock('../../../api/weather', () => ({
-  weatherApi: {
-    getCurrentWeather: vi.fn().mockResolvedValue({
-      temperature_c: 31,
-      humidity: 55,
-      wind_speed_kmh: 8,
-      condition: 'Sunny',
-      rain_forecast_mm: 0,
-      timestamp: new Date().toISOString(),
-    }),
-  },
-}));
+vi.mock('../../../api/weather', () => {
+  const mockCurrent = {
+    temperature_c: 31,
+    relative_humidity_pct: 55,
+    humidity: 55,
+    wind_speed_kmh: 8,
+    condition: 'Sunny',
+    weather_code: 0,
+    expected_rainfall_today_mm: 0,
+    rain_forecast_mm: 0,
+    reference_et0_mm: 4.5,
+    is_day: 1,
+    place_name: 'Warangal Farm',
+    grid_disclaimer: 'model grid value for this location, not a village sensor',
+    stale_age_seconds: 30,
+    stale_label: 'Fresh (<1m ago)',
+    fetched_at: '2026-11-15T07:00:00Z',
+    timestamp: '2026-11-15T07:00:00Z',
+    source: 'Open-Meteo',
+  };
+  const mockForecast = {
+    latitude: 17.9689,
+    longitude: 79.5941,
+    current: mockCurrent,
+    daily: [],
+    place_name: 'Warangal Farm',
+    grid_disclaimer: 'model grid value for this location, not a village sensor',
+    stale_age_seconds: 30,
+    stale_label: 'Fresh (<1m ago)',
+    fetched_at: '2026-11-15T07:00:00Z',
+    source: 'Open-Meteo',
+  };
+  return {
+    weatherApi: {
+      getCurrentWeather: vi.fn().mockResolvedValue(mockCurrent),
+      getForecast: vi.fn().mockResolvedValue(mockForecast),
+      getFarmWeather: vi.fn().mockResolvedValue(mockForecast),
+      getCropSuitability: vi.fn().mockResolvedValue({ crop: 'Cotton', suitability_score: 85 }),
+      getClimateNormals: vi.fn().mockResolvedValue({}),
+    },
+  };
+});
 
 vi.mock('../../../api/agents', () => ({
   agentsApi: {

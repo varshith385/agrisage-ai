@@ -65,61 +65,60 @@ def main():
     assert irr_resp.status_code == 200, f"Irrigation failed: {irr_resp.text}"
     irr_data = irr_resp.json()
 
-    irr_temp = w_temp  # Derived from farm weather forecast
-    irr_hum = w_hum
-    irr_rain = f"{irr_data.get('forecast_7d_rain_mm', 0.0):.1f} mm (7d)"
-    irr_fetched = w_fetched
+    irr_temp = f"{irr_data.get('weather_temperature_c', 0.0):.1f}°C" if irr_data.get('weather_temperature_c') is not None else w_temp
+    irr_hum = f"{irr_data.get('weather_relative_humidity_pct', 0.0):.1f}%" if irr_data.get('weather_relative_humidity_pct') is not None else w_hum
+    irr_rain = f"{irr_data.get('effective_rain_today_mm', 0.0):.1f} mm"
+    irr_fetched = (irr_data.get('weather_fetched_at') or "")[:19].replace("T", " ")
     irr_place = f"{farm.get('name')} ({farm.get('village')})"
-    irr_lat_lon = f"{irr_data.get('latitude', farm.get('latitude')):.4f}, {irr_data.get('longitude', farm.get('longitude')):.4f}"
+    irr_lat_lon = f"{farm.get('latitude', 0.0):.4f}, {farm.get('longitude', 0.0):.4f}"
 
     # 4. Calendar (/api/v1/calendar/events)
     cal_resp = client.get(f"/api/v1/calendar/events?farm_id={farm_id}", headers=headers)
     assert cal_resp.status_code == 200, f"Calendar failed: {cal_resp.text}"
     cal_data = cal_resp.json()
 
-    # Calendar does NOT display weather directly
-    cal_note = "Calendar displays phenology stages & farm tasks; does not display raw weather telemetry"
-    cal_temp = "N/A (Phenology)"
-    cal_hum = "N/A (Phenology)"
-    cal_rain = "N/A (Phenology)"
-    cal_fetched = w_fetched
+    # Calendar does NOT display weather telemetry (tracks growth stages and agricultural operations)
+    cal_temp = "no weather"
+    cal_hum = "no weather"
+    cal_rain = "no weather"
+    cal_fetched = ""
     cal_place = f"{farm.get('name')} ({farm.get('village')})"
-    cal_lat_lon = w_lat_lon
+    cal_lat_lon = f"{farm.get('latitude', 0.0):.4f}, {farm.get('longitude', 0.0):.4f}"
 
     # 5. Disease Risk (/api/v1/disease/predict)
-    # Upload minimal mock leaf photo to evaluate weather-derived fungal risk
-    files = {"file": ("leaf.jpg", b"\xff\xd8\xff\xe0" + b"\x00" * 500, "image/jpeg")}
-    data = {"crop_name": "cotton", "farm_id": str(farm_id)}
+    import io
+    from PIL import Image
+    _img = Image.new("RGB", (100, 100), color="green")
+    _buf = io.BytesIO()
+    _img.save(_buf, format="JPEG")
+    jpeg_bytes = _buf.getvalue()
+
+    files = {"file": ("leaf.jpg", jpeg_bytes, "image/jpeg")}
+    data = {"crop_hint": "tomato", "farm_id": str(farm_id), "confirmed": "true"}
     dis_resp = client.post("/api/v1/disease/predict", files=files, data=data, headers=headers)
-    if dis_resp.status_code == 200:
-        dis_json = dis_resp.json()
-        fungal = dis_json.get("weather_fungal_risk", {})
-        dis_temp = w_temp
-        dis_hum = f"{fungal.get('relative_humidity_pct', 0.0):.1f}%"
-        dis_rain = f"{fungal.get('rain_24h_mm', 0.0):.1f} mm (24h)"
-        dis_fetched = w_fetched
-        dis_place = f"{farm.get('village')}, {farm.get('district')}"
-        dis_lat_lon = w_lat_lon
-    else:
-        dis_temp = w_temp
-        dis_hum = w_hum
-        dis_rain = f"0.0 mm"
-        dis_fetched = w_fetched
-        dis_place = f"{farm.get('village')}, {farm.get('district')}"
-        dis_lat_lon = w_lat_lon
+    assert dis_resp.status_code == 200, f"Disease failed: {dis_resp.text}"
+    dis_json = dis_resp.json()
+    fungal = dis_json.get("weather_fungal_risk") or {}
+
+    dis_temp = f"{fungal.get('temperature_c', 0.0):.1f}°C" if fungal.get('temperature_c') is not None else w_temp
+    dis_hum = f"{fungal.get('relative_humidity_pct', 0.0):.1f}%" if fungal.get('relative_humidity_pct') is not None else w_hum
+    dis_rain = f"{fungal.get('rain_24h_mm', 0.0):.1f} mm (24h)" if fungal.get('rain_24h_mm') is not None else "0.0 mm"
+    dis_fetched = (fungal.get('fetched_at') or "")[:19].replace("T", " ")
+    dis_place = f"{farm.get('village')}, {farm.get('district')}"
+    dis_lat_lon = f"{farm.get('latitude', 0.0):.4f}, {farm.get('longitude', 0.0):.4f}"
 
     # 6. Reminders Suggestions (/api/v1/reminders/suggestions)
     rem_resp = client.get(f"/api/v1/reminders/suggestions?farm_id={farm_id}", headers=headers)
     assert rem_resp.status_code == 200, f"Reminders failed: {rem_resp.text}"
     rem_list = rem_resp.json()
-    spray_sugg = next((r for r in rem_list if r.get("source") == "weather_alert"), None)
+    rem_sugg = rem_list[0] if rem_list else {}
 
     rem_temp = w_temp
     rem_hum = w_hum
     rem_rain = w_rain
-    rem_fetched = w_fetched
+    rem_fetched = (rem_sugg.get('weather_fetched_at') or "")[:19].replace("T", " ")
     rem_place = f"{farm.get('name')} ({farm.get('village')})"
-    rem_lat_lon = w_lat_lon
+    rem_lat_lon = f"{farm.get('latitude', 0.0):.4f}, {farm.get('longitude', 0.0):.4f}"
 
     # 7. Chat (/api/v1/voice/query)
     chat_resp = client.post(

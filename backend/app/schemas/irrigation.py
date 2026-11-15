@@ -1,5 +1,5 @@
-from datetime import date
-from typing import Any, Dict, List, Literal, Optional
+from datetime import date, datetime
+from typing import Any, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 
 
@@ -58,6 +58,9 @@ class IrrigationPlanResponse(BaseModel):
     daily_forecast_balance: List[DailyBalanceItem]
     recommendation_text: str
     explanation: Dict[str, Any]
+    weather_fetched_at: Optional[Union[datetime, str]] = None
+    weather_temperature_c: Optional[float] = None
+    weather_relative_humidity_pct: Optional[float] = None
     status: Literal["WORKING", "PARTIAL", "DEMO", "stub"] = "WORKING"
 
 
