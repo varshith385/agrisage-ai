@@ -599,7 +599,7 @@
     "source_measured": "मापा गया (मौसम API)",
     "source_entered": "दर्ज किया गया (उपयोगकर्ता)",
     "source_soil_card": "मृदा कार्ड से",
-    "source_soil_card_tested": "सॉइल कार्ड, परीक्षण तिथि {{date}}",
+    "source_soil_card_tested": "सॉइल कार्ड, परीक्षण तिथि {date}",
     "source_typed_farmer": "किसान द्वारा दर्ज किया गया",
     "soil_values_missing": "मृदा मान अनुपलब्ध हैं। सर्वोत्तम फसल सलाह के लिए अपने सॉइल कार्ड से जोड़ें",
     "save_to_farm": "खेत में सहेजें",

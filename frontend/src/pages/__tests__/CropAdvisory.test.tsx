@@ -153,10 +153,12 @@ describe('Phase 6: Crop Advisory Rebuild & Validation', () => {
     renderComponent('en');
 
     await waitFor(() => {
-      expect(clientModule.apiRequest).toHaveBeenCalled();
+      const recommendCall = (clientModule.apiRequest as any).mock.calls.find((c: any[]) => c[0] === '/api/v1/recommend/crop');
+      expect(recommendCall).toBeDefined();
     });
 
-    const callPayload = JSON.parse((clientModule.apiRequest as any).mock.calls[0][1].body);
+    const recommendCall = (clientModule.apiRequest as any).mock.calls.find((c: any[]) => c[0] === '/api/v1/recommend/crop');
+    const callPayload = JSON.parse(recommendCall[1].body);
     expect(callPayload.n).toBeUndefined();
     expect(callPayload.p).toBeUndefined();
     expect(callPayload.k).toBeUndefined();

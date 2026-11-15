@@ -599,7 +599,7 @@
     "source_measured": "కొలవబడినది (వాతావరణ API)",
     "source_entered": "నమోదు చేసినది (రైతు)",
     "source_soil_card": "నేల ఆరోగ్య పత్రం నుండి",
-    "source_soil_card_tested": "సాయిల్ కార్డ్, పరీక్షించిన తేదీ {{date}}",
+    "source_soil_card_tested": "సాయిల్ కార్డ్, పరీక్షించిన తేదీ {date}",
     "source_typed_farmer": "రైతు ద్వారా నమోదు చేయబడింది",
     "soil_values_missing": "నేల పరీక్ష వివరాలు లేవు. ఉత్తమ పంట సలహా కోసం మీ సాయిల్ హెల్త్ కార్డ్ నుండి జోడించండి",
     "save_to_farm": "పొలానికి భద్రపరచండి",

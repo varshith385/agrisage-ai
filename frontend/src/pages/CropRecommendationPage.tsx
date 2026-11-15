@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Sprout,
   RotateCcw,
@@ -18,6 +19,7 @@ import {
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePictorial } from '../context/PictorialContext';
+import { useSoilCard } from '../hooks/useSoilCard';
 import { getRotationRecommendations } from '../api/economics';
 import { weatherApi } from '../api/weather';
 import { apiRequest } from '../api/client';
@@ -80,12 +82,55 @@ export const CropRecommendationPage: React.FC = () => {
   const [userEditedWeather, setUserEditedWeather] = useState<boolean>(false);
   const [windowDates, setWindowDates] = useState<string>('Trailing 12 months (365 days)');
 
+  const navigate = useNavigate();
+  const { card: savedCard, hasCard, saveSoilCard, isSaving } = useSoilCard(activeFarm?.id);
+
   // Soil inputs: strictly distinguishing measured from defaults
   const [hasUserEnteredSoil, setHasUserEnteredSoil] = useState<boolean>(false);
+  const [isSoilOverridden, setIsSoilOverridden] = useState<boolean>(false);
   const [n, setN] = useState<number>(50.0);
   const [p, setP] = useState<number>(50.0);
   const [k, setK] = useState<number>(50.0);
   const [ph, setPh] = useState<number>(6.5);
+
+  // Missing soil status
+  const isMissingN = (!hasCard && !isSoilOverridden && !hasUserEnteredSoil) || (hasCard && savedCard?.nitrogen_kg_ha == null && !isSoilOverridden && !hasUserEnteredSoil);
+  const isMissingP = (!hasCard && !isSoilOverridden && !hasUserEnteredSoil) || (hasCard && savedCard?.phosphorus_kg_ha == null && !isSoilOverridden && !hasUserEnteredSoil);
+  const isMissingK = (!hasCard && !isSoilOverridden && !hasUserEnteredSoil) || (hasCard && savedCard?.potassium_kg_ha == null && !isSoilOverridden && !hasUserEnteredSoil);
+  const isMissingPh = (!hasCard && !isSoilOverridden && !hasUserEnteredSoil) || (hasCard && savedCard?.ph == null && !isSoilOverridden && !hasUserEnteredSoil);
+  const isMissingAnySoil = isMissingN || isMissingP || isMissingK || isMissingPh;
+
+  // Pre-fill soil card inputs on load or when active farm changes
+  useEffect(() => {
+    if (savedCard) {
+      if (savedCard.nitrogen_kg_ha != null) setN(savedCard.nitrogen_kg_ha);
+      if (savedCard.phosphorus_kg_ha != null) setP(savedCard.phosphorus_kg_ha);
+      if (savedCard.potassium_kg_ha != null) setK(savedCard.potassium_kg_ha);
+      if (savedCard.ph != null) setPh(savedCard.ph);
+      setHasUserEnteredSoil(true);
+      setIsSoilOverridden(false);
+    } else {
+      setHasUserEnteredSoil(false);
+      setIsSoilOverridden(false);
+    }
+  }, [savedCard, activeFarm?.id]);
+
+  const handleSaveToFarm = async () => {
+    if (!activeFarm?.id) return;
+    try {
+      await saveSoilCard({
+        farm_id: activeFarm.id,
+        nitrogen_kg_ha: n,
+        phosphorus_kg_ha: p,
+        potassium_kg_ha: k,
+        ph: ph,
+        source: 'typed by farmer',
+      });
+      setIsSoilOverridden(false);
+    } catch (e) {
+      console.error('Failed to save soil to farm:', e);
+    }
+  };
 
   const [mlResult, setMlResult] = useState<CropRecommendationResponse | null>(null);
   const [loadingMl, setLoadingMl] = useState<boolean>(false);
@@ -198,13 +243,15 @@ export const CropRecommendationPage: React.FC = () => {
       if (activeFarm?.id) {
         payload.farm_id = activeFarm.id;
       }
-      // ONLY send soil parameters if user explicitly entered them
-      if (hasUserEnteredSoil) {
+      // Send soil parameters if available (from saved card, user entered soil, or user what-if)
+      if (!isMissingAnySoil && (hasCard || hasUserEnteredSoil || isSoilOverridden)) {
         payload.n = n;
         payload.p = p;
         payload.k = k;
         payload.ph = ph;
-        payload.soil_source = 'Entered (user)';
+        payload.soil_source = (hasCard && !isSoilOverridden)
+          ? (savedCard?.source === 'photo read by AI' ? 'From soil card' : 'Typed by farmer')
+          : 'Entered (user)';
       }
       const res = await apiRequest<CropRecommendationResponse>('/api/v1/recommend/crop', {
         method: 'POST',
@@ -229,7 +276,7 @@ export const CropRecommendationPage: React.FC = () => {
 
   useEffect(() => {
     fetchRecommendation();
-  }, [hasUserEnteredSoil, coordinates.lat, coordinates.lon, temp, humidity, rainfall]);
+  }, [isMissingAnySoil, hasUserEnteredSoil, coordinates.lat, coordinates.lon, temp, humidity, rainfall, n, p, k, ph]);
 
   useEffect(() => {
     fetchRotation();
@@ -276,6 +323,25 @@ export const CropRecommendationPage: React.FC = () => {
         ? 'फसल उपयुक्तता और भूमि सुधार का मूल्यांकन किया जा रहा है...'
         : 'Evaluating crop suitability and restorative rotation sequence...');
 
+  // Determine soil source label based on card persistence / override
+  const getSoilChipSource = () => {
+    if (isSoilOverridden) {
+      return t('recommend.source_entered', { defaultValue: 'Entered (user)' });
+    }
+    if (hasCard && savedCard) {
+      if (savedCard.source === 'photo read by AI') {
+        return savedCard.test_date
+          ? t('recommend.source_soil_card_tested', { date: savedCard.test_date, defaultValue: `Soil card, tested ${savedCard.test_date}` })
+          : t('recommend.source_soil_card', { defaultValue: 'From soil card' });
+      }
+      return t('recommend.source_typed_farmer', { defaultValue: 'Typed by farmer' });
+    }
+    if (hasUserEnteredSoil) {
+      return t('recommend.source_entered', { defaultValue: 'Entered (user)' });
+    }
+    return t('recommend.source_not_provided', { defaultValue: 'Not provided' });
+  };
+
   // Construct 7 input chips data
   const inputChips: Array<{
     key: string;
@@ -285,42 +351,47 @@ export const CropRecommendationPage: React.FC = () => {
     source: string;
     inRange: boolean;
     rangeStr: string;
+    isMissing?: boolean;
   }> = [
     {
       key: 'n',
       label: 'Nitrogen',
-      value: hasUserEnteredSoil ? n : null,
+      value: !isMissingN ? n : null,
       unit: 'kg/ha',
-      source: hasUserEnteredSoil ? 'Entered (user)' : t('recommend.source_not_provided', { defaultValue: 'Not provided' }),
-      inRange: hasUserEnteredSoil ? (n >= TRAINING_RANGES.n.min && n <= TRAINING_RANGES.n.max) : true,
+      source: getSoilChipSource(),
+      inRange: !isMissingN ? (n >= TRAINING_RANGES.n.min && n <= TRAINING_RANGES.n.max) : true,
       rangeStr: `[${TRAINING_RANGES.n.min}–${TRAINING_RANGES.n.max}]`,
+      isMissing: isMissingN,
     },
     {
       key: 'p',
       label: 'Phosphorus',
-      value: hasUserEnteredSoil ? p : null,
+      value: !isMissingP ? p : null,
       unit: 'kg/ha',
-      source: hasUserEnteredSoil ? 'Entered (user)' : t('recommend.source_not_provided', { defaultValue: 'Not provided' }),
-      inRange: hasUserEnteredSoil ? (p >= TRAINING_RANGES.p.min && p <= TRAINING_RANGES.p.max) : true,
+      source: getSoilChipSource(),
+      inRange: !isMissingP ? (p >= TRAINING_RANGES.p.min && p <= TRAINING_RANGES.p.max) : true,
       rangeStr: `[${TRAINING_RANGES.p.min}–${TRAINING_RANGES.p.max}]`,
+      isMissing: isMissingP,
     },
     {
       key: 'k',
       label: 'Potassium',
-      value: hasUserEnteredSoil ? k : null,
+      value: !isMissingK ? k : null,
       unit: 'kg/ha',
-      source: hasUserEnteredSoil ? 'Entered (user)' : t('recommend.source_not_provided', { defaultValue: 'Not provided' }),
-      inRange: hasUserEnteredSoil ? (k >= TRAINING_RANGES.k.min && k <= TRAINING_RANGES.k.max) : true,
+      source: getSoilChipSource(),
+      inRange: !isMissingK ? (k >= TRAINING_RANGES.k.min && k <= TRAINING_RANGES.k.max) : true,
       rangeStr: `[${TRAINING_RANGES.k.min}–${TRAINING_RANGES.k.max}]`,
+      isMissing: isMissingK,
     },
     {
       key: 'ph',
       label: 'Soil pH',
-      value: hasUserEnteredSoil ? ph : null,
+      value: !isMissingPh ? ph : null,
       unit: 'pH',
-      source: hasUserEnteredSoil ? 'Entered (user)' : t('recommend.source_not_provided', { defaultValue: 'Not provided' }),
-      inRange: hasUserEnteredSoil ? (ph >= TRAINING_RANGES.ph.min && ph <= TRAINING_RANGES.ph.max) : true,
+      source: getSoilChipSource(),
+      inRange: !isMissingPh ? (ph >= TRAINING_RANGES.ph.min && ph <= TRAINING_RANGES.ph.max) : true,
       rangeStr: `[${TRAINING_RANGES.ph.min}–${TRAINING_RANGES.ph.max}]`,
+      isMissing: isMissingPh,
     },
     {
       key: 'temperature',
@@ -356,10 +427,12 @@ export const CropRecommendationPage: React.FC = () => {
     inputChips.forEach((chip) => {
       const backendDetail: InputFeatureDetail | undefined = mlResult.input_sources?.[chip.key];
       if (backendDetail) {
-        chip.source = backendDetail.source;
+        if (!['n', 'p', 'k', 'ph'].includes(chip.key) || isMissingAnySoil) {
+          chip.source = backendDetail.source;
+        }
         chip.inRange = backendDetail.in_training_range;
         chip.rangeStr = backendDetail.training_range;
-        if (backendDetail.value !== null && backendDetail.value !== undefined) {
+        if (backendDetail.value !== null && backendDetail.value !== undefined && !['n', 'p', 'k', 'ph'].includes(chip.key)) {
           chip.value = backendDetail.value;
         }
       }
@@ -830,11 +903,11 @@ export const CropRecommendationPage: React.FC = () => {
                 {t('recommend.evaluation_basis_title', { defaultValue: 'Evaluation Basis' })}
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                !hasUserEnteredSoil
+                isMissingAnySoil
                   ? 'bg-amber-100 text-amber-900 border border-amber-300'
                   : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
               }`}>
-                {!hasUserEnteredSoil
+                {isMissingAnySoil
                   ? (language === 'te' ? 'నేల వివరాలు ఇవ్వలేదు (వాతావరణ ఆధారితం)' : language === 'hi' ? 'मृदा मान उपलब्ध नहीं (मौसम आधारित)' : 'Soil not provided (Weather-only)')
                   : (language === 'te' ? 'కొలిచిన నేల + వాతావరణం' : language === 'hi' ? 'प्रमाणित मिट्टी + मौसम' : 'Measured Soil + Weather')}
               </span>
@@ -849,7 +922,7 @@ export const CropRecommendationPage: React.FC = () => {
                 <span className="text-[10px] text-[#7A553A] block">{t('recommend.rainfall_label', { defaultValue: 'Rainfall' })}</span>
                 <strong className="text-sm font-bold text-[#183D2E]">{rainfall.toFixed(1)} mm/mo</strong>
               </div>
-              {hasUserEnteredSoil ? (
+              {!isMissingAnySoil ? (
                 <>
                   <div className="p-2 rounded-lg bg-[#FAF8F5] border border-[#7A553A]/10">
                     <span className="text-[10px] text-[#7A553A] block">{t('recommend.npk_label', { defaultValue: 'NPK (kg/ha)' })}</span>
@@ -861,17 +934,23 @@ export const CropRecommendationPage: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="col-span-2 p-2 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900">
-                  <span className="font-bold block">
-                    {language === 'te' ? 'నేల పరీక్ష వివరాలు నమోదు చేయలేదు' : language === 'hi' ? 'मृदा परीक्षण डेटा दर्ज नहीं' : 'Soil test values not entered'}
-                  </span>
-                  <span>
-                    {language === 'te'
-                      ? 'ఖచ్చితమైన NPK/pH ఆధారిత సిఫార్సుల కొరకు క్రింద నేల వివరాలను నమోదు చేయండి.'
-                      : language === 'hi'
-                      ? 'सटीक NPK/pH आधारित सिफारिश के लिए नीचे मृदा मान दर्ज करें।'
-                      : 'Enter measured NPK and pH under Nutrient Parameters tab for calibrated full-soil evaluation.'}
-                  </span>
+                <div className="col-span-2 p-3 bg-red-50 dark:bg-red-950/40 border-2 border-red-600 dark:border-red-500 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                    <span className="text-xs font-bold text-red-700 dark:text-red-300">
+                      {t('recommend.soil_values_missing', {
+                        defaultValue: 'Soil values missing. Add them from your Soil Card for the best crop recommendation',
+                      })}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/schemes?tab=upload&returnTo=/recommend')}
+                    className="shrink-0 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+                  >
+                    <span>{t('soilcard.calibrate_soil_btn', { defaultValue: 'Calibrate Soil' })}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               )}
             </div>
@@ -955,6 +1034,18 @@ export const CropRecommendationPage: React.FC = () => {
                   )}
                   <span className="text-[9px] text-[#7A553A]">{chip.rangeStr}</span>
                 </div>
+                {chip.isMissing && (
+                  <div className="pt-1 border-t border-red-300 dark:border-red-800">
+                    <button
+                      type="button"
+                      onClick={() => navigate('/schemes?tab=upload&returnTo=/recommend')}
+                      className="text-[10px] font-bold text-red-700 dark:text-red-400 hover:underline flex items-start gap-1 text-left"
+                    >
+                      <AlertTriangle className="w-3 h-3 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                      <span>{t('recommend.soil_values_missing', { defaultValue: 'Soil values missing. Add them from your Soil Card for the best crop recommendation' })}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -1151,16 +1242,45 @@ export const CropRecommendationPage: React.FC = () => {
                 </label>
               </div>
 
-              {!hasUserEnteredSoil && (
-                <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-900 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
-                  <span>
-                    {language === 'te'
-                      ? 'నేల విలువలు లేవు (వాతావరణ ఆధారిత సలహా). కొలిచిన నేల డేటా కోసం పై చెక్‌బాక్స్‌ను ఎంచుకోండి.'
-                      : language === 'hi'
-                      ? 'मृदा मान उपलब्ध नहीं (केवल मौसम आधारित)। प्रमाणित मृदा डेटा के लिए उपरोक्त चेकबॉक्स चुनें।'
-                      : 'Soil values omitted — running weather-only model variant (confidence 50%). Check box above to enter measured Soil Health Card values.'}
-                  </span>
+              {/* Unsaved soil edit warning and save action */}
+              {isSoilOverridden && (
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 rounded-xl flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span className="font-bold text-amber-900 dark:text-amber-200">
+                      {t('recommend.not_saved_notice', { defaultValue: 'Not saved to farm profile' })}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSaveToFarm}
+                    disabled={isSaving}
+                    className="px-3 py-1.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold rounded-lg text-xs transition-colors shadow-sm disabled:bg-stone-400"
+                  >
+                    {isSaving ? t('soilcard.confirming', { defaultValue: 'Saving to Farm Profile...' }) : t('recommend.save_to_farm', { defaultValue: 'Save to farm' })}
+                  </button>
+                </div>
+              )}
+
+              {/* Missing Soil Alert */}
+              {isMissingAnySoil && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/40 border-2 border-red-600 dark:border-red-500 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                    <span className="text-xs font-bold text-red-700 dark:text-red-300">
+                      {t('recommend.soil_values_missing', {
+                        defaultValue: 'Soil values missing. Add them from your Soil Card for the best crop recommendation',
+                      })}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/schemes?tab=upload&returnTo=/recommend')}
+                    className="shrink-0 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+                  >
+                    <span>{t('soilcard.calibrate_soil_btn', { defaultValue: 'Calibrate Soil' })}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               )}
 
@@ -1171,7 +1291,10 @@ export const CropRecommendationPage: React.FC = () => {
                     type="number"
                     disabled={!hasUserEnteredSoil}
                     value={n}
-                    onChange={(e) => setN(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => {
+                      setN(parseFloat(e.target.value) || 0);
+                      setIsSoilOverridden(true);
+                    }}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
                   />
                   <span className="text-[9px] text-[#7A553A] block mt-0.5">Range: 0–140</span>
@@ -1182,7 +1305,10 @@ export const CropRecommendationPage: React.FC = () => {
                     type="number"
                     disabled={!hasUserEnteredSoil}
                     value={p}
-                    onChange={(e) => setP(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => {
+                      setP(parseFloat(e.target.value) || 0);
+                      setIsSoilOverridden(true);
+                    }}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
                   />
                   <span className="text-[9px] text-[#7A553A] block mt-0.5">Range: 5–145</span>
@@ -1193,7 +1319,10 @@ export const CropRecommendationPage: React.FC = () => {
                     type="number"
                     disabled={!hasUserEnteredSoil}
                     value={k}
-                    onChange={(e) => setK(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => {
+                      setK(parseFloat(e.target.value) || 0);
+                      setIsSoilOverridden(true);
+                    }}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
                   />
                   <span className="text-[9px] text-[#7A553A] block mt-0.5">Range: 5–205</span>
@@ -1205,7 +1334,10 @@ export const CropRecommendationPage: React.FC = () => {
                     step="0.1"
                     disabled={!hasUserEnteredSoil}
                     value={ph}
-                    onChange={(e) => setPh(parseFloat(e.target.value) || 7.0)}
+                    onChange={(e) => {
+                      setPh(parseFloat(e.target.value) || 7.0);
+                      setIsSoilOverridden(true);
+                    }}
                     className="w-full min-h-[44px] bg-white border border-[#7A553A]/30 rounded-xl px-2.5 py-1 text-xs font-bold text-[#183D2E] disabled:opacity-40"
                   />
                   <span className="text-[9px] text-[#7A553A] block mt-0.5">Range: 3.5–9.9</span>

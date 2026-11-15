@@ -55,13 +55,13 @@ export interface SoilCardConfirmRequest {
 export interface SoilCardRecord {
   id: number;
   farm_id: number;
-  nitrogen_kg_ha: number | null;
-  phosphorus_kg_ha: number | null;
-  potassium_kg_ha: number | null;
-  ph: number | null;
-  organic_carbon_pct: number | null;
-  electrical_conductivity_ds_m: number | null;
-  soil_texture: string | null;
+  nitrogen_kg_ha?: number | null;
+  phosphorus_kg_ha?: number | null;
+  potassium_kg_ha?: number | null;
+  ph?: number | null;
+  organic_carbon_pct?: number | null;
+  electrical_conductivity_ds_m?: number | null;
+  soil_texture?: string | null;
   source?: string | null;
   test_date?: string | null;
   is_confirmed: boolean;

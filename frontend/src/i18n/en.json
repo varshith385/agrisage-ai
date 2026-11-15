@@ -599,7 +599,7 @@
     "source_measured": "Measured (weather API)",
     "source_entered": "Entered (user)",
     "source_soil_card": "From soil card",
-    "source_soil_card_tested": "Soil card, tested {{date}}",
+    "source_soil_card_tested": "Soil card, tested {date}",
     "source_typed_farmer": "Typed by farmer",
     "soil_values_missing": "Soil values missing. Add them from your Soil Card for the best crop recommendation",
     "save_to_farm": "Save to farm",
