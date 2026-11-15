@@ -659,6 +659,18 @@ To accurately represent administrative reality in South India (TS/AP/KA/MH) wher
 | **Farm Parcel Wizard Description** | Pinpoint mandal or taluk coordinates for hyper-local rain telemetry | ఖచ్చితమైన వర్షపాత సూచన కోసం మండలం / తాలూకా ఎంచుకోండి | सटीक बारिश के लिए मंडल / तालुका का चयन करें | **needs native review** |
 | **Farm Form Field Prompt** | Parcel name, total acres, tenure breakdown (owned/leased), soil type, water source, and mandal / taluk. | పొలం పేరు, విస్తీర్ణం (ఎకరాల్లో), భూమి రకం (సొంతం/కౌలు), నేల స్వభావం మరియు మండలం / తాలూకా. | खेत का नाम, रकबा (एकड़ में), जमीन का प्रकार (खुद की/बटाई), मिट्टी का प्रकार और मंडल / तालुका। | **needs native review** |
 
+---
+
+## 11. Round 8 Phase 2 Calendar Cleanup (Unreviewed Strings)
+
+In Round 8 Phase 2, the "Export Calendar" (.ics export) button and all user-facing references to calendar RFC 5545 export were removed from the Calendar page. The backend ICS endpoint (`/api/v1/calendar/export.ics`) and its test coverage remain preserved in the backend codebase for API backward compatibility, but are documented as unused by the frontend UI.
+
+| UI Key / Location | English (`en`) | Telugu (`te`) | Hindi (`hi`) | Review Status |
+|---|---|---|---|---|
+| **calendar.subtitle** | Stage-by-stage agronomic timeline tied to your sowing date. | విత్తిన తేదీ ఆధారంగా దశలవారీ వ్యవసాయ ప్రణాళిక. | बुवाई की तिथि से जुड़े चरणबद्ध कृषि कार्य। | **NOT native-reviewed** |
+| **calendar.explain_title** | Calendar Logic & Agronomic Principles | క్యాలెండర్ విధానం & వ్యవసాయ సూత్రాలు | कैलेंडर तर्क एवं कृषि सिद्धांत | **NOT native-reviewed** |
+
+
 
 
 

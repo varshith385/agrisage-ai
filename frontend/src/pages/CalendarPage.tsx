@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Calendar as CalendarIcon,
-  Download,
   Bell,
   BellOff,
   Sun,
@@ -100,15 +99,6 @@ export const CalendarPage: React.FC = () => {
     }
   };
 
-  const downloadIcsFile = () => {
-    const url = `/api/v1/calendar/export.ics?crop_name=${encodeURIComponent(cropName)}&planting_date=${plantingDate}`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${cropName.toLowerCase()}_schedule.ics`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
 
   const filteredEvents = (calendarData?.events || []).filter((evt) => {
     if (eventTypeFilter === 'all') return true;
@@ -268,20 +258,10 @@ export const CalendarPage: React.FC = () => {
         whatIsThis={{
           summary: 'Generates day-by-day agronomic task timelines and 7-stage phenological milestones based on your actual sowing date using UN FAO-56 crop growth stage models.',
           whatToEnter: 'Selected crop, sowing/planting date, and your registered farm holding.',
-          whatYouGet: 'Scheduled field actions (fertilizer, scouting, weeding, harvest), growth stage tracking, and downloadable RFC 5545 .ics smartphone calendar file.',
+          whatYouGet: 'Scheduled field actions (fertilizer, scouting, weeding, harvest), and growth stage tracking.',
         }}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={downloadIcsFile}
-              className="min-h-[44px] flex items-center gap-1.5 px-4 py-2 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all"
-              title="Export RFC 5545 .ics Calendar"
-            >
-              <Download className="w-4 h-4 text-[#DA9A4C]" />
-              <span>{t('calendar.export_ics_btn')}</span>
-            </button>
-
             <button
               type="button"
               onClick={requestNotificationOptIn}
@@ -705,7 +685,6 @@ export const CalendarPage: React.FC = () => {
                   confidence_type: 'rule',
                   reasons: [
                     "Lifecycle stages align directly with FAO-56 stage lengths computed from your crop sowing date.",
-                    "Calendar export complies strictly with the RFC 5545 iCalendar standard for cross-platform calendar synchronization.",
                     "In-app reminders flag high-priority moisture stress checks and pest scouting windows ahead of time.",
                   ],
                   sources: [
