@@ -589,6 +589,15 @@ export interface CropCandidate {
   suitability_note?: string | null;
 }
 
+export interface InputFeatureDetail {
+  value: number | null;
+  unit: string;
+  source: string;
+  window_dates?: string | null;
+  training_range: string;
+  in_training_range: boolean;
+}
+
 export interface CropRecommendationResponse {
   top_crops: CropCandidate[];
   soil_values_missing: boolean;
@@ -602,6 +611,12 @@ export interface CropRecommendationResponse {
   ood_warning?: string | null;
   explanation: ExplainabilitySchema;
   status: FeatureStatus;
+  decision_status?: 'CONFIDENT' | 'LOW_CONFIDENCE' | 'UNUSUAL' | 'INVALID';
+  decision_reasons?: string[];
+  confidence_label?: 'High' | 'Medium' | 'Low' | 'None';
+  model_name?: string;
+  model_probability?: number;
+  input_sources?: Record<string, InputFeatureDetail>;
 }
 
 export interface CostLineItems {

@@ -590,7 +590,19 @@
     "npk_label": "NPK (కిలో/హెక్టారు)",
     "soil_ph_label": "నేల pH",
     "humidity_label": "గాలిలో తేమ (%)",
-    "climate_suitability_warnings": "వాతావరణ అనుకూలత హెచ్చరికలు:"
+    "climate_suitability_warnings": "వాతావరణ అనుకూలత హెచ్చరికలు:",
+    "status_confident": "నమ్మదగిన సరిపోలిక",
+    "status_low_confidence": "సూచనాత్మకమైనది మాత్రమే (నేల వివరాలు అవసరం)",
+    "status_unusual": "అసాధారణ కలయిక",
+    "status_invalid": "చెల్లని ఇన్‌పుట్",
+    "unusual_refusal_title": "అసాధారణ కలయిక, నమ్మకం సరిపోదు",
+    "unusual_refusal_msg": "దయచేసి నేల పరీక్ష లేదా స్థానిక వ్యవసాయ అధికారితో ధృవీకరించండి.",
+    "source_measured": "కొలవబడినది (వాతావరణ API)",
+    "source_entered": "నమోదు చేసినది (రైతు)",
+    "source_soil_card": "నేల ఆరోగ్య పత్రం నుండి",
+    "source_not_provided": "అందించలేదు",
+    "how_chosen_title": "ఇది ఎలా ఎంపిక చేయబడింది",
+    "public_dataset_disclaimer": "పబ్లిక్ బెంచ్‌మార్క్ డేటాసెట్ ఆధారిత సలహా. క్షేత్రస్థాయి ధృవీకరణ అవసరం."
   },
   "voice": {
     "fab_label": "Grow2Gain వాయిస్ అసిస్టెంట్",

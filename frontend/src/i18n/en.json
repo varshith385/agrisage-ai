@@ -590,7 +590,19 @@
     "npk_label": "NPK (kg/ha)",
     "soil_ph_label": "Soil pH",
     "humidity_label": "Relative Humidity (%)",
-    "climate_suitability_warnings": "Climate Suitability Warnings:"
+    "climate_suitability_warnings": "Climate Suitability Warnings:",
+    "status_confident": "Confident Match",
+    "status_low_confidence": "Indicative Only (Soil Needed)",
+    "status_unusual": "Unusual Combination",
+    "status_invalid": "Invalid Input",
+    "unusual_refusal_title": "Unusual Combination, Not Confident",
+    "unusual_refusal_msg": "Please verify with a soil test or local agriculture officer.",
+    "source_measured": "Measured (weather API)",
+    "source_entered": "Entered (user)",
+    "source_soil_card": "From soil card",
+    "source_not_provided": "Not provided",
+    "how_chosen_title": "How This Was Chosen",
+    "public_dataset_disclaimer": "Advisory based on public benchmark dataset. Field verification is advised."
   },
   "voice": {
     "fab_label": "Grow2Gain Voice Assistant",

@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from backend.app.database.session import get_db
-from backend.app.services.open_meteo import get_weather_forecast, evaluate_crop_suitability
+from backend.app.services.open_meteo import (
+    get_weather_forecast,
+    evaluate_crop_suitability,
+    get_climate_normals,
+)
 from backend.app.schemas.weather import (
     CurrentWeatherResponse,
     WeatherForecastResponse,
@@ -9,6 +13,15 @@ from backend.app.schemas.weather import (
 )
 
 router = APIRouter(prefix="/weather", tags=["Weather"])
+
+
+@router.get("/climate-normals")
+async def get_historical_climate_normals(
+    lat: float = Query(..., ge=-90.0, le=90.0, description="Latitude"),
+    lon: float = Query(..., ge=-180.0, le=180.0, description="Longitude"),
+):
+    """Fetches trailing 12-month climate averages (temperature, humidity, monthly precipitation) from Open-Meteo."""
+    return await get_climate_normals(lat, lon)
 
 
 @router.get("/current", response_model=CurrentWeatherResponse)

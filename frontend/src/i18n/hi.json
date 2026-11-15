@@ -590,7 +590,19 @@
     "npk_label": "NPK (किलो/हेक्टेयर)",
     "soil_ph_label": "मिट्टी pH",
     "humidity_label": "सापेक्षिक आर्द्रता (%)",
-    "climate_suitability_warnings": "जलवायु उपयुक्तता चेतावनियाँ:"
+    "climate_suitability_warnings": "जलवायु उपयुक्तता चेतावनियाँ:",
+    "status_confident": "विश्वसनीय मिलान",
+    "status_low_confidence": "केवल सांकेतिक (मिट्टी विवरण आवश्यक)",
+    "status_unusual": "असामान्य संयोजन",
+    "status_invalid": "अमान्य इनपुट",
+    "unusual_refusal_title": "असामान्य संयोजन, विश्वास योग्य नहीं",
+    "unusual_refusal_msg": "कृपया मिट्टी परीक्षण या स्थानीय कृषि अधिकारी से सत्यापित करें।",
+    "source_measured": "मापा गया (मौसम API)",
+    "source_entered": "दर्ज किया गया (उपयोगकर्ता)",
+    "source_soil_card": "मृदा कार्ड से",
+    "source_not_provided": "उपलब्ध नहीं",
+    "how_chosen_title": "इसे कैसे चुना गया",
+    "public_dataset_disclaimer": "सार्वजनिक बेंचमार्क डेटासेट पर आधारित सलाह। क्षेत्रीय सत्यापन की सलाह दी जाती है।"
   },
   "voice": {
     "fab_label": "Grow2Gain वॉयस सहायक",

@@ -555,6 +555,29 @@ The following agronomic, economic, workflow, and interface strings were added in
 | **UI Label** | Edit Farm Parcel | పొలం వివరాలు సవరించండి | खेत विवरण बदलें | **Unverified**: Awaiting native agronomist review. |
 | **UI Label** | Save Changes | మార్పులను భద్రపరచండి | बदलाव सहेजें | **Unverified**: Awaiting native agronomist review. |
 
+---
+
+## 8. Round 7b Crop Advisory Decision States & Input Sourcing (`docs/I18N_REVIEW.md`)
+
+**Date:** 2026-11-15  
+**Scope:** 4-Tier decision status system, input sourcing chips, refusal states, and benchmark model transparency.
+
+| Phrase Category | English Phrase | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Status Badge** | Confident Match | నమ్మదగిన సరిపోలిక | विश्वसनीय मिलान | **Unverified**: Not native-reviewed. |
+| **Status Badge** | Indicative Only (Soil Needed) | సూచనాత్మకమైనది మాత్రమే (నేల వివరాలు అవసరం) | केवल सांकेतिक (मिट्टी विवरण आवश्यक) | **Unverified**: Not native-reviewed. |
+| **Status Badge** | Unusual Combination | అసాధారణ కలయిక | असामान्य संयोजन | **Unverified**: Not native-reviewed. |
+| **Status Badge** | Invalid Input | చెల్లని ఇన్‌పుట్ | अमान्य इनपुट | **Unverified**: Not native-reviewed. |
+| **Refusal Headline** | Unusual Combination, Not Confident | అసాధారణ కలయిక, నమ్మకం సరిపోదు | असामान्य संयोजन, विश्वास योग्य नहीं | **Unverified**: Not native-reviewed. |
+| **Refusal Message** | Please verify with a soil test or local agriculture officer. | దయచేసి నేల పరీక్ష లేదా స్థానిక వ్యవసాయ అధికారితో ధృవీకరించండి. | कृपया मिट्टी परीक्षण या स्थानीय कृषि अधिकारी से सत्यापित करें। | **Unverified**: Not native-reviewed. |
+| **Input Source** | Measured (weather API) | కొలవబడినది (వాతావరణ API) | मापा गया (मौसम API) | **Unverified**: Not native-reviewed. |
+| **Input Source** | Entered (user) | నమోదు చేసినది (రైతు) | दर्ज किया गया (उपयोगकर्ता) | **Unverified**: Not native-reviewed. |
+| **Input Source** | From soil card | నేల ఆరోగ్య పత్రం నుండి | मृदा कार्ड से | **Unverified**: Not native-reviewed. |
+| **Input Source** | Not provided | అందించలేదు | उपलब्ध नहीं | **Unverified**: Not native-reviewed. |
+| **UI Header** | How This Was Chosen | ఇది ఎలా ఎంపిక చేయబడింది | इसे कैसे चुना गया | **Unverified**: Not native-reviewed. |
+| **Disclaimer** | Advisory based on public benchmark dataset. Field verification is advised. | పబ్లిక్ బెంచ్‌మార్క్ డేటాసెట్ ఆధారిత సలహా. క్షేత్రస్థాయి ధృవీకరణ అవసరం. | सार्वजनिक बेंचमार्क डेटासेट पर आधारित सलाह। क्षेत्रीय सत्यापन की सलाह दी जाती है। | **Unverified**: Not native-reviewed. |
+
+
 
 
 

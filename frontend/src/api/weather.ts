@@ -15,5 +15,21 @@ export const weatherApi = {
       `/api/v1/weather/suitability?crop=${encodeURIComponent(crop)}&lat=${lat}&lon=${lon}`
     );
   },
+
+  getClimateNormals: async (lat: number, lon: number): Promise<{
+    latitude: number;
+    longitude: number;
+    mean_temperature_c: number;
+    mean_relative_humidity_pct: number;
+    mean_monthly_rainfall_mm: number;
+    annual_rainfall_mm: number;
+    window_start_date: string;
+    window_end_date: string;
+    window_days: number;
+    source: string;
+    formula_note: string;
+  }> => {
+    return apiRequest(`/api/v1/weather/climate-normals?lat=${lat}&lon=${lon}`);
+  },
 };
 
