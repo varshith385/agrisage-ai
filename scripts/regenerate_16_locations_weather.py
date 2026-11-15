@@ -24,7 +24,8 @@ LOCATIONS = [
 ]
 
 now_utc = datetime.now(timezone.utc)
-end_date_dt = (now_utc - timedelta(days=1)).date()
+# Single authoritative climate window rule: end = today minus 5 days, start = end minus 364 days
+end_date_dt = (now_utc - timedelta(days=5)).date()
 start_date_dt = end_date_dt - timedelta(days=364)
 start_date = start_date_dt.strftime("%Y-%m-%d")
 end_date = end_date_dt.strftime("%Y-%m-%d")
@@ -78,7 +79,14 @@ async def fetch_location(client, name, state, lat, lon):
 
 async def main():
     async with httpx.AsyncClient() as client:
-        results = {}
+        results = {
+            "_window": {
+                "start_date": start_date,
+                "end_date": end_date,
+                "days": 365,
+                "definition": "end = today minus 5 days, start = end minus 364 days",
+            }
+        }
         for city, state, lat, lon in LOCATIONS:
             name, info = await fetch_location(client, city, state, lat, lon)
             results[name] = info

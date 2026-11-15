@@ -125,14 +125,31 @@ export const LocationWeatherPage: React.FC = () => {
     setIsLoadingWeather(true);
     setWeatherError(null);
     try {
-      const [current, forecast, suit] = await Promise.all([
-        weatherApi.getCurrentWeather(lat, lon),
-        weatherApi.getForecast(lat, lon),
-        weatherApi.getCropSuitability('cotton', lat, lon),
-      ]);
+      let current: CurrentWeather;
+      let forecastData: { daily: DailyForecastItem[] };
+
+      // Route through farm endpoint when coordinates match activeFarm for strict consistency
+      if (
+        activeFarm?.id &&
+        Math.abs(lat - (activeFarm.latitude || 0)) < 0.001 &&
+        Math.abs(lon - (activeFarm.longitude || 0)) < 0.001
+      ) {
+        const farmForecast = await weatherApi.getFarmWeather(activeFarm.id);
+        current = farmForecast.current;
+        forecastData = farmForecast;
+      } else {
+        const [cw, fc] = await Promise.all([
+          weatherApi.getCurrentWeather(lat, lon),
+          weatherApi.getForecast(lat, lon),
+        ]);
+        current = cw;
+        forecastData = fc;
+      }
+
+      const suit = await weatherApi.getCropSuitability('cotton', lat, lon).catch(() => null);
 
       setWeatherData(current);
-      setDailyForecast(forecast.daily);
+      setDailyForecast(forecastData.daily || []);
       setSuitability(suit);
     } catch (err: unknown) {
       setWeatherError(

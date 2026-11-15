@@ -384,8 +384,8 @@ export const FarmRegistrationPage: React.FC = () => {
             },
             {
               stepNumber: 2,
-              title: language === 'te' ? 'గ్రామం & జీపీఎస్ లొకేషన్' : language === 'hi' ? 'गांव व स्थान' : 'Village & Weather Location',
-              desc: language === 'te' ? 'ఖచ్చితమైన వర్షపాత సూచన కోసం గ్రామం ఎంచుకోండి' : language === 'hi' ? 'सटीक बारिश के लिए गांव का चयन करें' : 'Pinpoint village coordinates for hyper-local rain telemetry',
+              title: language === 'te' ? 'మండలం / తాలూకా & జీపీఎస్ లొకేషన్' : language === 'hi' ? 'मंडल / तालुका व स्थान' : 'Mandal / Taluk & Weather Location',
+              desc: language === 'te' ? 'ఖచ్చితమైన వర్షపాత సూచన కోసం మండలం / తాలూకా ఎంచుకోండి' : language === 'hi' ? 'सटीक बारिश के लिए मंडल / तालुका का चयन करें' : 'Pinpoint mandal or taluk coordinates for hyper-local rain telemetry',
               icon: MapPin,
             },
             {
@@ -414,10 +414,10 @@ export const FarmRegistrationPage: React.FC = () => {
               ? 'अपनी खुद की और बटाई (पट्टे) वाली जमीन का रकबा दर्ज करें ताकि सिंचाई और खाद की सही योजना बन सके।'
               : 'Allows farmers to register parcels with accurate owned and leased acreages so all water budgets and crop cost models calculate correctly.',
           whatToEnter: language === 'te'
-            ? 'పొలం పేరు, విస్తీర్ణం (ఎకరాల్లో), భూమి రకం (సొంతం/కౌలు), నేల స్వభావం మరియు గ్రామం.'
+            ? 'పొలం పేరు, విస్తీర్ణం (ఎకరాల్లో), భూమి రకం (సొంతం/కౌలు), నేల స్వభావం మరియు మండలం / తాలూకా.'
             : language === 'hi'
-              ? 'खेत का नाम, रकबा (एकड़ में), जमीन का प्रकार (खुद की/बटाई), मिट्टी का प्रकार और गांव।'
-              : 'Parcel name, total acres, tenure breakdown (owned/leased), soil type, water source, and village.',
+              ? 'खेत का नाम, रकबा (एकड़ में), जमीन का प्रकार (खुद की/बटाई), मिट्टी का प्रकार और मंडल / तालुका।'
+              : 'Parcel name, total acres, tenure breakdown (owned/leased), soil type, water source, and mandal / taluk.',
           whatYouGet: language === 'te'
             ? 'ఖచ్చితమైన భూమి లెక్కలు మరియు యాక్టివ్ ఫామ్ ప్రొఫైల్.'
             : language === 'hi'

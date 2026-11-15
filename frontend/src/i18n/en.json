@@ -125,7 +125,7 @@
     "irrigation_flood": "Flood Irrigation",
     "irrigation_furrow": "Furrow",
     "state_label": "State",
-    "village_label": "Village / Mandal",
+    "village_label": "Mandal / Taluk",
     "district_label": "District",
     "latitude_label": "Latitude",
     "longitude_label": "Longitude",

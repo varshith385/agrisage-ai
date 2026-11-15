@@ -38,50 +38,93 @@
 **Retrieved Date**: 2026-11-15  
 **Coverage**: 36 States and Union Territories, 742 Districts Total (682 with exact measured coordinates, 60 with state center fallback)
 
-### Data Provenance & Licenses
+### Data Provenance & Licenses (No Claims of Official Portal / GODL)
 
 | Jurisdiction / Component | Source Repository & URL | License Status | District Count | Verification & Notes |
 |---|---|---|---|---|
-| **Telangana Official Districts** | [`gpavanb1/Telangana-Visualisation`](https://raw.githubusercontent.com/gpavanb1/Telangana-Visualisation/master/data/Telangana.geojson) | Government Open Data License - India (GODL) / Open Data Telangana (`data.telangana.gov.in`) | **33 districts** | **100% Verified**: Matched all 33 official districts including Hanumakonda (Warangal Urban), Warangal (Warangal Rural), Mulugu, and Jayashankar Bhupalpally. Coordinates calculated directly from boundary polygon centroids. Zero fallbacks. |
-| **Andhra Pradesh Official Districts** | [`satishvmadala/andhrapradesh_opendata_locations`](https://raw.githubusercontent.com/satishvmadala/andhrapradesh_opendata_locations/master/AndhraPradesh_Districts.geojson) | GNU General Public License v3.0 (GPL-3.0) / AP Official Gazette (2022 Reorganization) | **26 districts** | **100% Verified**: Matched all 26 official post-2022 districts including Alluri Sitharama Raju, Dr. B.R. Ambedkar Konaseema, Anakapalli, Nandyal, Palnadu, and NTR. Coordinates calculated directly from boundary polygon centroids. Zero fallbacks. |
-| **Pan-India District Coordinates** | [`nswamy14/geoJson`](https://raw.githubusercontent.com/nswamy14/geoJson/master/indianDistrictLatLong.json) | MIT License (Copyright 2020 Narayana Swamy) | **771 centroids** | Provides pan-India district headquarters coordinates across remaining 34 States and Union Territories. |
-| **State & District Hierarchy** | [`sab99r/Indian-States-And-Districts`](https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json) | Open Access Public Domain / Community Sourced | **36 States/UTs** | Augmented with Andaman and Nicobar Islands and Ladakh UTs. |
+| **Telangana Boundary Centroids** | [`gpavanb1/Telangana-Visualisation`](https://raw.githubusercontent.com/gpavanb1/Telangana-Visualisation/master/data/Telangana.geojson) | Community GitHub repository; underlying data license unknown (no official portal/GODL claim) | **33 districts** | Polygon centroids for 33 districts including Hanumakonda, Warangal, Mulugu, and Jayashankar Bhupalpally. |
+| **Andhra Pradesh Boundary Centroids** | [`satishvmadala/andhrapradesh_opendata_locations`](https://raw.githubusercontent.com/satishvmadala/andhrapradesh_opendata_locations/master/AndhraPradesh_Districts.geojson) | Community GitHub repository (GPL-3.0); underlying government survey license unknown (no official portal/GODL claim) | **26 districts** | Polygon centroids for 26 post-2022 districts including Alluri Sitharama Raju, Dr. B.R. Ambedkar Konaseema, Anakapalli, Nandyal, Palnadu, and NTR. |
+| **Pan-India District Coordinates** | [`nswamy14/geoJson`](https://raw.githubusercontent.com/nswamy14/geoJson/master/indianDistrictLatLong.json) | MIT License (Copyright 2020 Narayana Swamy); underlying data license unknown | **771 centroids** | District headquarters coordinates across remaining 34 States and Union Territories. |
+| **State & District Hierarchy** | [`sab99r/Indian-States-And-Districts`](https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json) | Community repository (MIT/Public Domain); underlying survey license unknown | **36 States/UTs** | Augmented with Andaman and Nicobar Islands and Ladakh UTs. |
 | **Geocoding Fallback Engine** | Open-Meteo Geocoding API (`geocoding-api.open-meteo.com`) | Open Database License (ODbL) | Ad-hoc fallback | Where district coordinates are absent, falls back to state centroid with visible `is_fallback: true` ("approximate district centre") label. |
 
 ### Verification Ledger for Telangana and Andhra Pradesh
-- **Telangana Official 33 Districts**: Adilabad, Bhadradri Kothagudem, Hanumakonda, Hyderabad, Jagtial, Jangaon, Jayashankar Bhupalpally, Jogulamba Gadwal, Kamareddy, Karimnagar, Khammam, Kumuram Bheem Asifabad, Mahabubabad, Mahabubnagar, Mancherial, Medak, Medchal-Malkajgiri, Mulugu, Nagarkurnool, Nalgonda, Narayanpet, Nirmal, Nizamabad, Peddapalli, Rajanna Sircilla, Rangareddy, Sangareddy, Siddipet, Suryapet, Vikarabad, Wanaparthy, Warangal, Yadadri Bhuvanagiri.
-- **Andhra Pradesh Official 26 Districts**: Alluri Sitharama Raju, Anakapalli, Ananthapuramu, Annamayya, Bapatla, Chittoor, Dr. B.R. Ambedkar Konaseema, East Godavari, Eluru, Guntur, Kakinada, Krishna, Kurnool, Nandyal, NTR, Palnadu, Parvathipuram Manyam, Prakasam, Sri Potti Sriramulu Nellore, Sri Sathya Sai, Srikakulam, Tirupati, Visakhapatnam, Vizianagaram, West Godavari, YSR Kadapa.
-- **Localizations**: Both Telangana and Andhra Pradesh districts carry official Telugu (`te`) and Hindi (`hi`) transliterations. Other Indian states carry English names with `[EN]` indicators in multilingual mode.
+- **Telangana 33 Districts**: Adilabad, Bhadradri Kothagudem, Hanumakonda, Hyderabad, Jagtial, Jangaon, Jayashankar Bhupalpally, Jogulamba Gadwal, Kamareddy, Karimnagar, Khammam, Kumuram Bheem Asifabad, Mahabubabad, Mahabubnagar, Mancherial, Medak, Medchal-Malkajgiri, Mulugu, Nagarkurnool, Nalgonda, Narayanpet, Nirmal, Nizamabad, Peddapalli, Rajanna Sircilla, Rangareddy, Sangareddy, Siddipet, Suryapet, Vikarabad, Wanaparthy, Warangal, Yadadri Bhuvanagiri.
+- **Andhra Pradesh 26 Districts**: Alluri Sitharama Raju, Anakapalli, Ananthapuramu, Annamayya, Bapatla, Chittoor, Dr. B.R. Ambedkar Konaseema, East Godavari, Eluru, Guntur, Kakinada, Krishna, Kurnool, Nandyal, NTR, Palnadu, Parvathipuram Manyam, Prakasam, Sri Potti Sriramulu Nellore, Sri Sathya Sai, Srikakulam, Tirupati, Visakhapatnam, Vizianagaram, West Godavari, YSR Kadapa.
+- **Localizations**: Both Telangana and Andhra Pradesh districts carry Telugu (`te`) and Hindi (`hi`) transliterations. Other Indian states carry English names with `[EN]` indicators in multilingual mode.
 
 ---
 
 ## 5. Sub-Districts, Mandals, and Taluk Coordinates (`backend/app/data/subdistricts_villages.json`, `frontend/src/data/subdistricts_villages.json`)
 
 **Retrieved Date**: 2026-11-15  
-**Source Repository**: [`datta07/INDIAN-SHAPEFILES`](https://github.com/datta07/INDIAN-SHAPEFILES)  
+**Source Repository**: [`datta07/INDIAN-SHAPEFILES`](https://github.com/datta07/INDIAN-SHAPEFILES) (GitHub)  
 **Repository License**: MIT License (Copyright (c) 2020 Datta Prasad)  
-**Underlying Data Provenance & License**:
-- The boundary features carry Census of India 2011 administrative codes (`STCODE11`, `DTCODE11`, `SDTCODE11`, `NAME11`).
-- The repository does NOT include a license declaration for the underlying government survey data. In strict accordance with honesty rules, **no claim of "official government portal" or "Government Open Data License (GODL)" is made**.
-- **Mandal/Taluk Level**: This dataset contains sub-district (mandal/taluk) headquarters centroid coordinates, **not village-level cadastral survey boundaries**.
+**Underlying Data License**: **Unknown / Unspecified in upstream repository**. In strict adherence to honesty rules, **no claim of official government portal or Government Open Data License (GODL) is made**.
 
-### Counts, Assignment Methodology, and Official Discrepancy Ledger
+### 5.1 Census 2011 Subdistrict Assignment Methodology
+1. **Telangana Assignment**:
+   - The shapefile contains subdistrict headquarters points carrying Census 2011 codes (`SDTCODE11`, `LOC_NAME`) with post-2016 district names.
+   - 8 district alias mappings normalize names to standard 33 districts:
+     - `Warangal Rural` $\to$ `Warangal`
+     - `Warangal Urban` $\to$ `Hanumakonda`
+     - `Jangoan` $\to$ `Jangaon`
+     - `Jagitial` $\to$ `Jagtial`
+     - `Medchal Malkajgiri` $\to$ `Medchal-Malkajgiri`
+     - `Ranga Reddy` $\to$ `Rangareddy`
+     - `Jayashankar` $\to$ `Jayashankar Bhupalpally`
+     - `Komaram Bheem` $\to$ `Kumuram Bheem Asifabad`
+   - 5 sample villages were added for Warangal testing (`Geikonda`, `Dharmasagar`, `Atmakur`, `Wardhannapet`, `Parkal`).
+   - Total Telangana coverage: **33 districts, 461 mandals**.
 
-| State | Districts Covered | Sub-Districts / Mandals Count | Administrative Unit Type | Assignment Method & Discrepancy Disclosures |
-|---|---|---|---|---|
-| **Telangana** | 33 districts | **459 mandals** | Mandals | **Mandal Assignment**: Feature `dtname` mapped to 33 districts using alias normalization (`Warangal Rural` $\to$ `Warangal`, `Warangal Urban` $\to$ `Hanumakonda`, `Ranga Reddy` $\to$ `Rangareddy`, etc.).<br>**Discrepancy Disclosure**: Official Telangana state records list **612 mandals** across 33 districts. The bundled dataset contains **459 mandals**, leaving an official mismatch of 153 mandals formed during post-2016 re-divisions. Mandals not in the dataset fall back to district centre. |
-| **Andhra Pradesh** | 13 legacy / 26 modern | **669 mandals** | Mandals | **Mandal Assignment**: Feature `dtname` groups 669 mandals under the **13 pre-2022 undivided districts** (Anantapur, Chittoor, East Godavari, Guntur, Krishna, Kurnool, Prakasam, SPSR Nellore, Srikakulam, Visakhapatnam, Vizianagaram, West Godavari, YSR Kadapa).<br>**Discrepancy Disclosure**: Andhra Pradesh reorganized into 26 districts in April 2022. Mandals created or reassigned in 2022 that lack direct sub-district entries fall back to district headquarters coordinates. |
-| **Karnataka** | 30 districts | **176 talukas** | Talukas | Mapped directly from `dtname` polygon centroids. |
-| **Maharashtra** | 34 districts | **355 talukas** | Talukas | Mapped directly from `dtname` polygon centroids. |
-| **Total** | **123 districts** | **1,659 units** | Sub-district level | **Verified Centroid Coordinates** |
+2. **Andhra Pradesh Assignment & Reorganization Disclosure**:
+   - The shapefile reflects Census 2011 undivided Andhra Pradesh (**13 districts, 669 subdistricts**).
+   - In April 2022, Andhra Pradesh was reorganized into **26 districts**.
+   - **10 districts** in the modern 26-district list match undivided names directly and carry subdistrict mandal data (total **509 mandals**):
+     - `Chittoor` (66 mandals), `East Godavari` (63), `Guntur` (57), `Krishna` (50), `Kurnool` (54), `Prakasam` (56), `Srikakulam` (38), `Visakhapatnam` (43), `Vizianagaram` (34), `West Godavari` (48).
+   - **16 modern districts** (13 newly created districts + 3 historical shapefile spelling variations: `Anantapur` vs `Ananthapuramu`, `Sri Potti Sriramulu Nell*` vs `Sri Potti Sriramulu Nellore`, `Y.S.R.` vs `YSR Kadapa`) do not match shapefile keys and fallback to verified district headquarters centroids with read-only precision label `"approximate district centre"`:
+     - `Alluri Sitharama Raju`, `Anakapalli`, `Ananthapuramu`, `Annamayya`, `Bapatla`, `Dr. B.R. Ambedkar Konaseema`, `Eluru`, `Kakinada`, `Nandyal`, `NTR`, `Palnadu`, `Parvathipuram Manyam`, `Sri Potti Sriramulu Nellore`, `Sri Sathya Sai`, `Tirupati`, `YSR Kadapa`.
 
-### Khammam District Mandals List (20 Bundled Mandals)
-`Madhira`, `Yerrupalem`, `Kusumanchi`, `Nelakondapalle`, `Kallur`, `Tallada`, `Khammam (Rural)`, `Bonakal`, `Chinthakani`, `Enkuru`, `Kamepalle`, `Konijerla`, `Mudigonda`, `Penuballi`, `Sathupalle`, `Singareni`, `Thirumalayapalem`, `Vemsoor`, `Wyra`, `Khammam (Urban)`.
+3. **Karnataka & Maharashtra**:
+   - Karnataka: 30 districts, 176 talukas (mapped from `dtname` polygon centroids).
+   - Maharashtra: 34 districts, 355 talukas (mapped from `dtname` polygon centroids).
 
-### Integrity & Hierarchy Rules
-1. **Cascading Dropdowns**: In the UI (`FarmRegistrationPage.tsx`), State $\to$ District $\to$ Mandal/Taluk are strictly chained. Selecting a state filters the districts; selecting a district filters the mandals/taluks. Changing a parent immediately resets the child selection.
-2. **Read-Only Coordinate Transparency**: Selecting a mandal displays its exact latitude and longitude with a read-only badge indicating precision level.
-3. **District-Centre Fallback**: If a district has no sub-district entry (or for states outside the bundled 4 states), the selector offers the district headquarters centroid with a read-only badge indicating `precision: "district"` ("approximate district centre"). Coordinates are never invented or guessed.
+### 5.2 Mandal Counts Per District (Telangana — 33 Districts)
+
+| District | Mandal Count | District | Mandal Count | District | Mandal Count |
+|---|---|---|---|---|---|
+| Adilabad | 13 | Bhadradri Kothagudem | 17 | Hanumakonda | 7 |
+| Hyderabad | 16 | Jagtial | 15 | Jangaon | 11 |
+| Jayashankar Bhupalpally | 9 | Jogulamba Gadwal | 9 | Kamareddy | 17 |
+| Karimnagar | 12 | **Khammam** | **20** | Kumuram Bheem Asifabad | 12 |
+| Mahabubabad | 12 | Mahabubnagar | 12 | Mancherial | 14 |
+| Medak | 15 | Medchal-Malkajgiri | 8 | Mulugu | 8 |
+| Nagarkurnool | 16 | Nalgonda | 26 | Narayanpet | 9 |
+| Nirmal | 13 | Nizamabad | 19 | Peddapalli | 11 |
+| Rajanna Sircilla | 9 | Rangareddy | 21 | Sangareddy | 19 |
+| Siddipet | 17 | Suryapet | 18 | Vikarabad | 17 |
+| Wanaparthy | 9 | Warangal | 16 | Yadadri Bhuvanagiri | 14 |
+| **Total** | | | | **33 Districts** | **461 Mandals** |
+
+### 5.3 Full Khammam Mandal List (20 Mandals)
+
+| # | Mandal Name | Latitude | Longitude | # | Mandal Name | Latitude | Longitude |
+|---|---|---|---|---|---|---|---|
+| 1 | Madhira | 16.9216 | 80.3609 | 11 | Kamepalle | 17.4498 | 80.2804 |
+| 2 | Yerrupalem | 16.8223 | 80.4716 | 12 | Konijerla | 17.2249 | 80.2943 |
+| 3 | Kusumanchi | 17.2271 | 79.9542 | 13 | Mudigonda | 17.1767 | 80.0976 |
+| 4 | Nelakondapalle | 17.1020 | 80.0521 | 14 | Penuballi | 17.2223 | 80.6670 |
+| 5 | Kallur | 17.2026 | 80.5465 | 15 | Sathupalle | 17.2116 | 80.8365 |
+| 6 | Tallada | 17.2167 | 80.4249 | 16 | Singareni | 17.5010 | 80.2652 |
+| 7 | Khammam (Rural) | 17.2412 | 80.1421 | 17 | Thirumalayapalem | 17.3117 | 80.0395 |
+| 8 | Bonakal | 17.0198 | 80.2682 | 18 | Vemsoor | 17.1295 | 80.7934 |
+| 9 | Chinthakani | 17.1220 | 80.2082 | 19 | Wyra | 17.1949 | 80.3562 |
+| 10 | Enkuru | 17.3292 | 80.4404 | 20 | Khammam (Urban) | 17.2413 | 80.1420 |
+
+### 5.4 Integrity & Hierarchy Rules
+1. **Cascading Dropdowns**: In the UI (`FarmRegistrationPage.tsx`), State $\to$ District $\to$ Mandal/Taluk are strictly chained. Selecting a state filters districts; selecting a district filters mandals/taluks. Changing a parent resets the child selection.
+2. **Read-Only Coordinate Transparency**: Selecting a mandal displays its exact latitude and longitude with a read-only badge indicating precision level (`village` vs `approximate district centre`).
+3. **District-Centre Fallback**: If a district has no sub-district entry, the selector provides the district headquarters centroid with `precision: "approximate district centre"`. Coordinates are never invented or guessed.
 4. **Backend Hierarchy Enforcement**: Backend endpoints (`POST /api/v1/farms/` and `PUT /api/v1/farms/{id}`) validate that the submitted village/mandal belongs to the chosen district, and the district belongs to the chosen state. Any mismatch is strictly rejected with HTTP 422 naming the invalid field, preventing client bypass.
 
 ---

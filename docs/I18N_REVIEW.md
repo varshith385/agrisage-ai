@@ -598,6 +598,67 @@ A rigorous evaluation across 16 queries (8 in Telugu `te`, 4 in Hindi `hi`, and 
 - **Telugu & Hindi transliteration status**: District-level names for Telangana (33) and Andhra Pradesh (26) are fully transliterated. Sub-district mandal names currently display their official survey transliteration in Latin script with Telugu and Hindi phonetics.
 - **Native Review Policy**: In accordance with Grow2Gain honesty rules, all non-English voice and text advisory outputs are flagged as requiring native agronomist field validation.
 
+---
+
+## 10. Round 7e Voice Reminders, Mandi/Crop Translations & Wording Ledger
+
+**Date:** 2026-11-15  
+**Scope:** Multilingual voice reminders with Asia/Kolkata timestamps and confirmation prompts, grounded entity translation maps (crops, mandis, agricultural officers), user-visible "Mandal / Taluk" wording update, and typo resolution.
+
+### 10.1 Voice Reminder Confirmation Prompts & Task Titles
+Voice reminders deterministically parse natural speech in Asia/Kolkata timezone (UTC+05:30) and ask for farmer confirmation before persisting to the database.
+
+| Phrase Category | English Phrase | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|---|
+| **Voice Reminder Command** | remind me tomorrow 6 am to water | రేపు ఉదయం 6 గంటలకు పత్తికి నీరు పెట్టాలని గుర్తు చేయండి | कल सुबह 6 बजे कपास में पानी देने का स्मरण कराएं | **needs native review** |
+| **Clean Extracted Title** | Water | పత్తికి నీరు పెట్టాలని | कपास में पानी देने | **needs native review** |
+| **Confirmation Prompt** | Would you like me to schedule a reminder: '{title}' for {formatted_date} (Asia/Kolkata)? Reminder scheduled only after your confirmation. Reply 'Yes' to confirm or 'No' to cancel. | మీరు ఈ జ్ఞాపిక షెడ్యూల్ చేయాలనుకుంటున్నారా: '{title}', సమయం {formatted_date} (Asia/Kolkata)? జ్ఞాపిక నమోదు చేయబడింది నిర్ధారణ తర్వాత మాత్రమే. సేవ్ చేయడానికి 'అవును' లేదా రద్దు చేయడానికి 'వద్దు' అనండి. | क्या आप यह स्मरणपत्र जोड़ना चाहते हैं: '{title}', समय {formatted_date} (Asia/Kolkata)? स्मरणपत्र दर्ज किया गया पुष्टि के बाद ही। सहेजने के लिए 'हाँ' या रद्द करने के लिए 'नहीं' कहें। | **needs native review** |
+| **Confirmation Action Chip** | Confirm in Reminders | రిమైండర్లలో నిర్ధారించండి | स्मरणपत्र में पुष्टि करें | **needs native review** |
+| **Reminder Saved Spoken** | Reminder saved successfully: '{title}'. You will see it on your Reminders page. | జ్ఞాపిక విజయవంతంగా భద్రపరచబడింది: '{title}'. ఇది మీ రిమైండర్ల పేజీలో కనిపిస్తుంది. | स्मरणपत्र सफलतापूर्वक सहेजा गया: '{title}'। यह आपके स्मरणपत्र पृष्ठ पर दिखाई देगा। | **needs native review** |
+| **Reminder Cancelled Spoken** | Reminder was cancelled. | జ్ఞాపిక రద్దు చేయబడింది. | स्मरणपत्र रद्द कर दिया गया। | **needs native review** |
+
+### 10.2 Entity Grounding & Translation Maps
+To eliminate raw English terminology appearing in Telugu and Hindi rule-based chat responses, comprehensive translation mappings are applied. Any unknown entity retains an explicit `[EN]` fallback marker rather than fabricating translations.
+
+| English Entity | Telugu Translation (`te`) | Hindi Translation (`hi`) | Review Status |
+|---|---|---|---|
+| **Cotton** | పత్తి | कपास | **needs native review** |
+| **Rice / Paddy** | వరి | धान | **needs native review** |
+| **Wheat** | గోధుమ | गेहूं | **needs native review** |
+| **Maize / Corn** | మొక్కజొన్న | मक्का | **needs native review** |
+| **Chilli / Chili** | మిర్చి | मिर्च | **needs native review** |
+| **Groundnut** | వేరుశనగ | मूंगफली | **needs native review** |
+| **Tomato** | టమోటా | टमाटर | **needs native review** |
+| **Potato** | బంగాళాదుంప | आलू | **needs native review** |
+| **Pulses** | పప్పుధాన్యాలు | दालें | **needs native review** |
+| **Redgram / Pigeonpeas** | కందులు | अरहर | **needs native review** |
+| **Blackgram** | మినుములు | उड़द | **needs native review** |
+| **Greengram / Mungbean** | పెసలు | मूंग | **needs native review** |
+| **Bengalgram / Chickpea** | శనగలు | चना | **needs native review** |
+| **Soyabean** | సోయాబీన్ | सोयाबीन | **needs native review** |
+| **Sugarcane** | చెరకు | गन्ना | **needs native review** |
+| **Turmeric** | పసుపు | हल्दी | **needs native review** |
+| **Onion** | ఉల్లిపాయ | प्याज | **needs native review** |
+| **Enumamula (Warangal)** | ఎనుమాముల (వరంగల్) | एनुमामुला (वारंगल) | **needs native review** |
+| **Khammam** | ఖమ్మం | खम्मम | **needs native review** |
+| **Badepalli (Jadcherla)** | బాదేపల్లి (జడ్చర్ల) | बादेपल्ली (जडचेर्ला) | **needs native review** |
+| **Agriculture Extension Officer** | వ్యవసాయ విస్తరణ అధికారి | कृषि विस्तार अधिकारी | **needs native review** |
+| **Block / Mandal Agriculture Officer** | మండల వ్యవసాయ అధికారి | प्रखंड / मंडल कृषि अधिकारी | **needs native review** |
+
+### 10.3 Typo Correction: Soil Testing Causative Infix
+- **Reported Typo:** `"పరీక్షించించుకోండి"` (accidental double-causative duplication of `-చించు-`).
+- **Correction:** Standardized across all Telugu advisory copy to `"పరీక్షించుకోండి"` (or `"నేల పరీక్ష చేయించుకోండి"` / `"నేల పరీక్ష విలువలను నమోదు చేయండి"`). Marked as **needs native review**.
+
+### 10.4 User-Visible Sub-District Wording: "Mandal / Taluk"
+To accurately represent administrative reality in South India (TS/AP/KA/MH) where Census 2011 subdistricts are mandals/taluks rather than individual revenue villages, all user-facing labels were renamed. Underlying database schema and JSON API properties (`village`, `precision`) remain unchanged for strict backward compatibility.
+
+| UI Component | English (`en`) | Telugu (`te`) | Hindi (`hi`) | Review Status |
+|---|---|---|---|---|
+| **farms.village_label** | Mandal / Taluk | మండలం / తాలూకా | मंडल / तालुका | **needs native review** |
+| **Farm Parcel Wizard Step 2** | Mandal / Taluk & Weather Location | మండలం / తాలూకా & జీపీఎస్ లొకేషన్ | मंडल / तालुका व स्थान | **needs native review** |
+| **Farm Parcel Wizard Description** | Pinpoint mandal or taluk coordinates for hyper-local rain telemetry | ఖచ్చితమైన వర్షపాత సూచన కోసం మండలం / తాలూకా ఎంచుకోండి | सटीक बारिश के लिए मंडल / तालुका का चयन करें | **needs native review** |
+| **Farm Form Field Prompt** | Parcel name, total acres, tenure breakdown (owned/leased), soil type, water source, and mandal / taluk. | పొలం పేరు, విస్తీర్ణం (ఎకరాల్లో), భూమి రకం (సొంతం/కౌలు), నేల స్వభావం మరియు మండలం / తాలూకా. | खेत का नाम, रकबा (एकड़ में), जमीन का प्रकार (खुद की/बटाई), मिट्टी का प्रकार और मंडल / तालुका। | **needs native review** |
+
 
 
 

@@ -37,9 +37,12 @@ def parse_reminder_voice_command(
     trigger_patterns = [
         "remind me to", "remind me", "set a reminder", "add a reminder", "create reminder",
         "schedule a reminder", "schedule reminder",
-        "గుర్తు చేయి", "రిమైండర్ పెట్టు", "రిమైండర్ జోడించు", "గుర్తుచేయి",
+        "గుర్తు చేయండి", "గుర్తుచేయండి", "గుర్తు చేయి", "గుర్తుచేయి", "జ్ఞాపిక ఉంచండి", "జ్ఞాపిక",
+        "రిమైండర్ పెట్టండి", "రిమైండర్ పెట్టు", "రిమైండర్ జోడించండి", "రిమైండర్ జోడించు",
         "యాడ్ రిమైండర్", "రిమైండర్",
-        "याद दिलाना", "रिमाइंडर लगाओ", "रिमाइंडर जोड़ें", "याद दिलाओ", "रिमाइंडर"
+        "का स्मरण कराएं", "स्मरण कराएं", "स्मरण दिलाएं", "स्मरण कराओ", "स्मरण दिलाओ",
+        "याद दिलाएं", "याद दिलाना", "याद दिलाओ", "याद कराएं", "स्मरण पत्र", "स्मरण",
+        "रिमाइंडर लगाएं", "रिमाइंडर लगाओ", "रिमाइंडर जोड़ें", "रिमाइंडर"
     ]
     matched_trigger = False
     for pat in trigger_patterns:
@@ -136,15 +139,36 @@ def parse_reminder_voice_command(
             target_hour = 12
             target_minute = 0
 
-        # Explicit hour match (e.g. 6 am, 7 pm, 10:30 am, at 6 pm)
-        time_match = re.search(r"(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)", q_lower)
-        if time_match:
-            h = int(time_match.group(1))
-            m = int(time_match.group(2) or 0)
-            meridiem = time_match.group(3).lower()
+        # Explicit hour match (e.g. 6 am, 7 pm, 10:30 am, at 6 pm, 6 గంటలకు, 6 बजे)
+        time_match_en = re.search(r"(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)", q_lower)
+        time_match_te = re.search(r"(\d{1,2})(?::(\d{2}))?\s*గంటల(?:కు|కి)", q_lower)
+        time_match_hi = re.search(r"(\d{1,2})(?::(\d{2}))?\s*बजे", q_lower)
+
+        if time_match_en:
+            h = int(time_match_en.group(1))
+            m = int(time_match_en.group(2) or 0)
+            meridiem = time_match_en.group(3).lower()
             if meridiem == "pm" and h < 12:
                 h += 12
             elif meridiem == "am" and h == 12:
+                h = 0
+            target_hour = h
+            target_minute = m
+        elif time_match_te:
+            h = int(time_match_te.group(1))
+            m = int(time_match_te.group(2) or 0)
+            if ("సాయంత్రం" in q_lower or "రాత్రి" in q_lower) and h < 12:
+                h += 12
+            elif "ఉదయం" in q_lower and h == 12:
+                h = 0
+            target_hour = h
+            target_minute = m
+        elif time_match_hi:
+            h = int(time_match_hi.group(1))
+            m = int(time_match_hi.group(2) or 0)
+            if ("शाम" in q_lower or "रात" in q_lower) and h < 12:
+                h += 12
+            elif "सुबह" in q_lower and h == 12:
                 h = 0
             target_hour = h
             target_minute = m
@@ -168,24 +192,37 @@ def parse_reminder_voice_command(
 
     # 4. Extract task title
     cleaned_title = q
-    for p in trigger_patterns:
-        cleaned_title = re.sub(re.escape(p), "", cleaned_title, flags=re.IGNORECASE)
+    for p in sorted(trigger_patterns, key=len, reverse=True):
+        if re.search(r"[a-zA-Z]", p):
+            cleaned_title = re.sub(rf"\b{re.escape(p)}\b", "", cleaned_title, flags=re.IGNORECASE)
+        else:
+            cleaned_title = re.sub(re.escape(p), "", cleaned_title, flags=re.IGNORECASE)
 
-    date_words = [
+    # Strip Indic hour patterns
+    cleaned_title = re.sub(r"\d{1,2}(?::\d{2})?\s*గంటల(?:కు|కి)", "", cleaned_title)
+    cleaned_title = re.sub(r"\d{1,2}(?::\d{2})?\s*बजे", "", cleaned_title)
+
+    date_words_en = [
         "day after tomorrow", "tomorrow", "today", "morning", "evening", "afternoon", "noon", "midnight",
         "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
         "on", "at", "to", "for", "in", "hours?", "days?",
+    ]
+    for dw in sorted(date_words_en, key=len, reverse=True):
+        cleaned_title = re.sub(rf"\b{re.escape(dw)}\b", "", cleaned_title, flags=re.IGNORECASE)
+
+    date_words_indic = [
         "ఎల్లుండి", "రేపు", "ఈరోజు", "ఉదయం", "సాయంత్రం", "మధ్యాహ్నం", "అర్థరాత్రి", "గంటల్లో", "రోజుల్లో",
         "సోమవారం", "మంగళవారం", "బుధవారం", "గురువారం", "శుక్రవారం", "శనివారం", "ఆదివారం",
         "परसों", "कल", "आज", "सुबह", "शाम", "दोपहर", "आधी रात", "घंटे", "दिन",
-        "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार", "रविवार"
+        "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार", "रविवार",
     ]
-    for dw in date_words:
-        cleaned_title = re.sub(rf"\b{re.escape(dw)}\b", "", cleaned_title, flags=re.IGNORECASE)
+    for dw in sorted(date_words_indic, key=len, reverse=True):
+        cleaned_title = re.sub(re.escape(dw), "", cleaned_title, flags=re.IGNORECASE)
 
     # Clean time patterns like "6 am", "7 pm", "2 hours"
     cleaned_title = re.sub(r"\b\d{1,2}(?::\d{2})?\s*(?:am|pm)?\b", "", cleaned_title, flags=re.IGNORECASE)
-    cleaned_title = re.sub(r"[\.,!\?]", "", cleaned_title).strip()
+    cleaned_title = re.sub(r"[\.,!\?]", "", cleaned_title)
+    cleaned_title = re.sub(r"\s+", " ", cleaned_title).strip()
 
     if not cleaned_title:
         cleaned_title = {

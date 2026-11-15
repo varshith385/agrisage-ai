@@ -208,6 +208,107 @@ def resolve_response_language(query: str, selected_lang: Optional[str]) -> str:
     return sel
 
 
+# Multilingual entity translation dictionaries for grounded responses (Telugu & Hindi)
+CROP_TRANSLATIONS: Dict[str, Dict[str, str]] = {
+    "cotton": {"te": "పత్తి", "hi": "कपास"},
+    "rice": {"te": "వరి", "hi": "धान"},
+    "paddy": {"te": "వరి", "hi": "धान"},
+    "wheat": {"te": "గోధుమ", "hi": "गेहूं"},
+    "maize": {"te": "మొక్కజొన్న", "hi": "मक्का"},
+    "corn": {"te": "మొక్కజొన్న", "hi": "मक्का"},
+    "chilli": {"te": "మిర్చి", "hi": "मिर्च"},
+    "chili": {"te": "మిర్చి", "hi": "मिर्च"},
+    "groundnut": {"te": "వేరుశనగ", "hi": "मूंगफली"},
+    "tomato": {"te": "టమోటా", "hi": "टमाटर"},
+    "potato": {"te": "బంగాళాదుంప", "hi": "आलू"},
+    "pulses": {"te": "పప్పుధాన్యాలు", "hi": "दालें"},
+    "redgram": {"te": "కందులు", "hi": "अरहर"},
+    "blackgram": {"te": "మినుములు", "hi": "उड़द"},
+    "greengram": {"te": "పెసలు", "hi": "मूंग"},
+    "bengalgram": {"te": "శనగలు", "hi": "चना"},
+    "soyabean": {"te": "సోయాబీన్", "hi": "सोयाबीन"},
+    "sugarcane": {"te": "చెరకు", "hi": "गन्ना"},
+    "turmeric": {"te": "పసుపు", "hi": "హల్దీ"},
+    "onion": {"te": "ఉల్లిపాయ", "hi": "प्याज"},
+    "mango": {"te": "మామిడి", "hi": "आम"},
+    "banana": {"te": "అరటి", "hi": "केला"},
+    "grapes": {"te": "ద్రాక్ష", "hi": "अंगूर"},
+    "watermelon": {"te": "పుచ్చకాయ", "hi": "तरबूज"},
+    "muskmelon": {"te": "ఖర్బూజ", "hi": "खरबूजा"},
+    "apple": {"te": "యాపిల్", "hi": "सेब"},
+    "orange": {"te": "నారింజ", "hi": "संतरा"},
+    "papaya": {"te": "బొప్పాయి", "hi": "पपीता"},
+    "coconut": {"te": "కొబ్బరి", "hi": "नारियल"},
+    "jute": {"te": "జనపనార", "hi": "जूट"},
+    "coffee": {"te": "కాఫీ", "hi": "कॉफ़ी"},
+    "mothbeans": {"te": "మొత్ బీన్స్", "hi": "मोठ"},
+    "mungbean": {"te": "పెసలు", "hi": "मूंग"},
+    "pigeonpeas": {"te": "కందులు", "hi": "अरहर"},
+    "kidneybeans": {"te": "రాజ్మా", "hi": "राजमा"},
+    "chickpea": {"te": "శనగలు", "hi": "चना"},
+    "lentil": {"te": "మసూర్ పప్పు", "hi": "मसूर"},
+    "pomegranate": {"te": "దానిమ్మ", "hi": "अनार"},
+}
+
+MANDI_TRANSLATIONS: Dict[str, Dict[str, str]] = {
+    "enumamula (warangal)": {"te": "ఎనుమాముల (వరంగల్)", "hi": "एनुमामुला (वारंगल)"},
+    "enumamula": {"te": "ఎనుమాముల", "hi": "एनुमामुला"},
+    "warangal": {"te": "వరంగల్", "hi": "वारंगल"},
+    "khammam": {"te": "ఖమ్మం", "hi": "खम्मम"},
+    "badepalli (jadcherla)": {"te": "బాదేపల్లి (జడ్చర్ల)", "hi": "बादेपल्ली (जडचेर्ला)"},
+    "badepalli": {"te": "బాదేపల్లి", "hi": "बादेपल्ली"},
+    "suryapet": {"te": "సూర్యాపేట", "hi": "सूर्यापेट"},
+    "karimnagar": {"te": "కరీంనగర్", "hi": "करीमनगर"},
+    "nizamabad": {"te": "నిజామాబాద్", "hi": "निजामाबाद"},
+    "adilabad": {"te": "ఆదిలాబాద్", "hi": "आदिलाबाद"},
+    "nalgonda": {"te": "నల్గొండ", "hi": "नलगोंडा"},
+    "guntur": {"te": "గుంటూరు", "hi": "गुंटूर"},
+    "kurnool": {"te": "కర్నూలు", "hi": "कुरनूल"},
+    "anantapur": {"te": "అనంతపురం", "hi": "अनंतपुर"},
+    "rajahmundry": {"te": "రాజమండ్రి", "hi": "राजमंद्री"},
+    "eluru": {"te": "ఏలూరు", "hi": "एलुरु"},
+    "vijayawada": {"te": "విజయవాడ", "hi": "विजयवाड़ा"},
+    "hyderabad": {"te": "హైదరాబాద్", "hi": "हैदराबाद"},
+}
+
+OFFICER_TRANSLATIONS: Dict[str, Dict[str, str]] = {
+    "agriculture extension officer": {"te": "వ్యవసాయ విస్తరణ అధికారి", "hi": "कृषि विस्तार अधिकारी"},
+    "block agriculture officer": {"te": "మండల వ్యవసాయ అధికారి", "hi": "प्रखंड कृषि अधिकारी"},
+    "agriculture officer": {"te": "వ్యవసాయ అధికారి", "hi": "कृषि अधिकारी"},
+    "mandal agriculture officer": {"te": "మండల వ్యవసాయ అధికారి", "hi": "मंडल कृषि अधिकारी"},
+}
+
+
+def translate_crop_name(crop: str, lang: str) -> str:
+    if lang not in ("te", "hi"):
+        return crop
+    clean = crop.strip().lower()
+    mapping = CROP_TRANSLATIONS.get(clean)
+    if mapping and lang in mapping:
+        return mapping[lang]
+    return f"{crop} [EN]"
+
+
+def translate_mandi_name(mandi: str, lang: str) -> str:
+    if lang not in ("te", "hi"):
+        return mandi
+    clean = mandi.strip().lower()
+    mapping = MANDI_TRANSLATIONS.get(clean)
+    if mapping and lang in mapping:
+        return mapping[lang]
+    return f"{mandi} [EN]"
+
+
+def translate_officer_phrase(phrase: str, lang: str) -> str:
+    if lang not in ("te", "hi"):
+        return phrase
+    clean = phrase.strip().lower()
+    mapping = OFFICER_TRANSLATIONS.get(clean)
+    if mapping and lang in mapping:
+        return mapping[lang]
+    return f"{phrase} [EN]"
+
+
 class VoiceAssistantService:
     def __init__(self):
         self.default_lat = 17.9689
@@ -432,6 +533,7 @@ class VoiceAssistantService:
         crop_name = fp.get("crop", self.default_crop)
         area = fp.get("area_acres", self.default_area)
         method = fp.get("irrigation_method", "drip")
+        crop_label = translate_crop_name(crop_name, lang)
 
         should_irrigate = irr_info.get("should_irrigate", False)
         gross_depth_mm = round(float(irr_info.get("gross_depth_mm", 0.0)), 1)
@@ -449,20 +551,20 @@ class VoiceAssistantService:
                 spoken = f"Skip irrigation today due to forecasted rainfall. Conserving {litres_saved:,} litres. Next watering is on {next_date}."
         elif not should_irrigate:
             if lang == "te":
-                spoken = f"మీ {crop_name} పంటకు ఈరోజు నీరు పెట్టాల్సిన అవసరం లేదు. తదుపరి తడి {next_date} తేదీన షెడ్యూల్ చేయబడింది."
+                spoken = f"మీ {crop_label} పంటకు ఈరోజు నీరు పెట్టాల్సిన అవసరం లేదు. తదుపరి తడి {next_date} తేదీన షెడ్యూల్ చేయబడింది."
             elif lang == "hi":
-                spoken = f"आपकी {crop_name} फसल को आज सिंचाई की आवश्यकता नहीं है। अगली सिंचाई {next_date} को निर्धारित है।"
+                spoken = f"आपकी {crop_label} फसल को आज सिंचाई की आवश्यकता नहीं है। अगली सिंचाई {next_date} को निर्धारित है।"
             else:
                 spoken = f"No watering needed today. Next watering is on {next_date}."
         else:
             if lang == "te":
                 spoken = (
-                    f"మీ {crop_name} పంటకు ఈరోజు నీరు పెట్టాలి. "
+                    f"మీ {crop_label} పంటకు ఈరోజు నీరు పెట్టాలి. "
                     f"సిఫార్సు చేసిన తడి లోతు {gross_depth_mm} మి.మీ (మొత్తం {litres:,} లీటర్లు, {area} ఎకరాలకు {method} ద్వారా)."
                 )
             elif lang == "hi":
                 spoken = (
-                    f"आपकी {crop_name} फसल को आज सिंचाई की आवश्यकता है। "
+                    f"आपकी {crop_label} फसल को आज सिंचाई की आवश्यकता है। "
                     f"सिंचाई गहराई {gross_depth_mm} मिमी (कुल {litres:,} लीटर, {area} एकड़ के लिए {method} द्वारा) है।"
                 )
             else:
@@ -504,12 +606,12 @@ class VoiceAssistantService:
         if lang == "te":
             spoken = (
                 "పైరు తెగులును గుర్తించడానికి, వ్యాధి సోకిన ఆకు యొక్క స్పష్టమైన ఫోటో తీసి డిసీజ్ స్కానర్‌లో అప్‌లోడ్ చేయండి. "
-                "మేము రసాయన రహిత యాజమాన్య పద్ధతులను సూచిస్తాము. రసాయన మోతాదులను స్వయంగా వాడవద్దు."
+                "మేము రసాయన రహిత యాజమాన్య పద్ధతులను సూచిస్తాము. రసాయన మోతాదుల కోసం మీ స్థానిక వ్యవసాయ విస్తరణ అధికారిని సంప్రదించండి."
             )
         elif lang == "hi":
             spoken = (
                 "फसल रोग की पहचान के लिए, प्रभावित पत्ती की साफ फोटो डिसीज स्कैनर में अपलोड करें। "
-                "हम जैविक व सुरक्षात्मक उपाय बताएंगे। बिना कृषि अधिकारी की सलाह रासायनिक दवाओं का छिड़काव न करें।"
+                "हम जैविक व सुरक्षात्मक उपाय बताएंगे। बिना कृषि विस्तार अधिकारी की सलाह रासायनिक दवाओं का छिड़काव न करें।"
             )
         else:
             spoken = (
@@ -565,16 +667,17 @@ class VoiceAssistantService:
         cost_per_acre = int(float(str(econ.combined_summary.total_cost_per_acre).replace(",", "")))
         gross_return = int(float(str(econ.combined_summary.gross_revenue).replace(",", "")))
         margin = round(float(econ.combined_summary.margin_pct), 1)
+        crop_label = translate_crop_name(crop_name, lang)
 
         if lang == "te":
             spoken = (
-                f"{area} ఎకరాల {crop_name} సాగుకు ప్రాజెక్ట్ అంచనా ఖర్చు ₹{total_cost:,} (ఎకరాకు ₹{cost_per_acre:,}). "
+                f"{area} ఎకరాల {crop_label} సాగుకు ప్రాజెక్ట్ అంచనా ఖర్చు ₹{total_cost:,} (ఎకరాకు ₹{cost_per_acre:,}). "
                 f"అంచనా స్థూల ఆదాయం ₹{gross_return:,} ({margin}% లాభం). "
                 f"ఇది ప్రాజెక్ట్ బృందం ఇచ్చిన సూచనాత్మక అంచనా మాత్రమే [డెమో డేటా (DEMO DATA)], మీ వాస్తవ ఖర్చులను సరిచూసుకోండి."
             )
         elif lang == "hi":
             spoken = (
-                f"{area} एकड़ {crop_name} की अनुमानित खेती लागत ₹{total_cost:,} (₹{cost_per_acre:,}/एकड़) है। "
+                f"{area} एकड़ {crop_label} की अनुमानित खेती लागत ₹{total_cost:,} (₹{cost_per_acre:,}/एकड़) है। "
                 f"अनुमानित कुल आय ₹{gross_return:,} ({margin}% शुद्ध लाभ) है। "
                 f"यह केवल सांकेतिक अनुमान है [डेमो डेटा (DEMO DATA)], इसे अपनी वास्तविक लागत के अनुसार बदलें।"
             )
@@ -688,19 +791,22 @@ class VoiceAssistantService:
             except Exception:
                 pass
 
+        crop_label = translate_crop_name(crop_name, lang)
+        mandi_label = translate_mandi_name(mandi_name, lang)
+
         demo_tag_en = " [DEMO DATA]" if is_demo else ""
         demo_tag_te = " [డెమో డేటా (DEMO DATA)]" if is_demo else ""
         demo_tag_hi = " [डेमो डेटा (DEMO DATA)]" if is_demo else ""
 
         if lang == "te":
             spoken = (
-                f"{mandi_name} మార్కెట్ యార్డులో {crop_name} మోడల్ ధర క్వింటాలుకు ₹{modal_price:,} "
+                f"{mandi_label} మార్కెట్ యార్డులో {crop_label} మోడల్ ధర క్వింటాలుకు ₹{modal_price:,} "
                 f"(కనిష్ట ధర ₹{min_price:,}, గరిష్ట ధర ₹{max_price:,}){demo_tag_te}. "
                 f"కనీస మద్దతు ధర (MSP) ధృవీకరణ వివరాలు మరియు మార్కెట్ యార్డుల నికర లాభాల కొరకు మార్కెట్ పేజీని చూడండి."
             )
         elif lang == "hi":
             spoken = (
-                f"{mandi_name} मंडी में {crop_name} का मॉडल भाव ₹{modal_price:,} प्रति क्विंटल है "
+                f"{mandi_label} मंडी में {crop_label} का मॉडल भाव ₹{modal_price:,} प्रति क्विंटल है "
                 f"(न्यूनतम ₹{min_price:,}, अधिकतम ₹{max_price:,}){demo_tag_hi}। "
                 f"एमएसपी और विभिन्न मंडियों के शुद्ध लाभ के लिए मार्केट पेज देखें।"
             )
@@ -713,7 +819,7 @@ class VoiceAssistantService:
 
         status_val = "DEMO" if is_demo else "WORKING"
         source_citation = (
-            "DEMO DATA (datasets/demo/mandi_prices.csv)"
+            "Demo data (datasets/demo/mandi_prices.csv)"
             if is_demo
             else "AGMARKNET (api.data.gov.in / OGD India)"
         )
@@ -749,7 +855,11 @@ class VoiceAssistantService:
                 "Mandi prices reflect modal market arrivals; lot prices vary by moisture and staple grade.",
                 "MSP applies to FAQ (Fair Average Quality) produce procured at designated state agencies.",
             ],
-            upstream_status="AGMARKNET / Market Service Query",
+            upstream_status=(
+                "Demo data (datasets/demo/mandi_prices.csv)"
+                if is_demo
+                else "AGMARKNET / Market Service Query"
+            ),
         )
 
     async def _handle_crop_advice(
@@ -762,6 +872,7 @@ class VoiceAssistantService:
         top_crop = ca.get("top_crop", "Cotton")
         prob = ca.get("probability_pct", 0.0)
         soil_missing = ca.get("soil_missing", True)
+        top_crop_label = translate_crop_name(top_crop, lang)
 
         if decision_status == "MODEL_UNAVAILABLE":
             if lang == "te":
@@ -773,12 +884,12 @@ class VoiceAssistantService:
         elif soil_missing:
             if lang == "te":
                 spoken = (
-                    f"గ్రో2గెయిన్ పంట సలహాదారు వాతావరణం ఆధారంగా {top_crop} ను సూచిస్తున్నారు (నిర్ణయ స్థితి: {decision_status}). "
+                    f"గ్రో2గెయిన్ పంట సలహాదారు వాతావరణం ఆధారంగా {top_crop_label} ను సూచిస్తున్నారు (నిర్ణయ స్థితి: {decision_status}). "
                     f"ఖచ్చితమైన సిఫార్సు కోసం దయచేసి మీ నేల పరీక్ష విలువలను (N, P, K, pH) నమోదు చేయండి."
                 )
             elif lang == "hi":
                 spoken = (
-                    f"Grow2Gain फसल सलाहकार मौसम के आधार पर {top_crop} का सुझाव देता है (निर्णय स्थिति: {decision_status})। "
+                    f"Grow2Gain फसल सलाहकार मौसम के आधार पर {top_crop_label} का सुझाव देता है (निर्णय स्थिति: {decision_status})। "
                     f"सटीक अनुशंसा के लिए कृपया अपनी मिट्टी के पोषक तत्व मान (N, P, K, pH) दर्ज करें।"
                 )
             else:
@@ -789,12 +900,12 @@ class VoiceAssistantService:
         else:
             if lang == "te":
                 spoken = (
-                    f"గ్రో2గెయిన్ పంట సలహాదారు మీ నేల మరియు వాతావరణం ఆధారంగా {top_crop} పంటను సిఫార్సు చేస్తున్నారు "
+                    f"గ్రో2గెయిన్ పంట సలహాదారు మీ నేల మరియు వాతావరణం ఆధారంగా {top_crop_label} పంటను సిఫార్సు చేస్తున్నారు "
                     f"(నిర్ణయ స్థితి: {decision_status}, మోడల్ సంభావ్యత: {prob}%)."
                 )
             elif lang == "hi":
                 spoken = (
-                    f"Grow2Gain फसल सलाहकार आपके खेत की मिट्टी और मौसम के आधार पर {top_crop} की सिफारिश करता है "
+                    f"Grow2Gain फसल सलाहकार आपके खेत की मिट्टी और मौसम के आधार पर {top_crop_label} की सिफारिश करता है "
                     f"(निर्णय स्थिति: {decision_status}, मॉडल संभावना: {prob}%)।"
                 )
             else:

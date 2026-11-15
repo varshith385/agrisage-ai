@@ -20,12 +20,11 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../context/LanguageContext';
 import { usePictorial, useShowListen } from '../context/PictorialContext';
-import { weatherApi } from '../api/weather';
+import { useFarmWeather } from '../hooks/useFarmWeather';
 import { agentsApi } from '../api/agents';
 import { advisoryApi } from '../api/advisory';
 import { calculateEconomics } from '../api/economics';
 import {
-  CurrentWeather,
   AgentRunItem,
   OrchestratorRunResult,
   GrowthStageResponse,
@@ -64,8 +63,6 @@ export const DashboardPage: React.FC = () => {
   const showListen = useShowListen();
 
   const farmData = activeFarm;
-  const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
-  const [isLoadingWeather, setIsLoadingWeather] = useState<boolean>(true);
 
   // Growth Stage State
   const [growthStageData, setGrowthStageData] = useState<GrowthStageResponse | null>(null);
@@ -153,31 +150,15 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
-  const [weatherError, setWeatherError] = useState<string | null>(null);
-
-  // Weather Coordinates
-  const lat = farmData?.latitude || activeFarm?.latitude || 17.9689;
-  const lon = farmData?.longitude || activeFarm?.longitude || 79.5941;
-  const farmId = farmData?.id || activeFarm?.id;
-
-  const fetchWeather = async (l1: number, l2: number) => {
-    setIsLoadingWeather(true);
-    setWeatherError(null);
-    try {
-      const data = await weatherApi.getCurrentWeather(l1, l2, farmId);
-      setWeatherData(data);
-    } catch (err: any) {
-      console.error('Failed to fetch weather', err);
-      setWeatherError(err?.message || 'Open-Meteo weather service unreachable.');
-      setWeatherData(null);
-    } finally {
-      setIsLoadingWeather(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWeather(lat, lon);
-  }, [lat, lon, farmId]);
+  // Unified Farm Weather (from shared hook)
+  const {
+    weather: weatherData,
+    isLoading: isLoadingWeather,
+    error: weatherError,
+    refetch: refetchWeather,
+    latitude: lat,
+    longitude: lon,
+  } = useFarmWeather();
 
   // Crop Cycle Information
   const activeCycle = farmData?.current_crop_cycles && farmData.current_crop_cycles.length > 0
@@ -664,7 +645,7 @@ export const DashboardPage: React.FC = () => {
               <ErrorState
                 title={language === 'te' ? 'వాతావరణం లోడ్ కాలేదు' : language === 'hi' ? 'मौसम लोड नहीं हुआ' : 'Weather Unavailable'}
                 message={weatherError}
-                onRetry={() => fetchWeather(lat, lon)}
+                onRetry={refetchWeather}
               />
             ) : weatherData ? (
               <div className="space-y-2">

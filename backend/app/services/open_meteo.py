@@ -1,7 +1,7 @@
 import json
 import httpx
-from datetime import datetime, timedelta, timezone
-from typing import Dict, Any, List, Optional
+from datetime import date, datetime, timedelta, timezone
+from typing import Dict, Any, List, Optional, Tuple
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from backend.app.config import settings
@@ -283,6 +283,16 @@ def evaluate_crop_suitability(crop: str, forecast: WeatherForecastResponse) -> C
     )
 
 
+def get_climate_window(reference_date: Optional[date] = None) -> Tuple[str, str]:
+    """Single authoritative climate window definition:
+    end = today minus 5 days, start = end minus 364 days.
+    """
+    ref = reference_date or datetime.now(timezone.utc).date()
+    end_dt = ref - timedelta(days=5)
+    start_dt = end_dt - timedelta(days=364)
+    return start_dt.strftime("%Y-%m-%d"), end_dt.strftime("%Y-%m-%d")
+
+
 CLIMATE_NORMALS_CACHE: Dict[str, Dict[str, Any]] = {}
 
 
@@ -294,10 +304,7 @@ async def get_climate_normals(lat: float, lon: float) -> Dict[str, Any]:
     """
     lat_bin = round(lat, 2)
     lon_bin = round(lon, 2)
-    now_utc = datetime.now(timezone.utc)
-    # Trailing 365 complete days window (accounting for 5-day ERA5 archive lag)
-    end_date = (now_utc - timedelta(days=5)).strftime("%Y-%m-%d")
-    start_date = (now_utc - timedelta(days=369)).strftime("%Y-%m-%d")
+    start_date, end_date = get_climate_window()
     cache_key = f"{lat_bin}_{lon_bin}_{start_date}_{end_date}"
 
     if cache_key in CLIMATE_NORMALS_CACHE:
@@ -311,6 +318,8 @@ async def get_climate_normals(lat: float, lon: float) -> Dict[str, Any]:
             with open(pre_cache_file, "r", encoding="utf-8") as f:
                 pre_data = json.load(f)
                 for loc_name, loc_info in pre_data.items():
+                    if loc_name.startswith("_") or not isinstance(loc_info, dict) or "lat" not in loc_info:
+                        continue
                     if abs(loc_info["lat"] - lat) < 0.20 and abs(loc_info["lon"] - lon) < 0.20:
                         w_start = loc_info.get("window_start_date", start_date)
                         w_end = loc_info.get("window_end_date", end_date)
@@ -333,8 +342,6 @@ async def get_climate_normals(lat: float, lon: float) -> Dict[str, Any]:
     except Exception:
         pass
 
-    end_date = (now_utc - timedelta(days=5)).strftime("%Y-%m-%d")
-    start_date = (now_utc - timedelta(days=370)).strftime("%Y-%m-%d")
     url = (
         f"https://archive-api.open-meteo.com/v1/archive?"
         f"latitude={lat}&longitude={lon}&"

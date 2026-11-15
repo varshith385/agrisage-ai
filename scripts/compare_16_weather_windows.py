@@ -2,6 +2,8 @@ import asyncio
 import json
 import httpx
 
+from datetime import datetime, timedelta, timezone
+
 LOCATIONS = [
     ("Warangal", "Telangana", 17.97, 79.59),
     ("Rajkot", "Gujarat", 22.30, 70.80),
@@ -21,13 +23,28 @@ LOCATIONS = [
     ("Bikaner", "Rajasthan", 28.02, 73.31),
 ]
 
+now_utc = datetime.now(timezone.utc)
+# Single authoritative definition: end = today minus 5 days, start = end minus 364 days
+end_new_dt = (now_utc - timedelta(days=5)).date()
+start_new_dt = end_new_dt - timedelta(days=364)
+start_new = start_new_dt.strftime("%Y-%m-%d")
+end_new = end_new_dt.strftime("%Y-%m-%d")
+
+# Prior historical 2-year window for comparison
+end_old_dt = (now_utc - timedelta(days=5 + 365 * 2)).date()
+start_old_dt = end_old_dt - timedelta(days=364)
+start_old = start_old_dt.strftime("%Y-%m-%d")
+end_old = end_old_dt.strftime("%Y-%m-%d")
+
 async def check():
     async with httpx.AsyncClient(timeout=25.0) as client:
-        print(f"{'City':15s} | {'2023-11-15..2024-11-14':26s} | {'2025-11-15..2026-11-14':26s} | {'Rain Diff':10s}")
+        col1_header = f"{start_old}..{end_old}"
+        col2_header = f"{start_new}..{end_new}"
+        print(f"{'City':15s} | {col1_header:26s} | {col2_header:26s} | {'Rain Diff':10s}")
         print("-" * 85)
         for name, st, lat, lon in LOCATIONS:
-            u_old = f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&start_date=2023-11-15&end_date=2024-11-14&daily=temperature_2m_mean,relative_humidity_2m_mean,precipitation_sum&timezone=auto"
-            u_new = f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&start_date=2025-11-15&end_date=2026-11-14&daily=temperature_2m_mean,relative_humidity_2m_mean,precipitation_sum&timezone=auto"
+            u_old = f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&start_date={start_old}&end_date={end_old}&daily=temperature_2m_mean,relative_humidity_2m_mean,precipitation_sum&timezone=auto"
+            u_new = f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&start_date={start_new}&end_date={end_new}&daily=temperature_2m_mean,relative_humidity_2m_mean,precipitation_sum&timezone=auto"
             
             resp_old = await client.get(u_old)
             resp_new = await client.get(u_new)

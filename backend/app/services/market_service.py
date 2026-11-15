@@ -184,7 +184,7 @@ async def fetch_agmarknet_prices(
     return (
         filtered,
         True,
-        "DEMO DATA (datasets/demo/mandi_prices.csv — API key missing or external AGMARKNET offline)",
+        "Demo data (datasets/demo/mandi_prices.csv)",
     )
 
 

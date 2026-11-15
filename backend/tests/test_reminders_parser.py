@@ -98,6 +98,45 @@ def test_parser_unparseable_phrase():
     assert result2 is None
 
 
+def test_parser_title_cleaning_water():
+    """Verify 'remind me tomorrow 6 am to water' yields clean task title 'Water', not 'Morrow water'."""
+    ref_time = datetime(2026, 11, 14, 15, 0, 0, tzinfo=KOLKATA_TZ)
+    result = parse_reminder_voice_command("remind me tomorrow 6 am to water", lang="en", reference_time=ref_time)
+    assert result is not None
+    title, due_at_utc, prompt = result
+    assert title == "Water"
+
+
+def test_parser_telugu_tomorrow_6_am():
+    """Verify Telugu voice reminder command parsing for tomorrow 6 AM with confirmation prompt."""
+    ref_time = datetime(2026, 11, 14, 15, 0, 0, tzinfo=KOLKATA_TZ)
+    result = parse_reminder_voice_command("రేపు ఉదయం 6 గంటలకు పత్తికి నీరు పెట్టాలని గుర్తు చేయండి", lang="te", reference_time=ref_time)
+    assert result is not None
+    title, due_at_utc, prompt = result
+    assert "పత్తికి నీరు పెట్టాలని" in title
+    due_at_kolkata = due_at_utc.replace(tzinfo=timezone.utc).astimezone(KOLKATA_TZ)
+    assert due_at_kolkata.date() == ref_time.date() + timedelta(days=1)
+    assert due_at_kolkata.hour == 6
+    assert due_at_kolkata.minute == 0
+    assert "మీరు ఈ జ్ఞాపిక షెడ్యూల్ చేయాలనుకుంటున్నారా" in prompt
+    assert "నిర్ధారణ తర్వాత మాత్రమే" in prompt
+
+
+def test_parser_hindi_tomorrow_6_am():
+    """Verify Hindi voice reminder command parsing for tomorrow 6 AM with confirmation prompt."""
+    ref_time = datetime(2026, 11, 14, 15, 0, 0, tzinfo=KOLKATA_TZ)
+    result = parse_reminder_voice_command("कल सुबह 6 बजे कपास में पानी देने का स्मरण कराएं", lang="hi", reference_time=ref_time)
+    assert result is not None
+    title, due_at_utc, prompt = result
+    assert "कपास में पानी देने" in title
+    due_at_kolkata = due_at_utc.replace(tzinfo=timezone.utc).astimezone(KOLKATA_TZ)
+    assert due_at_kolkata.date() == ref_time.date() + timedelta(days=1)
+    assert due_at_kolkata.hour == 6
+    assert due_at_kolkata.minute == 0
+    assert "क्या आप यह स्मरणपत्र जोड़ना चाहते हैं" in prompt
+    assert "पुष्टि के बाद ही" in prompt
+
+
 @pytest.mark.asyncio
 async def test_voice_reminder_asks_yes_before_saving(mock_farmer):
     """Voice reminder command MUST prompt for confirmation rather than saving immediately."""
@@ -115,6 +154,50 @@ async def test_voice_reminder_asks_yes_before_saving(mock_farmer):
     assert "Would you like me to schedule a reminder" in res.spoken_text
     assert "Reply 'Yes' to confirm" in res.spoken_text
     # Verify it was NOT saved to DB on first turn!
+    db_mock.add.assert_not_called()
+    db_mock.commit.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_voice_reminder_telugu_asks_confirmation(mock_farmer):
+    """Telugu voice reminder command MUST prompt for confirmation in Telugu rather than saving immediately."""
+    db_mock = MagicMock()
+    mock_farmer.preferred_language = Language.TE
+
+    req = VoiceQueryRequest(
+        query="రేపు ఉదయం 6 గంటలకు పత్తికి నీరు పెట్టాలని గుర్తు చేయండి",
+        language="te"
+    )
+
+    res = await voice_service.process_query(req, mock_farmer, db_mock)
+
+    assert res.intent == "reminder_confirm"
+    assert res.action_type == "confirm_reminder"
+    assert "మీరు ఈ జ్ఞాపిక షెడ్యూల్ చేయాలనుకుంటున్నారా" in res.spoken_text
+    assert "నిర్ధారణ తర్వాత మాత్రమే" in res.spoken_text
+    assert "పత్తికి నీరు పెట్టాలని" in res.spoken_text
+    db_mock.add.assert_not_called()
+    db_mock.commit.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_voice_reminder_hindi_asks_confirmation(mock_farmer):
+    """Hindi voice reminder command MUST prompt for confirmation in Hindi rather than saving immediately."""
+    db_mock = MagicMock()
+    mock_farmer.preferred_language = Language.HI
+
+    req = VoiceQueryRequest(
+        query="कल सुबह 6 बजे कपास में पानी देने का स्मरण कराएं",
+        language="hi"
+    )
+
+    res = await voice_service.process_query(req, mock_farmer, db_mock)
+
+    assert res.intent == "reminder_confirm"
+    assert res.action_type == "confirm_reminder"
+    assert "क्या आप यह स्मरणपत्र जोड़ना चाहते हैं" in res.spoken_text
+    assert "पुष्टि के बाद ही" in res.spoken_text
+    assert "कपास में पानी देने" in res.spoken_text
     db_mock.add.assert_not_called()
     db_mock.commit.assert_not_called()
 

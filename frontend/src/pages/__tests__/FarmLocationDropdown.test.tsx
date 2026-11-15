@@ -202,7 +202,7 @@ describe('Phase 5: State & District Cascading Dropdowns with Verified Coordinate
 
     const stateSelect = screen.getByLabelText(/state/i) as HTMLSelectElement;
     const districtSelect = screen.getByLabelText(/district/i) as HTMLSelectElement;
-    const villageSelect = screen.getByLabelText(/village/i) as HTMLSelectElement;
+    const villageSelect = screen.getByLabelText(/village|mandal/i) as HTMLSelectElement;
 
     expect(stateSelect.value).toBe('Telangana');
     expect(districtSelect.value).toBe('Warangal');
