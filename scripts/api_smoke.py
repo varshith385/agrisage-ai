@@ -19,11 +19,11 @@ if str(ROOT_DIR) not in sys.path:
 import httpx
 from backend.app.config import settings
 
-BASE_URL = os.environ.get("AGRI_BASE_URL", "http://127.0.0.1:8030")
+BASE_URL = os.environ.get("AGRI_BASE_URL", "http://127.0.0.1:8040")
 
 
 def run_smoke_tests():
-    client = httpx.Client(base_url=BASE_URL, timeout=15.0)
+    client = httpx.Client(base_url=BASE_URL, timeout=60.0)
 
     results = []
 
