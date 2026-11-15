@@ -411,18 +411,18 @@ export const FarmRegistrationPage: React.FC = () => {
           summary: language === 'te'
             ? 'మీ సొంత మరియు కౌలు భూమి వివరాలను నమోదు చేసి, నీటి పారుదల మరియు ఎరువుల బడ్జెట్‌ను ఖచ్చితంగా లెక్కించడానికి ఉపయోగపడుతుంది.'
             : language === 'hi'
-            ? 'अपनी खुद की और बटाई (पट्टे) वाली जमीन का रकबा दर्ज करें ताकि सिंचाई और खाद की सही योजना बन सके।'
-            : 'Allows farmers to register parcels with accurate owned and leased acreages so all water budgets and crop cost models calculate correctly.',
+              ? 'अपनी खुद की और बटाई (पट्टे) वाली जमीन का रकबा दर्ज करें ताकि सिंचाई और खाद की सही योजना बन सके।'
+              : 'Allows farmers to register parcels with accurate owned and leased acreages so all water budgets and crop cost models calculate correctly.',
           whatToEnter: language === 'te'
             ? 'పొలం పేరు, విస్తీర్ణం (ఎకరాల్లో), భూమి రకం (సొంతం/కౌలు), నేల స్వభావం మరియు గ్రామం.'
             : language === 'hi'
-            ? 'खेत का नाम, रकबा (एकड़ में), जमीन का प्रकार (खुद की/बटाई), मिट्टी का प्रकार और गांव।'
-            : 'Parcel name, total acres, tenure breakdown (owned/leased), soil type, water source, and village.',
+              ? 'खेत का नाम, रकबा (एकड़ में), जमीन का प्रकार (खुद की/बटाई), मिट्टी का प्रकार और गांव।'
+              : 'Parcel name, total acres, tenure breakdown (owned/leased), soil type, water source, and village.',
           whatYouGet: language === 'te'
             ? 'ఖచ్చితమైన భూమి లెక్కలు మరియు యాక్టివ్ ఫామ్ ప్రొఫైల్.'
             : language === 'hi'
-            ? 'जमीन का सटीक हिसाब और ऐप में सक्रिय खेत की प्रोफाइल।'
-            : 'Verified parcel acreage and active farm state used across weather, irrigation, and economics tools.',
+              ? 'जमीन का सटीक हिसाब और ऐप में सक्रिय खेत की प्रोफाइल।'
+              : 'Verified parcel acreage and active farm state used across weather, irrigation, and economics tools.',
         }}
       />
 
@@ -562,11 +562,10 @@ export const FarmRegistrationPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('register')}
-            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-              activeTab === 'register'
-                ? 'border-[#183D2E] text-[#183D2E] bg-white'
-                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
-            }`}
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'register'
+              ? 'border-[#183D2E] text-[#183D2E] bg-white'
+              : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+              }`}
           >
             <Plus className="w-4 h-4 text-[#DA9A4C]" />
             <span>Register Land Parcel</span>
@@ -575,11 +574,10 @@ export const FarmRegistrationPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('holdings')}
-            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-              activeTab === 'holdings'
-                ? 'border-[#183D2E] text-[#183D2E] bg-white'
-                : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
-            }`}
+            className={`min-h-[48px] px-4 py-3 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'holdings'
+              ? 'border-[#183D2E] text-[#183D2E] bg-white'
+              : 'border-transparent text-[#7A553A] hover:text-[#183D2E]'
+              }`}
           >
             <Tractor className="w-4 h-4 text-[#DA9A4C]" />
             <span>Registered Holdings ({farms.length})</span>
@@ -596,27 +594,24 @@ export const FarmRegistrationPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFormStep(1)}
-                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                      formStep === 1 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
-                    }`}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${formStep === 1 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
+                      }`}
                   >
                     <span>1. Land & Tenure</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormStep(2)}
-                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                      formStep === 2 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
-                    }`}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${formStep === 2 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
+                      }`}
                   >
                     <span>2. Soil & Water</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormStep(3)}
-                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                      formStep === 3 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
-                    }`}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${formStep === 3 ? 'bg-[#183D2E] text-white shadow-sm' : 'bg-[#FAF8F5] text-[#7A553A]'
+                      }`}
                   >
                     <span>3. Location & GPS</span>
                   </button>
@@ -684,11 +679,10 @@ export const FarmRegistrationPage: React.FC = () => {
                             key={type}
                             type="button"
                             onClick={() => setOwnershipType(type)}
-                            className={`min-h-[44px] py-2 px-3 rounded-xl text-xs font-bold border transition-all text-center ${
-                              ownershipType === type
-                                ? 'bg-[#183D2E] text-white border-[#183D2E] shadow-sm'
-                                : 'bg-[#FAF8F5] text-[#7A553A] border-[#7A553A]/20 hover:border-[#183D2E]'
-                            }`}
+                            className={`min-h-[44px] py-2 px-3 rounded-xl text-xs font-bold border transition-all text-center ${ownershipType === type
+                              ? 'bg-[#183D2E] text-white border-[#183D2E] shadow-sm'
+                              : 'bg-[#FAF8F5] text-[#7A553A] border-[#7A553A]/20 hover:border-[#183D2E]'
+                              }`}
                           >
                             {t(`farms.${type}_option`, { defaultValue: type.toUpperCase() })}
                           </button>
@@ -751,11 +745,10 @@ export const FarmRegistrationPage: React.FC = () => {
 
                         {ownershipType === 'mixed' && (
                           <div
-                            className={`text-[11px] font-semibold flex items-center justify-between p-2.5 rounded-xl ${
-                              isTenureValid()
-                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                                : 'bg-rose-100 text-rose-900 border border-rose-300'
-                            }`}
+                            className={`text-[11px] font-semibold flex items-center justify-between p-2.5 rounded-xl ${isTenureValid()
+                              ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                              : 'bg-rose-100 text-rose-900 border border-rose-300'
+                              }`}
                           >
                             <span>
                               Owned ({ownedArea} ac) + Leased ({leasedArea} ac) = {(ownedArea + leasedArea).toFixed(1)} ac
@@ -927,11 +920,10 @@ export const FarmRegistrationPage: React.FC = () => {
                           <label className="block text-xs font-bold text-[#183D2E]" htmlFor="farm-latitude-input">
                             {t('farms.latitude_label', { defaultValue: 'Latitude' })}
                           </label>
-                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
-                            precisionLevel === 'village'
-                              ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
-                              : 'text-[#7A553A] bg-amber-50 border border-amber-200'
-                          }`}>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${precisionLevel === 'village'
+                            ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
+                            : 'text-[#7A553A] bg-amber-50 border border-amber-200'
+                            }`}>
                             {precisionLevel}
                           </span>
                         </div>
@@ -949,13 +941,6 @@ export const FarmRegistrationPage: React.FC = () => {
                           <label className="block text-xs font-bold text-[#183D2E]" htmlFor="farm-longitude-input">
                             {t('farms.longitude_label', { defaultValue: 'Longitude' })}
                           </label>
-                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
-                            precisionLevel === 'village'
-                              ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
-                              : 'text-[#7A553A] bg-amber-50 border border-amber-200'
-                          }`}>
-                            {precisionLevel}
-                          </span>
                         </div>
                         <input
                           id="farm-longitude-input"
@@ -1035,11 +1020,10 @@ export const FarmRegistrationPage: React.FC = () => {
                 {farms.map((farm) => (
                   <div
                     key={farm.id}
-                    className={`rounded-2xl p-5 border transition-all space-y-3 ${
-                      farm.id === activeFarmId
-                        ? 'border-2 border-[#183D2E] bg-gradient-to-br from-[#FEF6E9]/40 to-white shadow-sm'
-                        : 'border-[#7A553A]/20 bg-[#FAF8F5] hover:border-[#183D2E]'
-                    }`}
+                    className={`rounded-2xl p-5 border transition-all space-y-3 ${farm.id === activeFarmId
+                      ? 'border-2 border-[#183D2E] bg-gradient-to-br from-[#FEF6E9]/40 to-white shadow-sm'
+                      : 'border-[#7A553A]/20 bg-[#FAF8F5] hover:border-[#183D2E]'
+                      }`}
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -1231,11 +1215,10 @@ export const FarmRegistrationPage: React.FC = () => {
                     <label className="block text-xs font-bold text-[#183D2E]">
                       {t('farms.latitude_label', { defaultValue: 'Latitude' })}
                     </label>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
-                      editPrecisionLevel === 'village'
-                        ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
-                        : 'text-[#7A553A] bg-amber-50 border border-amber-200'
-                    }`}>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${editPrecisionLevel === 'village'
+                      ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
+                      : 'text-[#7A553A] bg-amber-50 border border-amber-200'
+                      }`}>
                       {editPrecisionLevel}
                     </span>
                   </div>
@@ -1252,13 +1235,6 @@ export const FarmRegistrationPage: React.FC = () => {
                     <label className="block text-xs font-bold text-[#183D2E]">
                       {t('farms.longitude_label', { defaultValue: 'Longitude' })}
                     </label>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
-                      editPrecisionLevel === 'village'
-                        ? 'text-[#1B5E3B] bg-[#E8F5E9] border border-[#1B5E3B]/30'
-                        : 'text-[#7A553A] bg-amber-50 border border-amber-200'
-                    }`}>
-                      {editPrecisionLevel}
-                    </span>
                   </div>
                   <input
                     type="number"

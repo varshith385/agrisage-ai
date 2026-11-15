@@ -218,7 +218,7 @@ describe('Phase 5: State & District Cascading Dropdowns with Verified Coordinate
     expect(villageSelect.value).toBe('Wardhannapet');
 
     // Precision badge should display village
-    expect(screen.getAllByText('village').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('village')).toBeInTheDocument();
 
     // Change district to Khammam
     fireEvent.change(districtSelect, { target: { value: 'Khammam' } });
