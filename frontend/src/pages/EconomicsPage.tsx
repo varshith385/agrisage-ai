@@ -50,6 +50,7 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { MoneyProfitIllustration, CoinStackGauge, NoDataIllustration } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
+import { scrollToSection } from '../utils/scrollToSection';
 import { translateBackendString } from '../utils/safeTranslation';
 
 export const EconomicsPage: React.FC = () => {
@@ -652,7 +653,10 @@ export const EconomicsPage: React.FC = () => {
             <ReadAloudButton text={`Live Net Profit is ₹${Math.round(liveResult.net_profit).toLocaleString('en-IN')}. ${plainMeaning}`} />
             <button
               type="button"
-              onClick={() => setActiveTab('whatif')}
+              onClick={() => {
+                setActiveTab('whatif');
+                scrollToSection('economics-tabs-section');
+              }}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
               <span>{t('economics.simulate_what_if', { defaultValue: 'Simulate What-If' })}</span>
@@ -736,7 +740,7 @@ export const EconomicsPage: React.FC = () => {
       </div>
 
       {/* DETAIL TABS (Decluttering without deleting any feature or control) */}
-      <div className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+      <div id="economics-tabs-section" tabIndex={-1} className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden scroll-mt-24">
         {/* Tabs Bar */}
         <div className="flex border-b border-[#7A553A]/15 overflow-x-auto bg-[#FAF8F5]/80">
           <button

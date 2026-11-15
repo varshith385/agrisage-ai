@@ -38,6 +38,7 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { LeafScanIllustration, NoDataIllustration } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
+import { scrollToSection } from '../utils/scrollToSection';
 
 export const DiseasePage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -109,9 +110,7 @@ export const DiseasePage: React.FC = () => {
       if (data.reported_to_outbreak) {
         queryClient.invalidateQueries({ queryKey: ['diseaseHistory'] });
       }
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 150);
+      scrollToSection(resultsRef.current);
     },
     onError: (err: any) => {
       if (err.status === 422 && err.detailPayload?.borderline) {
@@ -470,7 +469,7 @@ export const DiseasePage: React.FC = () => {
 
       {/* LEAD SUMMARY SECTION (1 to 3 Large Result Cards if Result Exists) */}
       {result && result.success && (
-        <div ref={resultsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
+        <div ref={resultsRef} tabIndex={-1} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start scroll-mt-24">
           {/* Card 1: Diagnosis Condition & Confidence */}
           <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
             <div className="space-y-1.5">

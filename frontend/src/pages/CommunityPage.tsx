@@ -23,6 +23,7 @@ import { WhatThisMeans } from '../components/common/WhatThisMeans';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { scrollToSection } from '../utils/scrollToSection';
 
 export const CommunityPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -115,6 +116,7 @@ export const CommunityPage: React.FC = () => {
             onOpenDetails={() => {
               setMode('words');
               setActiveTab('machinery');
+              scrollToSection('community-tabs-section');
             }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -130,6 +132,7 @@ export const CommunityPage: React.FC = () => {
             onOpenDetails={() => {
               setMode('words');
               setActiveTab('requests');
+              scrollToSection('community-tabs-section');
             }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -145,6 +148,7 @@ export const CommunityPage: React.FC = () => {
             onOpenDetails={() => {
               setMode('words');
               setActiveTab('outbreak');
+              scrollToSection('community-tabs-section');
             }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
@@ -168,7 +172,10 @@ export const CommunityPage: React.FC = () => {
         actions={
           <button
             type="button"
-            onClick={() => setActiveTab('machinery')}
+            onClick={() => {
+              setActiveTab('machinery');
+              scrollToSection('community-tabs-section');
+            }}
             className="min-h-[48px] px-5 py-2.5 bg-[#183D2E] hover:bg-[#265C46] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2"
           >
             <Wrench className="w-4 h-4 text-[#DA9A4C]" />
@@ -230,7 +237,10 @@ export const CommunityPage: React.FC = () => {
             <ReadAloudButton text={`Community sharing network for ${villageName}. ${plainMeaning}`} />
             <button
               type="button"
-              onClick={() => setActiveTab('groups')}
+              onClick={() => {
+                setActiveTab('groups');
+                scrollToSection('community-tabs-section');
+              }}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
               <span>{t('community.view_groups', { defaultValue: 'View Groups' })}</span>
@@ -265,7 +275,10 @@ export const CommunityPage: React.FC = () => {
           <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">
             <button
               type="button"
-              onClick={() => setActiveTab('calculator')}
+              onClick={() => {
+                setActiveTab('calculator');
+                scrollToSection('community-tabs-section');
+              }}
               className="text-xs font-bold text-[#183D2E] hover:underline flex items-center gap-1"
             >
               <span>{t('community.open_split_calculator', { defaultValue: 'Open Split Calculator' })}</span>
@@ -295,7 +308,10 @@ export const CommunityPage: React.FC = () => {
           <div className="pt-2 border-t border-[#7A553A]/15 flex items-center justify-between">
             <button
               type="button"
-              onClick={() => setActiveTab('outbreak')}
+              onClick={() => {
+                setActiveTab('outbreak');
+                scrollToSection('community-tabs-section');
+              }}
               className="text-xs font-bold text-[#183D2E] hover:underline flex items-center gap-1"
             >
               <span>Open Outbreak Map</span>
@@ -306,7 +322,7 @@ export const CommunityPage: React.FC = () => {
       </div>
 
       {/* DETAIL TABS (Preserving all community tools and sections) */}
-      <div className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+      <div id="community-tabs-section" tabIndex={-1} className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden scroll-mt-24">
         {/* Main Page Navigation Tabs */}
         <div className="flex border-b border-[#7A553A]/15 overflow-x-auto bg-[#FAF8F5]/80">
           {[
@@ -345,7 +361,7 @@ export const CommunityPage: React.FC = () => {
         {/* Active Tab Content */}
         <div className="p-5 sm:p-6">
           {activeTab === 'groups' && <GroupsSection />}
-          {activeTab === 'requests' && <RequestsSection onOpenCalculator={() => setActiveTab('calculator')} />}
+          {activeTab === 'requests' && <RequestsSection onOpenCalculator={() => { setActiveTab('calculator'); scrollToSection('community-tabs-section'); }} />}
           {activeTab === 'calculator' && <CostSplitCalculator />}
           {activeTab === 'machinery' && <MachinerySection />}
           {activeTab === 'outbreak' && <OutbreakMapSection />}

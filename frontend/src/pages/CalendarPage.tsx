@@ -28,6 +28,7 @@ import { NoDataIllustration, LeafScanIllustration } from '../components/common/F
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { StepFlow } from '../components/common/StepFlow';
+import { scrollToSection } from '../utils/scrollToSection';
 
 export const CalendarPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -394,7 +395,10 @@ export const CalendarPage: React.FC = () => {
             <ReadAloudButton text={`Current Stage is ${activeStage?.stage_name_en || 'Active growth'}. ${plainMeaning}`} />
             <button
               type="button"
-              onClick={() => setActiveTab('stages')}
+              onClick={() => {
+                setActiveTab('stages');
+                scrollToSection('calendar-tabs-section');
+              }}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
               <span>{t('calendar.view_stages_btn', { defaultValue: 'View 7 Stages' })}</span>
@@ -466,7 +470,10 @@ export const CalendarPage: React.FC = () => {
             <span>{t('calendar.imd_agromet_guidelines', { defaultValue: 'IMD Agromet Guidelines' })}</span>
             <button
               type="button"
-              onClick={() => setActiveTab('season')}
+              onClick={() => {
+                setActiveTab('season');
+                scrollToSection('calendar-tabs-section');
+              }}
               className="font-bold text-[#183D2E] hover:underline"
             >
               Season Details →
@@ -476,7 +483,7 @@ export const CalendarPage: React.FC = () => {
       </div>
 
       {/* DETAIL TABS (Decluttering all calendar controls without deleting) */}
-      <div className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+      <div id="calendar-tabs-section" tabIndex={-1} className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden scroll-mt-24">
         {/* Tabs Bar */}
         <div className="flex border-b border-[#7A553A]/15 overflow-x-auto bg-[#FAF8F5]/80">
           <button

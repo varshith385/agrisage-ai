@@ -24,6 +24,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { ReadAloudButton } from '../components/common/ReadAloudButton';
 import { translateBackendString } from '../utils/safeTranslation';
+import { scrollToSection } from '../utils/scrollToSection';
 import {
   Reminder,
   ReminderSuggestion,
@@ -256,7 +257,10 @@ export const RemindersPage: React.FC = () => {
               status="good"
               statusWord={translateBackendString('Scheduled', language)}
               illustration={<Calendar className="w-16 h-16 text-emerald-600" />}
-              detailsLink="#tabs"
+              onOpenDetails={() => {
+                setActiveTab('upcoming');
+                scrollToSection('tabs');
+              }}
               detailsLabel={t('reminders.view_list_btn', { defaultValue: 'View List' })}
             />
             <PictorialTile
@@ -265,7 +269,10 @@ export const RemindersPage: React.FC = () => {
               status={overdueReminders.length > 0 ? 'attention' : 'good'}
               statusWord={overdueReminders.length > 0 ? (language === 'te' ? 'చర్య అవసరం' : language === 'hi' ? 'कार्रवाई आवश्यक' : 'Action Needed') : (language === 'te' ? 'సమయానికి నడుస్తోంది' : language === 'hi' ? 'समय पर' : 'On Schedule')}
               illustration={<AlertTriangle className="w-16 h-16 text-amber-600" />}
-              detailsLink="#tabs"
+              onOpenDetails={() => {
+                setActiveTab('overdue');
+                scrollToSection('tabs');
+              }}
               detailsLabel={t('reminders.resolve_btn', { defaultValue: 'Resolve' })}
             />
             <PictorialTile
@@ -274,7 +281,7 @@ export const RemindersPage: React.FC = () => {
               status="good"
               statusWord={translateBackendString('Ready', language)}
               illustration={<Sparkles className="w-16 h-16 text-sky-600" />}
-              detailsLink="#suggestions"
+              onOpenDetails={() => scrollToSection('suggestions')}
               detailsLabel={t('reminders.adopt_btn', { defaultValue: 'Adopt' })}
             />
           </div>
@@ -296,7 +303,7 @@ export const RemindersPage: React.FC = () => {
 
       {/* One-Tap Suggested Reminders Carousel / Grid */}
       {suggestions.length > 0 && (
-        <div id="suggestions" className="space-y-3">
+        <div id="suggestions" tabIndex={-1} className="space-y-3 scroll-mt-24">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Sparkles className="w-4 h-4 text-agri-green-600 dark:text-agri-green-400" />
@@ -350,7 +357,7 @@ export const RemindersPage: React.FC = () => {
       )}
 
       {/* Tabs & Active Reminders List */}
-      <div id="tabs" className="bg-white dark:bg-[#121A15] border border-stone-200 dark:border-stone-800 rounded-3xl p-4 sm:p-5 shadow-sm space-y-4">
+      <div id="tabs" tabIndex={-1} className="bg-white dark:bg-[#121A15] border border-stone-200 dark:border-stone-800 rounded-3xl p-4 sm:p-5 shadow-sm space-y-4 scroll-mt-24">
         {/* Tab Headers */}
         <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
           <div className="flex space-x-2 sm:space-x-3">

@@ -27,6 +27,7 @@ import { WateringFieldIllustration } from '../components/common/FarmerIllustrati
 import { PictorialTile } from '../components/common/PictorialTile';
 import { translateBackendString } from '../utils/safeTranslation';
 import { StepFlow } from '../components/common/StepFlow';
+import { scrollToSection } from '../utils/scrollToSection';
 import {
   getIndianStates,
   getDistrictsForState,
@@ -458,7 +459,10 @@ export const FarmRegistrationPage: React.FC = () => {
             <ReadAloudButton text={`Active farm is ${activeFarm ? activeFarm.name : name}. ${plainMeaning}`} />
             <button
               type="button"
-              onClick={() => setActiveTab('holdings')}
+              onClick={() => {
+                setActiveTab('holdings');
+                scrollToSection('farms-tabs-section');
+              }}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
               <span>View All Holdings ({farms.length})</span>
@@ -547,7 +551,10 @@ export const FarmRegistrationPage: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setActiveTab('register')}
+            onClick={() => {
+              setActiveTab('register');
+              scrollToSection('farms-tabs-section');
+            }}
             className="w-full min-h-[44px] py-2 px-3 rounded-xl border border-[#DA9A4C] bg-[#FEF6E9] hover:bg-[#FAF8F5] font-bold text-xs text-[#183D2E] flex items-center justify-center gap-2 transition-all shadow-sm"
           >
             <Plus className="w-4 h-4 text-[#DA9A4C]" />
@@ -557,7 +564,7 @@ export const FarmRegistrationPage: React.FC = () => {
       </div>
 
       {/* DETAIL TABS */}
-      <div className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+      <div id="farms-tabs-section" tabIndex={-1} className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden scroll-mt-24">
         <div className="flex border-b border-[#7A553A]/15 bg-[#FAF8F5] px-3 sm:px-6 overflow-x-auto scrollbar-none">
           <button
             type="button"

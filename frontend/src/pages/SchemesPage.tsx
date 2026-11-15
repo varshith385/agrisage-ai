@@ -38,6 +38,7 @@ import { WateringFieldIllustration } from '../components/common/FarmerIllustrati
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { scrollToSection } from '../utils/scrollToSection';
 
 // Quick test sample transcripts
 const SAMPLE_ENGLISH = `GOVERNMENT OF INDIA - MINISTRY OF AGRICULTURE & FARMERS WELFARE
@@ -318,7 +319,11 @@ export const SchemesPage: React.FC = () => {
             />
             <button
               type="button"
-              onClick={() => { setActiveTab('upload'); setMode('words'); }}
+              onClick={() => {
+                setActiveTab('upload');
+                setMode('words');
+                scrollToSection('soil-card-upload');
+              }}
               className="min-h-[56px] px-6 py-3 rounded-2xl font-bold bg-[#1B5E3B] text-white hover:bg-[#265C46] flex items-center gap-2 text-[18px] shadow-sm transition-all"
             >
               <span>{language === 'te' ? 'పూర్తి వివరాలు & క్యాలిబ్రేషన్' : language === 'hi' ? 'पूरा विवरण व कैलिब्रेशन' : 'View / Edit Card'}</span>
@@ -337,7 +342,11 @@ export const SchemesPage: React.FC = () => {
             status={hasCard ? 'success' : 'nodata'}
             statusWord={hasCard ? (language === 'te' ? 'ధృవీకరించబడింది' : language === 'hi' ? 'सत्यापित' : 'Confirmed') : (language === 'te' ? 'డేటా లేదు' : language === 'hi' ? 'डेटा नहीं' : 'Baseline / No Data')}
             spokenText={hasCard ? `Nitrogen is ${nitrogen} kg/ha, Phosphorus is ${phosphorus} kg/ha, Potassium is ${potassium} kg/ha.` : 'No lab soil test on file. Regional baseline estimates are being used.'}
-            onOpenDetails={() => { setActiveTab('upload'); setMode('words'); }}
+            onOpenDetails={() => {
+              setActiveTab('upload');
+              setMode('words');
+              scrollToSection('soil-card-upload');
+            }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
 
@@ -349,7 +358,11 @@ export const SchemesPage: React.FC = () => {
             status={hasCard ? 'info' : 'nodata'}
             statusWord={hasCard ? `pH ${ph || '7.2'}` : (language === 'te' ? 'అంచనా' : language === 'hi' ? 'अनुमानित' : 'Estimated')}
             spokenText={`Soil reaction is pH ${ph || '7.2'} and soil texture is ${soilTexture || 'sandy clay loam'}.`}
-            onOpenDetails={() => { setActiveTab('impact'); setMode('words'); }}
+            onOpenDetails={() => {
+              setActiveTab('impact');
+              setMode('words');
+              scrollToSection('soil-card-upload');
+            }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
 
@@ -361,7 +374,11 @@ export const SchemesPage: React.FC = () => {
             status="warning"
             statusWord={language === 'te' ? 'ధృవీకరించండి' : language === 'hi' ? 'सत्यापित करें' : 'details to verify'}
             spokenText="Welfare schemes directory is planned. Details require verification from local agriculture extension offices."
-            onOpenDetails={() => { setActiveTab('schemes'); setMode('words'); }}
+            onOpenDetails={() => {
+              setActiveTab('schemes');
+              setMode('words');
+              scrollToSection('soil-card-upload');
+            }}
             detailsLabel={language === 'te' ? 'వివరాలు' : language === 'hi' ? 'विवरण' : 'Details'}
           />
         </div>
@@ -469,7 +486,10 @@ export const SchemesPage: React.FC = () => {
             <ReadAloudButton text={`Soil status: Nitrogen ${nitrogen || 280}, Phosphorus ${phosphorus || 18}, Potassium ${potassium || 310}. ${plainMeaning}`} />
             <button
               type="button"
-              onClick={() => setActiveTab('upload')}
+              onClick={() => {
+                setActiveTab('upload');
+                scrollToSection('soil-card-upload');
+              }}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
               <span>{t('soilcard.calibrate_soil_btn', { defaultValue: 'Calibrate Soil' })}</span>
@@ -551,7 +571,10 @@ export const SchemesPage: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setActiveTab('schemes')}
+            onClick={() => {
+              setActiveTab('schemes');
+              scrollToSection('soil-card-upload');
+            }}
             className="w-full min-h-[44px] py-2 px-3 rounded-xl border border-[#7A553A]/25 bg-[#FAF8F5] hover:bg-stone-100 font-bold text-xs text-[#183D2E] flex items-center justify-center gap-2 transition-all shadow-sm"
           >
             <BookOpen className="w-4 h-4 text-[#7A553A]" />
@@ -561,7 +584,7 @@ export const SchemesPage: React.FC = () => {
       </div>
 
       {/* DETAIL TABS */}
-      <div id="soil-card-upload" className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+      <div id="soil-card-upload" tabIndex={-1} className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden scroll-mt-24">
         <div className="flex border-b border-[#7A553A]/15 bg-[#FAF8F5] px-3 sm:px-6 overflow-x-auto scrollbar-none">
           <button
             type="button"

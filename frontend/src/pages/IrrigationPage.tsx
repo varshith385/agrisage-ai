@@ -48,6 +48,7 @@ import {
 } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
+import { scrollToSection } from '../utils/scrollToSection';
 
 const SUPPORTED_CROPS = [
   'Cotton',
@@ -160,9 +161,7 @@ export const IrrigationPage: React.FC = () => {
 
   const handleComputeBudget = async () => {
     await refetchPlan();
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
+    scrollToSection(resultsRef.current);
   };
 
   // Diagnostic Assistant State
@@ -424,7 +423,7 @@ export const IrrigationPage: React.FC = () => {
       />
 
       {/* LEAD SUMMARY SECTION (1 to 3 Important Results as Large Cards + ONE clear CTA) */}
-      <div ref={resultsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
+      <div ref={resultsRef} tabIndex={-1} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start scroll-mt-24">
         {/* Card 1: Today's Watering Decision */}
         <div className="bg-gradient-to-br from-[#FEF6E9] via-[#FAF8F5] to-white rounded-2xl border-2 border-[#DA9A4C]/60 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-3.5">
           <div className="space-y-1.5">

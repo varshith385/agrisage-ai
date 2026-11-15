@@ -32,6 +32,7 @@ import {
 } from '../components/common/FarmerIllustrations';
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StepFlow } from '../components/common/StepFlow';
+import { scrollToSection } from '../utils/scrollToSection';
 import { useTranslation } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePictorial } from '../context/PictorialContext';
@@ -416,7 +417,10 @@ export const LocationWeatherPage: React.FC = () => {
               <ReadAloudButton text={`Weather for ${selectedVillage}: ${weatherData.temperature_c.toFixed(0)} degrees Celsius. ${plainMeaning}`} />
               <button
                 type="button"
-                onClick={() => setActiveTab('forecast')}
+                onClick={() => {
+                  setActiveTab('forecast');
+                  scrollToSection('weather-tabs-section');
+                }}
                 className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
               >
                 <span>{t('location.seven_day_outlook', { defaultValue: '7-Day Outlook' })}</span>
@@ -492,7 +496,10 @@ export const LocationWeatherPage: React.FC = () => {
               <span>{t('location.indicative_centroid', { defaultValue: 'Indicative village-level centroid.' })}</span>
               <button
                 type="button"
-                onClick={() => setActiveTab('location')}
+                onClick={() => {
+                  setActiveTab('location');
+                  scrollToSection('weather-tabs-section');
+                }}
                 className="text-xs font-bold text-[#183D2E] hover:underline"
               >
                 {t('location.change_village', { defaultValue: 'Change Village →' })}
@@ -503,7 +510,7 @@ export const LocationWeatherPage: React.FC = () => {
       )}
 
       {/* DETAIL TABS (Preserving all weather features and controls) */}
-      <div className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+      <div id="weather-tabs-section" tabIndex={-1} className="bg-white rounded-2xl border border-[#7A553A]/20 shadow-sm overflow-hidden scroll-mt-24">
         {/* Tabs Bar */}
         <div className="flex border-b border-[#7A553A]/15 overflow-x-auto bg-[#FAF8F5]/80">
           <button

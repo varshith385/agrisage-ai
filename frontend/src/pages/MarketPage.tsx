@@ -57,6 +57,7 @@ import { MoneyProfitIllustration, CoinStackGauge, NoDataIllustration } from '../
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { StepFlow } from '../components/common/StepFlow';
+import { scrollToSection } from '../utils/scrollToSection';
 
 export const MarketPage: React.FC = () => {
   const { t, language } = useTranslation();
@@ -472,7 +473,10 @@ export const MarketPage: React.FC = () => {
             <ReadAloudButton text={`Best mandi for ${selectedCrop} is ${bestMandi?.mandi || 'nearby APMC'}. ${plainMeaning}`} />
             <button
               type="button"
-              onClick={() => setActiveTab('mandi')}
+              onClick={() => {
+                setActiveTab('mandi');
+                scrollToSection('market-tabs-section');
+              }}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
               <span>{t('market.view_all_mandis', { defaultValue: 'View All Mandis' })}</span>
@@ -569,7 +573,7 @@ export const MarketPage: React.FC = () => {
       </div>
 
       {/* DETAIL TABS */}
-      <div className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden">
+      <div id="market-tabs-section" tabIndex={-1} className="bg-white rounded-3xl border border-[#7A553A]/20 shadow-sm overflow-hidden scroll-mt-24">
         <div className="flex border-b border-[#7A553A]/15 bg-[#FAF8F5] px-3 sm:px-6 overflow-x-auto scrollbar-none">
           <button
             type="button"

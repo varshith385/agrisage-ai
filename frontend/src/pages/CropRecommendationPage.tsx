@@ -38,6 +38,7 @@ import { EmptyPlotIllustration, NoDataIllustration, LeafScanIllustration } from 
 import { PictorialTile } from '../components/common/PictorialTile';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { ErrorState } from '../components/common/ErrorState';
+import { scrollToSection } from '../utils/scrollToSection';
 
 // Training envelope ranges from Kaggle 2,200 sample benchmark
 const TRAINING_RANGES = {
@@ -780,7 +781,10 @@ export const CropRecommendationPage: React.FC = () => {
             </span>
             <button
               type="button"
-              onClick={() => setActiveTab('candidates')}
+              onClick={() => {
+                setActiveTab('candidates');
+                scrollToSection('crop-candidates-section');
+              }}
               className="min-h-[44px] px-4 py-2 rounded-xl font-bold bg-[#183D2E] text-white hover:bg-[#265C46] flex items-center gap-1.5 transition-all text-xs shadow-sm"
             >
               <span>{t('recommend.see_top_3_btn', { defaultValue: 'See Top 3' })}</span>
@@ -883,7 +887,11 @@ export const CropRecommendationPage: React.FC = () => {
             <span>Model: {mlResult?.model_name || 'scikit-learn Multi-Crop'}</span>
             <button
               type="button"
-              onClick={() => setActiveTab('inputs')}
+              onClick={() => {
+                setActiveTab('inputs');
+                setHasUserEnteredSoil(true);
+                scrollToSection('crop-inputs-section', { focusFirstEmptyInput: true });
+              }}
               className="font-bold text-[#183D2E] hover:underline"
             >
               {language === 'te' ? 'ఇన్‌పుట్‌లు మార్చండి →' : language === 'hi' ? 'इनपुट बदलें →' : 'Adjust Inputs →'}
@@ -1057,7 +1065,7 @@ export const CropRecommendationPage: React.FC = () => {
         <div className="p-5 sm:p-6">
           {/* TAB 1: TOP CROPS */}
           {activeTab === 'candidates' && (
-            <div className="space-y-5">
+            <div id="crop-candidates-section" tabIndex={-1} className="space-y-5 scroll-mt-24">
               {isUnusual && (
                 <div className="p-4 bg-amber-50 rounded-xl border border-amber-300 text-xs text-amber-900 space-y-1">
                   <span className="font-bold block flex items-center gap-1.5">
@@ -1121,7 +1129,7 @@ export const CropRecommendationPage: React.FC = () => {
 
           {/* TAB 2: INPUTS */}
           {activeTab === 'inputs' && (
-            <div className="space-y-5">
+            <div id="crop-inputs-section" tabIndex={-1} className="space-y-5 scroll-mt-24">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#7A553A]/15 pb-3">
                 <h3 className="text-sm font-bold text-[#183D2E]">
                   Crop Suitability Parameters
