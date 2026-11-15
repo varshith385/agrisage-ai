@@ -703,7 +703,7 @@ In Round 8 Phases 4 and 5, full Gemini Vision Soil Health Card extraction, farm-
 | **recommend.soil_values_missing** | Soil values missing. Add them from your Soil Card for the best crop recommendation | నేల పరీక్ష వివరాలు లేవు. ఉత్తమ పంట సలహా కోసం మీ సాయిల్ హెల్త్ కార్డ్ నుండి జోడించండి | मृदा मान अनुपलब्ध हैं। सर्वोत्तम फसल सलाह के लिए अपने सॉइल कार्ड से जोड़ें | **NOT native-reviewed** |
 | **recommend.save_to_farm** | Save to farm | పొలానికి భద్రపరచండి | खेत में सहेजें | **NOT native-reviewed** |
 | **recommend.not_saved_notice** | Not saved to farm profile | పొలం ప్రొఫైల్‌లో ఇంకా భద్రపరచబడలేదు | खेत प्रोफाइल में सहेजा नहीं गया है | **NOT native-reviewed** |
-| **recommend.source_soil_card_tested** | Soil card, tested {{date}} | సాయిల్ కార్డ్, పరీక్షించిన తేదీ {{date}} | सॉइल कार्ड, परीक्षण तिथि {{date}} | **NOT native-reviewed** |
+| **recommend.source_soil_card_tested** | Soil card, tested {date} | సాయిల్ కార్డ్, పరీక్షించిన తేదీ {date} | सॉइल कार्ड, परीक्षण तिथि {date} | **NOT native-reviewed** |
 | **recommend.source_typed_farmer** | Typed by farmer | రైతు ద్వారా నమోదు చేయబడింది | किसान द्वारा दर्ज किया गया | **NOT native-reviewed** |
 
 

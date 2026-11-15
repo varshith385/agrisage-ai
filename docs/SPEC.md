@@ -420,8 +420,11 @@ erDiagram
 - `GET /season?lat={lat}&lon={lon}`: Returns current season (Kharif/Rabi/Zaid) context.
 
 ### Module 20: Soil Health Card (`/api/v1/soil-card`)
-- `POST /ocr`: Pluggable OCR endpoint extracting N, P, K, pH, EC, and OC from card image with per-field confidence.
-- `POST /confirm`: Commits confirmed soil values to farm profile.
+- `GET /engines`: Reports active and installed OCR engines (Gemini Vision `gemini_vision`, EasyOCR, Tesseract, Manual Entry).
+- `POST /ocr`: Pluggable OCR endpoint extracting N, P, K, pH, EC, OC, and test date using Gemini Vision or local OCR with per-field confidence.
+- `POST /confirm`: Commits confirmed soil values to farm profile with source attribution and ownership enforcement.
+- `GET /latest?farm_id={id}`: Retrieves latest confirmed soil card for active farm.
+- `DELETE /?farm_id={id}`: Deletes saved soil card values for active farm with ownership enforcement.
 
 ### Module 21: Voice (`/api/v1/voice`)
 - `POST /query`: Processes speech transcript or typed query in English, Telugu, or Hindi, returning spoken-length response and structured action link.
