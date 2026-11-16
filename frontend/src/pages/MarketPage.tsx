@@ -31,7 +31,6 @@ import { useAuth } from '../context/AuthContext';
 import { usePictorial } from '../context/PictorialContext';
 import {
   getNetRealizationRanking,
-  getMSPComparison,
   getPriceTrends,
   getNearbyWarehouses,
   getMarketplaceListings,
@@ -45,7 +44,6 @@ import {
 import {
   InquiryResponse,
   ListingResponse,
-  MSPComparisonResponse,
   NetRealizationRankingResponse,
   PriceTrendResponse,
   WarehouseResponse,
@@ -73,7 +71,6 @@ export const MarketPage: React.FC = () => {
   const [transportRate, setTransportRate] = useState<number>(2.50);
   const [marketFeePct, setMarketFeePct] = useState<number>(1.0);
   const [rankingData, setRankingData] = useState<NetRealizationRankingResponse | null>(null);
-  const [_mspData, setMspData] = useState<MSPComparisonResponse | null>(null);
   const [trendData, setTrendData] = useState<PriceTrendResponse | null>(null);
   const [warehouseData, setWarehouseData] = useState<WarehouseResponse | null>(null);
   const [mandiLoading, setMandiLoading] = useState<boolean>(false);
@@ -121,22 +118,17 @@ export const MarketPage: React.FC = () => {
   const loadMandiData = async () => {
     setMandiLoading(true);
     try {
-      const [rankingRes, mspRes, trendRes, whRes] = await Promise.all([
+      const [rankingRes, trendRes, whRes] = await Promise.all([
         getNetRealizationRanking({
           crop: selectedCrop,
           quantity: quantity,
           transport_rate: transportRate,
           market_fee_pct: marketFeePct,
         }),
-        getMSPComparison({
-          crop: selectedCrop,
-          expected_price: 7200.0,
-        }),
         getPriceTrends({ crop: selectedCrop }),
         getNearbyWarehouses({}),
       ]);
       setRankingData(rankingRes);
-      setMspData(mspRes);
       setTrendData(trendRes);
       setWarehouseData(whRes);
     } catch (err) {

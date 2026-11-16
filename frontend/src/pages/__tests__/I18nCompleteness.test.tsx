@@ -120,7 +120,6 @@ vi.mock('../../api/market', () => ({
     ],
     crop: 'Cotton',
   }),
-  getMSPComparison: vi.fn().mockResolvedValue(null),
   getPriceTrends: vi.fn().mockResolvedValue({ trends: [] }),
   getNearbyWarehouses: vi.fn().mockResolvedValue({ warehouses: [] }),
   getMarketplaceListings: vi.fn().mockResolvedValue([]),

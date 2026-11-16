@@ -317,7 +317,6 @@ vi.mock('../../api/market', () => ({
       },
     ],
   }),
-  getMSPComparison: vi.fn().mockResolvedValue({}),
   getPriceTrends: vi.fn().mockResolvedValue({
     trends: [],
     trend_direction: 'stable',
