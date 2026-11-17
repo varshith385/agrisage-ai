@@ -26,6 +26,7 @@ export async function apiRequest<T>(
   
   const headers = new Headers(options.headers || {});
   headers.set('Accept', 'application/json');
+  headers.set('ngrok-skip-browser-warning', 'true');
 
   if (options.body && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
