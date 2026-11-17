@@ -1,7 +1,11 @@
+from unittest.mock import MagicMock, patch
+
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from backend.app.config import settings
 from backend.app.database.session import SessionLocal
 from backend.app.main import app
 from backend.app.models.market import MarketplaceInquiry, MarketplaceListing
@@ -9,6 +13,8 @@ from backend.app.models.user import User, UserRole
 from backend.app.security.auth import create_access_token
 from backend.app.schemas.voice import VoiceQueryRequest
 from backend.app.services.market_service import (
+    DATA_GOV_USER_AGENT,
+    fetch_agmarknet_prices,
     haversine_distance,
     get_msp_comparison,
     get_net_realization_ranking,
@@ -429,3 +435,59 @@ async def test_voice_assistant_price_intent(db: Session):
     assert res_hi.intent == "price"
     assert "मंडी" in res_hi.spoken_text or "भाव" in res_hi.spoken_text
     assert res_hi.action_link == "/market"
+
+
+# -----------------------------------------------------------------------------
+# 6. Data.gov.in User-Agent Tests
+# -----------------------------------------------------------------------------
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_sends_custom_user_agent(monkeypatch):
+    """Verifies that fetch_agmarknet_prices sends the exact User-Agent header on httpx.AsyncClient."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Enumamula",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "2026-11-17",
+                "min_price": 7000,
+                "max_price": 7500,
+                "modal_price": 7250,
+            }
+        ]
+    }
+
+    captured_client_kwargs = {}
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            captured_client_kwargs.update(kwargs)
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+
+    # Verify custom User-Agent header on AsyncClient
+    headers = captured_client_kwargs.get("headers", {})
+    assert headers.get("User-Agent") == "Grow2Gain/1.0 (+https://github.com/varshith385/agrisage-ai)"
+    assert headers.get("User-Agent") == DATA_GOV_USER_AGENT
+    assert captured_client_kwargs.get("timeout") == 4.0
+    assert is_demo is False
+    assert len(records) == 1
+    assert records[0].modal_price == 7250.0
+    assert source == "AGMARKNET (api.data.gov.in / OGD India)"

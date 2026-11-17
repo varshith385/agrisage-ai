@@ -8,6 +8,8 @@ Tests:
 - Safe agricultural prescriptions: strictly zero chemical dosages or banned pesticides
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -235,6 +237,44 @@ def test_voice_api_market_price_notice(client, setup_voice_db):
     assert "mandi price" in data["spoken_text"].lower() or "enumamula" in data["spoken_text"].lower()
     assert data["action_link"] == "/market"
     assert data["structured_data"]["market_data_available"] is True
+
+
+def test_voice_price_reply_keeps_demo_tag_when_market_lookup_fails_with_api_key(client, setup_voice_db, monkeypatch):
+    """Verifies [DEMO DATA] is retained on market failure even if DATA_GOV_IN_API_KEY is configured."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "configured_secret_api_key_12345")
+
+    with patch("backend.app.services.voice_service.get_mandi_prices", side_effect=Exception("ReadTimeout / Connection error")):
+        headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+        payload = {"query": "What is the cotton mandi price today?", "language": "en"}
+        res = client.post("/api/v1/voice/query", json=payload, headers=headers)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["intent"] == "price"
+        assert "[DEMO DATA]" in data["spoken_text"]
+        assert data["status"] == "DEMO"
+        assert "7,180" in data["spoken_text"]
+        assert "Enumamula" in data["spoken_text"]
+
+
+def test_voice_price_reply_keeps_demo_tag_when_market_returns_no_prices_with_api_key(client, setup_voice_db, monkeypatch):
+    """Verifies [DEMO DATA] is retained when market returns empty prices even if DATA_GOV_IN_API_KEY is configured."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "configured_secret_api_key_12345")
+
+    mock_empty_mkt = MagicMock()
+    mock_empty_mkt.prices = []
+    mock_empty_mkt.demo = False
+
+    with patch("backend.app.services.voice_service.get_mandi_prices", return_value=mock_empty_mkt):
+        headers = {"Authorization": f"Bearer {setup_voice_db['token']}"}
+        payload = {"query": "What is the cotton mandi price today?", "language": "en"}
+        res = client.post("/api/v1/voice/query", json=payload, headers=headers)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["intent"] == "price"
+        assert "[DEMO DATA]" in data["spoken_text"]
+        assert data["status"] == "DEMO"
+        assert "7,180" in data["spoken_text"]
+        assert "Enumamula" in data["spoken_text"]
 
 
 # 4. No-Key LLM Fallback Test

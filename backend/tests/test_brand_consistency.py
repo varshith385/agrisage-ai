@@ -33,6 +33,7 @@ ALLOWED_INTERNAL_IDENTIFIERS = {
     "agrisage-command-palette-btn": "Internal DOM element id for shortcut trigger.",
     "agrisage:start-tour": "Internal browser CustomEvent name for dispatching the guided tour.",
     # 3. Internal repo / package / DB / logger identifiers:
+    "agrisage-ai": "GitHub repository slug in User-Agent header.",
     "agrisage-frontend": "Package.json npm package name (internal package descriptor).",
     "agrisage.db": "SQLite database file name on disk.",
     "agrisage.llm": "Python logging module hierarchy identifier.",

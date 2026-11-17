@@ -29,6 +29,9 @@ DEMO_WAREHOUSES_CSV = DATASETS_DIR / "demo" / "warehouses.csv"
 DEMO_HISTORICAL_CSV = DATASETS_DIR / "demo" / "historical_prices.csv"
 MSP_CSV = DATASETS_DIR / "msp.csv"
 
+# api.data.gov.in stalls requests using httpx default User-Agent; custom User-Agent ensures reliable responses.
+DATA_GOV_USER_AGENT = "Grow2Gain/1.0 (+https://github.com/varshith385/agrisage-ai)"
+
 # Known mandi coordinates for geocoding fallback
 MANDI_COORDINATES: Dict[str, Tuple[float, float]] = {
     "enumamula": (17.9943, 79.6200),
@@ -117,7 +120,7 @@ async def fetch_agmarknet_prices(
             params["filters[district]"] = district
 
         try:
-            async with httpx.AsyncClient(timeout=4.0) as client:
+            async with httpx.AsyncClient(timeout=4.0, headers={"User-Agent": DATA_GOV_USER_AGENT}) as client:
                 res = await client.get(url, params=params)
                 if res.status_code == 200:
                     data = res.json()

@@ -776,7 +776,7 @@ class VoiceAssistantService:
         min_price = 6850
         max_price = 7450
         mandi_name = "Enumamula (Warangal)"
-        is_demo = not bool(settings.DATA_GOV_IN_API_KEY)
+        is_demo = True
 
         if db:
             try:
