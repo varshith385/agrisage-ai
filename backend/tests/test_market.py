@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+import logging
 from unittest.mock import MagicMock, patch
 
 import httpx
@@ -13,7 +15,15 @@ from backend.app.models.user import User, UserRole
 from backend.app.security.auth import create_access_token
 from backend.app.schemas.voice import VoiceQueryRequest
 from backend.app.services.market_service import (
+    DATA_GOV_CONNECT_TIMEOUT,
+    DATA_GOV_READ_TIMEOUT,
+    DATA_GOV_TIMEOUT,
     DATA_GOV_USER_AGENT,
+    LIVE_MANDI_FAILURE_CACHE_TTL_SECONDS,
+    MAX_LIVE_AGE_DAYS,
+    _LIVE_MANDI_CACHE,
+    _LIVE_MANDI_FAILURE_CACHE,
+    clear_live_mandi_cache,
     fetch_agmarknet_prices,
     haversine_distance,
     get_msp_comparison,
@@ -22,6 +32,13 @@ from backend.app.services.market_service import (
     get_nearby_warehouses,
 )
 from backend.app.services.voice_service import VoiceAssistantService
+
+
+@pytest.fixture(autouse=True)
+def clean_live_mandi_cache():
+    clear_live_mandi_cache()
+    yield
+    clear_live_mandi_cache()
 
 
 @pytest.fixture
@@ -438,11 +455,11 @@ async def test_voice_assistant_price_intent(db: Session):
 
 
 # -----------------------------------------------------------------------------
-# 6. Data.gov.in User-Agent Tests
+# 6. Data.gov.in Live API, User-Agent, Timeout, Logging & Cache Tests
 # -----------------------------------------------------------------------------
 @pytest.mark.asyncio
-async def test_fetch_agmarknet_prices_sends_custom_user_agent(monkeypatch):
-    """Verifies that fetch_agmarknet_prices sends the exact User-Agent header on httpx.AsyncClient."""
+async def test_fetch_agmarknet_prices_sends_custom_user_agent_and_timeout(monkeypatch):
+    """Verifies that fetch_agmarknet_prices sends the custom User-Agent and configured timeouts."""
     monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
 
     mock_resp = MagicMock()
@@ -455,7 +472,7 @@ async def test_fetch_agmarknet_prices_sends_custom_user_agent(monkeypatch):
                 "state": "Telangana",
                 "commodity": "Cotton",
                 "variety": "FAQ",
-                "arrival_date": "2026-11-17",
+                "arrival_date": "17/11/2026",
                 "min_price": 7000,
                 "max_price": 7500,
                 "modal_price": 7250,
@@ -482,12 +499,873 @@ async def test_fetch_agmarknet_prices_sends_custom_user_agent(monkeypatch):
 
     records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
 
-    # Verify custom User-Agent header on AsyncClient
+    # Verify custom User-Agent header and Timeout on AsyncClient
     headers = captured_client_kwargs.get("headers", {})
     assert headers.get("User-Agent") == "Grow2Gain/1.0 (+https://github.com/varshith385/agrisage-ai)"
     assert headers.get("User-Agent") == DATA_GOV_USER_AGENT
-    assert captured_client_kwargs.get("timeout") == 4.0
+
+    timeout_arg = captured_client_kwargs.get("timeout")
+    assert timeout_arg == DATA_GOV_TIMEOUT
+    assert timeout_arg.read == 8.0
+    assert timeout_arg.connect == 4.0
+    assert DATA_GOV_CONNECT_TIMEOUT == 4.0
+    assert DATA_GOV_READ_TIMEOUT == 8.0
+
     assert is_demo is False
     assert len(records) == 1
     assert records[0].modal_price == 7250.0
+    assert records[0].arrival_date == "2026-11-17"
     assert source == "AGMARKNET (api.data.gov.in / OGD India)"
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_logs_reason_without_secrets_on_exception(monkeypatch, caplog):
+    """Verifies that exception logs only the exception class name without key, params, or URL, falling back to demo."""
+    dummy_key = "super_secret_test_api_key_12345"
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", dummy_key)
+
+    class FailingAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            raise httpx.ConnectTimeout("Connection timed out to external API")
+
+    monkeypatch.setattr(httpx, "AsyncClient", FailingAsyncClient)
+
+    with caplog.at_level(logging.WARNING):
+        records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+
+    # Must fall back honestly to demo data
+    assert is_demo is True
+    assert source == "Demo data (datasets/demo/mandi_prices.csv)"
+    assert len(records) > 0
+
+    # Verify log output: logs only exception class name, never the key, url, headers, or params
+    log_text = caplog.text
+    assert "AGMARKNET fallback: ConnectTimeout" in log_text
+    assert dummy_key not in log_text
+    assert "api-key" not in log_text
+    assert "filters[" not in log_text
+    assert "api.data.gov.in" not in log_text
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_logs_status_without_secrets_on_http_error(monkeypatch, caplog):
+    """Verifies that non-200 HTTP response logs status code without secrets and falls back to demo."""
+    dummy_key = "secret_key_http_error_test"
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", dummy_key)
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 503
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    with caplog.at_level(logging.WARNING):
+        records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+
+    assert is_demo is True
+    assert source == "Demo data (datasets/demo/mandi_prices.csv)"
+    log_text = caplog.text
+    assert "AGMARKNET fallback: HTTP 503" in log_text
+    assert dummy_key not in log_text
+    assert "api-key" not in log_text
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_filters_mismatched_commodity(monkeypatch, caplog):
+    """Verifies that mismatched commodities are dropped and falls through to demo if no matching records remain."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Enumamula",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "17/11/2026",
+                "min_price": 7000,
+                "max_price": 7500,
+                "modal_price": 7250,
+            },
+            {
+                "market": "Khammam",
+                "district": "Khammam",
+                "state": "Telangana",
+                "commodity": "Maize",
+                "variety": "Yellow",
+                "arrival_date": "17/11/2026",
+                "min_price": 2000,
+                "max_price": 2300,
+                "modal_price": 2150,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    # 1. Fetching Cotton keeps Cotton and drops Maize
+    records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo is False
+    assert len(records) == 1
+    assert records[0].commodity == "Cotton"
+
+    # 2. Fetching Potato when only Cotton and Maize returned drops all records and falls through to demo
+    clear_live_mandi_cache()
+    with caplog.at_level(logging.WARNING):
+        records_potato, is_demo_potato, source_potato = await fetch_agmarknet_prices(
+            "Potato", district="Warangal", state="Telangana"
+        )
+    assert is_demo_potato is True
+    assert source_potato == "Demo data (datasets/demo/mandi_prices.csv)"
+    assert "AGMARKNET fallback: no records" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_uses_mapped_crop_name(monkeypatch):
+    """Verifies that app crop names (e.g. Paddy (Dhan)) use mapped API commodity in filter and matching."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    captured_params = {}
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Enumamula",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Paddy(Common)",
+                "variety": "BPT 5204",
+                "arrival_date": "17/11/2026",
+                "min_price": 2200,
+                "max_price": 2400,
+                "modal_price": 2320,
+            },
+            {
+                "market": "Suryapet",
+                "district": "Suryapet",
+                "state": "Telangana",
+                "commodity": "Paddy(Fine/Superfine/Grade A)",
+                "variety": "Grade A",
+                "arrival_date": "16/11/2026",
+                "min_price": 2300,
+                "max_price": 2500,
+                "modal_price": 2420,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            captured_params.update(params or {})
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("Paddy (Dhan)", district="Warangal", state="Telangana")
+
+    # Mapped commodity was sent in API filter
+    assert captured_params.get("filters[commodity]") == "Paddy(Common)"
+    assert is_demo is False
+    # Both Paddy varieties are matched and kept
+    assert len(records) == 2
+    assert records[0].commodity == "Paddy(Common)"
+    assert records[1].commodity == "Paddy(Fine/Superfine/Grade A)"
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_in_memory_cache(monkeypatch):
+    """Verifies that second call within 15 minutes uses in-memory cache and makes only one HTTP call."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    http_call_count = 0
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Enumamula",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "17/11/2026",
+                "min_price": 7000,
+                "max_price": 7500,
+                "modal_price": 7250,
+            }
+        ]
+    }
+
+    class CountingAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            nonlocal http_call_count
+            http_call_count += 1
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", CountingAsyncClient)
+
+    # First call - triggers HTTP get
+    records1, is_demo1, source1 = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo1 is False
+    assert http_call_count == 1
+    assert len(records1) == 1
+
+    # Second call - within 15 minutes, returns cached result without making HTTP get
+    records2, is_demo2, source2 = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo2 is False
+    assert http_call_count == 1
+    assert len(records2) == 1
+    assert records2[0].modal_price == 7250.0
+
+    # Clearing cache forces next call to fetch via HTTP
+    clear_live_mandi_cache()
+    records3, is_demo3, source3 = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo3 is False
+    assert http_call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_demo_results_never_cached(monkeypatch):
+    """Verifies that demo fallback results are never stored in the live in-memory cache."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    class FailingAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            raise httpx.ConnectTimeout("Down")
+
+    monkeypatch.setattr(httpx, "AsyncClient", FailingAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo is True
+    assert source == "Demo data (datasets/demo/mandi_prices.csv)"
+
+    # Live cache must remain completely empty
+    assert len(_LIVE_MANDI_CACHE) == 0
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_dates_converted_and_sorted(monkeypatch):
+    """Verifies date conversion from DD/MM/YYYY to YYYY-MM-DD, newest-first sorting, and skipping bad date rows."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Mandi Older",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "12/11/2026",
+                "min_price": 6800,
+                "max_price": 7200,
+                "modal_price": 7000,
+            },
+            {
+                "market": "Mandi Newest",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "17/11/2026",
+                "min_price": 7100,
+                "max_price": 7600,
+                "modal_price": 7350,
+            },
+            {
+                "market": "Mandi Invalid Date",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "corrupted-date-string",
+                "min_price": 6500,
+                "max_price": 7000,
+                "modal_price": 6750,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo is False
+    # Bad row with corrupted-date-string is skipped; remaining 2 rows are kept and sorted newest-first
+    assert len(records) == 2
+
+    assert records[0].mandi == "Mandi Newest"
+    assert records[0].arrival_date == "2026-11-17"
+
+    assert records[1].mandi == "Mandi Older"
+    assert records[1].arrival_date == "2026-11-12"
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_rice_never_accepts_paddy(monkeypatch):
+    """Verifies that requesting Rice strictly matches Rice and never accepts Paddy commodities."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Enumamula",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Paddy(Common)",
+                "variety": "Common",
+                "arrival_date": "17/11/2026",
+                "min_price": 2200,
+                "max_price": 2400,
+                "modal_price": 2300,
+            },
+            {
+                "market": "Miryalaguda",
+                "district": "Nalgonda",
+                "state": "Telangana",
+                "commodity": "Rice",
+                "variety": "Sona Masuri",
+                "arrival_date": "17/11/2026",
+                "min_price": 3500,
+                "max_price": 3800,
+                "modal_price": 3650,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("Rice", district="Nalgonda", state="Telangana")
+    assert is_demo is False
+    assert len(records) == 1
+    assert records[0].commodity == "Rice"
+    assert records[0].mandi == "Miryalaguda"
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_chilli_dry_never_accepts_green_chilli(monkeypatch):
+    """Verifies that chilli (dry) accepts only Dry Chillies and never Green Chilli."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Warangal Mandi",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Green Chilli",
+                "variety": "Local",
+                "arrival_date": "17/11/2026",
+                "min_price": 3000,
+                "max_price": 3500,
+                "modal_price": 3200,
+            },
+            {
+                "market": "Khammam Mandi",
+                "district": "Khammam",
+                "state": "Telangana",
+                "commodity": "Dry Chillies",
+                "variety": "Teja",
+                "arrival_date": "17/11/2026",
+                "min_price": 18000,
+                "max_price": 21000,
+                "modal_price": 19500,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("chilli (dry)", district="Khammam", state="Telangana")
+    assert is_demo is False
+    assert len(records) == 1
+    assert records[0].commodity == "Dry Chillies"
+    assert records[0].modal_price == 19500
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_unmapped_crops_zero_http_calls_and_demo(monkeypatch, caplog):
+    """Verifies that unmapped or ambiguous crops (plain chilli, banana, groundnut) make zero HTTP calls and return demo."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    http_calls = 0
+
+    class NonCallingAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            nonlocal http_calls
+            http_calls += 1
+            raise AssertionError("HTTP call must not be made for unmapped crops!")
+
+    monkeypatch.setattr(httpx, "AsyncClient", NonCallingAsyncClient)
+
+    unmapped_crops = ["chilli", "banana", "groundnut", "dragonfruit", "papaya"]
+    for crop in unmapped_crops:
+        caplog.clear()
+        with caplog.at_level(logging.WARNING):
+            records, is_demo, source = await fetch_agmarknet_prices(crop, district="Warangal", state="Telangana")
+
+        assert is_demo is True
+        assert source == "Demo data (datasets/demo/mandi_prices.csv)"
+        assert len(records) > 0
+        assert "AGMARKNET skipped: crop not mapped" in caplog.text
+
+    assert http_calls == 0
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_loose_filter_response_keeps_only_allowed(monkeypatch):
+    """Verifies that loose API filter response mixing commodities keeps only the allowed ones."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Enumamula",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Dry Chillies",
+                "variety": "Guntur",
+                "arrival_date": "17/11/2026",
+                "min_price": 17000,
+                "max_price": 20000,
+                "modal_price": 18500,
+            },
+            {
+                "market": "Mandi 2",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Dry Fodder",
+                "variety": "Common",
+                "arrival_date": "17/11/2026",
+                "min_price": 500,
+                "max_price": 800,
+                "modal_price": 650,
+            },
+            {
+                "market": "Mandi 3",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Ginger(Dry)",
+                "variety": "Common",
+                "arrival_date": "17/11/2026",
+                "min_price": 12000,
+                "max_price": 15000,
+                "modal_price": 13500,
+            },
+            {
+                "market": "Mandi 4",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Peas(Dry)",
+                "variety": "Common",
+                "arrival_date": "17/11/2026",
+                "min_price": 4000,
+                "max_price": 5000,
+                "modal_price": 4500,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("dry chilli", district="Warangal", state="Telangana")
+    assert is_demo is False
+    assert len(records) == 1
+    assert records[0].commodity == "Dry Chillies"
+    assert records[0].modal_price == 18500
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_skips_bad_rows_without_losing_others(monkeypatch):
+    """Verifies that rows with missing arrival_date or non-numeric prices are skipped without losing valid rows."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Mandi Valid 1",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "17/11/2026",
+                "min_price": 7000,
+                "max_price": 7500,
+                "modal_price": 7250,
+            },
+            {
+                "market": "Mandi Bad Date 1",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": None,
+                "min_price": 6800,
+                "max_price": 7200,
+                "modal_price": 7000,
+            },
+            {
+                "market": "Mandi Bad Date 2",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "",
+                "min_price": 6800,
+                "max_price": 7200,
+                "modal_price": 7000,
+            },
+            {
+                "market": "Mandi Bad Price Non-Numeric",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "17/11/2026",
+                "min_price": "N/A",
+                "max_price": 7200,
+                "modal_price": 7000,
+            },
+            {
+                "market": "Mandi Bad Price Modal None",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "17/11/2026",
+                "min_price": 6800,
+                "max_price": 7200,
+                "modal_price": None,
+            },
+            {
+                "market": "Mandi Valid 2",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "16/11/2026",
+                "min_price": 6900,
+                "max_price": 7400,
+                "modal_price": 7150,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo is False
+    assert len(records) == 2
+    assert records[0].mandi == "Mandi Valid 1"
+    assert records[0].arrival_date == "2026-11-17"
+    assert records[1].mandi == "Mandi Valid 2"
+    assert records[1].arrival_date == "2026-11-16"
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_drops_old_records(monkeypatch, caplog):
+    """Verifies that records older than MAX_LIVE_AGE_DAYS (14 days) are dropped, and logs 'no recent records' if none remain."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    now = datetime.now(timezone.utc)
+    recent_date_str = (now - timedelta(days=3)).strftime("%d/%m/%Y")
+    old_date_str = (now - timedelta(days=20)).strftime("%d/%m/%Y")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Recent Mandi",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": recent_date_str,
+                "min_price": 7100,
+                "max_price": 7600,
+                "modal_price": 7350,
+            },
+            {
+                "market": "Old Mandi",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": old_date_str,
+                "min_price": 6800,
+                "max_price": 7200,
+                "modal_price": 7000,
+            },
+        ]
+    }
+
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            return mock_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    # 1. Recent record kept, old record dropped
+    records, is_demo, source = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo is False
+    assert len(records) == 1
+    assert records[0].mandi == "Recent Mandi"
+
+    # 2. When all records are older than MAX_LIVE_AGE_DAYS, none remain -> logs 'no recent records' and returns demo fallback
+    clear_live_mandi_cache()
+    mock_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Old Mandi Only",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": old_date_str,
+                "min_price": 6800,
+                "max_price": 7200,
+                "modal_price": 7000,
+            }
+        ]
+    }
+
+    with caplog.at_level(logging.WARNING):
+        records_old, is_demo_old, source_old = await fetch_agmarknet_prices(
+            "Cotton", district="Warangal", state="Telangana"
+        )
+    assert is_demo_old is True
+    assert source_old == "Demo data (datasets/demo/mandi_prices.csv)"
+    assert "AGMARKNET fallback: no recent records" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_fetch_agmarknet_prices_short_failure_cache_and_later_success(monkeypatch):
+    """Verifies failure is cached for 120s (preventing repeated 8s waits), and a later success is not blocked."""
+    monkeypatch.setattr(settings, "DATA_GOV_IN_API_KEY", "dummy_test_api_key")
+
+    http_call_count = 0
+    should_fail = True
+
+    mock_success_resp = MagicMock()
+    mock_success_resp.status_code = 200
+    mock_success_resp.json.return_value = {
+        "records": [
+            {
+                "market": "Enumamula",
+                "district": "Warangal",
+                "state": "Telangana",
+                "commodity": "Cotton",
+                "variety": "FAQ",
+                "arrival_date": "17/11/2026",
+                "min_price": 7000,
+                "max_price": 7500,
+                "modal_price": 7250,
+            }
+        ]
+    }
+
+    class FlakyAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def get(self, url, params=None, **kwargs):
+            nonlocal http_call_count
+            http_call_count += 1
+            if should_fail:
+                raise httpx.ReadTimeout("Simulated API timeout")
+            return mock_success_resp
+
+    monkeypatch.setattr(httpx, "AsyncClient", FlakyAsyncClient)
+
+    # Call 1: fails and stores failure in failure cache
+    records1, is_demo1, source1 = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo1 is True
+    assert source1 == "Demo data (datasets/demo/mandi_prices.csv)"
+    assert http_call_count == 1
+    cache_key = ("cotton", "warangal", "telangana")
+    assert cache_key in _LIVE_MANDI_FAILURE_CACHE
+
+    # Call 2: within 120 seconds, immediately goes to demo fallback WITHOUT making HTTP get
+    records2, is_demo2, source2 = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo2 is True
+    assert source2 == "Demo data (datasets/demo/mandi_prices.csv)"
+    assert http_call_count == 1  # No additional HTTP call made
+
+    # Call 3: after cache clear, when API recovers, HTTP call is made and later success is NOT blocked
+    clear_live_mandi_cache()
+    assert cache_key not in _LIVE_MANDI_FAILURE_CACHE
+
+    should_fail = False
+    records3, is_demo3, source3 = await fetch_agmarknet_prices("Cotton", district="Warangal", state="Telangana")
+    assert is_demo3 is False
+    assert source3 == "AGMARKNET (api.data.gov.in / OGD India)"
+    assert http_call_count == 2
+    assert len(records3) == 1
+    assert records3[0].modal_price == 7250
+    assert cache_key not in _LIVE_MANDI_FAILURE_CACHE
+    assert cache_key in _LIVE_MANDI_CACHE
+

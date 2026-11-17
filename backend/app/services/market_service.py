@@ -1,8 +1,9 @@
 import csv
+import logging
 import math
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import httpx
 from sqlalchemy.orm import Session
@@ -23,6 +24,8 @@ from backend.app.schemas.market import (
     WarehouseResponse,
 )
 
+logger = logging.getLogger(__name__)
+
 DATASETS_DIR = Path(__file__).resolve().parent.parent.parent.parent / "datasets"
 DEMO_PRICES_CSV = DATASETS_DIR / "demo" / "mandi_prices.csv"
 DEMO_WAREHOUSES_CSV = DATASETS_DIR / "demo" / "warehouses.csv"
@@ -31,6 +34,126 @@ MSP_CSV = DATASETS_DIR / "msp.csv"
 
 # api.data.gov.in stalls requests using httpx default User-Agent; custom User-Agent ensures reliable responses.
 DATA_GOV_USER_AGENT = "Grow2Gain/1.0 (+https://github.com/varshith385/agrisage-ai)"
+
+# HTTP timeout settings for api.data.gov.in: 8s read/pool timeout with 4s connect timeout.
+DATA_GOV_CONNECT_TIMEOUT = 4.0
+DATA_GOV_READ_TIMEOUT = 8.0
+DATA_GOV_TIMEOUT = httpx.Timeout(DATA_GOV_READ_TIMEOUT, connect=DATA_GOV_CONNECT_TIMEOUT)
+
+# Maximum age in days for live AGMARKNET mandi price records to be considered fresh.
+MAX_LIVE_AGE_DAYS = 14
+
+# In-memory cache for live AGMARKNET prices (15 min TTL)
+LIVE_MANDI_CACHE_TTL_SECONDS = 15 * 60
+_LIVE_MANDI_CACHE: Dict[Tuple[str, str, str], Tuple[List[MandiPriceRecord], datetime]] = {}
+
+# Short failure cache (120s TTL) to prevent repeated 8s timeouts on failed live calls
+LIVE_MANDI_FAILURE_CACHE_TTL_SECONDS = 120
+_LIVE_MANDI_FAILURE_CACHE: Dict[Tuple[str, str, str], datetime] = {}
+
+
+def clear_live_mandi_cache() -> None:
+    """Clears the in-memory live mandi price cache and failure cache (useful for tests)."""
+    _LIVE_MANDI_CACHE.clear()
+    _LIVE_MANDI_FAILURE_CACHE.clear()
+
+
+# Normalized mapping from app crop names to official api.data.gov.in commodity names
+APP_CROP_TO_API_COMMODITIES: Dict[str, Set[str]] = {
+    "cotton": {"Cotton"},
+    "maize": {"Maize"},
+    "corn": {"Maize"},
+    "corn (maize)": {"Maize"},
+    "onion": {"Onion"},
+    "potato": {"Potato"},
+    "tomato": {"Tomato"},
+    "brinjal": {"Brinjal"},
+    "cabbage": {"Cabbage"},
+    "cauliflower": {"Cauliflower"},
+    "carrot": {"Carrot"},
+    "green chilli": {"Green Chilli"},
+    "chilli (dry)": {"Dry Chillies"},
+    "dry chilli": {"Dry Chillies"},
+    "paddy": {"Paddy(Common)", "Paddy(Fine/Superfine/Grade A)"},
+    "paddy (dhan)": {"Paddy(Common)", "Paddy(Fine/Superfine/Grade A)"},
+    "rice": {"Rice"},
+    "wheat": {"Wheat"},
+    "soybean": {"Soyabean"},
+    "soyabean": {"Soyabean"},
+    "chickpea": {"Bengal Gram(Gram)(Whole)"},
+    "gram": {"Bengal Gram(Gram)(Whole)"},
+    "bengal gram": {"Bengal Gram(Gram)(Whole)"},
+    "red gram (tur)": {"Red gram/Arhar/Tur(whole)"},
+    "tur": {"Red gram/Arhar/Tur(whole)"},
+    "arhar": {"Red gram/Arhar/Tur(whole)"},
+    "bhindi": {"Bhindi(Ladies Finger)"},
+    "okra": {"Bhindi(Ladies Finger)"},
+    "ladies finger": {"Bhindi(Ladies Finger)"},
+}
+
+# Backward compatibility alias returning a primary commodity string
+APP_CROP_TO_API_COMMODITY: Dict[str, str] = {
+    k: sorted(v)[0] for k, v in APP_CROP_TO_API_COMMODITIES.items()
+}
+
+
+def _matches_commodity(
+    record_commodity: str,
+    allowed_commodities: Union[Set[str], str],
+    *args: Any,
+    **kwargs: Any,
+) -> bool:
+    """Checks whether record_commodity exactly matches any allowed commodity name (case-insensitive)."""
+    rec = record_commodity.strip().lower()
+    if isinstance(allowed_commodities, str):
+        allowed = APP_CROP_TO_API_COMMODITIES.get(
+            allowed_commodities.strip().lower(), {allowed_commodities}
+        )
+    else:
+        allowed = allowed_commodities
+    return rec in {c.strip().lower() for c in allowed}
+
+
+def _parse_arrival_date(raw_date: Any) -> Optional[datetime]:
+    """Parses arrival date string to UTC datetime. Returns None if missing or invalid."""
+    if not raw_date or not isinstance(raw_date, str):
+        return None
+    clean = raw_date.strip()
+    if not clean:
+        return None
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(clean, fmt).replace(tzinfo=timezone.utc)
+        except ValueError:
+            pass
+    return None
+
+
+def _parse_numeric_price(val: Any) -> Optional[float]:
+    """Parses numeric price value. Returns None if value is None, empty, non-numeric, or negative."""
+    if val is None or val == "":
+        return None
+    try:
+        p = float(val)
+        if math.isnan(p) or math.isinf(p) or p < 0:
+            return None
+        return p
+    except (ValueError, TypeError):
+        return None
+
+
+def _normalize_arrival_date(raw_date: Optional[str]) -> str:
+    """Converts DD/MM/YYYY date strings to ISO YYYY-MM-DD. Falls back to raw text on failure."""
+    dt = _parse_arrival_date(raw_date)
+    if dt:
+        return dt.strftime("%Y-%m-%d")
+    return str(raw_date) if raw_date is not None else datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def _parse_sort_date(date_str: Optional[str]) -> datetime:
+    """Parses date string for sorting newest first. Unparseable dates sort to end."""
+    dt = _parse_arrival_date(date_str)
+    return dt if dt is not None else datetime.min
 
 # Known mandi coordinates for geocoding fallback
 MANDI_COORDINATES: Dict[str, Tuple[float, float]] = {
@@ -97,76 +220,10 @@ def _load_demo_mandi_prices() -> List[MandiPriceRecord]:
     return records
 
 
-async def fetch_agmarknet_prices(
-    crop: str, district: Optional[str] = None, state: Optional[str] = None
+def _get_demo_fallback(
+    crop: str, district: Optional[str] = None
 ) -> Tuple[List[MandiPriceRecord], bool, str]:
-    """
-    Attempts to fetch live AGMARKNET mandi prices using DATA_GOV_IN_API_KEY.
-    Falls back gracefully to datasets/demo/mandi_prices.csv if key is missing or API call fails.
-    Returns: (records, is_demo, source_citation)
-    """
-    api_key = settings.DATA_GOV_IN_API_KEY.strip()
-    if api_key:
-        url = "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070"
-        params = {
-            "api-key": api_key,
-            "format": "json",
-            "limit": 50,
-            "filters[commodity]": crop,
-        }
-        if state:
-            params["filters[state]"] = state
-        if district:
-            params["filters[district]"] = district
-
-        try:
-            async with httpx.AsyncClient(timeout=4.0, headers={"User-Agent": DATA_GOV_USER_AGENT}) as client:
-                res = await client.get(url, params=params)
-                if res.status_code == 200:
-                    data = res.json()
-                    records_raw = data.get("records", [])
-                    if records_raw:
-                        live_records: List[MandiPriceRecord] = []
-                        for r in records_raw:
-                            mandi_name = r.get("market", "APMC Mandi")
-                            dist_name = r.get("district", district or "Unknown")
-                            st_name = r.get("state", state or "Telangana")
-                            comm_name = r.get("commodity", crop)
-                            var_name = r.get("variety", "FAQ")
-                            arr_date = r.get("arrival_date", datetime.now(timezone.utc).strftime("%Y-%m-%d"))
-
-                            # Resolve coordinates
-                            coords = (None, None)
-                            for k, v in MANDI_COORDINATES.items():
-                                if k in mandi_name.lower() or k in dist_name.lower():
-                                    coords = v
-                                    break
-
-                            live_records.append(
-                                MandiPriceRecord(
-                                    mandi=mandi_name,
-                                    district=dist_name,
-                                    state=st_name,
-                                    commodity=comm_name,
-                                    variety=var_name,
-                                    arrival_date=arr_date,
-                                    min_price=float(r.get("min_price", 0)),
-                                    max_price=float(r.get("max_price", 0)),
-                                    modal_price=float(r.get("modal_price", 0)),
-                                    latitude=coords[0],
-                                    longitude=coords[1],
-                                    is_demo=False,
-                                    source="AGMARKNET (api.data.gov.in / OGD India)",
-                                    last_verified=None,
-                                )
-                            )
-                        if live_records:
-                            return live_records, False, "AGMARKNET (api.data.gov.in / OGD India)"
-        except Exception:
-            # Fall back to demo dataset on any API failure
-            pass
-
-    # Demo fallback path
+    """Returns fallback demo records for the requested crop and optional district."""
     demo_records = _load_demo_mandi_prices()
     norm_crop = crop.strip().lower()
 
@@ -189,6 +246,144 @@ async def fetch_agmarknet_prices(
         True,
         "Demo data (datasets/demo/mandi_prices.csv)",
     )
+
+
+async def fetch_agmarknet_prices(
+    crop: str, district: Optional[str] = None, state: Optional[str] = None
+) -> Tuple[List[MandiPriceRecord], bool, str]:
+    """
+    Attempts to fetch live AGMARKNET mandi prices using DATA_GOV_IN_API_KEY.
+    Falls back gracefully to datasets/demo/mandi_prices.csv if key is missing, crop unmapped, or API call fails.
+    Returns: (records, is_demo, source_citation)
+    """
+    cache_key = (
+        crop.strip().lower(),
+        (district or "").strip().lower(),
+        (state or "").strip().lower(),
+    )
+    now = datetime.now(timezone.utc)
+    if cache_key in _LIVE_MANDI_CACHE:
+        cached_records, cached_time = _LIVE_MANDI_CACHE[cache_key]
+        if (now - cached_time).total_seconds() < LIVE_MANDI_CACHE_TTL_SECONDS:
+            return (
+                [r.model_copy() for r in cached_records],
+                False,
+                "AGMARKNET (api.data.gov.in / OGD India)",
+            )
+        else:
+            del _LIVE_MANDI_CACHE[cache_key]
+
+    norm_crop = crop.strip().lower()
+    allowed_commodities = APP_CROP_TO_API_COMMODITIES.get(norm_crop)
+    if not allowed_commodities:
+        logger.warning("AGMARKNET skipped: crop not mapped")
+        return _get_demo_fallback(crop, district)
+
+    # Short failure cache (120s TTL) check to avoid repeated 8s delays
+    if cache_key in _LIVE_MANDI_FAILURE_CACHE:
+        fail_time = _LIVE_MANDI_FAILURE_CACHE[cache_key]
+        if (now - fail_time).total_seconds() < LIVE_MANDI_FAILURE_CACHE_TTL_SECONDS:
+            return _get_demo_fallback(crop, district)
+        else:
+            del _LIVE_MANDI_FAILURE_CACHE[cache_key]
+
+    api_key = settings.DATA_GOV_IN_API_KEY.strip()
+    if api_key:
+        url = "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070"
+        filter_commodity = sorted(allowed_commodities)[0]
+        params = {
+            "api-key": api_key,
+            "format": "json",
+            "limit": 50,
+            "filters[commodity]": filter_commodity,
+        }
+        if state:
+            params["filters[state]"] = state
+        if district:
+            params["filters[district]"] = district
+
+        try:
+            async with httpx.AsyncClient(timeout=DATA_GOV_TIMEOUT, headers={"User-Agent": DATA_GOV_USER_AGENT}) as client:
+                res = await client.get(url, params=params)
+                if res.status_code == 200:
+                    data = res.json()
+                    records_raw = data.get("records", [])
+                    live_records: List[MandiPriceRecord] = []
+                    had_matching_records = False
+                    for r in records_raw:
+                        comm_name = r.get("commodity", "")
+                        if not _matches_commodity(comm_name, allowed_commodities):
+                            continue
+
+                        had_matching_records = True
+
+                        # Validate arrival date; skip bad row if missing or invalid
+                        parsed_dt = _parse_arrival_date(r.get("arrival_date"))
+                        if parsed_dt is None:
+                            continue
+
+                        # Validate numeric prices; skip bad row if non-numeric
+                        min_p = _parse_numeric_price(r.get("min_price"))
+                        max_p = _parse_numeric_price(r.get("max_price"))
+                        mod_p = _parse_numeric_price(r.get("modal_price"))
+                        if min_p is None or max_p is None or mod_p is None:
+                            continue
+
+                        # Discard records older than MAX_LIVE_AGE_DAYS
+                        age_days = (now.date() - parsed_dt.date()).days
+                        if age_days > MAX_LIVE_AGE_DAYS:
+                            continue
+
+                        mandi_name = r.get("market", "APMC Mandi")
+                        dist_name = r.get("district", district or "Unknown")
+                        st_name = r.get("state", state or "Telangana")
+                        var_name = r.get("variety", "FAQ")
+                        arr_date = parsed_dt.strftime("%Y-%m-%d")
+
+                        # Resolve coordinates
+                        coords = (None, None)
+                        for k, v in MANDI_COORDINATES.items():
+                            if k in mandi_name.lower() or k in dist_name.lower():
+                                coords = v
+                                break
+
+                        live_records.append(
+                            MandiPriceRecord(
+                                mandi=mandi_name,
+                                district=dist_name,
+                                state=st_name,
+                                commodity=comm_name,
+                                variety=var_name,
+                                arrival_date=arr_date,
+                                min_price=min_p,
+                                max_price=max_p,
+                                modal_price=mod_p,
+                                latitude=coords[0],
+                                longitude=coords[1],
+                                is_demo=False,
+                                source="AGMARKNET (api.data.gov.in / OGD India)",
+                                last_verified=None,
+                            )
+                        )
+                    if live_records:
+                        live_records.sort(key=lambda rec: _parse_sort_date(rec.arrival_date), reverse=True)
+                        _LIVE_MANDI_CACHE[cache_key] = (live_records, now)
+                        _LIVE_MANDI_FAILURE_CACHE.pop(cache_key, None)
+                        return live_records, False, "AGMARKNET (api.data.gov.in / OGD India)"
+                    else:
+                        if had_matching_records:
+                            logger.warning("AGMARKNET fallback: no recent records")
+                        else:
+                            logger.warning("AGMARKNET fallback: no records")
+                        _LIVE_MANDI_FAILURE_CACHE[cache_key] = now
+                else:
+                    logger.warning("AGMARKNET fallback: HTTP %s", res.status_code)
+                    _LIVE_MANDI_FAILURE_CACHE[cache_key] = now
+        except Exception as exc:
+            logger.warning("AGMARKNET fallback: %s", exc.__class__.__name__)
+            _LIVE_MANDI_FAILURE_CACHE[cache_key] = now
+
+    return _get_demo_fallback(crop, district)
 
 
 def cache_mandi_prices(records: List[MandiPriceRecord], db: Session) -> None:
